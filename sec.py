@@ -412,9 +412,9 @@ def SoubleSection(section, dist=0):
                          composite='notPlate', convert_type=convert_type)
 
 def AddPlateTB(section, plate):
-    '''add plate to Top and Botton of section, center of palate in x direction
+    '''add plate to Top and Bottom of section, center of palate in x direction
        is equal to center of section.
-       bf times to 2 beacuse section equal to I_STEEL_SECTION and b/t in I
+       bf times to 2 because section equal to I_STEEL_SECTION and b/t in I
        section equal to bf/(2*tf)'''
 
     _type = section.type
