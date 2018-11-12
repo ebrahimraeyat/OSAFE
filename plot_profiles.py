@@ -14,6 +14,7 @@ base_section_type = {'IPE': 'H', 'UNP': 'U', 'CPE': 'H'}
 LH, TH, LV, TV, LW, TW, DIST, ISTBPLATE, ISLRPLATE, ISWEBPLATE, USEAS, DUCTILITY, ISDOUBLE, \
 ISSOUBLE, SECTIONSIZE, SECTIONTYPE, CONVERT_TYPE = range(17)
 
+
 class PlotSectionAndEqSection(object):
 
     def __init__(self, section_prop, row=0):
@@ -35,6 +36,9 @@ class PlotSectionAndEqSection(object):
         doc = App.getDocument("current_section")
         group=doc.addObject("App::DocumentObjectGroup","Profiles_set")
         s1 = ArchProfile.makeProfile([0, sectionType, sectionType + '_000', baseSectionType ,bf, d, tw, tf])
+        gui = Gui.ActiveDocument
+        gui.getObject(s1.Label).LineColor = (1.0, 0.0, 0.0)
+        gui.getObject(s1.Label).DisplayMode = "Wireframe"
         obj = doc.getObjectsByLabel(s1.Label)[0]
         doc.recompute()
         if sectionType == 'UNP':
@@ -43,8 +47,8 @@ class PlotSectionAndEqSection(object):
         deltax = baseSection.bf + dist
         if self.section_prop[ISSOUBLE]:
             Draft.move(obj, App.Vector(deltax, 0, 0))
-            s2 = ArchProfile.makeProfile([0, sectionType, sectionType + '_000', baseSectionType ,bf, d, tw, tf])
-            s3 = Draft.rotate(obj, 180, center=App.Vector(0, 0, 0), copy=True)
+            s2 = Draft.move(obj, App.Vector(-deltax, 0, 0), copy=True)
+            s3 = Draft.move(obj, App.Vector(-2 * deltax, 0, 0), copy=True)
             group.addObjects([s2, s3])
 
         if self.section_prop[ISDOUBLE]:
@@ -58,6 +62,8 @@ class PlotSectionAndEqSection(object):
             width = self.section_prop[LH]
             height = self.section_prop[TH]
             plt = ArchProfile.makeProfile([0, 'PlateT', 'PlateT' + '_000', 'R' , width, height])
+            gui.getObject(plt.Label).LineColor = (0.0, 0.0, 1.0)
+            gui.getObject(plt.Label).DisplayMode = "Wireframe"
             Draft.move(doc.PlateT_000, p3)
             plb = Draft.rotate(doc.PlateT_000, 180, center=App.Vector(0, 0, 0), copy=True)
             group.addObjects([plt, plb])
@@ -68,6 +74,8 @@ class PlotSectionAndEqSection(object):
             x = obj.Shape.OuterWire.BoundBox.XMax + height / 2
             p5 = App.Vector(x, 0, 0)
             plr = ArchProfile.makeProfile([0, 'PlateR', 'PlateR' + '_000', 'R' , height, width])
+            gui.getObject(plr.Label).LineColor = (0.0, 1.0, 0.0)
+            gui.getObject(plr.Label).DisplayMode = "Wireframe"
             Draft.move(doc.PlateR_000, p5)
             pll = Draft.rotate(doc.PlateR_000, 180, center=App.Vector(0, 0, 0), copy=True)
             group.addObjects([plr, pll])
@@ -78,10 +86,12 @@ class PlotSectionAndEqSection(object):
             x = obj.Shape.BoundBox.Center.x + (obj.WebThickness.Value + height) / 2
             p6 = App.Vector(x, 0, 0)
             plwr = ArchProfile.makeProfile([0, 'PlateWR', 'PlateWR' + '_000', 'R' , height, width])
+            gui.getObject(plwr.Label).LineColor = (0.0, 1.0, 0.0)
+            gui.getObject(plwr.Label).DisplayMode = "Wireframe"
             Draft.move(doc.PlateWR_000, p6)
             plwl = Draft.rotate(doc.PlateWR_000, 180, center=App.Vector(0, 0, 0), copy=True)
             group.addObjects([plwr, plwl])
-            
+        
         doc.recompute()
 
 
