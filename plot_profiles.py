@@ -38,7 +38,7 @@ class PlotSectionAndEqSection(object):
         s1 = ArchProfile.makeProfile([0, sectionType, sectionType + '_000', baseSectionType ,bf, d, tw, tf])
         gui = Gui.ActiveDocument
         gui.getObject(s1.Label).LineColor = (1.0, 0.0, 0.0)
-        gui.getObject(s1.Label).DisplayMode = "Wireframe"
+        # gui.getObject(s1.Label).DisplayMode = "Wireframe"
         obj = doc.getObjectsByLabel(s1.Label)[0]
         doc.recompute()
         if sectionType == 'UNP':
@@ -63,7 +63,7 @@ class PlotSectionAndEqSection(object):
             height = self.section_prop[TH]
             plt = ArchProfile.makeProfile([0, 'PlateT', 'PlateT' + '_000', 'R' , width, height])
             gui.getObject(plt.Label).LineColor = (0.0, 0.0, 1.0)
-            gui.getObject(plt.Label).DisplayMode = "Wireframe"
+            # gui.getObject(plt.Label).DisplayMode = "Wireframe"
             Draft.move(doc.PlateT_000, p3)
             plb = Draft.rotate(doc.PlateT_000, 180, center=App.Vector(0, 0, 0), copy=True)
             group.addObjects([plt, plb])
@@ -75,7 +75,7 @@ class PlotSectionAndEqSection(object):
             p5 = App.Vector(x, 0, 0)
             plr = ArchProfile.makeProfile([0, 'PlateR', 'PlateR' + '_000', 'R' , height, width])
             gui.getObject(plr.Label).LineColor = (0.0, 1.0, 0.0)
-            gui.getObject(plr.Label).DisplayMode = "Wireframe"
+            # gui.getObject(plr.Label).DisplayMode = "Wireframe"
             Draft.move(doc.PlateR_000, p5)
             pll = Draft.rotate(doc.PlateR_000, 180, center=App.Vector(0, 0, 0), copy=True)
             group.addObjects([plr, pll])
@@ -87,11 +87,12 @@ class PlotSectionAndEqSection(object):
             p6 = App.Vector(x, 0, 0)
             plwr = ArchProfile.makeProfile([0, 'PlateWR', 'PlateWR' + '_000', 'R' , height, width])
             gui.getObject(plwr.Label).LineColor = (0.0, 1.0, 0.0)
-            gui.getObject(plwr.Label).DisplayMode = "Wireframe"
+            # gui.getObject(plwr.Label).DisplayMode = "Wireframe"
             Draft.move(doc.PlateWR_000, p6)
             plwl = Draft.rotate(doc.PlateWR_000, 180, center=App.Vector(0, 0, 0), copy=True)
             group.addObjects([plwr, plwl])
-        
+
+        Gui.runCommand("Std_DrawStyle",3) # Wireframe        
         doc.recompute()
 
 
