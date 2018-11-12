@@ -152,7 +152,7 @@ class Geom(object):
 
 	def shell_center_of_mass(self, shell):
 		'''
-		give a shell and return center of mass cordinate
+		give a shell and return center of mass coordinate
 		in (x, y, z)
 		'''
 		sorat_x = 0
