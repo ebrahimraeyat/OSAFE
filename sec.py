@@ -116,11 +116,12 @@ class Section(object):
                '\t<Z33>{:.0f}</Z33>\n'
                '\t<Z22>{:.0f}</Z22>\n'
                '\t<J>0</J>\n'
+               '\t<CW>{:.1f}</CW>\n'
                '  </{}>'
               ).format(secType, self.name, self.name, self.d_equivalentI, self.bf_equivalentI, self.tf_equivalentI,
                                        self.tw_equivalentI, self.area, self.ASy, self.ASx, self.Ix, self.Iy,
                                        self.Sx, self.Sx, self.Sy, self.Sy, self.Rx,
-                                       self.Ry, self.Zx, self.Zy, secType)
+                                       self.Ry, self.Zx, self.Zy, self.cw, secType)
         return s
 
     @staticmethod
