@@ -7,9 +7,9 @@ from PySide2.QtGui import *
 # from PyQt5.QtXml import *
 import re
 
-column_count = 22
+column_count = 23
 NAME, AREA, ASX, ASY, IX, IY, ZX, ZY, \
-Sx, Sy, RX, RY, CW, BF, TF, D, TW, XM, YM, V2, V3, SLENDER = range(column_count)
+Sx, Sy, RX, RY, CW, J, BF, TF, D, TW, XM, YM, V2, V3, SLENDER = range(column_count)
 
 LH, TH, LV, TV, LW, _TW, DIST, ISTBPLATE, ISLRPLATE, ISWEBPLATE, USEAS, DUCTILITY, ISDOUBLE, \
 ISSOUBLE, SECTIONSIZE, SECTIONTYPE, CONVERT_TYPE = range(17)
@@ -49,6 +49,7 @@ class Section(object):
         self.tw = kwargs['tw']
         self.r1 = kwargs['r1']
         self.cw = kwargs['cw']
+        self.J = kwargs['J']
         self.cc = cc
         self.composite = composite
         self.useAs = useAs
@@ -115,13 +116,13 @@ class Section(object):
                '\t<R22>{:.1f}</R22>\n'
                '\t<Z33>{:.0f}</Z33>\n'
                '\t<Z22>{:.0f}</Z22>\n'
-               '\t<J>0</J>\n'
+               '\t<J>{:.1f}</J>\n'
                '\t<CW>{:.1f}</CW>\n'
                '  </{}>'
               ).format(secType, self.name, self.name, self.d_equivalentI, self.bf_equivalentI, self.tf_equivalentI,
                                        self.tw_equivalentI, self.area, self.ASy, self.ASx, self.Ix, self.Iy,
                                        self.Sx, self.Sx, self.Sy, self.Sy, self.Rx,
-                                       self.Ry, self.Zx, self.Zy, self.cw, secType)
+                                       self.Ry, self.Zx, self.Zy, self.J, self.cw, secType)
         return s
 
     @staticmethod
@@ -377,7 +378,7 @@ def DoubleSection(section, dist=0):
         name = '2' + section.name + 'c{:.0f}'.format(cc / 10)
     return Section(_type=_type, name=name, area=area, xm=xm, ym=ym,
                          xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                         Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, isDouble=True, cc=cc,
+                         Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0, isDouble=True, cc=cc,
                          useAs=useAs, ductility=ductility, baseSection=baseSection,
                          composite='notPlate', convert_type=convert_type)
 
@@ -415,7 +416,7 @@ def SoubleSection(section, dist=0):
         name = '3' + section.name + 'c{:.0f}'.format(cc / 10)
     return Section(_type=_type, name=name, area=area, xm=xm, ym=ym,
                          xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                         Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=0, isDouble=False, isSouble=True, cc=cc,
+                         Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=0, J=0, isDouble=False, isSouble=True, cc=cc,
                          useAs=useAs, ductility=ductility, baseSection=baseSection,
                          composite='notPlate', convert_type=convert_type)
 
@@ -455,7 +456,7 @@ def AddPlateTB(section, plate):
     cw = section.cw + plate.Iy * (dp ** 2 / 2)
     return Section(_type=_type, name=name, area=area, xm=xm, ym=ym,
         xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy, Zx=Zx, Zy=Zy, bf=bf, tf=tf,
-        d=d, tw=tw, r1=r1, cw=cw, isDouble=isDouble, isSouble=isSouble, baseSection=baseSection, cc=cc,
+        d=d, tw=tw, r1=r1, cw=cw, J=0, isDouble=isDouble, isSouble=isSouble, baseSection=baseSection, cc=cc,
         useAs=useAs, TBPlate=plate, ductility=ductility, composite='TBPlate', convert_type=convert_type)
 
 
@@ -491,7 +492,7 @@ def AddPlateLR(section, plate):
     cw = section.cw + plate.Ix * (dp ** 2 / 2)
     return Section(_type=_type, name=name, area=area, xm=xm, ym=ym,
         xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy, Zx=Zx, Zy=Zy, bf=bf, tf=tf,
-        d=d, tw=tw, r1=r1, cw=cw, isDouble=isDouble, isSouble=isSouble, baseSection=baseSection, cc=cc,
+        d=d, tw=tw, r1=r1, cw=cw, J=0, isDouble=isDouble, isSouble=isSouble, baseSection=baseSection, cc=cc,
         useAs=useAs, TBPlate=TBPlate, LRPlate=plate,
         ductility=ductility, composite='LRPlate', convert_type=convert_type)
 
@@ -529,7 +530,7 @@ def AddPlateWeb(section, plate):
     cw = section.cw + plate.Ix * (dp ** 2 / 2)
     return Section(_type=_type, name=name, area=area, xm=xm, ym=ym,
         xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy, Zx=Zx, Zy=Zy, bf=bf, tf=tf,
-        d=d, tw=tw, r1=r1, cw=cw, isDouble=isDouble, isSouble=isSouble, baseSection=baseSection, cc=cc,
+        d=d, tw=tw, r1=r1, cw=cw, J=0, isDouble=isDouble, isSouble=isSouble, baseSection=baseSection, cc=cc,
         useAs=useAs, TBPlate=TBPlate, LRPlate=LRPlate, webPlate=plate,
         ductility=ductility, composite='LRPlate', convert_type=convert_type)
 
@@ -554,7 +555,7 @@ class Ipe(Section):
         cw = (tf * bf ** 3 / 12) * (df ** 2 / 2)
         super(Ipe, self).__init__(_type='IPE', name=name, area=area, xm=xm, ym=ym,
                                   xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw)
+                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0)
 
     @staticmethod
     def createStandardIpes():
@@ -583,7 +584,7 @@ class PG(Section):
 
         super(PG, self).__init__(_type='IPE', name=name, area=pg.area, xm=pg.xm, ym=pg.ym,
                                   xmax=pg.xmax, ymax=pg.ymax, ASy=ASy, ASx=ASx, Ix=pg.Ix, Iy=pg.Iy,
-                                  Zx=pg.Zx, Zy=pg.Zy, bf=bf, tf=tf, d=d, tw=tw, r1=0, cw=0)
+                                  Zx=pg.Zx, Zy=pg.Zy, bf=bf, tf=tf, d=d, tw=tw, r1=0, cw=0, J=0)
 
 
 
@@ -600,7 +601,7 @@ class Unp(Section):
         cw = (tf * bf ** 3 / 12) * (df ** 2 / 2)
         super(Unp, self).__init__(_type='UNP', name=name, area=area, xm=xm, ym=ym,
                                   xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw)
+                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0)
 
     @staticmethod
     def createStandardUnps():
@@ -634,7 +635,7 @@ class Cpe(Section):
         cw = (tf * bf ** 3 / 12) * (df ** 2 / 2)
         super(Cpe, self).__init__(_type='CPE', name=name, area=area, xm=xm, ym=ym,
                                   xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw)
+                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0)
 
     @staticmethod
     def createStandardCpes():
@@ -674,7 +675,7 @@ class Plate(Section):
         self.cc = 0
         super(Plate, self).__init__(_type='PLATE', name=name, area=area, xm=xm, ym=ym,
             xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-            Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=0, tw=0, r1=0, cw=0)
+            Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=0, tw=0, r1=0, cw=0, J=0)
 
 
 def createSection(sectionProp):
@@ -788,6 +789,8 @@ class SectionTableModel(QAbstractTableModel):
                 return '{0:.1f}'.format(section.Ry / 10.)
             elif column == CW:
                 return '{0:.0f}'.format(section.cw / 1e6)
+            elif column == J:
+                return '{0:.0f}'.format(section.J)
             #elif column == SLENDER:
                 #return '{0:.1f}'.format(section.slender))
             elif column == V2:
@@ -873,6 +876,8 @@ class SectionTableModel(QAbstractTableModel):
                 return "ry (cm)"
             elif section == CW:
                 return "cw (cm6)"
+            elif section == J:
+                return "J (mm4)"
             elif section == SLENDER:
                 return "Slender"
             elif section == V2:
@@ -925,6 +930,8 @@ class SectionTableModel(QAbstractTableModel):
                         section.tw_equivalentI = value
                     elif column == CW:
                         section.cw = value
+                    elif column == J:
+                        section.J = value
                     elif column == XM:
                         section.xm = value
                     elif column == YM:
