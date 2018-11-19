@@ -116,8 +116,8 @@ class Section(object):
                '\t<R22>{:.1f}</R22>\n'
                '\t<Z33>{:.0f}</Z33>\n'
                '\t<Z22>{:.0f}</Z22>\n'
-               '\t<J>{:.1f}</J>\n'
-               '\t<CW>{:.1f}</CW>\n'
+               '\t<J>{:.0f}</J>\n'
+               '\t<CW>{:.0f}</CW>\n'
                '  </{}>'
               ).format(secType, self.name, self.name, self.d_equivalentI, self.bf_equivalentI, self.tf_equivalentI,
                                        self.tw_equivalentI, self.area, self.ASy, self.ASx, self.Ix, self.Iy,
@@ -372,13 +372,15 @@ def DoubleSection(section, dist=0):
     if _type == 'UNP':
         dw = dist + 2 * bf - tw
     cw = 2 * baseSection.cw + (tw * hw ** 3 / 12) * dw ** 2 / 2
+    if dist > 0:
+        J = 2 * baseSection.J
     if dist == 0:
         name = '2' + section.name
     else:
         name = '2' + section.name + 'c{:.0f}'.format(cc / 10)
     return Section(_type=_type, name=name, area=area, xm=xm, ym=ym,
                          xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                         Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0, isDouble=True, cc=cc,
+                         Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=J, isDouble=True, cc=cc,
                          useAs=useAs, ductility=ductility, baseSection=baseSection,
                          composite='notPlate', convert_type=convert_type)
 
@@ -599,9 +601,10 @@ class Unp(Section):
         ASx = 5 / 3 * bf * tf
         df = d - tf
         cw = (tf * bf ** 3 / 12) * (df ** 2 / 2)
+        J = (2 * bf * tf ** 3 + (d - 2 * tf) * tw ** 3) / 3
         super(Unp, self).__init__(_type='UNP', name=name, area=area, xm=xm, ym=ym,
                                   xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0)
+                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=J)
 
     @staticmethod
     def createStandardUnps():
