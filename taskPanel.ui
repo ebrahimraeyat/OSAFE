@@ -440,7 +440,7 @@
         <string>Add</string>
        </property>
        <property name="icon">
-        <iconset resource="images/resource.qrc">
+        <iconset>
          <normaloff>:/general/add.png</normaloff>:/general/add.png</iconset>
        </property>
       </widget>
@@ -451,7 +451,18 @@
         <string>xml</string>
        </property>
        <property name="icon">
-        <iconset resource="images/resource.qrc">
+        <iconset>
+         <normaloff>:/sections/xml.png</normaloff>:/sections/xml.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="excel_button">
+       <property name="text">
+        <string>excel</string>
+       </property>
+       <property name="icon">
+        <iconset>
          <normaloff>:/sections/xml.png</normaloff>:/sections/xml.png</iconset>
        </property>
       </widget>

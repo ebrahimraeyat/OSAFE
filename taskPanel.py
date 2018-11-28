@@ -172,6 +172,7 @@ class SectionTaskPanel:
         # self.clear_all_Button.clicked.connect(self.clearSectionOne)
         # self.deleteSectionButton.clicked.connect(self.removeSection)
         self.form.saveToXml1Button.clicked.connect(self.saveToXml1)
+        self.form.excel_button.clicked.connect(self.save_to_excel)
         # self.save_to_autocad_Button.clicked.connect(self.save_to_autocad_script_format)
         # self.saveToFileButton.clicked.connect(self.export_to_dat)
         # self.load_from_dat_button.clicked.connect(self.load_from_dat)
@@ -398,6 +399,14 @@ class SectionTaskPanel:
         if not filename.endswith('xml'):
             filename += '.xml'
         sec.Section.exportXml(filename , self.model1.sections)
+
+    def save_to_excel(self):
+        filename = self.getFilename(['xlsx'])
+        if not filename:
+            return
+        if not filename.endswith('xlsx'):
+            filename += '.xlsx'
+        sec.Section.export_to_excel(filename , self.model1.sections)
 
     def getLastSaveDirectory(self, f):
         return os.sep.join(f.split(os.sep)[:-1])

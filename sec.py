@@ -6,6 +6,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 # from PyQt5.QtXml import *
 import re
+import pandas as pd
 
 column_count = 23
 NAME, AREA, ASX, ASY, IX, IY, ZX, ZY, \
@@ -163,6 +164,36 @@ class Section(object):
             except AttributeError:
                 pass
         return True, "Exported section properties to %s" % (QFileInfo(fname).fileName())
+
+    @staticmethod
+    def export_to_excel(fname, sections):
+        IPES = pd.DataFrame(columns=['TYPE', 'EDI_LABEL', 'LABEL', 'T_F', 'A', 'D', 'BF',  'TW', 
+                    'TF', 'KDES', 'KDET', 'IX', 'ZX', 'SX', 'RX', 'ASX', 'IY', 'ZY', 'SY',
+                    'RY', 'ASY', 'J', 'CW'], index=range(len(sections)))
+        IPES['TYPE'][:] = 'W'
+        for row, section in enumerate(sections):
+            IPES['EDI_LABEL'][row] = IPES['LABEL'][row] = section.name
+            IPES['T_F'][row] = ''
+            IPES['A'][row] = section.area
+            IPES['D'][row] = section.d_equivalentI
+            IPES['BF'][row] = section.bf_equivalentI
+            IPES['TW'][row] = section.tw_equivalentI
+            IPES['TF'][row] = section.tf_equivalentI
+            IPES['KDES'][row] = ''
+            IPES['KDET'][row] = ''
+            IPES['IX'][row] = section.Ix
+            IPES['ZX'][row] = section.Zx
+            IPES['SX'][row] = section.Sx
+            IPES['RX'][row] = section.Rx
+            IPES['ASX'][row] = section.ASx
+            IPES['IY'][row] = section.Iy
+            IPES['ZY'][row] = section.Zy
+            IPES['SY'][row] = section.Sy
+            IPES['RY'][row] = section.Ry
+            IPES['ASY'][row] = section.ASy
+            IPES['J'][row] = section.J
+            IPES['CW'][row] = section.cw
+        IPES.to_excel(fname, index=False)
 
     def equivalentSectionI(self):
 
