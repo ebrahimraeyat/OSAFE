@@ -169,10 +169,11 @@ class SectionTaskPanel:
         self.model1 = sec.SectionTableModel("section.dat")
         # self.ui.tableView1.setLayoutDirection(Qt.LeftToRight)
         self.form.tableView1.setModel(self.model1)
-        # self.clear_all_Button.clicked.connect(self.clearSectionOne)
+        self.form.clear_all_Button.clicked.connect(self.clear_sections)
         # self.deleteSectionButton.clicked.connect(self.removeSection)
         self.form.saveToXml1Button.clicked.connect(self.saveToXml1)
         self.form.excel_button.clicked.connect(self.save_to_excel)
+        self.form.remove_Button.clicked.connect(self.removeSection)
         # self.save_to_autocad_Button.clicked.connect(self.save_to_autocad_script_format)
         # self.saveToFileButton.clicked.connect(self.export_to_dat)
         # self.load_from_dat_button.clicked.connect(self.load_from_dat)
@@ -388,6 +389,34 @@ class SectionTaskPanel:
         if doc is None: return
         for obj in doc.Objects:
             doc.removeObject(obj.Name)
+
+    def removeSection(self):
+        index = self.form.tableView1.currentIndex()
+        if not index.isValid():
+            return
+        row = index.row()
+        name = self.model1.data(
+                        self.model1.index(row, sec.NAME))
+        if (QMessageBox.question(self.form, "sections - Remove",
+                f"Remove section {name}?",
+                QMessageBox.Yes|QMessageBox.No) ==
+                QMessageBox.No):
+            return
+
+        self.model1.removeRows(row)
+        self.resizeColumns(self.form.tableView1)
+
+    def clear_sections(self):
+        if self.model1.sections == []:
+            return
+        if (QMessageBox.question(self.form, "sections - Remove", "همه مقاطع حذف شوند؟",
+                QMessageBox.Yes|QMessageBox.No) == QMessageBox.No):
+            return
+        self.model1.beginResetModel()
+        self.model1.sections = []
+        self.model1.endResetModel()
+        self.model1.names = set()
+        # self.model1.dirty = False
 
     def saveToXml1(self):
         #if not self.model1.dirty:
