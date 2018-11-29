@@ -403,6 +403,7 @@ def DoubleSection(section, dist=0):
     if _type == 'UNP':
         dw = dist + 2 * bf - tw
     cw = 2 * baseSection.cw + (tw * hw ** 3 / 12) * dw ** 2 / 2
+    J = 0
     if dist > 0:
         J = 2 * baseSection.J
     if dist == 0:
@@ -586,10 +587,10 @@ class Ipe(Section):
         ASx = 5 / 3 * bf * tf
         df = d - tf
         cw = (tf * bf ** 3 / 12) * (df ** 2 / 2)
+        J = (2 * bf * tf ** 3 + (d - 2 * tf) * tw ** 3) / 3
         super(Ipe, self).__init__(_type='IPE', name=name, area=area, xm=xm, ym=ym,
                                   xmax=xmax, ymax=ymax, ASy=ASy, ASx=ASx, Ix=Ix, Iy=Iy,
-                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=0)
-
+                                  Zx=Zx, Zy=Zy, bf=bf, tf=tf, d=d, tw=tw, r1=r1, cw=cw, J=J)
     @staticmethod
     def createStandardIpes():
         IPE14 = Ipe("IPE14", 1640, 73, 140, 5410000, 449000, 88300, 19200, 6.9, 4.7, 7)
