@@ -4,12 +4,12 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-et-xmlfile==1.0.1         # via openpyxl
-jdcal==1.4                # via openpyxl
-numpy==1.15.4             # via pandas
-openpyxl==2.5.11
-pandas==0.23.4
-python-dateutil==2.7.5    # via pandas
-pytz==2018.7              # via pandas
-six==1.11.0               # via python-dateutil
-xlrd==1.1.0
+et-xmlfile>=1.0.1         # via openpyxl
+jdcal>=1.4                # via openpyxl
+numpy>=1.15.4             # via pandas
+openpyxl>=2.5.11
+pandas>=0.23.4
+python-dateutil>=2.7.5    # via pandas
+pytz>=2018.7              # via pandas
+six>=1.11.0               # via python-dateutil
+xlrd>=1.1.0
