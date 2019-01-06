@@ -14,6 +14,8 @@ class Geom(object):
 			self._safe = safe.Safe(filename)
 			self.solid_slabs = self._safe.solid_slabs
 			self.slab_prop_assignment = self._safe.slab_prop_assignment
+			self.load_combinations = self._safe.load_combinations
+			self.point_loads = self._safe.points_loads
 			self.removeSplitter = True
 
 	def create_vectors(self, points_prop=None):
@@ -139,7 +141,7 @@ class Geom(object):
 								if -.01 < vo.X -  vi.X < .01 and -.01 < vo.Y - vi.Y < .01 and -.01 < vo.Z - vi.Z < .01:
 									no_same_V = no_same_V + 1
 							if  no_same_V == len(fo.Vertexes):
-								intersection_faces.append(fo) 
+								intersection_faces.append(fo)
 		shell = Part.makeShell(intersection_faces)
 		Part.show(shell)
 		return shell
@@ -196,7 +198,7 @@ class Geom(object):
 			elif normal.y:
 				Ixx += A * (dy ** 2) # + dz ** 2)
 				Iyy += iyy + A * dx ** 2
-			Ixy += A * dx * dy	
+			Ixy += A * dx * dy
 		return Ixx, Iyy, Ixy
 
 	def get_shell_moment_of_inersias(self, shells):
@@ -260,7 +262,7 @@ class Geom(object):
 		y_axis_length = b.XLength * 1.2
 		x_grids_coord = -b.YLength * .1
 		y_grids_coord = b.XLength * 1
-		
+
 		for text, coord in x_grids.items():
 			ax = Arch.makeAxis(1)
 			ax.Distances = [coord]
@@ -318,7 +320,7 @@ class Geom(object):
 	def calculate_punch(self):
 		pass
 
-		
-      
+
+
 
 

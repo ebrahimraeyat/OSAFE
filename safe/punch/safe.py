@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 
 
-
 class Safe:
 	__bool = {'Yes': True, 'No': False}
 
@@ -13,13 +12,17 @@ class Safe:
 		self.access = None
 		self.read_file()
 		self.read_sheets_informations()
+		self.load_combinations = self.read_load_combinations()
+		self.points_loads = self.read_point_loads()
 
 	def __str__(self):
 		s = ''
 		if not self.version:
 			return s
 		s += f"{self.program_name} ver '{self.version}'\n"
-		s += f'Code : {self.concrete_code}'
+		s += f'Code : {self.concrete_code}\n'
+		s += f"No. of Columns = {len(self.points_loads['Point'].unique())}\n"
+		s += f"No. of Load Combinations = {len(self.load_combinations['Combo'].unique())}"
 		return s
 
 	def read_file(self):
@@ -98,7 +101,7 @@ class Safe:
 			if _id in stiff_areas:
 				stiff_prop[_id] = points
 			else:
-				areas_prop[_id] = points	
+				areas_prop[_id] = points
 		return areas_prop, stiff_prop
 
 	def point_loads(self):
@@ -173,6 +176,74 @@ class Safe:
 			ordinate = row['Ordinate']
 			grid_lines[_dir][_id] = ordinate
 		return grid_lines
+
+	def read_load_combinations(self):
+		df = self.excel['Load Combinations']
+		combos_sr = df[df['DSStrength'] == 'Yes']['Combo']
+		combos_df = df[df['Combo'].isin(combos_sr)]
+		return combos_df[['Combo','Load','SF']]
+
+	def read_point_loads(self):
+		df = self.excel['Load Assignments - Point Loads']
+		df['LoadPat'] = df['LoadPat'].str.rstrip('_ABOVE')
+		return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
+
+	def points_loads_combinations(self, combos_df, point_load_df):
+		points = point_load_df['Point'].unique()
+		combos_sr = combos_df['Combo'].unique()
+		points_combos_loads = pd.DataFrame(columns=['Point', 'Combo', 'Fgrav', 'Mx', 'My'])
+		index = 0
+		for p in points:
+		    point = (point_load_df[point_load_df['Point'] == p][['LoadPat','Fgrav', 'Mx', 'My']]
+		             .set_index('LoadPat')
+		            )
+		    for combo in combos_sr:
+		        udcon = (combos_df[combos_df['Combo'] == combo]
+		                 .set_index('Load')
+		                )
+		        load = list(point.mul(udcon['SF'], axis=0).sum())
+		        points_combos_loads.loc[index] = [p, combo] + load
+		        index += 1
+		return points_combos_loads
+
+	def calculate_punch(self, geom_prop):
+		App.Console.PrintMessage('ali_safe')
+		for _id, point_prop in geom_prop.obj_geom_point_loads.items():
+			bx = point_prop['xdim']
+			by = point_prop['ydim']
+			gamma_fx = 1 / (1 + (2/3) * sqrt(bx / by))
+			gamma_fy = 1 / (1 + (2/3) * sqrt(by / bx))
+			gamma_vx = 1 - gamma_fx
+			gamma_vy = 1 - gamma_fy
+			I22, I33, I23 = geom_prop.punch_areas_moment_inersia[_id]
+			b0d = geom_prop.punch_areas[key].Area
+			point = self.obj_geom_points[_id]
+			x1 = point.x
+			y1 = point.y
+			shell = geom_prop.punch_areas[_id]
+			x3, y3, _ = geom_prop.shell_center_of_mass(shell)
+			combos_load = self.load_combinations[self.load_combinations['Point'] == _id]
+			len_combos = len(combos_load)
+			ratio_df = pd.DataFrame(columns=['combo'])
+			col = 0
+			App.Console.PrintMessage(f"id = {_id}\nbx = {bx}\nby = {by}\ngamma_vx = {gamma_vx}\ngamma_vy = {gamma_vy}\n I22, I33, I23 = {I22, I33, I23}\n b0d = {b0d}\n x1, y1 = {x1, y1}\nx3, y3 = {x3, y3}\n")
+			# for f in shell.Faces:
+			# 	# ratio_df[col] = ""
+			# 	x4 = f.CenterOfMass.x
+			# 	y4 = f.CenterOfMass.y
+			# 	print(f"id = {_id}\nbx = {bx}\nby = {by}\ngamma_vx = {gamma_vx}\ngamma_vy = {gamma_vy}\n I22, I33, I23 = {I22, I33, I23}\n b0d = {b0d}\n x1, y1 = {x1, y1}\nx3, y3 = {x3, y3}\n x4, y4 = {x4, y4}\n")
+				# for i in range(len_combos):
+				# 	pass
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
 	safe = Safe("sattari_safe.xlsx")

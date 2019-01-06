@@ -11,7 +11,7 @@ from safe.punch import geom
 
 
 class PunchTaskPanel:
-    
+
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(os.path.splitext(__file__)[0] + ".ui")
         self.lastDirectory = ''
@@ -21,7 +21,7 @@ class PunchTaskPanel:
         # self.createWidgetsOne()
         self.create_connections()
         # self.updateSectionShape()
-    
+
     def create_connections(self):
         self.form.excel_button.clicked.connect(self.on_browse)
         self.form.excel_lineedit.textChanged.connect(self.update_shape)
@@ -39,6 +39,8 @@ class PunchTaskPanel:
     def update_shape(self):
         filename = self.form.excel_lineedit.text()
         self.shape = geom.Geom(filename)
+        combos = self.shape.load_combinations['Combo'].unique()
+        self.form.load_combination_box.addItems(list(combos))
         self.form.safe_prop_browser.setText(self.shape._safe.__str__())
         self.shape.plot()
         observer_instance = MyObserver(self.shape, self.form)
@@ -87,8 +89,8 @@ class MyObserver(object):
         html += f'Area={area}\n'
         html += f'location = {location}\n'
         self.form.info_browser.setText(html)
-       
+
 
 if __name__ == '__main__':
     panel = PunchTaskPanel()
-    
+

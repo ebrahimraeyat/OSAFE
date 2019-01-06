@@ -43,6 +43,20 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Load Combination</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="load_combination_box"/>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QTextBrowser" name="safe_prop_browser"/>
    </item>
    <item>
