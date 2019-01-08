@@ -14,6 +14,8 @@ class Safe:
 		self.read_sheets_informations()
 		self.load_combinations = self.read_load_combinations()
 		self.points_loads = self.read_point_loads()
+		self.points_loads_combinations = self.apply_loads_combinations_to_points(
+            	self.load_combinations, self.points_loads)
 
 	def __str__(self):
 		s = ''
@@ -188,7 +190,7 @@ class Safe:
 		df['LoadPat'] = df['LoadPat'].str.rstrip('_ABOVE')
 		return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
 
-	def points_loads_combinations(self, combos_df, point_load_df):
+	def apply_loads_combinations_to_points(self, combos_df, point_load_df):
 		points = point_load_df['Point'].unique()
 		combos_sr = combos_df['Combo'].unique()
 		points_combos_loads = pd.DataFrame(columns=['Point', 'Combo', 'Fgrav', 'Mx', 'My'])
@@ -205,45 +207,6 @@ class Safe:
 		        points_combos_loads.loc[index] = [p, combo] + load
 		        index += 1
 		return points_combos_loads
-
-	def calculate_punch(self, geom_prop):
-		App.Console.PrintMessage('ali_safe')
-		for _id, point_prop in geom_prop.obj_geom_point_loads.items():
-			bx = point_prop['xdim']
-			by = point_prop['ydim']
-			gamma_fx = 1 / (1 + (2/3) * sqrt(bx / by))
-			gamma_fy = 1 / (1 + (2/3) * sqrt(by / bx))
-			gamma_vx = 1 - gamma_fx
-			gamma_vy = 1 - gamma_fy
-			I22, I33, I23 = geom_prop.punch_areas_moment_inersia[_id]
-			b0d = geom_prop.punch_areas[key].Area
-			point = self.obj_geom_points[_id]
-			x1 = point.x
-			y1 = point.y
-			shell = geom_prop.punch_areas[_id]
-			x3, y3, _ = geom_prop.shell_center_of_mass(shell)
-			combos_load = self.load_combinations[self.load_combinations['Point'] == _id]
-			len_combos = len(combos_load)
-			ratio_df = pd.DataFrame(columns=['combo'])
-			col = 0
-			App.Console.PrintMessage(f"id = {_id}\nbx = {bx}\nby = {by}\ngamma_vx = {gamma_vx}\ngamma_vy = {gamma_vy}\n I22, I33, I23 = {I22, I33, I23}\n b0d = {b0d}\n x1, y1 = {x1, y1}\nx3, y3 = {x3, y3}\n")
-			# for f in shell.Faces:
-			# 	# ratio_df[col] = ""
-			# 	x4 = f.CenterOfMass.x
-			# 	y4 = f.CenterOfMass.y
-			# 	print(f"id = {_id}\nbx = {bx}\nby = {by}\ngamma_vx = {gamma_vx}\ngamma_vy = {gamma_vy}\n I22, I33, I23 = {I22, I33, I23}\n b0d = {b0d}\n x1, y1 = {x1, y1}\nx3, y3 = {x3, y3}\n x4, y4 = {x4, y4}\n")
-				# for i in range(len_combos):
-				# 	pass
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
 	safe = Safe("sattari_safe.xlsx")

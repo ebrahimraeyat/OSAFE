@@ -1,9 +1,10 @@
+from math import sqrt
 import Draft
 import Arch
 import Part
 import FreeCAD as App
 import FreeCADGui as Gui
-
+import pandas as pd
 from safe.punch import safe
 
 
@@ -318,9 +319,40 @@ class Geom(object):
 		Gui.activeDocument().activeView().viewAxonometric()
 
 	def calculate_punch(self):
-		pass
-
-
-
-
+		combos = self._safe.points_loads_combinations['Combo'].unique()
+		ratios_df = pd.DataFrame(index=combos)
+		prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
+		for _id, point_prop in self._safe.point_loads.items():
+			bx = point_prop['xdim']
+			by = point_prop['ydim']
+			gamma_fx = 1 / (1 + (2/3) * sqrt(bx / by))
+			gamma_fy = 1 / (1 + (2/3) * sqrt(by / bx))
+			gamma_vx = 1 - gamma_fx
+			gamma_vy = 1 - gamma_fy
+			I22, I33, I23 = self.punch_areas_moment_inersia[_id]
+			I23 = 0
+			shell = self.punch_areas[_id]
+			b0d = shell.Area
+			point = self._safe.obj_geom_points[_id]
+			x1, y1 = point.x, point.y
+			prop_df[_id] = [I22, I33, I23, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
+			x3, y3, _ = self.shell_center_of_mass(shell)
+			combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
+			combos_load.set_index('Combo', inplace=True)
+			ratio = pd.DataFrame(index=combos)
+			for col, f in enumerate(shell.Faces):
+				x4 = f.CenterOfMass.x
+				y4 = f.CenterOfMass.y
+				ratio[col] = ""
+				for combo in combos:
+					_, vu, mx, my = list(combos_load.loc[combo])
+					Vu = vu / b0d + (gamma_vx*(mx - vu*(y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - (gamma_vy*(my - vu*(x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
+					Vu *= 1000
+					ratio.at[combo, col] = Vu / 1.37
+			ratios_df[_id] = ratio.max(axis=1)
+		ratios_df.loc['Max'] = ratios_df.max()
+		ratios_df = (ratios_df.applymap("{0:.2f}".format)
+		             .astype(float))
+		ratios_df.loc['Combo'] = ratios_df.idxmax()
+		return ratios_df
 

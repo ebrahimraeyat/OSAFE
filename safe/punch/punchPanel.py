@@ -26,6 +26,7 @@ class PunchTaskPanel:
         self.form.excel_button.clicked.connect(self.on_browse)
         self.form.excel_lineedit.textChanged.connect(self.update_shape)
         self.form.calculate_punch_button.clicked.connect(self.calculate_punch)
+        self.form.export_excel_button.clicked.connect(self.export_to_excel)
 
     def clearAll(self):
         doc = App.getDocument("punch")
@@ -43,17 +44,29 @@ class PunchTaskPanel:
         self.form.load_combination_box.addItems(list(combos))
         self.form.safe_prop_browser.setText(self.shape._safe.__str__())
         self.shape.plot()
+        self.form.calculate_punch_button.setEnabled(True)
         observer_instance = MyObserver(self.shape, self.form)
         Gui.Selection.addObserver(observer_instance)
 
     def calculate_punch(self):
-        self.shape.calculate_punch()
+        self.ratios_df = self.shape.calculate_punch()
+        self.form.export_excel_button.setEnabled(True)
 
     def on_browse(self):
         filename = self.getFilename(['xls', 'xlsx'])
         if not filename:
             return
         self.form.excel_lineedit.setText(filename)
+
+    def export_to_excel(self):
+        filters = "xlsx(*.xlsx)"
+        filename, _ = QFileDialog.getSaveFileName(self.form , 'select file',
+                                               self.lastDirectory, filters)
+        if not filename:
+            return
+        if not filename.endswith("xls", 0, 3):
+            filename += ".xlsx"
+        self.ratios_df.to_excel(filename)
 
     def getLastSaveDirectory(self, f):
         return os.sep.join(f.split(os.sep)[:-1])
@@ -62,7 +75,7 @@ class PunchTaskPanel:
         filters = ''
         for prefix in prefixes:
             filters += "{}(*.{})".format(prefix, prefix)
-        filename, _ = QFileDialog.getOpenFileName(self.form , 'خروجی',
+        filename, _ = QFileDialog.getOpenFileName(self.form , 'select file',
                                                self.lastDirectory, filters)
 
         if not filename:
