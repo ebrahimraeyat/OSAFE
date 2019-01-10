@@ -254,6 +254,12 @@ class Geom(object):
 		else:
 			return 'Center'
 
+	def loacation_of_columns(self):
+		locations = {}
+		for key, value in self.punch_areas.items():
+			locations[key] = self.location_of_column(value)
+		return locations
+
 	def grid_lines(self):
 		gridLines = self._safe.grid_lines()
 		x_grids = gridLines['x']
@@ -293,7 +299,7 @@ class Geom(object):
 		html = ''
 		I22, I33, I23 = self.punch_areas_moment_inersia[key]
 		area = self.punch_areas[key].Area
-		location = self.location_of_column(self.punch_areas[key])
+		location = self.locations[key]
 		html += f'I22={I22} \nI33={I33}\n'
 		html += f'Area={area}\n'
 		html += f'location = {location}\n'
@@ -314,6 +320,7 @@ class Geom(object):
 		self.punch_areas = self.get_punch_areas(self.foundation, self.offset_structures)
 		self.punch_areas_moment_inersia = self.get_shell_moment_of_inersias(self.punch_areas)
 		self.grid_lines()
+		self.locations = self.loacation_of_columns()
 		doc.recompute()
 		Gui.SendMsgToActiveView("ViewFit")
 		Gui.activeDocument().activeView().viewAxonometric()
