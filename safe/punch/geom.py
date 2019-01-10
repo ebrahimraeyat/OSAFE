@@ -325,6 +325,8 @@ class Geom(object):
 		for _id, point_prop in self._safe.point_loads.items():
 			bx = point_prop['xdim']
 			by = point_prop['ydim']
+			if (bx == 0 or by == 0):
+				continue
 			gamma_fx = 1 / (1 + (2/3) * sqrt(bx / by))
 			gamma_fy = 1 / (1 + (2/3) * sqrt(by / bx))
 			gamma_vx = 1 - gamma_fx

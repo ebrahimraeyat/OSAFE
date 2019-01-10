@@ -89,6 +89,8 @@ class Safe:
 		stiff_prop = {}
 		all_areas = []
 		for _, row in obj_geom_areas.iterrows():
+			if row['AreaType'] == 'Wall':
+				continue
 			_id = row['Area']
 			if not _id in all_areas:
 				all_areas.append(_id)
