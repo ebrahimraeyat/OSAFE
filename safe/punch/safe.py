@@ -16,6 +16,7 @@ class Safe:
 		self.points_loads = self.read_point_loads()
 		self.points_loads_combinations = self.apply_loads_combinations_to_points(
             	self.load_combinations, self.points_loads)
+		self.combos = self.points_loads_combinations['Combo'].unique()
 
 	def __str__(self):
 		s = ''
@@ -44,6 +45,7 @@ class Safe:
 		self.obj_geom_stiff = all_areas[1]
 		self.point_loads = self.point_loads()
 		self.concrete_mat = self.concrete_mat()
+		self.fc = min(self.concrete_mat.values()) * 1000
 
 	def program_control(self):
 		if self.excel is not None:

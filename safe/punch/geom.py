@@ -6,6 +6,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import pandas as pd
 from safe.punch import safe
+from safe.punch.allowableStress import allowable_stress
 
 
 class Geom(object):
@@ -252,7 +253,7 @@ class Geom(object):
 			else:
 				return 'Edge'
 		else:
-			return 'Center'
+			return 'Center_'
 
 	def loacation_of_columns(self):
 		locations = {}
@@ -325,43 +326,71 @@ class Geom(object):
 		Gui.SendMsgToActiveView("ViewFit")
 		Gui.activeDocument().activeView().viewAxonometric()
 
-	def calculate_punch(self):
-		combos = self._safe.points_loads_combinations['Combo'].unique()
-		ratios_df = pd.DataFrame(index=combos)
-		prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
+	def ultimate_shear_stress(self):
+		combos = self._safe.combos
+		Vus_df = pd.DataFrame(index=combos)
+		prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'location', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
 		for _id, point_prop in self._safe.point_loads.items():
 			bx = point_prop['xdim']
 			by = point_prop['ydim']
 			if (bx == 0 or by == 0):
 				continue
+			location = self.locations[_id]
+			location = location.lower()[:-1]
 			gamma_fx = 1 / (1 + (2/3) * sqrt(bx / by))
 			gamma_fy = 1 / (1 + (2/3) * sqrt(by / bx))
 			gamma_vx = 1 - gamma_fx
 			gamma_vy = 1 - gamma_fy
 			I22, I33, I23 = self.punch_areas_moment_inersia[_id]
-			I23 = 0
+			if 'Corner' in location: I23 = 0
 			shell = self.punch_areas[_id]
 			b0d = shell.Area
 			point = self._safe.obj_geom_points[_id]
 			x1, y1 = point.x, point.y
-			prop_df[_id] = [I22, I33, I23, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
+			prop_df[_id] = [I22, I33, I23, self.locations[_id], b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
 			x3, y3, _ = self.shell_center_of_mass(shell)
 			combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
 			combos_load.set_index('Combo', inplace=True)
-			ratio = pd.DataFrame(index=combos)
+			Vu_df = pd.DataFrame(index=combos)
 			for col, f in enumerate(shell.Faces):
 				x4 = f.CenterOfMass.x
 				y4 = f.CenterOfMass.y
-				ratio[col] = ""
+				Vu_df[col] = ""
 				for combo in combos:
 					_, vu, mx, my = list(combos_load.loc[combo])
 					Vu = vu / b0d + (gamma_vx*(mx - vu*(y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - (gamma_vy*(my - vu*(x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
 					Vu *= 1000
-					ratio.at[combo, col] = Vu / 1.37
-			ratios_df[_id] = ratio.max(axis=1)
-		ratios_df.loc['Max'] = ratios_df.max()
-		ratios_df = (ratios_df.applymap("{0:.2f}".format)
-		             .astype(float))
-		ratios_df.loc['Combo'] = ratios_df.idxmax()
-		return ratios_df
+					Vu_df.at[combo, col] = Vu
+			Vus_df[_id] = Vu_df.max(axis=1)
+		Vus_df.loc['Max'] = Vus_df.max()
+		# Vus_df = (Vus_df.applymap("{0:.2f}".format)
+		#              .astype(float))
+		return Vus_df, prop_df
+
+	def allowable_shear_stress(self, fc=None):
+		fc = self._safe.fc
+		Vc_allowable = pd.Series(index=list(self._safe.point_loads.keys()))
+		for _id, point_prop in self._safe.point_loads.items():
+			bx = point_prop['xdim']
+			by = point_prop['ydim']
+			if (bx == 0 or by == 0):
+				continue
+			location = self.locations[_id]
+			location = location.lower()[:-1]
+			shell = self.punch_areas[_id]
+			b0d = shell.Area
+			Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0d)
+		return Vc_allowable
+
+	def punch_ratios(self):
+		Vus_df, prop_df = self.ultimate_shear_stress()
+		Vcs_series = self.allowable_shear_stress()
+		df = Vus_df / Vcs_series
+		df.loc['Combo'] = Vus_df.idxmax()
+		df.loc['properties'] = "=" * 20
+		df = df.append(prop_df)
+		return df
+
+
+
 

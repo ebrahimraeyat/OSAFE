@@ -49,7 +49,7 @@ class PunchTaskPanel:
         Gui.Selection.addObserver(observer_instance)
 
     def calculate_punch(self):
-        self.ratios_df = self.shape.calculate_punch()
+        self.ratios_df = self.shape.punch_ratios()
         self.form.export_excel_button.setEnabled(True)
 
     def on_browse(self):
@@ -64,8 +64,8 @@ class PunchTaskPanel:
                                                self.lastDirectory, filters)
         if not filename:
             return
-        if not filename.endswith("xls", 0, 3):
-            filename += ".xlsx"
+        # if not filename.endswith("xls", 0, 3):
+        #     filename += ".xlsx"
         self.ratios_df.to_excel(filename)
 
     def getLastSaveDirectory(self, f):
