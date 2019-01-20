@@ -190,8 +190,8 @@ class Geom(object):
 			z = f.CenterOfMass.z
 			ixx = f.MatrixOfInertia.A11
 			iyy = f.MatrixOfInertia.A22
-			dx = x - x_bar
-			dy = y - y_bar
+			dx = abs(x - x_bar)
+			dy = abs(y - y_bar)
 			# dz = z - z_bar
 			normal = f.normalAt(0, 0)
 			if normal.x:
@@ -221,6 +221,8 @@ class Geom(object):
 			if normal_y:
 				if not normal_y in faces_normals['y']:
 					faces_normals['y'].append(normal_y)
+		if not (faces_normals['x'] and faces_normals['y']):
+			return None
 		no_of_faces = len(faces_normals['x'] + faces_normals['y'])
 		if no_of_faces == 2:
 			signx = faces_normals['x'][0] > 0
@@ -336,13 +338,16 @@ class Geom(object):
 			if (bx == 0 or by == 0):
 				continue
 			location = self.locations[_id]
+			if not location:
+				Vus_df[_id] = 0
+				continue
 			location = location.lower()[:-1]
 			gamma_fx = 1 / (1 + (2/3) * sqrt(bx / by))
 			gamma_fy = 1 / (1 + (2/3) * sqrt(by / bx))
 			gamma_vx = 1 - gamma_fx
 			gamma_vy = 1 - gamma_fy
 			I22, I33, I23 = self.punch_areas_moment_inersia[_id]
-			if 'Corner' in location: I23 = 0
+			if 'corner' in location: I23 = 0
 			shell = self.punch_areas[_id]
 			b0d = shell.Area
 			point = self._safe.obj_geom_points[_id]
@@ -376,6 +381,9 @@ class Geom(object):
 			if (bx == 0 or by == 0):
 				continue
 			location = self.locations[_id]
+			if not location:
+				Vc_allowable[_id] = 1
+				continue
 			location = location.lower()[:-1]
 			shell = self.punch_areas[_id]
 			b0d = shell.Area
@@ -387,7 +395,7 @@ class Geom(object):
 		Vcs_series = self.allowable_shear_stress()
 		df = Vus_df / Vcs_series
 		df.loc['Combo'] = Vus_df.idxmax()
-		df.loc['properties'] = "=" * 20
+		df.loc['properties'] = df.columns
 		df = df.append(prop_df)
 		return df
 
