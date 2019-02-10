@@ -397,6 +397,24 @@ class Geom(object):
 		df.loc['Combo'] = Vus_df.idxmax()
 		df.loc['properties'] = df.columns
 		df = df.append(prop_df)
+		# insert ratios to Gui
+		for key, value in self._safe.point_loads.items():
+			v = self.obj_geom_points[key]
+			length = value['xdim']
+			height = value['ydim']
+			v = self.obj_geom_points[key]
+			v.x = v.x + length
+			v.y = v.y + height
+			pl = App.Vector(v.x, v.y, 4100)
+			ratio = df[key]['Max']
+			t = f"{ratio:.2f}"
+			l = str(self.locations[key])
+			text = Draft.makeText([t, l], point=pl)
+			text.ViewObject.FontSize = 200
+			if ratio > 1:
+				text.ViewObject.TextColor = (1.00,0.00,0.00)
+				col3d = self.columns_3D[key]
+				col3d.ViewObject.ShapeColor = (1.00, 0.00, 0.00)
 		return df
 
 
