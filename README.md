@@ -15,6 +15,18 @@ This reads an excel output from CSI Safe software and calculate shear punching r
 ### Sections
 This converts a combined steel section to one standard section (I shape) to be imported in CSI Etabs for checking classification of compact level of section.
 
+## Installation
+### Debian 10 (Buster)
+
+```bash
+$ sudo apt install freecad-python3
+$ sudo update-alternatives --set freecad /usr/lib/freecad/bin/freecad-python3
+$ sudo apt install git python3-pandas
+$ mkdir -p $HOME/.FreeCAD/Mod
+$ cd $HOME/.FreeCAD/Mod
+$ git clone https://github.com/ebrahimraeyat/Civil.git 
+```
+
 ## Discussion
 Forum thread to discuss this workbench can be found in the [FreeCAD Subforums](https://forum.freecadweb.org/viewtopic.php?f=24&t=31813#p264539)
 
