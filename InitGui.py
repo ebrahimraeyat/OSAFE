@@ -10,9 +10,8 @@ class CivilWorkbench(Workbench):
 
 	def Initialize(self):
 		from PySide2 import QtCore, QtGui
-		command_list = ["Section",
-						"Punch"]
-				
+		command_list = ["Punch"]
+
 		self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP(
 			"Civil",
 			"Civil tools")), command_list)
