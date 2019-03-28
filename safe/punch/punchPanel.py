@@ -6,8 +6,8 @@ import FreeCAD as App
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
-
 from safe.punch import geom
+from safe.punch.colorbar import ColorMap
 
 
 class PunchTaskPanel:
@@ -30,7 +30,8 @@ class PunchTaskPanel:
 
     def clearAll(self):
         doc = App.getDocument("punch")
-        if doc is None: return
+        if doc is None:
+            return
         objs = doc.Objects
         if objs:
             group = objs[0]
@@ -50,7 +51,17 @@ class PunchTaskPanel:
 
     def calculate_punch(self):
         self.ratios_df = self.shape.punch_ratios()
+        # self.add_color_map()
         self.form.export_excel_button.setEnabled(True)
+
+    # def add_color_map(self):
+    #     ratios = self.ratios_df.loc['Max']
+    #     min_ = ratios.min()
+    #     max_ = ratios.max()
+    #     mw = Gui.getMainWindow()  # access the main window
+    #     ColorMapWidget = QDockWidget()  # create a new dockwidget
+    #     ColorMapWidget.setWidget(ColorMap(min_, max_))  # load the Ui script
+    #     mw.addDockWidget(Qt.RightDockWidgetArea, ColorMapWidget)  # add the widget to the main window
 
     def on_browse(self):
         filename = self.getFilename(['xls', 'xlsx'])
@@ -60,8 +71,8 @@ class PunchTaskPanel:
 
     def export_to_excel(self):
         filters = "xlsx(*.xlsx)"
-        filename, _ = QFileDialog.getSaveFileName(self.form , 'select file',
-                                               self.lastDirectory, filters)
+        filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
+                                                  self.lastDirectory, filters)
         if not filename:
             return
         # if not filename.endswith("xls", 0, 3):
@@ -75,13 +86,14 @@ class PunchTaskPanel:
         filters = ''
         for prefix in prefixes:
             filters += "{}(*.{})".format(prefix, prefix)
-        filename, _ = QFileDialog.getOpenFileName(self.form , 'select file',
-                                               self.lastDirectory, filters)
+        filename, _ = QFileDialog.getOpenFileName(self.form, 'select file',
+                                                  self.lastDirectory, filters)
 
         if not filename:
             return
         self.lastDirectory = self.getLastSaveDirectory(filename)
         return filename
+
 
 class MyObserver(object):
 
@@ -106,4 +118,3 @@ class MyObserver(object):
 
 if __name__ == '__main__':
     panel = PunchTaskPanel()
-
