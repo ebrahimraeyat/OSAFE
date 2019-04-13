@@ -7,7 +7,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from safe.punch import geom
-from safe.punch.colorbar import ColorMap
+# from safe.punch.colorbar import ColorMap
 
 
 class PunchTaskPanel:
@@ -70,7 +70,7 @@ class PunchTaskPanel:
         self.form.excel_lineedit.setText(filename)
 
     def export_to_excel(self):
-        filters = "xlsx(*.xlsx)"
+        filters = "Excel (*.xls *.xlsx)"
         filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
                                                   self.lastDirectory, filters)
         if not filename:
@@ -83,9 +83,10 @@ class PunchTaskPanel:
         return os.sep.join(f.split(os.sep)[:-1])
 
     def getFilename(self, prefixes):
-        filters = ''
+        filters = 'Excel ('
         for prefix in prefixes:
-            filters += "{}(*.{})".format(prefix, prefix)
+            filters += f"*.{prefix} "
+        filters += ')'
         filename, _ = QFileDialog.getOpenFileName(self.form, 'select file',
                                                   self.lastDirectory, filters)
 
@@ -105,15 +106,15 @@ class MyObserver(object):
         for key, value in self.geom.columns_3D.items():
             if object_name == value.Name:
                 break
-        html = ''
-        I22, I33, I23 = self.geom.punch_areas_moment_inersia[key]
-        shell = self.geom.punch_areas[key]
-        area = shell.Area
-        location = self.geom.location_of_column(shell)
-        html += f'I22={I22} \nI33={I33}\n'
-        html += f'Area={area}\n'
-        html += f'location = {location}\n'
-        self.form.info_browser.setText(html)
+        # html = ''
+        # I22, I33, I23 = self.geom.punch_areas_moment_inersia[key]
+        # shell = self.geom.punch_areas[key]
+        # area = shell.Area
+        # location = self.geom.location_of_column(shell)
+        # html += f'I22={I22} \nI33={I33}\n'
+        # html += f'Area={area}\n'
+        # html += f'location = {location}\n'
+        # self.form.info_browser.setText(html)
 
 
 if __name__ == '__main__':

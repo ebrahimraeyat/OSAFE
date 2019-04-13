@@ -173,6 +173,8 @@ class Geom(object):
             sorat_y += area * y
             sorat_z += area * z
             makhraj += area
+        if makhraj == 0:
+            return None
         return (sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
 
     def shell_moment_inersia(self, shell):
@@ -182,6 +184,8 @@ class Geom(object):
         Ixx = 0
         Iyy = 0
         Ixy = 0
+        if not self.shell_center_of_mass(shell):
+            return None
         x_bar, y_bar, z_bar = self.shell_center_of_mass(shell)
         for f in shell.Faces:
             A = f.Area
