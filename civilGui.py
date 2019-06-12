@@ -22,7 +22,12 @@ class Punch:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Punch",
             "control shear punching")
-        return {'Pixmap': FreeCAD.ConfigGet("AppHomePath") + "Mod/Civil/images/punch.svg",
+        rel_path = "Mod/Civil/images/punch.svg"
+        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        import os
+        if not os.path.exists(path):
+            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 

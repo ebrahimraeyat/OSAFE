@@ -259,7 +259,7 @@ class Geom(object):
             else:
                 return 'Edge'
         else:
-            return 'Center_'
+            return 'Center'
 
     def loacation_of_columns(self):
         locations = {}
@@ -345,7 +345,7 @@ class Geom(object):
             if not location:
                 Vus_df[_id] = 0
                 continue
-            location = location.lower()[:-1]
+            location = location.rstrip('1234').lower()
             gamma_fx = 1 / (1 + (2 / 3) * sqrt(bx / by))
             gamma_fy = 1 / (1 + (2 / 3) * sqrt(by / bx))
             gamma_vx = 1 - gamma_fx
@@ -389,7 +389,7 @@ class Geom(object):
             if not location:
                 Vc_allowable[_id] = 1
                 continue
-            location = location.lower()[:-1]
+            location = location.rstrip('1234').lower()
             shell = self.punch_areas[_id]
             b0d = shell.Area
             Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0d)
