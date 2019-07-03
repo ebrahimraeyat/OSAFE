@@ -20,7 +20,6 @@ class PunchTaskPanel:
     def setupUi(self):
         # self.createWidgetsOne()
         self.create_connections()
-        # self.updateSectionShape()
 
     def create_connections(self):
         self.form.excel_button.clicked.connect(self.on_browse)
@@ -46,8 +45,6 @@ class PunchTaskPanel:
         self.form.safe_prop_browser.setText(self.shape._safe.__str__())
         self.shape.plot()
         self.form.calculate_punch_button.setEnabled(True)
-        observer_instance = MyObserver(self.shape, self.form)
-        Gui.Selection.addObserver(observer_instance)
 
     def calculate_punch(self):
         self.ratios_df = self.shape.punch_ratios()
@@ -94,27 +91,6 @@ class PunchTaskPanel:
             return
         self.lastDirectory = self.getLastSaveDirectory(filename)
         return filename
-
-
-class MyObserver(object):
-
-    def __init__(self, geom, form):
-        self.geom = geom
-        self.form = form
-
-    def addSelection(self, doc_name, object_name, subelement_name, point):
-        for key, value in self.geom.columns_3D.items():
-            if object_name == value.Name:
-                break
-        # html = ''
-        # I22, I33, I23 = self.geom.punch_areas_moment_inersia[key]
-        # shell = self.geom.punch_areas[key]
-        # area = shell.Area
-        # location = self.geom.location_of_column(shell)
-        # html += f'I22={I22} \nI33={I33}\n'
-        # html += f'Area={area}\n'
-        # html += f'location = {location}\n'
-        # self.form.info_browser.setText(html)
 
 
 if __name__ == '__main__':

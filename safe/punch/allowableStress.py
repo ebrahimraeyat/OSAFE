@@ -1,7 +1,7 @@
 import math
 
 pi = math.pi
-alpha_ss = {'center':40, 'edge':30, 'corner':20}
+alpha_ss = {'interier':40, 'edge':30, 'corner':20}
 
 
 def allowable_stress(bx, by, location, fc, b0d=None,b0=None, d=None, phi_c=.75):

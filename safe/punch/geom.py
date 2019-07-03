@@ -7,6 +7,7 @@ import FreeCADGui as Gui
 import pandas as pd
 from safe.punch import safe
 from safe.punch.allowableStress import allowable_stress
+from safe.punch.punch import _Punch, _ViewProviderPunch
 
 
 class Geom(object):
@@ -93,27 +94,26 @@ class Geom(object):
         return foun
 
     def create_3D_column(self, columns):
-        columns_3D = {}
         for key, area in columns.items():
-            columns_3D[key] = Arch.makeStructure(area, height=4000)
-            Draft.autogroup(columns_3D[key])
-        return columns_3D
+            col = Part.makeBox(area.Length, area.Height, 4000, area.Placement.Base)
+            self.punchs[key].Shape = col
+            self.punchs[key].number = int(key)
 
     # def point_loads_is_in_witch_areas(self, areas, points_loads, obj_geom_points):
-    # 	''' search areas that special point is in it/them
-    # 	 it return a dictionary with keys = special points ids
-    # 	 and a list of areas that special point is in as value
-    # 	 '''
-    # 	point_loads_areas_contain = {}
-    # 	for _id in points_loads.keys():
-    # 		coord = obj_geom_points[_id]
-    # 		p = App.Vector(coord.x, coord.y, coord.z)
-    # 		curr_areas = {}
-    # 		for key, value in areas.items():
-    # 			if value.Shape.isInside(p, .01, True):
-    # 				curr_areas[key] = value
-    # 		point_loads_areas_contain[_id] = curr_areas
-    # 	return point_loads_areas_contain
+    #   ''' search areas that special point is in it/them
+    #    it return a dictionary with keys = special points ids
+    #    and a list of areas that special point is in as value
+    #    '''
+    #   point_loads_areas_contain = {}
+    #   for _id in points_loads.keys():
+    #       coord = obj_geom_points[_id]
+    #       p = App.Vector(coord.x, coord.y, coord.z)
+    #       curr_areas = {}
+    #       for key, value in areas.items():
+    #           if value.Shape.isInside(p, .01, True):
+    #               curr_areas[key] = value
+    #       point_loads_areas_contain[_id] = curr_areas
+    #   return point_loads_areas_contain
 
     def create_column_offset(self, column_areas, gui):
         offset_structures = {}
@@ -144,17 +144,15 @@ class Geom(object):
                                     no_same_V = no_same_V + 1
                             if no_same_V == len(fo.Vertexes):
                                 intersection_faces.append(fo)
-        shell = Part.makeShell(intersection_faces)
-        Part.show(shell)
-        return shell
+        return intersection_faces
 
-    def get_punch_areas(self, foun, offset_structures):
-        punch_areas = {}
+    def get_punch_faces(self, foun, offset_structures):
+        punch_faces = {}
         for key, value in offset_structures.items():
-            punch_areas[key] = self.get_intersections_areas(foun, value)
-        return punch_areas
+            punch_faces[key] = self.get_intersections_areas(foun, value)
+        return punch_faces
 
-    def shell_center_of_mass(self, shell):
+    def shell_center_of_mass(self, faces):
         '''
         give a shell and return center of mass coordinate
         in (x, y, z)
@@ -164,7 +162,8 @@ class Geom(object):
         sorat_z = 0
         makhraj = 0
 
-        for f in shell.Faces:
+        for f in faces:
+            f = f.Shape
             area = f.Area
             x = f.CenterOfMass.x
             y = f.CenterOfMass.y
@@ -177,45 +176,9 @@ class Geom(object):
             return None
         return (sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
 
-    def shell_moment_inersia(self, shell):
-        '''
-        return rotational moment inersia of shell Ixx, Iyy
-        '''
-        Ixx = 0
-        Iyy = 0
-        Ixy = 0
-        if not self.shell_center_of_mass(shell):
-            return None
-        x_bar, y_bar, z_bar = self.shell_center_of_mass(shell)
-        for f in shell.Faces:
-            A = f.Area
-            x = f.CenterOfMass.x
-            y = f.CenterOfMass.y
-            z = f.CenterOfMass.z
-            ixx = f.MatrixOfInertia.A11
-            iyy = f.MatrixOfInertia.A22
-            dx = abs(x - x_bar)
-            dy = abs(y - y_bar)
-            # dz = z - z_bar
-            normal = f.normalAt(0, 0)
-            if normal.x:
-                Ixx += ixx + A * dy ** 2
-                Iyy += A * (dx ** 2)  # + dz ** 2)
-            elif normal.y:
-                Ixx += A * (dy ** 2)  # + dz ** 2)
-                Iyy += iyy + A * dx ** 2
-            Ixy += A * dx * dy
-        return Ixx, Iyy, Ixy
-
-    def get_shell_moment_of_inersias(self, shells):
-        shell_moment_inersias = {}
-        for key, shell in shells.items():
-            shell_moment_inersias[key] = self.shell_moment_inersia(shell)
-        return shell_moment_inersias
-
-    def location_of_column(self, shell):
+    def location_of_column(self, faces):
         faces_normals = {'x': [], 'y': []}
-        for f in shell.Faces:
+        for f in faces:
             normal = f.normalAt(0, 0)
             normal_x = normal.x
             normal_y = normal.y
@@ -259,58 +222,63 @@ class Geom(object):
             else:
                 return 'Edge'
         else:
-            return 'Center'
+            return 'Interier'
 
     def loacation_of_columns(self):
         locations = {}
-        for key, value in self.punch_areas.items():
+        for key, value in self.punch_faces.items():
             locations[key] = self.location_of_column(value)
         return locations
 
-    def grid_lines(self):
-        gridLines = self._safe.grid_lines()
-        x_grids = gridLines['x']
-        y_grids = gridLines['y']
-        b = self.foundation.Shape.BoundBox
-        x_axis_length = b.YLength * 1.2
-        y_axis_length = b.XLength * 1.2
-        x_grids_coord = -b.YLength * .1
-        y_grids_coord = b.XLength * 1
+    def create_punches(self):
+        punchs = {}
+        for key in self.columns_number:
+            p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
+            _Punch(p)
+            _ViewProviderPunch(p.ViewObject)
+            value = self._safe.point_loads[key]
+            p.bx = value['xdim']
+            p.by = value['ydim']
+            intersection_faces = self.punch_faces[key]
+            faces = []
+            for f in intersection_faces:
+                face = App.ActiveDocument.addObject("Part::Feature", "face")
+                face.Shape = f
+                faces.append(face.Name)
+            p.faces = faces
+            p.Location = self.locations[key]
+            punchs[key] = p
+        return punchs
 
-        for text, coord in x_grids.items():
-            ax = Arch.makeAxis(1)
-            ax.Distances = [coord]
-            ax.Length = x_axis_length
-            ax.CustomNumber = str(text)
-            Draft.move(ax, App.Vector(0, x_grids_coord, 0), copy=False)
-            ax_gui = ax.ViewObject
-            ax_gui.BubbleSize = 1500
-            ax_gui.FontSize = 750
-        for text, coord in y_grids.items():
-            ax = Arch.makeAxis(1)
-            ax.Length = y_axis_length
-            ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
-            ax.Distances = [coord]
-            ax.CustomNumber = str(text)
-            Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
-            ax_gui = ax.ViewObject
-            ax_gui.BubbleSize = 1500
-            ax_gui.FontSize = 750
+    # def grid_lines(self):
+    #     gridLines = self._safe.grid_lines()
+    #     x_grids = gridLines['x']
+    #     y_grids = gridLines['y']
+    #     b = self.foundation.Shape.BoundBox
+    #     x_axis_length = b.YLength * 1.2
+    #     y_axis_length = b.XLength * 1.2
+    #     x_grids_coord = -b.YLength * .1
+    #     y_grids_coord = b.XLength * 1
 
-    def info_of_selected_punch(self):
-        col = Gui.Selection.getSelection()[0]
-        name = col.Name
-        for key, value in self.columns_3D.items():
-            if name == value.Name:
-                break
-        html = ''
-        I22, I33, I23 = self.punch_areas_moment_inersia[key]
-        area = self.punch_areas[key].Area
-        location = self.locations[key]
-        html += f'I22={I22} \nI33={I33}\n'
-        html += f'Area={area}\n'
-        html += f'location = {location}\n'
-        return html
+    #     for text, coord in x_grids.items():
+    #         ax = Arch.makeAxis(1)
+    #         ax.Distances = [coord]
+    #         ax.Length = x_axis_length
+    #         ax.CustomNumber = str(text)
+    #         Draft.move(ax, App.Vector(0, x_grids_coord, 0), copy=False)
+    #         ax_gui = ax.ViewObject
+    #         ax_gui.BubbleSize = 1500
+    #         ax_gui.FontSize = 750
+    #     for text, coord in y_grids.items():
+    #         ax = Arch.makeAxis(1)
+    #         ax.Length = y_axis_length
+    #         ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
+    #         ax.Distances = [coord]
+    #         ax.CustomNumber = str(text)
+    #         Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
+    #         ax_gui = ax.ViewObject
+    #         ax_gui.BubbleSize = 1500
+    #         ax_gui.FontSize = 750
 
     def plot(self):
         doc = App.getDocument("punch")
@@ -318,16 +286,20 @@ class Geom(object):
         self.obj_geom_points = self.create_vectors(self._safe.obj_geom_points)
         self.obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
         self.obj_geom_point_loads = self.create_column(self._safe.point_loads)
+        self.columns_number = list(self._safe.point_loads.keys())
         self.structures = self.create_structures(self.obj_geom_areas)
         self.fusion = self.create_fusion(self.structures, doc)
         doc.recompute()
         self.foundation = self.create_foundation(self.fusion, doc, gui)
-        self.columns_3D = self.create_3D_column(self.obj_geom_point_loads)
         self.offset_structures = self.create_column_offset(self.obj_geom_point_loads, gui)
-        self.punch_areas = self.get_punch_areas(self.foundation, self.offset_structures)
-        self.punch_areas_moment_inersia = self.get_shell_moment_of_inersias(self.punch_areas)
-        self.grid_lines()
+        doc.recompute()
+        self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
+        doc.recompute()
+        # self.punch_areas_moment_inersia = self.get_shell_moment_of_inersias(self.punch_areas)
+        # self.grid_lines()
         self.locations = self.loacation_of_columns()
+        self.punchs = self.create_punches()
+        self.create_3D_column(self.obj_geom_point_loads)
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
@@ -337,11 +309,13 @@ class Geom(object):
         Vus_df = pd.DataFrame(index=combos)
         prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'location', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
         for _id, point_prop in self._safe.point_loads.items():
+            punch = self.punchs[_id]
             bx = point_prop['xdim']
             by = point_prop['ydim']
             if (bx == 0 or by == 0):
                 continue
             location = self.locations[_id]
+            punch.Location = location.title()
             if not location:
                 Vus_df[_id] = 0
                 continue
@@ -350,19 +324,31 @@ class Geom(object):
             gamma_fy = 1 / (1 + (2 / 3) * sqrt(by / bx))
             gamma_vx = 1 - gamma_fx
             gamma_vy = 1 - gamma_fy
-            I22, I33, I23 = self.punch_areas_moment_inersia[_id]
+            # I22, I33, I23 = self.punch_areas_moment_inersia[_id]
+            I22 = punch.I22
+            I33 = punch.I33
+            I23 = punch.I23
             if 'corner' in location:
                 I23 = 0
-            shell = self.punch_areas[_id]
-            b0d = shell.Area
+            # shell = self.punch_areas[_id]
+            b0d = self.punchs[_id].Area
             point = self._safe.obj_geom_points[_id]
             x1, y1 = point.x, point.y
             prop_df[_id] = [I22, I33, I23, self.locations[_id], b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
-            x3, y3, _ = self.shell_center_of_mass(shell)
+            # x3, y3, _ = self.shell_center_of_mass(shell)
+            x3, y3 = punch.x3, punch.y3
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
             combos_load.set_index('Combo', inplace=True)
             Vu_df = pd.DataFrame(index=combos)
-            for col, f in enumerate(shell.Faces):
+            punch.bx = bx
+            punch.by = by
+            # punch.I22 = I22
+            # punch.I33 = I33
+            # punch.I23 = I23
+            # punch.Area = int(b0d)
+            for col, f in enumerate(punch.faces):
+                f = App.ActiveDocument.getObject(f)
+                f = f.Shape
                 x4 = f.CenterOfMass.x
                 y4 = f.CenterOfMass.y
                 Vu_df[col] = ""
@@ -390,8 +376,7 @@ class Geom(object):
                 Vc_allowable[_id] = 1
                 continue
             location = location.rstrip('1234').lower()
-            shell = self.punch_areas[_id]
-            b0d = shell.Area
+            b0d = self.punchs[_id].Area
             Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0d)
         return Vc_allowable
 
@@ -404,20 +389,21 @@ class Geom(object):
         df = df.append(prop_df)
         # insert ratios to Gui
         for key, value in self._safe.point_loads.items():
-            v = self.obj_geom_points[key]
             length = value['xdim']
             height = value['ydim']
+            # length = self.punchs[key].bx
+            # length = self.punchs[key].by
             v = self.obj_geom_points[key]
             v.x = v.x + length
             v.y = v.y + height
             pl = App.Vector(v.x, v.y, 4100)
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
+            self.punchs[key].Ratio = t
             l = str(self.locations[key])
             text = Draft.makeText([t, l], point=pl)
             text.ViewObject.FontSize = 200
             if ratio > 1:
                 text.ViewObject.TextColor = (1., 0.0, 0.0)
-                col3d = self.columns_3D[key]
-                col3d.ViewObject.ShapeColor = (1., 0.0, 0.0)
+
         return df
