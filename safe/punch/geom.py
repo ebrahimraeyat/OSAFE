@@ -232,6 +232,7 @@ class Geom(object):
 
     def create_punches(self):
         punchs = {}
+        fc = self._safe.fc
         for key in self.columns_number:
             p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
             _Punch(p)
@@ -244,9 +245,10 @@ class Geom(object):
             for f in intersection_faces:
                 face = App.ActiveDocument.addObject("Part::Feature", "face")
                 face.Shape = f
-                faces.append(face.Name)
+                faces.append(face)
             p.faces = faces
             p.Location = self.locations[key]
+            p.fc = int(fc)
             punchs[key] = p
         return punchs
 
@@ -303,6 +305,7 @@ class Geom(object):
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
+        Gui.activeDocument().activeView().setCameraType("Perspective")
 
     def ultimate_shear_stress(self):
         combos = self._safe.combos
@@ -314,8 +317,8 @@ class Geom(object):
             by = point_prop['ydim']
             if (bx == 0 or by == 0):
                 continue
-            location = self.locations[_id]
-            punch.Location = location.title()
+            # location = self.locations[_id]
+            location = punch.Location
             if not location:
                 Vus_df[_id] = 0
                 continue
@@ -331,7 +334,7 @@ class Geom(object):
             if 'corner' in location:
                 I23 = 0
             # shell = self.punch_areas[_id]
-            b0d = self.punchs[_id].Area
+            b0d = punch.Area
             point = self._safe.obj_geom_points[_id]
             x1, y1 = point.x, point.y
             prop_df[_id] = [I22, I33, I23, self.locations[_id], b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
@@ -340,14 +343,7 @@ class Geom(object):
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
             combos_load.set_index('Combo', inplace=True)
             Vu_df = pd.DataFrame(index=combos)
-            punch.bx = bx
-            punch.by = by
-            # punch.I22 = I22
-            # punch.I33 = I33
-            # punch.I23 = I23
-            # punch.Area = int(b0d)
             for col, f in enumerate(punch.faces):
-                f = App.ActiveDocument.getObject(f)
                 f = f.Shape
                 x4 = f.CenterOfMass.x
                 y4 = f.CenterOfMass.y
@@ -389,21 +385,27 @@ class Geom(object):
         df = df.append(prop_df)
         # insert ratios to Gui
         for key, value in self._safe.point_loads.items():
-            length = value['xdim']
-            height = value['ydim']
-            # length = self.punchs[key].bx
-            # length = self.punchs[key].by
+            punch = self.punchs[key]
+            length = value['xdim'] * 1.5
+            height = value['ydim'] * 1.5
+            l = punch.Location
+            if l in ('Corner1', 'Corner4', 'Edge4'):
+                length *= -1
+            elif l in ('Edge1'):
+                height *= -1
+            # elif l in ('Edge3'):
             v = self.obj_geom_points[key]
             v.x = v.x + length
             v.y = v.y + height
             pl = App.Vector(v.x, v.y, 4100)
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
-            self.punchs[key].Ratio = t
-            l = str(self.locations[key])
+            punch.Ratio = t
+            l = punch.Location
             text = Draft.makeText([t, l], point=pl)
             text.ViewObject.FontSize = 200
             if ratio > 1:
                 text.ViewObject.TextColor = (1., 0.0, 0.0)
+            punch.text = text
 
         return df

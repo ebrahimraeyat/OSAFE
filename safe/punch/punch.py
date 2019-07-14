@@ -22,7 +22,7 @@ class _Punch:
         self.set_properties(obj)
 
     def set_properties(self, obj):
-        obj.addProperty("App::PropertyStringList", "faces", "Punch", "", 1, False)
+        obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
         obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
         obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
         obj.addProperty("App::PropertyFloat", "Area", "Punch", "", 1, True)
@@ -44,7 +44,7 @@ class _Punch:
         obj.addProperty("App::PropertyFloat", "y3", "Punch", "", 1, True)
         obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
-        # obj.addProperty("App::PropertyLinkList", "facess", "Punch")
+        obj.addProperty("App::PropertyLink", "text", "Punch")
         obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
 
     def onChanged(self, fp, prop):
@@ -52,15 +52,14 @@ class _Punch:
             loc = fp.Location
             normals = self._location[loc]
             if len(normals) >= len(fp.faces):
-                for name in fp.faces:
-                    Gui.ActiveDocument.getObject(name).Visibility = True
+                for f in fp.faces:
+                    f.ViewObject.Visibility = True
                 return
-            for name in fp.faces:
-                Gui.ActiveDocument.getObject(name).Visibility = True
-                f = FreeCAD.ActiveDocument.getObject(name)
+            for f in fp.faces:
+                f.ViewObject.Visibility = True
                 normal = tuple(f.Shape.normalAt(0, 0))
                 if not normal in normals:
-                    Gui.ActiveDocument.getObject(name).Visibility = False
+                    f.ViewObject.Visibility = False
         return
 
     def execute(self, obj):
@@ -71,8 +70,7 @@ class _Punch:
 
     def _area(self, obj):
         area = 0
-        for face_name in obj.faces:
-            f = FreeCAD.ActiveDocument.getObject(face_name)
+        for f in obj.faces:
             if f.ViewObject.Visibility == False:
                 continue
             f = f.Shape
@@ -89,8 +87,7 @@ class _Punch:
         sorat_z = 0
         makhraj = 0
 
-        for face_name in obj.faces:
-            f = FreeCAD.ActiveDocument.getObject(face_name)
+        for f in obj.faces:
             if f.ViewObject.Visibility == False:
                 continue
             f = f.Shape
@@ -117,8 +114,7 @@ class _Punch:
         if not self.center_of_mass(obj):
             return 0, 0, 0
         x_bar, y_bar, z_bar = self.center_of_mass(obj)
-        for face_name in obj.faces:
-            f = FreeCAD.ActiveDocument.getObject(face_name)
+        for f in obj.faces:
             if f.ViewObject.Visibility == False:
                 continue
             f = f.Shape
