@@ -234,13 +234,15 @@ class Geom(object):
         punchs = {}
         fc = self._safe.fc
         for key in self.columns_number:
+            intersection_faces = self.punch_faces.get(key, None)
+            if intersection_faces is None:
+                continue
             p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
             value = self._safe.point_loads[key]
             p.bx = value['xdim']
             p.by = value['ydim']
-            intersection_faces = self.punch_faces[key]
             faces = []
             for f in intersection_faces:
                 face = App.ActiveDocument.addObject("Part::Feature", "face")
@@ -249,6 +251,23 @@ class Geom(object):
             p.faces = faces
             p.Location = self.locations[key]
             p.fc = int(fc)
+            length = p.bx * 1.5
+            height = p.by * 1.5
+            l = p.Location
+            if l in ('Corner1', 'Corner4', 'Edge4'):
+                length *= -1
+            elif l in ('Edge1'):
+                height *= -1
+            # elif l in ('Edge3'):
+            v = self.obj_geom_points[key]
+            v.x = v.x + length
+            v.y = v.y + height
+            pl = App.Vector(v.x, v.y, 4100)
+            t = '0.0'
+            p.Ratio = t
+            text = Draft.makeText([t, l], point=pl)
+            text.ViewObject.FontSize = 200
+            p.text = text
             punchs[key] = p
         return punchs
 
@@ -312,7 +331,9 @@ class Geom(object):
         Vus_df = pd.DataFrame(index=combos)
         prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'location', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
         for _id, point_prop in self._safe.point_loads.items():
-            punch = self.punchs[_id]
+            punch = self.punchs.get(_id, None)
+            if punch is None:
+                continue
             bx = point_prop['xdim']
             by = point_prop['ydim']
             if (bx == 0 or by == 0):
@@ -331,13 +352,13 @@ class Geom(object):
             I22 = punch.I22
             I33 = punch.I33
             I23 = punch.I23
-            if 'corner' in location:
-                I23 = 0
+            # if 'corner' in location:
+            #     I23 = 0
             # shell = self.punch_areas[_id]
             b0d = punch.Area
             point = self._safe.obj_geom_points[_id]
             x1, y1 = point.x, point.y
-            prop_df[_id] = [I22, I33, I23, self.locations[_id], b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
+            prop_df[_id] = [I22, I33, I23, punch.Location, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
             # x3, y3, _ = self.shell_center_of_mass(shell)
             x3, y3 = punch.x3, punch.y3
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
@@ -363,16 +384,17 @@ class Geom(object):
         fc = self._safe.fc
         Vc_allowable = pd.Series(index=list(self._safe.point_loads.keys()))
         for _id, point_prop in self._safe.point_loads.items():
-            bx = point_prop['xdim']
-            by = point_prop['ydim']
+            punch = self.punchs[_id]
+            bx = punch.bx
+            by = punch.by
             if (bx == 0 or by == 0):
                 continue
-            location = self.locations[_id]
+            location = punch.Location
             if not location:
                 Vc_allowable[_id] = 1
                 continue
             location = location.rstrip('1234').lower()
-            b0d = self.punchs[_id].Area
+            b0d = punch.Area
             Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0d)
         return Vc_allowable
 
@@ -385,27 +407,32 @@ class Geom(object):
         df = df.append(prop_df)
         # insert ratios to Gui
         for key, value in self._safe.point_loads.items():
-            punch = self.punchs[key]
-            length = value['xdim'] * 1.5
-            height = value['ydim'] * 1.5
-            l = punch.Location
-            if l in ('Corner1', 'Corner4', 'Edge4'):
-                length *= -1
-            elif l in ('Edge1'):
-                height *= -1
-            # elif l in ('Edge3'):
-            v = self.obj_geom_points[key]
-            v.x = v.x + length
-            v.y = v.y + height
-            pl = App.Vector(v.x, v.y, 4100)
+            punch = self.punchs.get(key, None)
+            if punch is None:
+                continue
+            # length = value['xdim'] * 1.5
+            # height = value['ydim'] * 1.5
+            # l = punch.Location
+            # if l in ('Corner1', 'Corner4', 'Edge4'):
+            #     length *= -1
+            # elif l in ('Edge1'):
+            #     height *= -1
+            # # elif l in ('Edge3'):
+            # v = self.obj_geom_points[key]
+            # v.x = v.x + length
+            # v.y = v.y + height
+            # pl = App.Vector(v.x, v.y, 4100)
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
             punch.Ratio = t
-            l = punch.Location
-            text = Draft.makeText([t, l], point=pl)
-            text.ViewObject.FontSize = 200
+            punch.text.Text = [punch.Location, punch.Ratio]
+            # l = punch.Location
+            # text = Draft.makeText([t, l], point=pl)
+            # text.ViewObject.FontSize = 200
             if ratio > 1:
-                text.ViewObject.TextColor = (1., 0.0, 0.0)
-            punch.text = text
+                punch.text.ViewObject.TextColor = (1., 0.0, 0.0)
+            else:
+                punch.text.ViewObject.TextColor = (.8, .8, .8)
+            # punch.text = text
 
         return df

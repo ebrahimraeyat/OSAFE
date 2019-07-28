@@ -135,6 +135,8 @@ class _Punch:
                 Ixx += A * (dy ** 2)  # + dz ** 2)
                 Iyy += iyy + A * dx ** 2
             Ixy += A * dx * dy
+        if 'Corner' in obj.Location:
+            Ixy = 0
         return Ixx, Iyy, Ixy
 
 
