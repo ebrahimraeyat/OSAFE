@@ -7,6 +7,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from safe.punch import geom
+from safe.punch import pdf
 # from safe.punch.colorbar import ColorMap
 
 
@@ -26,6 +27,7 @@ class PunchTaskPanel:
         self.form.excel_lineedit.textChanged.connect(self.update_shape)
         self.form.calculate_punch_button.clicked.connect(self.calculate_punch)
         self.form.export_excel_button.clicked.connect(self.export_to_excel)
+        self.form.export_pdf_button.clicked.connect(self.export_to_pdf)
 
     def clearAll(self):
         doc = App.getDocument("punch")
@@ -50,6 +52,7 @@ class PunchTaskPanel:
         self.ratios_df = self.shape.punch_ratios()
         # self.add_color_map()
         self.form.export_excel_button.setEnabled(True)
+        self.form.export_pdf_button.setEnabled(True)
 
     # def add_color_map(self):
     #     ratios = self.ratios_df.loc['Max']
@@ -75,6 +78,15 @@ class PunchTaskPanel:
         # if not filename.endswith("xls", 0, 3):
         #     filename += ".xlsx"
         self.ratios_df.to_excel(filename)
+
+    def export_to_pdf(self):
+        filters = "pdf (*.pdf)"
+        filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
+                                                  self.lastDirectory, filters)
+        if not filename:
+            return
+        doc = App.getDocument("punch")
+        pdf.createPdf(doc, filename)
 
     def getLastSaveDirectory(self, f):
         return os.sep.join(f.split(os.sep)[:-1])

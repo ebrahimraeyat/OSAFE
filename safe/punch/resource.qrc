@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="punch">
+    <file>xlsx.png</file>
+  </qresource>
+</RCC>

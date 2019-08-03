@@ -316,7 +316,6 @@ class Geom(object):
         doc.recompute()
         self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
         doc.recompute()
-        # self.punch_areas_moment_inersia = self.get_shell_moment_of_inersias(self.punch_areas)
         # self.grid_lines()
         self.locations = self.loacation_of_columns()
         self.punchs = self.create_punches()
@@ -338,7 +337,6 @@ class Geom(object):
             by = point_prop['ydim']
             if (bx == 0 or by == 0):
                 continue
-            # location = self.locations[_id]
             location = punch.Location
             if not location:
                 Vus_df[_id] = 0
@@ -348,18 +346,13 @@ class Geom(object):
             gamma_fy = 1 / (1 + (2 / 3) * sqrt(by / bx))
             gamma_vx = 1 - gamma_fx
             gamma_vy = 1 - gamma_fy
-            # I22, I33, I23 = self.punch_areas_moment_inersia[_id]
             I22 = punch.I22
             I33 = punch.I33
             I23 = punch.I23
-            # if 'corner' in location:
-            #     I23 = 0
-            # shell = self.punch_areas[_id]
             b0d = punch.Area
             point = self._safe.obj_geom_points[_id]
             x1, y1 = point.x, point.y
             prop_df[_id] = [I22, I33, I23, punch.Location, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
-            # x3, y3, _ = self.shell_center_of_mass(shell)
             x3, y3 = punch.x3, punch.y3
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
             combos_load.set_index('Combo', inplace=True)
@@ -376,8 +369,6 @@ class Geom(object):
                     Vu_df.at[combo, col] = Vu
             Vus_df[_id] = Vu_df.max(axis=1)
         Vus_df.loc['Max'] = Vus_df.max()
-        # Vus_df = (Vus_df.applymap("{0:.2f}".format)
-        #              .astype(float))
         return Vus_df, prop_df
 
     def allowable_shear_stress(self, fc=None):
@@ -410,29 +401,12 @@ class Geom(object):
             punch = self.punchs.get(key, None)
             if punch is None:
                 continue
-            # length = value['xdim'] * 1.5
-            # height = value['ydim'] * 1.5
-            # l = punch.Location
-            # if l in ('Corner1', 'Corner4', 'Edge4'):
-            #     length *= -1
-            # elif l in ('Edge1'):
-            #     height *= -1
-            # # elif l in ('Edge3'):
-            # v = self.obj_geom_points[key]
-            # v.x = v.x + length
-            # v.y = v.y + height
-            # pl = App.Vector(v.x, v.y, 4100)
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
             punch.Ratio = t
             punch.text.Text = [punch.Location, punch.Ratio]
-            # l = punch.Location
-            # text = Draft.makeText([t, l], point=pl)
-            # text.ViewObject.FontSize = 200
             if ratio > 1:
                 punch.text.ViewObject.TextColor = (1., 0.0, 0.0)
             else:
-                punch.text.ViewObject.TextColor = (.8, .8, .8)
-            # punch.text = text
-
+                punch.text.ViewObject.TextColor = (1., 1., 1.)
         return df
