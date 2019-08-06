@@ -117,7 +117,12 @@ class Safe:
         point_loads = {_id: {'xdim': 0, 'ydim': 0, 'loads': {}} for _id in point_ids}
         load_pats = point_loads_sheet['LoadPat'].unique()
         for _, row in point_loads_sheet.iterrows():
+            xdim = row['XDim']
+            ydim = row['YDim']
             _id = row['Point']
+            if xdim == 0 or ydim == 0:
+                point_loads.pop(_id, None)
+                continue
             load_pat = row['LoadPat']
             fx = row['Fx']
             fy = row['Fy']
@@ -126,8 +131,6 @@ class Safe:
             my = row['My']
             mz = row['Mz']
             curr_loads = (fx, fy, fz, mx, my, mz)
-            xdim = row['XDim']
-            ydim = row['YDim']
             point_loads[_id]['loads'][load_pat] = POINTLOADS._make(curr_loads)
             point_loads[_id]['xdim'] = xdim
             point_loads[_id]['ydim'] = ydim
@@ -197,7 +200,7 @@ class Safe:
         df = self.excel['Load Assignments - Point Loads']
         df['LoadPat'] = df['LoadPat'].str.rstrip('_ABOVE')
         c = df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
-        c.to_excel('/home/ebi/alaki/pl.xlsx')
+        # c.to_excel('/home/ebi/alaki/pl.xlsx')
         return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
 
     def apply_loads_combinations_to_points(self, combos_df, point_load_df):

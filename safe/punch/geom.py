@@ -87,7 +87,9 @@ class Geom(object):
 
     def create_foundation(self, fusion, doc, gui):
         if not self.removeSplitter:
-            return fusion
+            foun = doc.addObject('Part::Feature', 'Foun')
+            foun.Shape = fusion.Shape
+            return foun
         foun = doc.addObject('Part::Feature', 'Foun')
         foun.Shape = fusion.Shape.removeSplitter()
         gui.getObject(fusion.Name).Visibility = False
@@ -331,12 +333,8 @@ class Geom(object):
         prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'location', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
         for _id, point_prop in self._safe.point_loads.items():
             punch = self.punchs.get(_id, None)
-            if punch is None:
-                continue
             bx = point_prop['xdim']
             by = point_prop['ydim']
-            if (bx == 0 or by == 0):
-                continue
             location = punch.Location
             if not location:
                 Vus_df[_id] = 0
@@ -378,8 +376,6 @@ class Geom(object):
             punch = self.punchs[_id]
             bx = punch.bx
             by = punch.by
-            if (bx == 0 or by == 0):
-                continue
             location = punch.Location
             if not location:
                 Vc_allowable[_id] = 1
@@ -399,8 +395,6 @@ class Geom(object):
         # insert ratios to Gui
         for key, value in self._safe.point_loads.items():
             punch = self.punchs.get(key, None)
-            if punch is None:
-                continue
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
             punch.Ratio = t
