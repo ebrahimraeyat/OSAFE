@@ -188,17 +188,46 @@ class Safe:
         return grid_lines
 
     def read_load_combinations(self):
-        df = self.excel['Load Combinations']
-        combos_sr = df[df['DSStrength'] == 'Yes']['Combo']
-        combos_df = df[df['Combo'].isin(combos_sr)]
-        c = combos_df[['Combo', 'Load', 'SF']]
-        c.to_excel('/home/ebi/alaki/combo.xlsx')
+        df_comb = self.excel['Load Combinations']
+        combos_sr = df_comb['Combo'].unique()
+        combos_sr_yes = df_comb[df_comb['DSStrength'] == 'Yes']['Combo'].unique()
+        df, load_cases_sr = self.read_load_cases()
+        index = 0
+        combo_df = pd.DataFrame(columns=['Combo', 'Load', 'SF'])
+        for _, row in df_comb.iterrows():
+            if row['Combo'] in combos_sr_yes:
+                combination = row['Combo']
+                load = row['Load']
+                sf = row['SF']
+                if load in load_cases_sr:
+                    case = df[df['LoadCase'] == load]
+                    for _, row2 in case.iterrows():
+                        combo_df.loc[index] = [combination, row2['LoadPat'], sf * row2['SF']]
+                        index += 1
+                # elif load in combos_sr:
+                #     case = df_comb[df_comb['Combo'] == load]
+                #     for _, row2 in case.iterrows():
+                #         load2 = row2['Load']
+                #         if not load2 in load_cases_sr:
+                #             combo_df.loc[index] = [combination, row2['Load'], sf * row2['SF']]
+                #             index += 1
+                #         elif load2 in load_cases_sr:
+                #             case2 = df[df['LoadCase'] == load2]
+                #             for _, row3 in case2.iterrows():
+                #                 combo_df.loc[index] = [combination, row3['LoadPat'], sf * row3['SF']]
+                #                 index += 1
 
-        return combos_df[['Combo', 'Load', 'SF']]
+        combo_df.to_excel('/home/ebi/combination.xlsx')
+        return combo_df
+
+    def read_load_cases(self):
+        df = self.excel['Load Cases 06 - Loads Applied']
+        cases = df['LoadCase'].unique()
+        return df, cases
 
     def read_point_loads(self):
         df = self.excel['Load Assignments - Point Loads']
-        df['LoadPat'] = df['LoadPat'].str.rstrip('_ABOVE')
+        # df['LoadPat'] = df['LoadPat'].str.rstrip('_ABOVE')
         c = df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
         # c.to_excel('/home/ebi/alaki/pl.xlsx')
         return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
