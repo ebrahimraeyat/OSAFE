@@ -194,30 +194,38 @@ class Safe:
         df, load_cases_sr = self.read_load_cases()
         index = 0
         combo_df = pd.DataFrame(columns=['Combo', 'Load', 'SF'])
+        combo_load_dict = {}
         for _, row in df_comb.iterrows():
             if row['Combo'] in combos_sr_yes:
                 combination = row['Combo']
                 load = row['Load']
                 sf = row['SF']
-                if load in load_cases_sr:
+                if load in combos_sr:
+                    combo = df_comb[df_comb['Combo'] == load]
+                    for _, row2 in combo.iterrows():
+                        load2 = row2['Load']
+                        sf2 = row2['SF']
+                        case2 = df[df['LoadCase'] == load2]
+                        for _, row3 in case2.iterrows():
+                            text = combination + row3['LoadPat']
+                            i = combo_load_dict.get(text, None)
+                            if i:
+                                combo_df['SF'][i] += sf * sf2 * row3['SF']
+                            else:
+                                combo_df.loc[index] = [combination, row3['LoadPat'], sf * sf2 * row3['SF']]
+                                combo_load_dict[text] = index
+                                index += 1
+                elif load in load_cases_sr:
                     case = df[df['LoadCase'] == load]
-                    for _, row2 in case.iterrows():
-                        combo_df.loc[index] = [combination, row2['LoadPat'], sf * row2['SF']]
-                        index += 1
-                # elif load in combos_sr:
-                #     case = df_comb[df_comb['Combo'] == load]
-                #     for _, row2 in case.iterrows():
-                #         load2 = row2['Load']
-                #         if not load2 in load_cases_sr:
-                #             combo_df.loc[index] = [combination, row2['Load'], sf * row2['SF']]
-                #             index += 1
-                #         elif load2 in load_cases_sr:
-                #             case2 = df[df['LoadCase'] == load2]
-                #             for _, row3 in case2.iterrows():
-                #                 combo_df.loc[index] = [combination, row3['LoadPat'], sf * row3['SF']]
-                #                 index += 1
-
-        combo_df.to_excel('/home/ebi/combination.xlsx')
+                    for _, row4 in case.iterrows():
+                        text = combination + row4['LoadPat']
+                        i = combo_load_dict.get(text, None)
+                        if i:
+                            combo_df['SF'][i] += sf * row4['SF']
+                        else:
+                            combo_df.loc[index] = [combination, row4['LoadPat'], sf * row4['SF']]
+                            combo_load_dict[text] = index
+                            index += 1
         return combo_df
 
     def read_load_cases(self):
@@ -227,7 +235,6 @@ class Safe:
 
     def read_point_loads(self):
         df = self.excel['Load Assignments - Point Loads']
-        # df['LoadPat'] = df['LoadPat'].str.rstrip('_ABOVE')
         c = df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
         # c.to_excel('/home/ebi/alaki/pl.xlsx')
         return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]

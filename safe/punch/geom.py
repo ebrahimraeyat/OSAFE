@@ -340,8 +340,8 @@ class Geom(object):
                 Vus_df[_id] = 0
                 continue
             location = location.rstrip('1234').lower()
-            gamma_fx = 1 / (1 + (2 / 3) * sqrt(bx / by))
-            gamma_fy = 1 / (1 + (2 / 3) * sqrt(by / bx))
+            gamma_fx = 1 / (1 + (2 / 3) * sqrt(by / bx))
+            gamma_fy = 1 / (1 + (2 / 3) * sqrt(bx / by))
             gamma_vx = 1 - gamma_fx
             gamma_vy = 1 - gamma_fy
             I22 = punch.I22
