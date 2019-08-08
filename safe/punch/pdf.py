@@ -4,6 +4,8 @@ import FreeCAD
 
 
 def createPdf(doc, pdfName):
+    if not pdfName:
+        return
     foun = doc.Foun
     fig = plt.figure()
     b = foun.Shape.BoundBox

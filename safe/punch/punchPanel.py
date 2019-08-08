@@ -9,6 +9,7 @@ from PySide2.QtWidgets import *
 from safe.punch import geom
 from safe.punch import pdf
 # from safe.punch.colorbar import ColorMap
+abs_path = os.path.split(os.path.abspath(__file__))[0]
 
 
 class PunchTaskPanel:
@@ -21,6 +22,11 @@ class PunchTaskPanel:
     def setupUi(self):
         # self.createWidgetsOne()
         self.create_connections()
+        self.form.export_excel_button.setIcon(QPixmap(abs_path + "/xlsx.png"))
+        self.form.export_pdf_button.setIcon(QPixmap(abs_path + "/pdf.svg"))
+        self.form.export_image_button.setIcon(QPixmap(abs_path + "/png.png"))
+        self.form.calculate_punch_button.setIcon(QPixmap(abs_path + "/run.svg"))
+        self.form.help_button.setIcon(QPixmap(abs_path + "/help.svg"))
 
     def create_connections(self):
         self.form.excel_button.clicked.connect(self.on_browse)
@@ -29,6 +35,7 @@ class PunchTaskPanel:
         self.form.export_excel_button.clicked.connect(self.export_to_excel)
         self.form.export_pdf_button.clicked.connect(self.export_to_pdf)
         self.form.export_image_button.clicked.connect(self.export_to_image)
+        self.form.help_button.clicked.connect(self.help)
 
     def clearAll(self):
         doc = App.getDocument("punch")
@@ -70,6 +77,10 @@ class PunchTaskPanel:
         if not filename:
             return
         self.form.excel_lineedit.setText(filename)
+
+    def help(self):
+        import webbrowser
+        webbrowser.open_new(abs_path + '/Help.pdf')
 
     def export_to_excel(self):
         filters = "Excel (*.xls *.xlsx)"
