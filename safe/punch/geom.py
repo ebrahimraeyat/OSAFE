@@ -273,35 +273,39 @@ class Geom(object):
             punchs[key] = p
         return punchs
 
-    # def grid_lines(self):
-    #     gridLines = self._safe.grid_lines()
-    #     x_grids = gridLines['x']
-    #     y_grids = gridLines['y']
-    #     b = self.foundation.Shape.BoundBox
-    #     x_axis_length = b.YLength * 1.2
-    #     y_axis_length = b.XLength * 1.2
-    #     x_grids_coord = -b.YLength * .1
-    #     y_grids_coord = b.XLength * 1
+    def grid_lines(self):
+        gridLines = self._safe.grid_lines()
+        if gridLines is None:
+            return
+        x_grids = gridLines['x']
+        y_grids = gridLines['y']
+        b = self.foundation.Shape.BoundBox
+        x_axis_length = b.YLength * 1.2
+        y_axis_length = b.XLength * 1.2
+        x_grids_coord = -b.YLength * .1
+        y_grids_coord = b.XLength * 1
 
-    #     for text, coord in x_grids.items():
-    #         ax = Arch.makeAxis(1)
-    #         ax.Distances = [coord]
-    #         ax.Length = x_axis_length
-    #         ax.CustomNumber = str(text)
-    #         Draft.move(ax, App.Vector(0, x_grids_coord, 0), copy=False)
-    #         ax_gui = ax.ViewObject
-    #         ax_gui.BubbleSize = 1500
-    #         ax_gui.FontSize = 750
-    #     for text, coord in y_grids.items():
-    #         ax = Arch.makeAxis(1)
-    #         ax.Length = y_axis_length
-    #         ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
-    #         ax.Distances = [coord]
-    #         ax.CustomNumber = str(text)
-    #         Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
-    #         ax_gui = ax.ViewObject
-    #         ax_gui.BubbleSize = 1500
-    #         ax_gui.FontSize = 750
+        for text, coord in x_grids.items():
+            ax = Arch.makeAxis(1)
+            ax.Distances = [coord]
+            ax.Length = x_axis_length
+            ax.CustomNumber = str(text)
+            ax.Placement.Base.y = b.YMin
+            Draft.move(ax, App.Vector(0, x_grids_coord, 0), copy=False)
+            ax_gui = ax.ViewObject
+            ax_gui.BubbleSize = 1500
+            ax_gui.FontSize = 750
+        for text, coord in y_grids.items():
+            ax = Arch.makeAxis(1)
+            ax.Length = y_axis_length
+            ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
+            ax.Distances = [coord]
+            ax.CustomNumber = str(text)
+            # ax.Placement.Base.x = b.XMax
+            Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
+            ax_gui = ax.ViewObject
+            ax_gui.BubbleSize = 1500
+            ax_gui.FontSize = 750
 
     def plot(self):
         doc = App.getDocument("punch")
@@ -318,14 +322,14 @@ class Geom(object):
         doc.recompute()
         self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
         doc.recompute()
-        # self.grid_lines()
+        self.grid_lines()
         self.locations = self.loacation_of_columns()
         self.punchs = self.create_punches()
         self.create_3D_column(self.obj_geom_point_loads)
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewAxonometric()
-        Gui.activeDocument().activeView().setCameraType("Perspective")
+        # Gui.activeDocument().activeView().viewAxonometric()
+        # Gui.activeDocument().activeView().setCameraType("Perspective")
 
     def ultimate_shear_stress(self):
         combos = self._safe.combos

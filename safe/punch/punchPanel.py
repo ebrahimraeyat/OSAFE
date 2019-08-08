@@ -28,6 +28,7 @@ class PunchTaskPanel:
         self.form.calculate_punch_button.clicked.connect(self.calculate_punch)
         self.form.export_excel_button.clicked.connect(self.export_to_excel)
         self.form.export_pdf_button.clicked.connect(self.export_to_pdf)
+        self.form.export_image_button.clicked.connect(self.export_to_image)
 
     def clearAll(self):
         doc = App.getDocument("punch")
@@ -53,6 +54,7 @@ class PunchTaskPanel:
         # self.add_color_map()
         self.form.export_excel_button.setEnabled(True)
         self.form.export_pdf_button.setEnabled(True)
+        self.form.export_image_button.setEnabled(True)
 
     # def add_color_map(self):
     #     ratios = self.ratios_df.loc['Max']
@@ -75,16 +77,17 @@ class PunchTaskPanel:
                                                   self.lastDirectory, filters)
         if not filename:
             return
-        # if not filename.endswith("xls", 0, 3):
-        #     filename += ".xlsx"
+        if not '.xls' in filename:
+            filename += ".xlsx"
         self.ratios_df.to_excel(filename)
 
     def export_to_pdf(self):
-        filters = "pdf (*.pdf)"
-        filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
-                                                  self.lastDirectory, filters)
-        if not filename:
-            return
+        filename = self.get_save_filename('.pdf')
+        doc = App.getDocument("punch")
+        pdf.createPdf(doc, filename)
+
+    def export_to_image(self):
+        filename = self.get_save_filename('.png')
         doc = App.getDocument("punch")
         pdf.createPdf(doc, filename)
 
@@ -98,9 +101,19 @@ class PunchTaskPanel:
         filters += ')'
         filename, _ = QFileDialog.getOpenFileName(self.form, 'select file',
                                                   self.lastDirectory, filters)
-
         if not filename:
             return
+        self.lastDirectory = self.getLastSaveDirectory(filename)
+        return filename
+
+    def get_save_filename(self, ext):
+        filters = f"{ext[:-1]} (*{ext})"
+        filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
+                                                  self.lastDirectory, filters)
+        if not filename:
+            return
+        if not ext in filename:
+            filename += ext
         self.lastDirectory = self.getLastSaveDirectory(filename)
         return filename
 

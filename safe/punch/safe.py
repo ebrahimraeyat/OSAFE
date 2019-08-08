@@ -178,7 +178,9 @@ class Safe:
         return concrete_mat
 
     def grid_lines(self):
-        grid_lines_sheet = self.excel['Grid Lines']
+        grid_lines_sheet = self.excel.get('Grid Lines', None)
+        if grid_lines_sheet is None:
+            return None
         grid_lines = {'x': {}, 'y': {}}
         for _, row in grid_lines_sheet.iterrows():
             _dir = row['AxisDir'].lower()
