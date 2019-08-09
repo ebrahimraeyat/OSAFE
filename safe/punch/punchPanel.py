@@ -83,12 +83,12 @@ class PunchTaskPanel:
         webbrowser.open_new(abs_path + '/Help.pdf')
 
     def export_to_excel(self):
-        filters = "Excel (*.xls *.xlsx)"
+        filters = "Excel (*.xlsx)"
         filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
                                                   self.lastDirectory, filters)
         if not filename:
             return
-        if not '.xls' in filename:
+        if not '.xlsx' in filename:
             filename += ".xlsx"
         self.ratios_df.to_excel(filename)
 
