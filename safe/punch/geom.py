@@ -308,8 +308,8 @@ class Geom(object):
             ax_gui.FontSize = 750
 
     def plot(self):
-        doc = App.getDocument("punch")
-        gui = Gui.getDocument("punch")
+        doc = App.ActiveDocument
+        gui = Gui.ActiveDocument
         self.obj_geom_points = self.create_vectors(self._safe.obj_geom_points)
         self.obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
         self.obj_geom_point_loads = self.create_column(self._safe.point_loads)

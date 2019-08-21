@@ -38,7 +38,7 @@ class PunchTaskPanel:
         self.form.help_button.clicked.connect(self.help)
 
     def clearAll(self):
-        doc = App.getDocument("punch")
+        doc = App.ActiveDocument
         if doc is None:
             return
         objs = doc.Objects
@@ -94,12 +94,12 @@ class PunchTaskPanel:
 
     def export_to_pdf(self):
         filename = self.get_save_filename('.pdf')
-        doc = App.getDocument("punch")
+        doc = App.ActiveDocument
         pdf.createPdf(doc, filename)
 
     def export_to_image(self):
         filename = self.get_save_filename('.png')
-        doc = App.getDocument("punch")
+        doc = App.ActiveDocument
         pdf.createPdf(doc, filename)
 
     def getLastSaveDirectory(self, f):
