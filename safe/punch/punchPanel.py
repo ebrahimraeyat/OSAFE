@@ -9,7 +9,8 @@ from PySide2.QtWidgets import *
 from safe.punch import geom
 from safe.punch import pdf
 # from safe.punch.colorbar import ColorMap
-abs_path = os.path.split(os.path.abspath(__file__))[0]
+punch_path = os.path.split(os.path.abspath(__file__))[0]
+civil_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
 
 
 class PunchTaskPanel:
@@ -22,12 +23,13 @@ class PunchTaskPanel:
     def setupUi(self):
         # self.createWidgetsOne()
         self.create_connections()
-        icon_path = abs_path + '/icon'
+        icon_path = punch_path + '/icon'
         self.form.export_excel_button.setIcon(QPixmap(icon_path + "/xlsx.png"))
         self.form.export_pdf_button.setIcon(QPixmap(icon_path + "/pdf.svg"))
         self.form.export_image_button.setIcon(QPixmap(icon_path + "/png.png"))
         self.form.calculate_punch_button.setIcon(QPixmap(icon_path + "/run.svg"))
         self.form.help_button.setIcon(QPixmap(icon_path + "/help.svg"))
+        self.form.update_button.setIcon(QPixmap(icon_path + "/update.png"))
 
     def create_connections(self):
         self.form.excel_button.clicked.connect(self.on_browse)
@@ -37,6 +39,7 @@ class PunchTaskPanel:
         self.form.export_pdf_button.clicked.connect(self.export_to_pdf)
         self.form.export_image_button.clicked.connect(self.export_to_image)
         self.form.help_button.clicked.connect(self.help)
+        self.form.update_button.clicked.connect(self.update)
 
     def clearAll(self):
         doc = App.ActiveDocument
@@ -83,7 +86,7 @@ class PunchTaskPanel:
 
     def help(self):
         import webbrowser
-        webbrowser.open_new(abs_path + '/Help.pdf')
+        webbrowser.open_new(punch_path + '/Help.pdf')
 
     def export_to_excel(self):
         filters = "Excel (*.xlsx)"
@@ -130,6 +133,78 @@ class PunchTaskPanel:
             filename += ext
         self.lastDirectory = self.getLastSaveDirectory(filename)
         return filename
+
+    def update(self):
+        from git import Repo, Git
+        repo = Repo(civil_path)
+        if (QMessageBox.question(None, "update", "update to latest version?!",
+                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.No):
+            return
+        if not internet():
+            msg = "You are not connected to the Internet, please check your internet connection."
+            QMessageBox.warning(None, 'update', str(msg))
+            return
+
+        import git
+        g = git.cmd.Git(civil_path)
+        msg = ''
+        try:
+            msg = g.pull(env={'GIT_SSL_NO_VERIFY': '1'})
+        except:
+            QMessageBox.information(None, "update", "update takes some minutes, please be patient.")
+            import shutil
+            import tempfile
+            default_tmp_dir = tempfile._get_default_tempdir()
+            name = next(tempfile._get_candidate_names())
+            punch_temp_dir = os.path.join(default_tmp_dir, 'Civil' + name)
+            os.mkdir(punch_temp_dir)
+            os.chdir(punch_temp_dir)
+            git.Git('.').clone("https://github.com/ebrahimraeyat/Civil.git", env={'GIT_SSL_NO_VERIFY': '1'})
+            shutil.rmtree(civil_path, onerror=onerror)
+            src_folder = os.path.join(punch_temp_dir, 'Civil')
+            shutil.copytree(src_folder, civil_path)
+            msg = 'update done successfully, please restart FreeCAD.'
+
+        # os.chdir(civiltools_path + '/..')
+        # pip_install = f'pip install --upgrade  --install-option="--prefix={civiltools_path}/.." git+https://github.com/ebrahimraeyat/civilTools.git'
+        # subprocess.Popen([python_exe, '-m', pip_install])
+        else:
+            if not msg:
+                msg = 'error occured during update\nplease contact with @roknabadi'
+        # msg += '\n please restart the programm.'
+        QMessageBox.information(None, 'update', msg)
+
+
+def onerror(func, path, exc_info):
+    """
+    Error handler for ``shutil.rmtree``.
+
+    If the error is due to an access error (read only file)
+    it attempts to add write permission and then retries.
+
+    If the error is for another reason it re-raises the error.
+
+    Usage : ``shutil.rmtree(path, onerror=onerror)``
+    """
+    import stat
+    if not os.access(path, os.W_OK):
+        # Is the error an access error ?
+        os.chmod(path, stat.S_IWUSR)
+        func(path)
+    else:
+        print('another error')
+        raise
+
+
+def internet(host="8.8.8.8", port=53, timeout=3):
+    import socket
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except Exception as ex:
+        #         print(ex.message)
+        return False
 
 
 if __name__ == '__main__':
