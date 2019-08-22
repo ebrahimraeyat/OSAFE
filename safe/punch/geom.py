@@ -386,7 +386,9 @@ class Geom(object):
                 continue
             location = location.rstrip('1234').lower()
             b0d = punch.Area
-            Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0d)
+            b0 = punch.b0
+            d = punch.d
+            Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0, d)
         return Vc_allowable
 
     def punch_ratios(self):

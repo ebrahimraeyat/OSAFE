@@ -20,6 +20,7 @@ class _Punch:
             'Interier': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
         }
         self.set_properties(obj)
+        self.Object = obj
 
     def set_properties(self, obj):
         obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
@@ -45,6 +46,7 @@ class _Punch:
         obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
         obj.addProperty("App::PropertyLink", "text", "Punch")
+        obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True).b0 = 0
         obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
 
     def onChanged(self, fp, prop):
@@ -66,7 +68,19 @@ class _Punch:
         obj.I22, obj.I33, obj.I23 = self.moment_inersia(obj)
         obj.Area = self._area(obj)
         obj.x3, obj.y3, _ = self.center_of_mass(obj)
+        obj.b0 = self.get_b0(obj)
+        obj.d = obj.Area / obj.b0
         return
+
+    def get_b0(self, obj):
+        b0 = 0
+        for f in obj.faces:
+            if f.ViewObject.isVisible():
+                for e in f.Shape.Edges:
+                    if e.BoundBox.ZLength == 0:
+                        b0 += e.Length
+                        break
+        return b0
 
     def _area(self, obj):
         area = 0
