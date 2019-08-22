@@ -20,6 +20,7 @@ class Geom(object):
             self.load_combinations = self._safe.load_combinations
             self.point_loads = self._safe.points_loads
             self.removeSplitter = True
+        self.ACI2019 = False
 
     def create_vectors(self, points_prop=None):
         vectors = {}
@@ -388,7 +389,7 @@ class Geom(object):
             b0d = punch.Area
             b0 = punch.b0
             d = punch.d
-            Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0, d)
+            Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0, d, self.ACI2019)
         return Vc_allowable
 
     def punch_ratios(self):

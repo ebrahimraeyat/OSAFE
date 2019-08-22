@@ -20,7 +20,6 @@ class _Punch:
             'Interier': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
         }
         self.set_properties(obj)
-        self.Object = obj
 
     def set_properties(self, obj):
         obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
@@ -30,13 +29,6 @@ class _Punch:
         obj.addProperty("App::PropertyInteger", "fc", "Punch", "", 1, True)
         obj.addProperty("App::PropertyFloat", "bx", "Column", "", 1, True)
         obj.addProperty("App::PropertyFloat", "by", "Column", "", 1, True)
-        # obj.addProperty("App::PropertyStringList", "faces", "Punch", "", 1, False)
-        # obj.addProperty("App::PropertyLength", "d", "Punch", "", 1, True)
-        # obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
-        # obj.addProperty("App::PropertyArea", "Area", "Punch", "", 1, True)
-        # obj.addProperty("App::PropertyInteger", "fc", "Punch", "", 1, True)
-        # obj.addProperty("App::PropertyLength", "bx", "Column", "", 1, True)
-        # obj.addProperty("App::PropertyLength", "by", "Column", "", 1, True)
         obj.addProperty("App::PropertyInteger", "number", "Column", "", 1, True)
         obj.addProperty("App::PropertyFloat", "I22", "Punch", "", 1, True)
         obj.addProperty("App::PropertyFloat", "I33", "Punch", "", 1, True)
@@ -45,8 +37,8 @@ class _Punch:
         obj.addProperty("App::PropertyFloat", "y3", "Punch", "", 1, True)
         obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
-        obj.addProperty("App::PropertyLink", "text", "Punch")
-        obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True).b0 = 0
+        obj.addProperty("App::PropertyLink", "text", "Punch", "", 1, True)
+        obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
         obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
 
     def onChanged(self, fp, prop):

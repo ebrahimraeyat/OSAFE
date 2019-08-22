@@ -22,11 +22,12 @@ class PunchTaskPanel:
     def setupUi(self):
         # self.createWidgetsOne()
         self.create_connections()
-        self.form.export_excel_button.setIcon(QPixmap(abs_path + "/xlsx.png"))
-        self.form.export_pdf_button.setIcon(QPixmap(abs_path + "/pdf.svg"))
-        self.form.export_image_button.setIcon(QPixmap(abs_path + "/png.png"))
-        self.form.calculate_punch_button.setIcon(QPixmap(abs_path + "/run.svg"))
-        self.form.help_button.setIcon(QPixmap(abs_path + "/help.svg"))
+        icon_path = abs_path + '/icon'
+        self.form.export_excel_button.setIcon(QPixmap(icon_path + "/xlsx.png"))
+        self.form.export_pdf_button.setIcon(QPixmap(icon_path + "/pdf.svg"))
+        self.form.export_image_button.setIcon(QPixmap(icon_path + "/png.png"))
+        self.form.calculate_punch_button.setIcon(QPixmap(icon_path + "/run.svg"))
+        self.form.help_button.setIcon(QPixmap(icon_path + "/help.svg"))
 
     def create_connections(self):
         self.form.excel_button.clicked.connect(self.on_browse)
@@ -49,6 +50,7 @@ class PunchTaskPanel:
 
     def update_shape(self):
         filename = self.form.excel_lineedit.text()
+        # ACI2019 = self.form.ACI2019_checkbox.isChecked()
         self.shape = geom.Geom(filename)
         combos = self.shape.load_combinations['Combo'].unique()
         self.form.load_combination_box.addItems(list(combos))
@@ -57,6 +59,7 @@ class PunchTaskPanel:
         self.form.calculate_punch_button.setEnabled(True)
 
     def calculate_punch(self):
+        self.shape.ACI2019 = self.form.ACI2019_checkbox.isChecked()
         self.ratios_df = self.shape.punch_ratios()
         # self.add_color_map()
         self.form.export_excel_button.setEnabled(True)
