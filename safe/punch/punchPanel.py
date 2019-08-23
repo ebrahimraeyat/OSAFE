@@ -135,8 +135,7 @@ class PunchTaskPanel:
         return filename
 
     def update(self):
-        from git import Repo, Git
-        repo = Repo(civil_path)
+
         if (QMessageBox.question(None, "update", "update to latest version?!",
                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.No):
             return
