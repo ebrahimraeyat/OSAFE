@@ -62,7 +62,6 @@ class PunchTaskPanel:
         self.form.calculate_punch_button.setEnabled(True)
 
     def calculate_punch(self):
-        self.shape.ACI2019 = self.form.ACI2019_checkbox.isChecked()
         self.ratios_df = self.shape.punch_ratios()
         # self.add_color_map()
         self.form.export_excel_button.setEnabled(True)

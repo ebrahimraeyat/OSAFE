@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>497</width>
+    <width>411</width>
     <height>528</height>
    </rect>
   </property>
@@ -43,13 +43,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="ACI2019_checkbox">
-     <property name="text">
-      <string>Apply ACI 2019</string>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QFrame" name="frame">

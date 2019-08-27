@@ -22,6 +22,7 @@ class _Punch:
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        obj.addProperty("App::PropertyLink", "text", "Punch", "", 1, True)
         obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
         obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
         obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
@@ -37,7 +38,6 @@ class _Punch:
         obj.addProperty("App::PropertyFloat", "y3", "Punch", "", 1, True)
         obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
-        obj.addProperty("App::PropertyLink", "text", "Punch", "", 1, True)
         obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
         obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
 
@@ -158,10 +158,17 @@ class _ViewProviderPunch:
 
     def updateData(self, fp, prop):
         ''' If a property of the handled feature has changed we have the chance to handle this here '''
-        if float(fp.Ratio) >= 1:
-            fp.ViewObject.ShapeColor = (1., 0.0, 0.0)
-        else:
-            fp.ViewObject.ShapeColor = (0.0, 1., 0.0)
+        if prop == "Ratio":
+            if float(fp.Ratio) == 0:
+                return
+            ratio = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1.0)
+            if float(fp.Ratio) > ratio:
+                color = get_color("Ratio_above_color", 674321151)
+                # fp.ViewObject.ShapeColor = (1., 0.0, 0.0)
+            else:
+                color = get_color("Ratio_below_color", 674321151)
+            fp.ViewObject.ShapeColor = color
+            fp.text.ViewObject.TextColor = color
         return
 
     def getDisplayModes(self, obj):
@@ -228,3 +235,11 @@ class _ViewProviderPunch:
         internals here. Since no data were pickled nothing needs to be done here.
         '''
         return None
+
+
+def get_color(pref_intity, color=674321151):
+    c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
+    r = float((c >> 24) & 0xFF) / 255.0
+    g = float((c >> 16) & 0xFF) / 255.0
+    b = float((c >> 8) & 0xFF) / 255.0
+    return (r, g, b)

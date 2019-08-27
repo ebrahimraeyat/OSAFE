@@ -9,11 +9,11 @@ def createPdf(doc, pdfName):
     foun = doc.Foun
     fig = plt.figure()
     b = foun.Shape.BoundBox
-    xMin, yMin, xMax, yMax = b.XMin, b.YMin, b.XMax, b.YMax
-    xMin -= .2 * abs(xMin)
-    yMin -= .2 * abs(yMin)
-    xMax += .2 * abs(xMax)
-    yMax += .2 * abs(yMax)
+    XMIN, YMIN, XMAX, YMAX = b.XMin, b.YMin, b.XMax, b.YMax
+    XMIN -= .2 * abs(XMIN)
+    YMIN -= .2 * abs(YMIN)
+    XMAX += .2 * abs(XMAX)
+    YMAX += .2 * abs(YMAX)
     ax1 = fig.add_subplot(111, aspect='equal')
 
     plt.axis('off')
@@ -28,9 +28,7 @@ def createPdf(doc, pdfName):
     text_ratio = f''
     for o in doc.Objects:
         if 'Punch' in o.Name:
-            color = 'green'
-            if float(o.Ratio) > 1:
-                color = 'red'
+            color = o.ViewObject.ShapeColor[:-1]
             for f in o.faces:
                 if f.ViewObject.isVisible():
                     xy = []
@@ -73,8 +71,8 @@ def createPdf(doc, pdfName):
                 x = v1.X
                 y = max(v1.Y, v2.Y) + r
                 YMAX = y + 2 * r
-            XMAX = max(v1.X, v2.X, xMax)
-            YMIN = min(v1.Y, v2.Y, yMin)
+            XMAX = max(v1.X, v2.X, XMAX)
+            YMIN = min(v1.Y, v2.Y, YMIN)
             p = patches.Circle([x, y], r, facecolor='white', edgecolor='black', linewidth=.3)
             ax1.add_patch(p)
             ax1.annotate(o.CustomNumber, (x, y), color='black', fontsize=6, ha='center', va='center', rotation=0, annotation_clip=False)

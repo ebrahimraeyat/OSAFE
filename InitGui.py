@@ -5,8 +5,13 @@ class CivilWorkbench(Workbench):
 
     def __init__(self):
         rel_path = "Mod/Civil/images/civil-engineering.png"
-        icon_path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        pref_visual_ui_rel_path = "Mod/Civil/ui/preferences-punch_visual.ui"
+        self.pref_visual_ui_abs_path = FreeCAD.ConfigGet("AppHomePath") + pref_visual_ui_rel_path
         import os
+        if not os.path.exists(self.pref_visual_ui_abs_path):
+            self.pref_visual_ui_abs_path = FreeCAD.ConfigGet("UserAppData") + pref_visual_ui_rel_path
+
+        icon_path = FreeCAD.ConfigGet("AppHomePath") + rel_path
         if not os.path.exists(icon_path):
             icon_path = FreeCAD.ConfigGet("UserAppData") + rel_path
 
@@ -24,6 +29,7 @@ class CivilWorkbench(Workbench):
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP(
             "Civil",
             "Civil")), command_list)
+        Gui.addPreferencePage(self.pref_visual_ui_abs_path, "punch")
 
 
 Gui.addWorkbench(CivilWorkbench())

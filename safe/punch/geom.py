@@ -20,7 +20,6 @@ class Geom(object):
             self.load_combinations = self._safe.load_combinations
             self.point_loads = self._safe.points_loads
             self.removeSplitter = True
-        self.ACI2019 = False
 
     def create_vectors(self, points_prop=None):
         vectors = {}
@@ -275,6 +274,9 @@ class Geom(object):
         return punchs
 
     def grid_lines(self):
+        if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
+            return
+
         gridLines = self._safe.grid_lines()
         if gridLines is None:
             return
@@ -389,7 +391,8 @@ class Geom(object):
             b0d = punch.Area
             b0 = punch.b0
             d = punch.d
-            Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0, d, self.ACI2019)
+            ACI2019 = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("apply_aci2019", False)
+            Vc_allowable[_id] = allowable_stress(bx, by, location, fc, b0, d, ACI2019)
         return Vc_allowable
 
     def punch_ratios(self):
@@ -406,8 +409,18 @@ class Geom(object):
             t = f"{ratio:.2f}"
             punch.Ratio = t
             punch.text.Text = [punch.Location, punch.Ratio]
-            if ratio > 1:
-                punch.text.ViewObject.TextColor = (1., 0.0, 0.0)
-            else:
-                punch.text.ViewObject.TextColor = (1., 1., 1.)
+            # r = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1)
+            # if ratio > r:
+            #     color = Geom.__get_color("Ratio_above_color", 674321151)
+            # else:
+            #     color = (1., 1., 1.)
+            # punch.text.ViewObject.TextColor = color
         return df
+
+    @staticmethod
+    def __get_color(pref_intity, color=674321151):
+        c = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
+        r = float((c >> 24) & 0xFF) / 255.0
+        g = float((c >> 16) & 0xFF) / 255.0
+        b = float((c >> 8) & 0xFF) / 255.0
+        return (r, g, b)
