@@ -195,33 +195,12 @@ class _ViewProviderPunch:
         ''' Return the icon in XMP format which will appear in the tree view. This method is optional
         and if not defined a default icon is shown.
         '''
-        return """
-            /* XPM */
-            static const char * ViewProviderBox_xpm[] = {
-            "16 16 6 1",
-            "   c None",
-            ".  c #141010",
-            "+  c #615BD2",
-            "@  c #C39D55",
-            "#  c #000000",
-            "$  c #57C355",
-            "        ........",
-            "   ......++..+..",
-            "   .@@@@.++..++.",
-            "   .@@@@.++..++.",
-            "   .@@  .++++++.",
-            "  ..@@  .++..++.",
-            "###@@@@ .++..++.",
-            "##$.@@$#.++++++.",
-            "#$#$.$$$........",
-            "#$$#######      ",
-            "#$$#$$$$$#      ",
-            "#$$#$$$$$#      ",
-            "#$$#$$$$$#      ",
-            " #$#$$$$$#      ",
-            "  ##$$$$$#      ",
-            "   #######      "};
-            """
+        rel_path = "Mod/Civil/images/punch.svg"
+        icon_path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        import os
+        if not os.path.exists(icon_path):
+            icon_path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        return icon_path
 
     def __getstate__(self):
         ''' When saving the document this object gets stored using Python's cPickle module.
