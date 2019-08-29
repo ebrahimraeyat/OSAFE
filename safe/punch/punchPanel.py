@@ -168,8 +168,8 @@ class PunchTaskPanel:
         # subprocess.Popen([python_exe, '-m', pip_install])
         else:
             if not msg:
-                msg = 'error occured during update\nplease contact with @roknabadi'
-        # msg += '\n please restart the programm.'
+                msg = 'error occurred during update\nplease contact with @roknabadi'
+        # msg += '\n please restart the program.'
         QMessageBox.information(None, 'update', msg)
 
 

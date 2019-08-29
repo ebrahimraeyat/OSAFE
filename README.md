@@ -1,5 +1,5 @@
 ## FreeCAD Civil Engineering Workbench
-A collection of civil engineering tools in FreeCAD.
+A collection of civil engineering tools for [FreeCAD](https://freecadweb.org)
 
 ![image](https://user-images.githubusercontent.com/8196112/48443187-3674e880-e788-11e8-9eec-3668095d8f65.png)
 
@@ -10,10 +10,10 @@ A collection of civil engineering tools in FreeCAD.
 At present this workbench includes two different functionalities:
 
 ### Shear Punching
-This reads an excel output from CSI Safe software and calculate shear punching ratio. 
+This reads an excel output from the CSI Safe software and calculates shear punching ratio.
 
 ### Sections
-This converts a combined steel section to one standard section (I shape) to be imported in CSI Etabs for checking classification of compact level of section.
+This converts a combined steel section into one standard section (`I shape`) which is then to be imported into CSI Etabs for checking classification of compact level of section.
 
 ## Installation
 ### Debian 10 (Buster)
