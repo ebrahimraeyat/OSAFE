@@ -2,6 +2,15 @@ from collections import namedtuple
 import pandas as pd
 import numpy as np
 
+global unit_dict
+
+unit_dict = dict(
+    Kip='1000 lb',
+    KN='kN',
+    Kgf='kg',
+    Tonf='t',
+)
+
 
 class Safe:
     __bool = {'Yes': True, 'No': False}
@@ -9,14 +18,9 @@ class Safe:
     def __init__(self, filename):
         self.filename = filename
         self.excel = None
-        self.access = None
         self.read_file()
         self.read_sheets_informations()
-        self.load_combinations = self.read_load_combinations()
         self.points_loads = self.read_point_loads()
-        self.points_loads_combinations = self.apply_loads_combinations_to_points(
-            self.load_combinations, self.points_loads)
-        self.combos = self.points_loads_combinations['Combo'].unique()
 
     def __str__(self):
         s = ''
@@ -24,16 +28,11 @@ class Safe:
             return s
         s += f"{self.program_name} ver '{self.version}'\n"
         s += f'Code : {self.concrete_code}\n'
-        s += f"No. of Columns = {len(self.points_loads['Point'].unique())}\n"
-        s += f"No. of Load Combinations = {len(self.load_combinations['Combo'].unique())}"
         return s
 
     def read_file(self):
         if self.filename.endswith((".xls", ".xlsx")):
-            self.excel = pd.read_excel(self.filename, sheetname=['Program Control', 'Obj Geom - Point Coordinates', 'Obj Geom - Areas 01 - General', 'Load Assignments - Point Loads', 'Slab Prop 02 - Solid Slabs', 'Slab Property Assignments', 'Material Prop 03 - Concrete', 'Grid Lines', 'Load Combinations', 'Load Cases 06 - Loads Applied'], skiprows=[0, 2])
-        elif self.filename.endswith((".mdb", ".accdb")):
-            # TODO
-            pass
+            self.excel = pd.read_excel(self.filename, sheetname=['Program Control', 'Obj Geom - Point Coordinates', 'Obj Geom - Areas 01 - General', 'Slab Prop 02 - Solid Slabs', 'Slab Property Assignments', 'Material Prop 03 - Concrete', 'Grid Lines', 'Load Assignments - Point Loads', ], skiprows=[0, 2])
 
     def read_sheets_informations(self):
         self.program_control()
@@ -48,12 +47,9 @@ class Safe:
         self.fc = min(self.concrete_mat.values()) * 1000
 
     def program_control(self):
-        if self.excel is not None:
-            program_control = self.excel["Program Control"]
-        elif self.access:
-            # TODO
-            pass
-
+        if self.excel is None:
+            return
+        program_control = self.excel["Program Control"]
         self.program_name = program_control["ProgramName"][0]
         self.version = program_control["Version"][0]
         UNITS = namedtuple("UNITS", 'force length temp')
@@ -112,9 +108,8 @@ class Safe:
 
     def point_loads(self):
         point_loads_sheet = self.excel["Load Assignments - Point Loads"]
-        POINTLOADS = namedtuple("POINTLOADS", 'fx fy fz mx my mz')
         point_ids = point_loads_sheet['Point'].unique()
-        point_loads = {_id: {'xdim': 0, 'ydim': 0, 'loads': {}} for _id in point_ids}
+        point_loads = {_id: {'xdim': 0, 'ydim': 0} for _id in point_ids}
         load_pats = point_loads_sheet['LoadPat'].unique()
         for _, row in point_loads_sheet.iterrows():
             xdim = row['XDim']
@@ -123,15 +118,6 @@ class Safe:
             if xdim == 0 or ydim == 0:
                 point_loads.pop(_id, None)
                 continue
-            load_pat = row['LoadPat']
-            fx = row['Fx']
-            fy = row['Fy']
-            fz = row['Fgrav']
-            mx = row['Mx']
-            my = row['My']
-            mz = row['Mz']
-            curr_loads = (fx, fy, fz, mx, my, mz)
-            point_loads[_id]['loads'][load_pat] = POINTLOADS._make(curr_loads)
             point_loads[_id]['xdim'] = xdim
             point_loads[_id]['ydim'] = ydim
         return point_loads
@@ -188,77 +174,6 @@ class Safe:
             ordinate = row['Ordinate']
             grid_lines[_dir][_id] = ordinate
         return grid_lines
-
-    def read_load_combinations(self):
-        df_comb = self.excel['Load Combinations']
-        combos_sr = df_comb['Combo'].unique()
-        combos_sr_yes = df_comb[df_comb['DSStrength'] == 'Yes']['Combo'].unique()
-        df, load_cases_sr = self.read_load_cases()
-        index = 0
-        combo_df = pd.DataFrame(columns=['Combo', 'Load', 'SF'])
-        combo_load_dict = {}
-        for _, row in df_comb.iterrows():
-            if row['Combo'] in combos_sr_yes:
-                combination = row['Combo']
-                load = row['Load']
-                sf = row['SF']
-                if load in combos_sr:
-                    combo = df_comb[df_comb['Combo'] == load]
-                    for _, row2 in combo.iterrows():
-                        load2 = row2['Load']
-                        sf2 = row2['SF']
-                        case2 = df[df['LoadCase'] == load2]
-                        for _, row3 in case2.iterrows():
-                            text = combination + row3['LoadPat']
-                            i = combo_load_dict.get(text, None)
-                            if i:
-                                combo_df['SF'][i] += sf * sf2 * row3['SF']
-                            else:
-                                combo_df.loc[index] = [combination, row3['LoadPat'], sf * sf2 * row3['SF']]
-                                combo_load_dict[text] = index
-                                index += 1
-                elif load in load_cases_sr:
-                    case = df[df['LoadCase'] == load]
-                    for _, row4 in case.iterrows():
-                        text = combination + row4['LoadPat']
-                        i = combo_load_dict.get(text, None)
-                        if i:
-                            combo_df['SF'][i] += sf * row4['SF']
-                        else:
-                            combo_df.loc[index] = [combination, row4['LoadPat'], sf * row4['SF']]
-                            combo_load_dict[text] = index
-                            index += 1
-        return combo_df
-
-    def read_load_cases(self):
-        df = self.excel['Load Cases 06 - Loads Applied']
-        cases = df['LoadCase'].unique()
-        return df, cases
-
-    def read_point_loads(self):
-        df = self.excel['Load Assignments - Point Loads']
-        c = df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
-        # c.to_excel('/home/ebi/alaki/pl.xlsx')
-        return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
-
-    def apply_loads_combinations_to_points(self, combos_df, point_load_df):
-        points = point_load_df['Point'].unique()
-        combos_sr = combos_df['Combo'].unique()
-        points_combos_loads = pd.DataFrame(columns=['Point', 'Combo', 'Fgrav', 'Mx', 'My'])
-        index = 0
-        for p in points:
-            point = (point_load_df[point_load_df['Point'] == p][['LoadPat', 'Fgrav', 'Mx', 'My']]
-                     .set_index('LoadPat')
-                     )
-            for combo in combos_sr:
-                udcon = (combos_df[combos_df['Combo'] == combo]
-                         .set_index('Load')
-                         )
-                load = list(point.mul(udcon['SF'], axis=0).sum())
-                points_combos_loads.loc[index] = [p, combo] + load
-                index += 1
-        # points_combos_loads.to_excel('/home/ebi/alaki/3.xlsx')
-        return points_combos_loads
 
 
 if __name__ == '__main__':

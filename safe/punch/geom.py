@@ -92,14 +92,15 @@ class Geom(object):
             return foun
         foun = doc.addObject('Part::Feature', 'Foun')
         foun.Shape = fusion.Shape.removeSplitter()
-        gui.getObject(fusion.Name).Visibility = False
+        doc.removeObject(fusion.Label)
+        # gui.getObject(fusion.Name).Visibility = False
         return foun
 
     def create_3D_column(self, columns):
         for key, area in columns.items():
             col = Part.makeBox(area.Length, area.Height, 4000, area.Placement.Base)
             self.punchs[key].Shape = col
-            self.punchs[key].number = int(key)
+            # self.punchs[key].number = int(key)
 
     # def point_loads_is_in_witch_areas(self, areas, points_loads, obj_geom_points):
     #   ''' search areas that special point is in it/them
@@ -132,6 +133,8 @@ class Geom(object):
     def get_intersections_areas(self, obj1, obj2):
         outer = obj1.Shape.cut(obj2.Shape)
         inner = obj1.Shape.common(obj2.Shape)
+        doc = obj2.Document
+        doc.removeObject(obj2.Label)
         faces_outer = outer.Faces
         faces_inner = inner.Faces
         intersection_faces = []
@@ -256,20 +259,23 @@ class Geom(object):
             length = p.bx * 1.5
             height = p.by * 1.5
             l = p.Location
-            if l in ('Corner1', 'Corner4', 'Edge4'):
+            if l in ('Corner1', 'Corner4', 'Edge4', 'Interier'):
                 length *= -1
-            elif l in ('Edge1'):
+            elif l in ('Edge1', 'Interier'):
                 height *= -1
             # elif l in ('Edge3'):
             v = self.obj_geom_points[key]
-            v.x = v.x + length
-            v.y = v.y + height
-            pl = App.Vector(v.x, v.y, 4100)
+            x = v.x + length
+            y = v.y + height
+            pl = App.Vector(x, y, 4100)
             t = '0.0'
             p.Ratio = t
             text = Draft.makeText([t, l], point=pl)
             text.ViewObject.FontSize = 200
             p.text = text
+            # pl = App.Vector(v.x, v.y, 0)
+            # p.Placement.Base = pl
+            p.number = int(key)
             punchs[key] = p
         return punchs
 
@@ -304,7 +310,6 @@ class Geom(object):
             ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
             ax.Distances = [coord]
             ax.CustomNumber = str(text)
-            # ax.Placement.Base.x = b.XMax
             Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
             ax_gui = ax.ViewObject
             ax_gui.BubbleSize = 1500
@@ -314,10 +319,11 @@ class Geom(object):
         doc = App.ActiveDocument
         gui = Gui.ActiveDocument
         self.obj_geom_points = self.create_vectors(self._safe.obj_geom_points)
-        self.obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
+        obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
         self.obj_geom_point_loads = self.create_column(self._safe.point_loads)
         self.columns_number = list(self._safe.point_loads.keys())
-        self.structures = self.create_structures(self.obj_geom_areas)
+        self.structures = self.create_structures(obj_geom_areas)
+        del obj_geom_areas
         self.fusion = self.create_fusion(self.structures, doc)
         doc.recompute()
         self.foundation = self.create_foundation(self.fusion, doc, gui)
@@ -338,10 +344,10 @@ class Geom(object):
         combos = self._safe.combos
         Vus_df = pd.DataFrame(index=combos)
         prop_df = pd.DataFrame(index=['I22', 'I33', 'I23', 'location', 'b0d', 'gammaـv2', 'gamma_v3', 'bx', 'by', 'x1', 'y1'])
-        for _id, point_prop in self._safe.point_loads.items():
-            punch = self.punchs.get(_id, None)
-            bx = point_prop['xdim']
-            by = point_prop['ydim']
+        for punch in self.punchs.values():
+            bx = punch.bx
+            by = punch.by
+            _id = punch.number
             location = punch.Location
             if not location:
                 Vus_df[_id] = 0

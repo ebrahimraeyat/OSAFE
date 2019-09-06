@@ -164,7 +164,6 @@ class _ViewProviderPunch:
             ratio = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1.0)
             if float(fp.Ratio) > ratio:
                 color = get_color("Ratio_above_color", 674321151)
-                # fp.ViewObject.ShapeColor = (1., 0.0, 0.0)
             else:
                 color = get_color("Ratio_below_color", 674321151)
             fp.ViewObject.ShapeColor = color

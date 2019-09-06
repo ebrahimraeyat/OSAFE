@@ -50,9 +50,9 @@ def createPdf(doc, pdfName):
             c = o.text.Placement.Base
             ha = 'right'
             va = 'center'
-            if o.Location in ('Corner2', 'Edge2', 'Corner3'):
+            if o.Location in ('Corner2', 'Edge2', 'Corner3', 'Interier'):
                 ha = 'left'
-            if o.Location in ('Corner3', 'Edge3', 'Corner4'):
+            if o.Location in ('Corner3', 'Edge3', 'Corner4', 'Interier'):
                 va = 'bottom'
             ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=0, annotation_clip=False)
 

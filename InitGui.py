@@ -21,7 +21,7 @@ class CivilWorkbench(Workbench):
 
     def Initialize(self):
         from PySide2 import QtCore, QtGui
-        command_list = ["Punch"]
+        command_list = ["Punch", "Copy", "Civil_pdf"]
 
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP(
             "Civil",
