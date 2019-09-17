@@ -54,7 +54,7 @@ class PunchTaskPanel:
     def update_shape(self):
         filename = self.form.excel_lineedit.text()
         # ACI2019 = self.form.ACI2019_checkbox.isChecked()
-        self.shape = geom.Geom(filename)
+        self.shape = geom.Geom(filename, self.form)
         combos = self.shape.load_combinations['Combo'].unique()
         self.form.load_combination_box.addItems(list(combos))
         self.form.safe_prop_browser.setText(self.shape._safe.__str__())
@@ -78,9 +78,12 @@ class PunchTaskPanel:
     #     mw.addDockWidget(Qt.RightDockWidgetArea, ColorMapWidget)  # add the widget to the main window
 
     def on_browse(self):
+        self.form.bar_label.setText('Reading excel file ...')
         filename = self.getFilename(['xls', 'xlsx'])
         if not filename:
+            self.form.bar_label.setText('')
             return
+
         self.form.excel_lineedit.setText(filename)
 
     def help(self):

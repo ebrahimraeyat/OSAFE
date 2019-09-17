@@ -12,7 +12,9 @@ from safe.punch.punch import _Punch, _ViewProviderPunch
 
 class Geom(object):
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, form=None):
+        self.progressbar = form.progressBar
+        self.bar_label = form.bar_label
         if filename:
             self._safe = safe.Safe(filename)
             self.solid_slabs = self._safe.solid_slabs
@@ -23,18 +25,21 @@ class Geom(object):
 
     def create_vectors(self, points_prop=None):
         vectors = {}
+        self.bar_label.setText("Reading Points Geometry")
         for key, value in points_prop.items():
             vectors[key] = App.Vector(round(value.x, 4), round(value.y, 4), int(value.z))
         return vectors
 
     def create_areas(self, areas_prop):
         areas = {}
+        self.bar_label.setText("Creating Areas Geometry")
         for key, points_id in areas_prop.items():
             points = [self.obj_geom_points[point_id] for point_id in points_id]
             areas[key] = Draft.makeWire(points, closed=True, face=True, support=None)
         return areas
 
     def create_column(self, point_loads_prop):
+        self.bar_label.setText("Creating columns Geometry")
         areas = {}
         for key, value in point_loads_prop.items():
             pl = App.Placement()
@@ -50,6 +55,7 @@ class Geom(object):
         return areas
 
     def create_structures(self, areas):
+        self.bar_label.setText("Creating structures Geometry")
         areas_thickness = self._safe.get_thickness(areas)
         structures = {}
         for key, area in areas.items():
@@ -60,6 +66,7 @@ class Geom(object):
         return structures
 
     def create_fusion(self, structures, doc):
+        self.bar_label.setText("Creating One Slab Geometry")
         slab_struc = []
         slab_opening = []
         for key, value in structures.items():
@@ -86,6 +93,7 @@ class Geom(object):
         return fusion
 
     def create_foundation(self, fusion, doc, gui):
+        self.bar_label.setText("Creating Foundation Geometry")
         if not self.removeSplitter:
             foun = doc.addObject('Part::Feature', 'Foun')
             foun.Shape = fusion.Shape
@@ -97,6 +105,7 @@ class Geom(object):
         return foun
 
     def create_3D_column(self, columns):
+        self.bar_label.setText("Creating 3D Columns")
         for key, area in columns.items():
             col = Part.makeBox(area.Length, area.Height, 4000, area.Placement.Base)
             self.punchs[key].Shape = col
@@ -119,6 +128,7 @@ class Geom(object):
     #   return point_loads_areas_contain
 
     def create_column_offset(self, column_areas, gui):
+        self.bar_label.setText("Creating offset of d/2 Geometry")
         offset_structures = {}
         d = self._safe.max_thickness
         for key, value in column_areas.items():
@@ -153,8 +163,12 @@ class Geom(object):
 
     def get_punch_faces(self, foun, offset_structures):
         punch_faces = {}
+        self.bar_label.setText("Get Punch Faces")
+        i = 1
         for key, value in offset_structures.items():
             punch_faces[key] = self.get_intersections_areas(foun, value)
+            self.progressbar.setValue(100 * i / len(self.columns_number))
+            i += 1
         return punch_faces
 
     def shell_center_of_mass(self, faces):
@@ -230,12 +244,14 @@ class Geom(object):
             return 'Interier'
 
     def loacation_of_columns(self):
+        self.bar_label.setText("Obtain Location of Columns")
         locations = {}
         for key, value in self.punch_faces.items():
             locations[key] = self.location_of_column(value)
         return locations
 
     def create_punches(self):
+        self.bar_label.setText("Creating Punch Objects")
         punchs = {}
         fc = self._safe.fc
         for key in self.columns_number:
@@ -326,6 +342,7 @@ class Geom(object):
         del obj_geom_areas
         self.fusion = self.create_fusion(self.structures, doc)
         doc.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
         self.foundation = self.create_foundation(self.fusion, doc, gui)
         self.offset_structures = self.create_column_offset(self.obj_geom_point_loads, gui)
         doc.recompute()
@@ -338,6 +355,8 @@ class Geom(object):
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
+        self.bar_label.setText("")
+        # self.progressbar.setValue(0)
         # Gui.activeDocument().activeView().setCameraType("Perspective")
 
     def ultimate_shear_stress(self):
