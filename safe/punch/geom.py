@@ -134,7 +134,7 @@ class Geom(object):
         outer = obj1.Shape.cut(obj2.Shape)
         inner = obj1.Shape.common(obj2.Shape)
         doc = obj2.Document
-        doc.removeObject(obj2.Label)
+        # doc.removeObject(obj2.Label)
         faces_outer = outer.Faces
         faces_inner = inner.Faces
         intersection_faces = []

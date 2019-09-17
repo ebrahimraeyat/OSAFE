@@ -22,11 +22,11 @@ class _Punch:
         self.set_properties(obj)
 
     def set_properties(self, obj):
-        obj.addProperty("App::PropertyLink", "text", "Punch", "", 1, True)
+        obj.addProperty("App::PropertyLink", "text", "Punch")
         obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
         obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
         obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
-        obj.addProperty("App::PropertyFloat", "Area", "Punch", "", 1, True)
+        obj.addProperty("App::PropertyFloat", "Area", "Punch")
         obj.addProperty("App::PropertyInteger", "fc", "Punch", "", 1, True)
         obj.addProperty("App::PropertyFloat", "bx", "Column", "", 1, True)
         obj.addProperty("App::PropertyFloat", "by", "Column", "", 1, True)
@@ -34,12 +34,17 @@ class _Punch:
         obj.addProperty("App::PropertyFloat", "I22", "Punch", "", 1, True)
         obj.addProperty("App::PropertyFloat", "I33", "Punch", "", 1, True)
         obj.addProperty("App::PropertyFloat", "I23", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "x3", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "y3", "Punch", "", 1, True)
+        obj.addProperty("App::PropertyFloat", "x3", "Punch")
+        obj.addProperty("App::PropertyFloat", "y3", "Punch")
         obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
         obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
         obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
+        obj.setEditorMode("text", 2)
+        obj.setEditorMode("x3", 2)
+        obj.setEditorMode("y3", 2)
+        obj.setEditorMode("Area", 2)
+        obj.setEditorMode("faces", 2)
 
     def onChanged(self, fp, prop):
         if prop == 'Location':

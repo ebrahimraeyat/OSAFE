@@ -30,7 +30,7 @@ class Safe:
 
     def read_file(self):
         if self.filename.endswith((".xls", ".xlsx")):
-            self.excel = pd.read_excel(self.filename, sheetname=['Program Control', 'Obj Geom - Point Coordinates', 'Obj Geom - Areas 01 - General', 'Load Assignments - Point Loads', 'Slab Prop 02 - Solid Slabs', 'Slab Property Assignments', 'Material Prop 03 - Concrete', 'Grid Lines', 'Load Combinations', 'Load Cases 06 - Loads Applied'], skiprows=[0, 2])
+            self.excel = pd.read_excel(self.filename, sheet_name=['Program Control', 'Obj Geom - Point Coordinates', 'Obj Geom - Areas 01 - General', 'Load Assignments - Point Loads', 'Slab Prop 02 - Solid Slabs', 'Slab Property Assignments', 'Material Prop 03 - Concrete', 'Grid Lines', 'Load Combinations', 'Load Cases 06 - Loads Applied'], skiprows=[0, 2])
         elif self.filename.endswith((".mdb", ".accdb")):
             # TODO
             pass
@@ -115,13 +115,24 @@ class Safe:
         POINTLOADS = namedtuple("POINTLOADS", 'fx fy fz mx my mz')
         point_ids = point_loads_sheet['Point'].unique()
         point_loads = {_id: {'xdim': 0, 'ydim': 0, 'loads': {}} for _id in point_ids}
+        null_id = []
+        for i, _id in enumerate(point_ids):
+            _df = point_loads_sheet[point_loads_sheet['Point'] == _id]
+            xdim = _df['XDim'].max()
+            ydim = _df['YDim'].max()
+            if not all([xdim, ydim]):
+                null_id.append(i)
+                point_loads.pop(_id)
+            else:
+                point_loads[_id]['xdim'] = int(xdim)
+                point_loads[_id]['ydim'] = int(ydim)
+        if null_id:
+            point_ids = np.delete(point_ids, null_id)
+
         load_pats = point_loads_sheet['LoadPat'].unique()
         for _, row in point_loads_sheet.iterrows():
-            xdim = row['XDim']
-            ydim = row['YDim']
             _id = row['Point']
-            if xdim == 0 or ydim == 0:
-                point_loads.pop(_id, None)
+            if not _id in point_ids:
                 continue
             load_pat = row['LoadPat']
             fx = row['Fx']
@@ -132,8 +143,8 @@ class Safe:
             mz = row['Mz']
             curr_loads = (fx, fy, fz, mx, my, mz)
             point_loads[_id]['loads'][load_pat] = POINTLOADS._make(curr_loads)
-            point_loads[_id]['xdim'] = xdim
-            point_loads[_id]['ydim'] = ydim
+            # point_loads[_id]['xdim'] = row['XDim']
+            # point_loads[_id]['ydim'] = row['YDim']
         return point_loads
 
     def solid_slabs(self):
@@ -237,8 +248,6 @@ class Safe:
 
     def read_point_loads(self):
         df = self.excel['Load Assignments - Point Loads']
-        c = df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
-        # c.to_excel('/home/ebi/alaki/pl.xlsx')
         return df[['Point', 'LoadPat', 'Fgrav', 'Mx', 'My']]
 
     def apply_loads_combinations_to_points(self, combos_df, point_load_df):
