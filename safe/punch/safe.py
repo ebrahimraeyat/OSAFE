@@ -115,36 +115,15 @@ class Safe:
         POINTLOADS = namedtuple("POINTLOADS", 'fx fy fz mx my mz')
         point_ids = point_loads_sheet['Point'].unique()
         point_loads = {_id: {'xdim': 0, 'ydim': 0, 'loads': {}} for _id in point_ids}
-        null_id = []
-        for i, _id in enumerate(point_ids):
+        for _id in point_ids:
             _df = point_loads_sheet[point_loads_sheet['Point'] == _id]
             xdim = _df['XDim'].max()
             ydim = _df['YDim'].max()
             if not all([xdim, ydim]):
-                null_id.append(i)
                 point_loads.pop(_id)
             else:
                 point_loads[_id]['xdim'] = int(xdim)
                 point_loads[_id]['ydim'] = int(ydim)
-        if null_id:
-            point_ids = np.delete(point_ids, null_id)
-
-        load_pats = point_loads_sheet['LoadPat'].unique()
-        for _, row in point_loads_sheet.iterrows():
-            _id = row['Point']
-            if not _id in point_ids:
-                continue
-            load_pat = row['LoadPat']
-            fx = row['Fx']
-            fy = row['Fy']
-            fz = row['Fgrav']
-            mx = row['Mx']
-            my = row['My']
-            mz = row['Mz']
-            curr_loads = (fx, fy, fz, mx, my, mz)
-            point_loads[_id]['loads'][load_pat] = POINTLOADS._make(curr_loads)
-            # point_loads[_id]['xdim'] = row['XDim']
-            # point_loads[_id]['ydim'] = row['YDim']
         return point_loads
 
     def solid_slabs(self):

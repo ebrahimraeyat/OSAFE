@@ -337,7 +337,7 @@ class Geom(object):
         self.create_3D_column(self.obj_geom_point_loads)
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
-        # Gui.activeDocument().activeView().viewAxonometric()
+        Gui.activeDocument().activeView().viewAxonometric()
         # Gui.activeDocument().activeView().setCameraType("Perspective")
 
     def ultimate_shear_stress(self):
@@ -384,8 +384,8 @@ class Geom(object):
 
     def allowable_shear_stress(self, fc=None):
         fc = self._safe.fc
-        Vc_allowable = pd.Series(index=list(self._safe.point_loads.keys()))
-        for _id, point_prop in self._safe.point_loads.items():
+        Vc_allowable = pd.Series(index=self.columns_number)
+        for _id in self.columns_number:
             punch = self.punchs[_id]
             bx = punch.bx
             by = punch.by
@@ -409,18 +409,12 @@ class Geom(object):
         df.loc['properties'] = df.columns
         df = df.append(prop_df)
         # insert ratios to Gui
-        for key, value in self._safe.point_loads.items():
+        for key in self.columns_number:
             punch = self.punchs.get(key, None)
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
             punch.Ratio = t
             punch.text.Text = [punch.Location, punch.Ratio]
-            # r = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1)
-            # if ratio > r:
-            #     color = Geom.__get_color("Ratio_above_color", 674321151)
-            # else:
-            #     color = (1., 1., 1.)
-            # punch.text.ViewObject.TextColor = color
         return df
 
     @staticmethod
