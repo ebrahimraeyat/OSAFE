@@ -340,10 +340,14 @@ class Geom(object):
         self.columns_number = list(self._safe.point_loads.keys())
         self.structures = self.create_structures(obj_geom_areas)
         del obj_geom_areas
-        self.fusion = self.create_fusion(self.structures, doc)
+        fusion = self.create_fusion(self.structures, doc)
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
-        self.foundation = self.create_foundation(self.fusion, doc, gui)
+        self.foundation = self.create_foundation(fusion, doc, gui)
+        # if fusion.Label:
+        #     import OpenSCADUtils
+        #     OpenSCADUtils.removesubtree(App.ActiveDocument.getObjectsByLabel(fusion.Label))
+        del fusion
         self.offset_structures = self.create_column_offset(self.obj_geom_point_loads, gui)
         doc.recompute()
         self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
