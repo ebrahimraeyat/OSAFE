@@ -168,10 +168,12 @@ class _ViewProviderPunch:
                 return
             ratio = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1.0)
             if float(fp.Ratio) > ratio:
-                color = get_color("Ratio_above_color", 674321151)
+                color = get_color("Ratio_above_color", 4278190335)
             else:
-                color = get_color("Ratio_below_color", 674321151)
+                color = get_color("Ratio_below_color", 16711935)
             fp.ViewObject.ShapeColor = color
+            if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("is_text_color", False):
+                color = get_color("text_color", 674321151)
             fp.text.ViewObject.TextColor = color
         return
 
@@ -220,9 +222,17 @@ class _ViewProviderPunch:
         return None
 
 
-def get_color(pref_intity, color=674321151):
+def get_color(pref_intity, color=16711935):
     c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
     r = float((c >> 24) & 0xFF) / 255.0
     g = float((c >> 16) & 0xFF) / 255.0
     b = float((c >> 8) & 0xFF) / 255.0
     return (r, g, b)
+
+# def get_color(pref_intity, default=11247519):
+#     RGBint = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, default)
+#     print(RGBint)
+#     b = (RGBint & 255) / 255
+#     g = ((RGBint >> 8) & 255) / 255
+#     r = ((RGBint >> 16) & 255) / 255
+#     return (r, g, b)

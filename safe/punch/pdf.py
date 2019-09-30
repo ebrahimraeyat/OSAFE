@@ -14,10 +14,14 @@ def createPdf(doc, pdfName):
     YMIN -= .2 * abs(YMIN)
     XMAX += .2 * abs(XMAX)
     YMAX += .2 * abs(YMAX)
+    x_max = [XMAX]
+    x_min = [XMIN]
+    y_max = [YMAX]
+    y_min = [YMIN]
+    bbbox = 500
     ax1 = fig.add_subplot(111, aspect='equal')
-
     plt.axis('off')
-    edges = []
+
     for e in foun.Shape.Edges:
         if e.BoundBox.ZLength == 0 and e.Vertexes[0].Z == 0:
             v1, v2 = e.Vertexes
@@ -27,6 +31,8 @@ def createPdf(doc, pdfName):
 
     text_ratio = f''
     for o in doc.Objects:
+        if not (hasattr(o, 'ViewObject') and o.ViewObject.Visibility):
+            continue
         if 'Punch' in o.Name:
             color = o.ViewObject.ShapeColor[:-1]
             for f in o.faces:
@@ -56,26 +62,46 @@ def createPdf(doc, pdfName):
                 va = 'bottom'
             ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=0, annotation_clip=False)
 
-        elif 'Axis' in o.Name:
+        elif 'sketch' in o.Name:
+            for g in o.Geometry:
+                if hasattr(g, 'StartPoint'):
+                    v1 = g.StartPoint
+                    v2 = g.EndPoint
+                    xy = [[v1.x, v1.y], [v2.x, v2.y]]
+                    p = patches.Polygon(xy, edgecolor='grey', facecolor='white', linewidth=.2, linestyle='-.', closed=False)
+                    ax1.add_patch(p)
+                elif hasattr(g, 'Center'):
+                    v = g.Location
+                    x, y = v.x, v.y
+                    r = g.Radius
+                    p = patches.Circle([x, y], r, facecolor='white', edgecolor='black', linewidth=.3)
+                    ax1.add_patch(p)
+
+                    # XMIN = x - 2 * r
+                    # YMAX = y + 2 * r
             b = o.Shape.BoundBox
+            y_max.append(b.YMax)
+            x_min.append(b.XMin)
+            if 'x' in o.Name:
+                x_max.append(b.XMax)
+            elif 'y' in o.Name:
+                y_min.append(b.YMin)
+        elif 'Shape' in o.Name:
             v1, v2 = o.Shape.Vertexes
             xy = [[v1.X, v1.Y], [v2.X, v2.Y]]
             p = patches.Polygon(xy, edgecolor='grey', facecolor='white', linewidth=.2, linestyle='-.', closed=False)
             ax1.add_patch(p)
-            r = o.ViewObject.BubbleSize.Value / 3
-            if o.Placement.Rotation.Angle:
-                x = min(v1.X, v2.X) - r
-                y = v1.Y
-                XMIN = x - 2 * r
-            else:
-                x = v1.X
-                y = max(v1.Y, v2.Y) + r
-                YMAX = y + 2 * r
-            XMAX = max(v1.X, v2.X, XMAX)
-            YMIN = min(v1.Y, v2.Y, YMIN)
-            p = patches.Circle([x, y], r, facecolor='white', edgecolor='black', linewidth=.3)
-            ax1.add_patch(p)
-            ax1.annotate(o.CustomNumber, (x, y), color='black', fontsize=6, ha='center', va='center', rotation=0, annotation_clip=False)
+
+        elif 'Text' in o.Name:
+            if len(o.Text) > 1:
+                continue
+            v = o.Placement.Base
+            x, y = v.x, v.y
+            ax1.annotate(o.Text[0], (x, y), color='black', fontsize=6, ha='center', va='center', rotation=0, annotation_clip=False)
+    XMIN = min(x_min) - bbbox
+    XMAX = max(x_max) + bbbox
+    YMIN = min(y_min) - bbbox
+    YMAX = max(y_max) + bbbox
     ax1.set_ylim(YMIN, YMAX)
     ax1.set_xlim(XMIN, XMAX)
 

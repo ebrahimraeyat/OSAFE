@@ -106,7 +106,9 @@ class PunchTaskPanel:
         pdf.createPdf(doc, filename)
 
     def export_to_image(self):
-        filename = self.get_save_filename('.png')
+        ext = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetInt("picture_ext", 0)
+        ext = ('png', 'jpg', 'pdf')[i]
+        filename = self.get_save_filename(f'.{ext}')
         doc = App.ActiveDocument
         pdf.createPdf(doc, filename)
 
@@ -126,7 +128,7 @@ class PunchTaskPanel:
         return filename
 
     def get_save_filename(self, ext):
-        filters = f"{ext[:-1]} (*{ext})"
+        filters = f"{ext[1:]} (*{ext})"
         filename, _ = QFileDialog.getSaveFileName(self.form, 'select file',
                                                   self.lastDirectory, filters)
         if not filename:
@@ -161,10 +163,17 @@ class PunchTaskPanel:
             os.mkdir(punch_temp_dir)
             os.chdir(punch_temp_dir)
             git.Git('.').clone("https://github.com/ebrahimraeyat/Civil.git", env={'GIT_SSL_NO_VERIFY': '1'})
-            shutil.rmtree(civil_path, onerror=onerror)
+            # shutil.rmtree(civil_path, onerror=onerror)
             src_folder = os.path.join(punch_temp_dir, 'Civil')
+            user_data_dir = FreeCAD.getUserAppDataDir()
+            if not user_data_dir in civil_path:
+                mod_path = os.path.join(FreeCAD.getUserAppDataDir(), 'Mod')
+                if not os.path.exists(mod_path):
+                    os.mkdir(mod_path)
+                    civil_path = os.path.join(mod_path, 'Civil')
+
             shutil.copytree(src_folder, civil_path)
-            msg = 'update done successfully, please restart FreeCAD.'
+            msg = 'update done successfully, please remove Civil folder from FreeCAD installation folder!,  then restart FreeCAD.'
 
         # os.chdir(civiltools_path + '/..')
         # pip_install = f'pip install --upgrade  --install-option="--prefix={civiltools_path}/.." git+https://github.com/ebrahimraeyat/civilTools.git'

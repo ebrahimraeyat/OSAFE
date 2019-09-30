@@ -1,4 +1,5 @@
 import civilGui
+import FreeCAD
 
 
 class CivilWorkbench(Workbench):
@@ -21,7 +22,7 @@ class CivilWorkbench(Workbench):
 
     def Initialize(self):
         from PySide2 import QtCore, QtGui
-        command_list = ["Punch", "Copy", "Civil_pdf"]
+        command_list = ["Punch", "Copy", "Civil_pdf", "Civil_pic"]
 
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP(
             "Civil",
@@ -30,6 +31,11 @@ class CivilWorkbench(Workbench):
             "Civil",
             "Civil")), command_list)
         Gui.addPreferencePage(self.pref_visual_ui_abs_path, "punch")
+
+        # from DraftGui import todo
+
+        # if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("show_at_startup", True):
+        #     todo.delay(FreeCADGui.runCommand, "Civil_Welcome")
 
 
 Gui.addWorkbench(CivilWorkbench())
