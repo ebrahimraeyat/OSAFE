@@ -8,6 +8,7 @@ import pandas as pd
 from safe.punch import safe
 from safe.punch.allowableStress import allowable_stress
 from safe.punch.punch import _Punch, _ViewProviderPunch
+from safe.punch.axis import create_grids
 
 
 class Geom(object):
@@ -305,31 +306,34 @@ class Geom(object):
         x_grids = gridLines['x']
         y_grids = gridLines['y']
         b = self.foundation.Shape.BoundBox
-        x_axis_length = b.YLength * 1.2
-        y_axis_length = b.XLength * 1.2
-        x_grids_coord = -b.YLength * .1
-        y_grids_coord = b.XLength * 1
+        # x_axis_length = b.YLength * 1.2
+        # y_axis_length = b.XLength * 1.2
+        # x_grids_coord = -b.YLength * .1
+        # y_grids_coord = b.XLength * 1
 
-        for text, coord in x_grids.items():
-            ax = Arch.makeAxis(1)
-            ax.Distances = [coord]
-            ax.Length = x_axis_length
-            ax.CustomNumber = str(text)
-            ax.Placement.Base.y = b.YMin
-            Draft.move(ax, App.Vector(0, x_grids_coord, 0), copy=False)
-            ax_gui = ax.ViewObject
-            ax_gui.BubbleSize = 1500
-            ax_gui.FontSize = 750
-        for text, coord in y_grids.items():
-            ax = Arch.makeAxis(1)
-            ax.Length = y_axis_length
-            ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
-            ax.Distances = [coord]
-            ax.CustomNumber = str(text)
-            Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
-            ax_gui = ax.ViewObject
-            ax_gui.BubbleSize = 1500
-            ax_gui.FontSize = 750
+        create_grids(x_grids, b, 'x')
+        create_grids(y_grids, b, 'y')
+
+        # for text, coord in x_grids.items():
+        #     ax = Arch.makeAxis(1)
+        #     ax.Distances = [coord]
+        #     ax.Length = x_axis_length
+        #     ax.CustomNumber = str(text)
+        #     ax.Placement.Base.y = b.YMin
+        #     Draft.move(ax, App.Vector(0, x_grids_coord, 0), copy=False)
+        #     ax_gui = ax.ViewObject
+        #     ax_gui.BubbleSize = 1500
+        #     ax_gui.FontSize = 750
+        # for text, coord in y_grids.items():
+        #     ax = Arch.makeAxis(1)
+        #     ax.Length = y_axis_length
+        #     ax.Placement = App.Placement(App.Vector(0, 0, 0), App.Rotation(App.Vector(0, 0, 1), 90))
+        #     ax.Distances = [coord]
+        #     ax.CustomNumber = str(text)
+        #     Draft.move(ax, App.Vector(y_grids_coord, 0, 0), copy=False)
+        #     ax_gui = ax.ViewObject
+        #     ax_gui.BubbleSize = 1500
+        #     ax_gui.FontSize = 750
 
     def plot(self):
         doc = App.ActiveDocument

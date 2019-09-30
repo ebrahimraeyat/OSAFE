@@ -6,14 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>244</height>
+    <width>733</width>
+    <height>407</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="Gui::PrefCheckBox" name="show_at_startup">
+     <property name="text">
+      <string>Show at Startup</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="prefEntry" stdset="0">
+      <cstring>show_at_startup</cstring>
+     </property>
+     <property name="prefPath" stdset="0">
+      <cstring>Mod/Civil</cstring>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="Gui::PrefCheckBox" name="checkBox_2">
      <property name="text">
@@ -28,139 +44,275 @@
     </widget>
    </item>
    <item>
-    <widget class="Gui::PrefCheckBox" name="checkBox">
-     <property name="text">
-      <string>Draw Grids</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>export picture extention</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="Gui::PrefComboBox" name="picture_ext">
+       <property name="prefEntry" stdset="0">
+        <cstring>picture_ext</cstring>
+       </property>
+       <property name="prefPath" stdset="0">
+        <cstring>Mod/Civil</cstring>
+       </property>
+       <item>
+        <property name="text">
+         <string>png</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>jpg</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>pdf</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Grid Lines</string>
      </property>
-     <property name="prefEntry" stdset="0">
-      <cstring>draw_grid</cstring>
-     </property>
-     <property name="prefPath" stdset="0">
-      <cstring>Mod/Civil</cstring>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="Gui::PrefCheckBox" name="checkBox">
+        <property name="text">
+         <string>Draw Grids</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>draw_grid</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/Civil</cstring>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Gui::PrefCheckBox" name="extend_grid">
+        <property name="text">
+         <string>extended Grid lines</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="prefEntry" stdset="0">
+         <cstring>extend_grid</cstring>
+        </property>
+        <property name="prefPath" stdset="0">
+         <cstring>Mod/Civil</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Ratio Tolerance</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="Gui::PrefDoubleSpinBox" name="doubleSpinBox">
-       <property name="maximum">
-        <double>20.000000000000000</double>
-       </property>
-       <property name="value">
-        <double>1.000000000000000</double>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>RatioTolerance</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/Civil</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>color above Ratio Tolerance</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="Gui::PrefColorButton" name="above_ration_color">
-       <property name="color">
-        <color>
-         <red>255</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>Ratio_above_color</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/Civil</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>color below Ratio Tolerance</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="Gui::PrefColorButton" name="below_ration_color">
-       <property name="color">
-        <color>
-         <red>0</red>
-         <green>255</green>
-         <blue>0</blue>
-        </color>
-       </property>
-       <property name="prefEntry" stdset="0">
-        <cstring>Ratio_below_color</cstring>
-       </property>
-       <property name="prefPath" stdset="0">
-        <cstring>Mod/Civil</cstring>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Punch</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Ratio Tolerance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="Gui::PrefDoubleSpinBox" name="doubleSpinBox">
+          <property name="maximum">
+           <double>20.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>RatioTolerance</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/Civil</cstring>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>color above Ratio Tolerance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="Gui::PrefColorButton" name="above_ration_color">
+          <property name="color">
+           <color>
+            <red>255</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>Ratio_above_color</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/Civil</cstring>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>color below Ratio Tolerance</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="Gui::PrefColorButton" name="below_ration_color">
+          <property name="color">
+           <color>
+            <red>0</red>
+            <green>255</green>
+            <blue>0</blue>
+           </color>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>Ratio_below_color</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/Civil</cstring>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="Gui::PrefCheckBox" name="is_text_color">
+          <property name="text">
+           <string>Text color</string>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>is_text_color</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/Civil</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="Gui::PrefColorButton" name="text_color">
+          <property name="color">
+           <color>
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>text_color</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/Civil</cstring>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
@@ -193,6 +345,11 @@
   <customwidget>
    <class>Gui::PrefCheckBox</class>
    <extends>QCheckBox</extends>
+   <header>Gui/PrefWidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Gui::PrefComboBox</class>
+   <extends>QComboBox</extends>
    <header>Gui/PrefWidgets.h</header>
   </customwidget>
   <customwidget>
