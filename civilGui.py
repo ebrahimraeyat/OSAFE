@@ -5,6 +5,7 @@ import FreeCADGui as Gui
 import DraftTools
 import os
 from safe.punch import punchPanel
+import civilwelcome
 
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -147,4 +148,4 @@ Gui.addCommand('Punch', Punch())
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
-Gui.addCommand('Civil_Welcome', CivilWelcome())
+Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())

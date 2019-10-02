@@ -32,10 +32,10 @@ class CivilWorkbench(Workbench):
             "Civil")), command_list)
         Gui.addPreferencePage(self.pref_visual_ui_abs_path, "punch")
 
-        # from DraftGui import todo
-
-        # if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("show_at_startup", True):
-        #     todo.delay(FreeCADGui.runCommand, "Civil_Welcome")
+    def Activated(self):
+        if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("FirstTime", True):
+            from DraftGui import todo
+            todo.delay(FreeCADGui.runCommand, "Civil_welcome")
 
 
 Gui.addWorkbench(CivilWorkbench())
