@@ -105,7 +105,7 @@ class PunchTaskPanel:
         pdf.createPdf(doc, filename)
 
     def export_to_image(self):
-        ext = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetInt("picture_ext", 0)
+        i = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetInt("picture_ext", 0)
         ext = ('png', 'jpg', 'pdf')[i]
         filename = self.get_save_filename(f'.{ext}')
         doc = App.ActiveDocument
@@ -148,11 +148,11 @@ class PunchTaskPanel:
 
         civil_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
         user_data_dir = FreeCAD.getUserAppDataDir()
-            if not user_data_dir in civil_path:
-                mod_path = os.path.join(FreeCAD.getUserAppDataDir(), 'Mod')
-                if not os.path.exists(mod_path):
-                    os.mkdir(mod_path)
-                civil_path = os.path.join(mod_path, 'Civil')
+        if not user_data_dir in civil_path:
+            mod_path = os.path.join(FreeCAD.getUserAppDataDir(), 'Mod')
+            if not os.path.exists(mod_path):
+                os.mkdir(mod_path)
+            civil_path = os.path.join(mod_path, 'Civil')
         import git
         g = git.cmd.Git(civil_path)
         msg = ''
