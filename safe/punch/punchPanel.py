@@ -10,7 +10,6 @@ from safe.punch import geom
 from safe.punch import pdf
 # from safe.punch.colorbar import ColorMap
 punch_path = os.path.split(os.path.abspath(__file__))[0]
-civil_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
 
 
 class PunchTaskPanel:
@@ -139,7 +138,6 @@ class PunchTaskPanel:
         return filename
 
     def update(self):
-
         if (QMessageBox.question(None, "update", "update to latest version?!",
                                  QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.No):
             return
@@ -148,6 +146,13 @@ class PunchTaskPanel:
             QMessageBox.warning(None, 'update', str(msg))
             return
 
+        civil_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
+        user_data_dir = FreeCAD.getUserAppDataDir()
+            if not user_data_dir in civil_path:
+                mod_path = os.path.join(FreeCAD.getUserAppDataDir(), 'Mod')
+                if not os.path.exists(mod_path):
+                    os.mkdir(mod_path)
+                civil_path = os.path.join(mod_path, 'Civil')
         import git
         g = git.cmd.Git(civil_path)
         msg = ''
@@ -165,19 +170,10 @@ class PunchTaskPanel:
             git.Git('.').clone("https://github.com/ebrahimraeyat/Civil.git", env={'GIT_SSL_NO_VERIFY': '1'})
             # shutil.rmtree(civil_path, onerror=onerror)
             src_folder = os.path.join(punch_temp_dir, 'Civil')
-            user_data_dir = FreeCAD.getUserAppDataDir()
-            if not user_data_dir in civil_path:
-                mod_path = os.path.join(FreeCAD.getUserAppDataDir(), 'Mod')
-                if not os.path.exists(mod_path):
-                    os.mkdir(mod_path)
-                    civil_path = os.path.join(mod_path, 'Civil')
 
             shutil.copytree(src_folder, civil_path)
             msg = 'update done successfully, please remove Civil folder from FreeCAD installation folder!,  then restart FreeCAD.'
 
-        # os.chdir(civiltools_path + '/..')
-        # pip_install = f'pip install --upgrade  --install-option="--prefix={civiltools_path}/.." git+https://github.com/ebrahimraeyat/civilTools.git'
-        # subprocess.Popen([python_exe, '-m', pip_install])
         else:
             if not msg:
                 msg = 'error occurred during update\nplease contact with @roknabadi'
