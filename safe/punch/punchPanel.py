@@ -147,9 +147,9 @@ class PunchTaskPanel:
             return
 
         civil_path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir))
-        user_data_dir = FreeCAD.getUserAppDataDir()
+        user_data_dir = App.getUserAppDataDir()
         if not user_data_dir in civil_path:
-            mod_path = os.path.join(FreeCAD.getUserAppDataDir(), 'Mod')
+            mod_path = os.path.join(App.getUserAppDataDir(), 'Mod')
             if not os.path.exists(mod_path):
                 os.mkdir(mod_path)
             civil_path = os.path.join(mod_path, 'Civil')
@@ -168,7 +168,6 @@ class PunchTaskPanel:
             os.mkdir(punch_temp_dir)
             os.chdir(punch_temp_dir)
             git.Git('.').clone("https://github.com/ebrahimraeyat/Civil.git", env={'GIT_SSL_NO_VERIFY': '1'})
-            # shutil.rmtree(civil_path, onerror=onerror)
             src_folder = os.path.join(punch_temp_dir, 'Civil')
 
             shutil.copytree(src_folder, civil_path)
