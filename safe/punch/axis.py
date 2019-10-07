@@ -46,8 +46,8 @@ def create_x_grid(sketch, xcoord, text, i, YMIN, YMAX, y1, y2, y3, y4, yc):
     const_num = sketch.addConstraint(Sketcher.Constraint('DistanceY', -1, 1, g4, 3, yc))
     sketch.renameConstraint(const_num, f'y_{text}')
     sketch.toggleDriving(const_num)
-    t.setExpression('.Placement.Base.x', f'{sketch.Name}.Constraints.x_{text}')
-    t.setExpression('.Placement.Base.y', f'{sketch.Name}.Constraints.y_{text}')
+    t.setExpression('Placement.Base.x', f'{sketch.Name}.Constraints.x_{text}')
+    t.setExpression('Placement.Base.y', f'{sketch.Name}.Constraints.y_{text}')
 
     if not i == no_of_edge_in_on_axis - 1:
         sketch.addConstraint(Sketcher.Constraint('DistanceY', g4, 3, g4 - no_of_edge_in_on_axis, 3, 0))
@@ -86,8 +86,8 @@ def create_y_grid(sketch, ycoord, text, i, XMIN, XMAX, x1, x2, x3, x4, xc):
     const_num = sketch.addConstraint(Sketcher.Constraint('DistanceX', -1, 1, g4, 3, xc))
     sketch.renameConstraint(const_num, f'x_{text}')
     sketch.toggleDriving(const_num)
-    t.setExpression('.Placement.Base.x', f'{sketch.Name}.Constraints.x_{text}')
-    t.setExpression('.Placement.Base.y', f'{sketch.Name}.Constraints.y_{text}')
+    t.setExpression('Placement.Base.x', f'{sketch.Name}.Constraints.x_{text}')
+    t.setExpression('Placement.Base.y', f'{sketch.Name}.Constraints.y_{text}')
 
     if not i == no_of_edge_in_on_axis - 1:
         sketch.addConstraint(Sketcher.Constraint('DistanceX', g4, 3, g4 - no_of_edge_in_on_axis, 3, 0))
