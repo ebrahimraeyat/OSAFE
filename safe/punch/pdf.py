@@ -23,6 +23,8 @@ def createPdf(doc, pdfName):
     plt.axis('off')
 
     for e in foun.Shape.Edges:
+        if not len(e.Vertexes) == 2:
+            continue
         if e.BoundBox.ZLength == 0 and e.Vertexes[0].Z == 0:
             v1, v2 = e.Vertexes
             xy = [[v1.X, v1.Y], [v2.X, v2.Y]]
