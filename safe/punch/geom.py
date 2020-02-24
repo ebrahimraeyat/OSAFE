@@ -259,6 +259,9 @@ class Geom(object):
             intersection_faces = self.punch_faces.get(key, None)
             if intersection_faces is None:
                 continue
+            location = self.locations.get(key, None)
+            if location is None:
+                continue
             p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
