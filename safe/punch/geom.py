@@ -410,6 +410,9 @@ class Geom(object):
                     Vu_df.at[combo, col] = Vu
             Vus_df[_id] = Vu_df.max(axis=1)
         Vus_df.loc['Max'] = Vus_df.max()
+        for _id, Vu in Vus_df.loc['Max'].items():
+            punch = self.punchs[_id]
+            punch.Vu = Vu
         return Vus_df, prop_df
 
     def allowable_shear_stress(self, fc=None):

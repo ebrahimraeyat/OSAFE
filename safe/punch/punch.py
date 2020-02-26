@@ -1,4 +1,4 @@
-
+import math
 import Part
 import FreeCAD
 import FreeCADGui as Gui
@@ -39,7 +39,16 @@ class _Punch:
         obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
         obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
+        obj.addProperty("App::PropertyInteger", "alpha_s", "Allowable_Stress", "", 1, True)
+        obj.addProperty("App::PropertyForce", "one_way_shear_capacity", "Allowable_Stress", "", 1, True)
+        obj.addProperty("App::PropertyForce", "Vc", "Allowable_Stress", "", 1, True)
+        obj.addProperty("App::PropertyPressure", "vc", "Allowable_Stress", "", 1, True).vc = 1.
+        obj.addProperty("App::PropertyPressure", "Vu", "Allowable_Stress", "", 1, True).Vu = 0
+        #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
+        #obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
         obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
+        #obj.ds = ['8', '10', '12', '14', '16', '18', '20']
+        #obj.Fys = ['340', '400']
         obj.setEditorMode("text", 2)
         obj.setEditorMode("x3", 2)
         obj.setEditorMode("y3", 2)
@@ -49,6 +58,7 @@ class _Punch:
     def onChanged(self, fp, prop):
         if prop == 'Location':
             loc = fp.Location
+            fp.alpha_s = self.alphas(loc)
             normals = self._location[loc]
             if len(normals) >= len(fp.faces):
                 for f in fp.faces:
@@ -67,7 +77,34 @@ class _Punch:
         obj.x3, obj.y3, _ = self.center_of_mass(obj)
         obj.b0 = self.get_b0(obj)
         obj.d = obj.Area / obj.b0
+        obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
+        # ratio = obj.Vu.Value / obj.vc.Value
+        # t = f"{ratio:.2f}"
+        # print(t, type(t))
+        # obj.Ratio = t
+        # obj.text.Text = [obj.Location, obj.Ratio]
         return
+
+    def alphas(self, location):
+        if 'Interier' in location:
+            return 40
+        elif 'Edge' in location:
+            return 30
+        elif 'Corner' in location:
+            return 20
+
+    def allowable_stress(self, obj, phi_c=.75):
+        b0d = obj.Area
+        beta = obj.bx / obj.by
+        if beta < 1:
+            beta = obj.by / obj.bx
+        one_way_shear_capacity = math.sqrt(obj.fc) * b0d / 6 * phi_c
+        Vc1 = one_way_shear_capacity * 2
+        Vc2 = one_way_shear_capacity * (1 + 2 / beta)
+        Vc3 = one_way_shear_capacity * (2 + obj.alpha_s * obj.d / obj.b0) / 2
+        Vc = min(Vc1, Vc2, Vc3)
+        vc = Vc / (b0d)
+        return one_way_shear_capacity, Vc, vc
 
     def get_b0(self, obj):
         b0 = 0
