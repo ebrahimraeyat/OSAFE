@@ -109,7 +109,10 @@ class Geom(object):
         self.bar_label.setText("Creating 3D Columns")
         for key, area in columns.items():
             col = Part.makeBox(area.Length, area.Height, 4000, area.Placement.Base)
-            self.punchs[key].Shape = col
+            try:
+                self.punchs[key].Shape = col
+            except KeyError:
+                pass
             # self.punchs[key].number = int(key)
 
     # def point_loads_is_in_witch_areas(self, areas, points_loads, obj_geom_points):
@@ -419,7 +422,9 @@ class Geom(object):
         fc = self._safe.fc
         Vc_allowable = pd.Series(index=self.columns_number)
         for _id in self.columns_number:
-            punch = self.punchs[_id]
+            punch = self.punchs.get(_id, None)
+            if punch == None:
+                continue
             bx = punch.bx
             by = punch.by
             location = punch.Location
@@ -444,6 +449,8 @@ class Geom(object):
         # insert ratios to Gui
         for key in self.columns_number:
             punch = self.punchs.get(key, None)
+            if not punch:
+                continue
             ratio = df[key]['Max']
             t = f"{ratio:.2f}"
             punch.Ratio = t
