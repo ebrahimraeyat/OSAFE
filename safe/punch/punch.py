@@ -8,6 +8,10 @@ from PySide.QtCore import QT_TRANSLATE_NOOP
 class _Punch:
     def __init__(self, obj):
         obj.Proxy = self
+        self.set_properties(obj)
+        obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
+
+    def set_properties(self, obj):
         self._location = {
             'Corner1': [(0, -1, 0), (-1, 0, 0)],
             'Corner2': [(0, -1, 0), (1, 0, 0)],
@@ -19,34 +23,52 @@ class _Punch:
             'Edge4': [(0, 1, 0), (-1, 0, 0), (0, -1, 0)],
             'Interier': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
         }
-        self.set_properties(obj)
-
-    def set_properties(self, obj):
-        obj.addProperty("App::PropertyLink", "text", "Punch")
-        obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
-        obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
-        obj.addProperty("App::PropertyFloat", "Area", "Punch")
-        obj.addProperty("App::PropertyInteger", "fc", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "bx", "Column", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "by", "Column", "", 1, True)
-        obj.addProperty("App::PropertyInteger", "number", "Column", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "I22", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "I33", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "I23", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyFloat", "x3", "Punch")
-        obj.addProperty("App::PropertyFloat", "y3", "Punch")
-        obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
-        obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
-        obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
-        obj.addProperty("App::PropertyInteger", "alpha_s", "Allowable_Stress", "", 1, True)
-        obj.addProperty("App::PropertyForce", "one_way_shear_capacity", "Allowable_Stress", "", 1, True)
-        obj.addProperty("App::PropertyForce", "Vc", "Allowable_Stress", "", 1, True)
-        obj.addProperty("App::PropertyPressure", "vc", "Allowable_Stress", "", 1, True).vc = 1.
-        obj.addProperty("App::PropertyPressure", "Vu", "Allowable_Stress", "", 1, True).Vu = 0
+        if not hasattr(obj, "text"):
+            obj.addProperty("App::PropertyLink", "text", "Punch")
+        if not hasattr(obj, "faces"):
+            obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
+        if not hasattr(obj, "d"):
+            obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
+        if not hasattr(obj, "normals"):
+            obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
+        if not hasattr(obj, "Area"):
+            obj.addProperty("App::PropertyFloat", "Area", "Punch")
+        if not hasattr(obj, "fc"):
+            obj.addProperty("App::PropertyInteger", "fc", "Punch", "", 1, True)
+        if not hasattr(obj, "bx"):
+            obj.addProperty("App::PropertyFloat", "bx", "Column", "", 1, True)
+        if not hasattr(obj, "by"):
+            obj.addProperty("App::PropertyFloat", "by", "Column", "", 1, True)
+        if not hasattr(obj, "number"):
+            obj.addProperty("App::PropertyInteger", "number", "Column", "", 1, True)
+        if not hasattr(obj, "I22"):
+            obj.addProperty("App::PropertyFloat", "I22", "Punch", "", 1, True)
+        if not hasattr(obj, "I33"):
+            obj.addProperty("App::PropertyFloat", "I33", "Punch", "", 1, True)
+        if not hasattr(obj, "I23"):
+            obj.addProperty("App::PropertyFloat", "I23", "Punch", "", 1, True)
+        if not hasattr(obj, "x3"):
+            obj.addProperty("App::PropertyFloat", "x3", "Punch")
+        if not hasattr(obj, "y3"):
+            obj.addProperty("App::PropertyFloat", "y3", "Punch")
+        if not hasattr(obj, "Ratio"):
+            obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
+        if not hasattr(obj, "Location"):
+            obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
+        if not hasattr(obj, "b0"):
+            obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
+        if not hasattr(obj, "alpha_s"):
+            obj.addProperty("App::PropertyInteger", "alpha_s", "Allowable_Stress", "", 1, True)
+        if not hasattr(obj, "one_way_shear_capacity"):
+            obj.addProperty("App::PropertyForce", "one_way_shear_capacity", "Allowable_Stress", "", 1, True)
+        if not hasattr(obj, "Vc"):
+            obj.addProperty("App::PropertyForce", "Vc", "Allowable_Stress", "", 1, True)
+        if not hasattr(obj, "vc"):
+            obj.addProperty("App::PropertyPressure", "vc", "Allowable_Stress", "", 1, True).vc = 1.
+        if not hasattr(obj, "Vu"):
+            obj.addProperty("App::PropertyPressure", "Vu", "Allowable_Stress", "", 1, True).Vu = 0
         #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
         #obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
-        obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
         #obj.ds = ['8', '10', '12', '14', '16', '18', '20']
         #obj.Fys = ['340', '400']
         obj.setEditorMode("text", 2)
@@ -70,6 +92,11 @@ class _Punch:
                 if not normal in normals:
                     f.ViewObject.Visibility = False
         return
+
+    def onDocumentRestored(self, obj):
+        obj.Proxy = self
+        self.set_properties(obj)
+
 
     def execute(self, obj):
         obj.I22, obj.I33, obj.I23 = self.moment_inersia(obj)
