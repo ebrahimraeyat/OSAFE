@@ -4,15 +4,14 @@ import FreeCAD
 import FreeCADGui as Gui
 import DraftTools
 import os
-from safe.punch import punchPanel
 import civilwelcome
-
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
 
 class Punch:
     def Activated(self):
+        from safe.punch import punchPanel
         panel = punchPanel.PunchTaskPanel()
         Gui.Control.showDialog(panel)
         if panel.setupUi():
@@ -106,32 +105,6 @@ class CivilPictur:
         return not FreeCAD.ActiveDocument is None
 
 
-class CivilWelcome:
-
-    def GetResources(self):
-
-        return {'Pixmap': os.path.join(os.path.dirname(__file__), "images", "civil_Welcome.svg"),
-                'MenuText': QT_TRANSLATE_NOOP("Civil_Welcome", "civil Welcome screen"),
-                'ToolTip': QT_TRANSLATE_NOOP("Civil_Welcome", "Show the Civil workbench welcome screen")}
-
-    def Activated(self):
-
-        # load dialog
-        self.form = Gui.PySideUic.loadUi(os.path.join(os.path.dirname(__file__), "ui/preferences-punch_visual.ui"))
-
-        # center the dialog over FreeCAD window
-        mw = Gui.getMainWindow()
-        self.form.move(mw.frameGeometry().topLeft() + mw.rect().center() - self.form.rect().center())
-
-        # show dialog and run setup dialog afterwards if OK was pressed
-        self.form.show()
-        # if result:
-        #     FreeCADGui.runCommand("Pyconcrete_Setup")
-
-        # # remove first time flag
-        # FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Pyconcrete").SetBool("FirstTime", False)
-
-
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
     filters = f"{ext[1:]} (*{ext})"
@@ -149,3 +122,5 @@ Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
 Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
+
+command_list = ["Punch", "Copy", "Civil_pdf", "Civil_pic"]
