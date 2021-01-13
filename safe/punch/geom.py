@@ -299,6 +299,15 @@ class Geom(object):
             # pl = App.Vector(v.x, v.y, 0)
             # p.Placement.Base = pl
             p.number = int(key)
+            combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == key]
+            d = {}
+            for row in combos_load.itertuples():
+                combo = row.Combo
+                F = row.Fgrav
+                Mx = row.Mx
+                My = row.My
+                d[combo] = f"{F}, {Mx}, {My}"
+            p.combos_load = d
             punchs[key] = p
         return punchs
 

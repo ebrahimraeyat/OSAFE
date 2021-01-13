@@ -67,6 +67,12 @@ class _Punch:
             obj.addProperty("App::PropertyPressure", "vc", "Allowable_Stress", "", 1, True).vc = 1.
         if not hasattr(obj, "Vu"):
             obj.addProperty("App::PropertyPressure", "Vu", "Allowable_Stress", "", 1, True).Vu = 0
+        if not hasattr(obj, "combos_load"):
+            obj.addProperty(
+                "App::PropertyMap",
+                "combos_load",
+                "Column",
+                )
         #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
         #obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
         #obj.ds = ['8', '10', '12', '14', '16', '18', '20']
