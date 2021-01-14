@@ -74,6 +74,13 @@ class _Punch:
                 "Column",
                 )
 
+        if not hasattr(obj, "foundation_plane"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "foundation_plane",
+                "Punch",
+                )
+
         if not hasattr(obj, "load_center"):
             obj.addProperty(
                 "App::PropertyVector",

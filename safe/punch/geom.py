@@ -256,8 +256,13 @@ class Geom(object):
 
     def create_punches(self):
         self.bar_label.setText("Creating Punch Objects")
+        for f in self.foundation.Shape.Faces:
+            if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+                foundation_plane = f
+                break
         punchs = {}
         fc = self._safe.fc
+
         for key in self.columns_number:
             intersection_faces = self.punch_faces.get(key, None)
             if intersection_faces is None:
@@ -268,6 +273,7 @@ class Geom(object):
             p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
+            p.foundation_plane = foundation_plane
             value = self._safe.point_loads[key]
             p.bx = value['xdim']
             p.by = value['ydim']
