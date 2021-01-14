@@ -73,6 +73,13 @@ class _Punch:
                 "combos_load",
                 "Column",
                 )
+
+        if not hasattr(obj, "load_center"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "load_center",
+                "Column",
+                )
         #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
         #obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
         #obj.ds = ['8', '10', '12', '14', '16', '18', '20']

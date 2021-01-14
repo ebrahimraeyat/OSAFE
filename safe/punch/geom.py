@@ -308,6 +308,8 @@ class Geom(object):
                 My = row.My
                 d[combo] = f"{F}, {Mx}, {My}"
             p.combos_load = d
+            point = self._safe.obj_geom_points[key]
+            p.load_center = App.Vector(point.x, point.y, 0)
             punchs[key] = p
         return punchs
 
