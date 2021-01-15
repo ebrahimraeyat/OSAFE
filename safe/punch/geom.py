@@ -9,6 +9,7 @@ from safe.punch import safe
 from safe.punch.allowableStress import allowable_stress
 from safe.punch.punch import _Punch, _ViewProviderPunch
 from safe.punch.axis import create_grids
+from safe.punch.punch_funcs import remove_obj
 
 
 class Geom(object):
@@ -22,7 +23,6 @@ class Geom(object):
             self.slab_prop_assignment = self._safe.slab_prop_assignment
             self.load_combinations = self._safe.load_combinations
             self.point_loads = self._safe.points_loads
-            self.removeSplitter = True
 
     def create_vectors(self, points_prop=None):
         vectors = {}
@@ -78,7 +78,6 @@ class Geom(object):
         if len(slab_struc) == 1:
             print('one slab')
             fusion = slab_struc[0]
-            self.removeSplitter = False
         else:
             fusion = doc.addObject("Part::MultiFuse", "Fusion")
             doc.Fusion.Shapes = slab_struc
@@ -95,14 +94,12 @@ class Geom(object):
 
     def create_foundation(self, fusion, doc, gui):
         self.bar_label.setText("Creating Foundation Geometry")
-        if not self.removeSplitter:
-            foun = doc.addObject('Part::Feature', 'Foun')
-            foun.Shape = fusion.Shape
-            return foun
         foun = doc.addObject('Part::Feature', 'Foun')
-        foun.Shape = fusion.Shape.removeSplitter()
-        doc.removeObject(fusion.Label)
-        # gui.getObject(fusion.Name).Visibility = False
+        if hasattr(fusion.Shape, "removeSplitter"):
+            foun.Shape = fusion.Shape.removeSplitter()
+        else:
+            foun.Shape = fusion.Shape
+        remove_obj(fusion.Name)
         return foun
 
     def create_3D_column(self, columns):
@@ -148,7 +145,7 @@ class Geom(object):
         outer = obj1.Shape.cut(obj2.Shape)
         inner = obj1.Shape.common(obj2.Shape)
         doc = obj2.Document
-        # doc.removeObject(obj2.Label)
+        remove_obj(obj2.Name)
         faces_outer = outer.Faces
         faces_inner = inner.Faces
         intersection_faces = []
@@ -364,7 +361,7 @@ class Geom(object):
         gui = Gui.ActiveDocument
         self.obj_geom_points = self.create_vectors(self._safe.obj_geom_points)
         obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
-        self.obj_geom_point_loads = self.create_column(self._safe.point_loads)
+        obj_geom_point_loads = self.create_column(self._safe.point_loads)
         self.columns_number = list(self._safe.point_loads.keys())
         self.structures = self.create_structures(obj_geom_areas)
         del obj_geom_areas
@@ -372,18 +369,17 @@ class Geom(object):
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         self.foundation = self.create_foundation(fusion, doc, gui)
-        # if fusion.Label:
-        #     import OpenSCADUtils
-        #     OpenSCADUtils.removesubtree(App.ActiveDocument.getObjectsByLabel(fusion.Label))
         del fusion
-        self.offset_structures = self.create_column_offset(self.obj_geom_point_loads, gui)
+        self.offset_structures = self.create_column_offset(obj_geom_point_loads, gui)
         doc.recompute()
         self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
         doc.recompute()
         self.grid_lines()
         self.locations = self.loacation_of_columns()
         self.punchs = self.create_punches()
-        self.create_3D_column(self.obj_geom_point_loads)
+        self.create_3D_column(obj_geom_point_loads)
+        for rec in obj_geom_point_loads.values():
+            remove_obj(rec.Name)
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
