@@ -126,6 +126,9 @@ def create_grids(grids, boundBox, direction='x'):
             create_y_grid(sketch, coord, text, i, XMIN, XMAX, x1, x2, x3, x4, xc)
             i += no_of_edge_in_on_axis
 
+    sketch.ViewObject.LineWidth = 1.
+    sketch.ViewObject.PointSize = 1.
+
     doc.recompute()
 
 

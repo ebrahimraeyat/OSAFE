@@ -279,6 +279,9 @@ class Geom(object):
             for f in intersection_faces:
                 face = App.ActiveDocument.addObject("Part::Feature", "face")
                 face.Shape = f
+                face.ViewObject.LineWidth = 1.
+                face.ViewObject.PointSize = 1.
+                face.ViewObject.DisplayMode = "Shaded"
                 faces.append(face)
             p.faces = faces
             p.Location = self.locations[key]
@@ -369,6 +372,9 @@ class Geom(object):
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         self.foundation = self.create_foundation(fusion, doc, gui)
+        self.foundation.ViewObject.Transparency = 40
+        # self.foundation.ViewObject.LineWidth = 1.
+        self.foundation.ViewObject.DisplayMode = "Shaded"
         del fusion
         self.offset_structures = self.create_column_offset(obj_geom_point_loads, gui)
         doc.recompute()
