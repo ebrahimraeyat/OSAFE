@@ -47,10 +47,11 @@ class _Punch:
             obj.addProperty("App::PropertyFloat", "I33", "Punch", "", 1, True)
         if not hasattr(obj, "I23"):
             obj.addProperty("App::PropertyFloat", "I23", "Punch", "", 1, True)
-        if not hasattr(obj, "x3"):
-            obj.addProperty("App::PropertyFloat", "x3", "Punch")
-        if not hasattr(obj, "y3"):
-            obj.addProperty("App::PropertyFloat", "y3", "Punch")
+        if not hasattr(obj, "center_of_punch"):
+            obj.addProperty("App::PropertyVector",
+                "center_of_punch",
+                "Punch",
+                )
         if not hasattr(obj, "Ratio"):
             obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
         if not hasattr(obj, "Location"):
@@ -92,8 +93,7 @@ class _Punch:
         #obj.ds = ['8', '10', '12', '14', '16', '18', '20']
         #obj.Fys = ['340', '400']
         obj.setEditorMode("text", 2)
-        obj.setEditorMode("x3", 2)
-        obj.setEditorMode("y3", 2)
+        obj.setEditorMode("center_of_punch", 2)
         obj.setEditorMode("Area", 2)
         obj.setEditorMode("faces", 2)
 
@@ -121,7 +121,7 @@ class _Punch:
     def execute(self, obj):
         obj.I22, obj.I33, obj.I23 = self.moment_inersia(obj)
         obj.Area = self._area(obj)
-        obj.x3, obj.y3, _ = self.center_of_mass(obj)
+        obj.center_of_punch = self.center_of_mass(obj)
         obj.b0 = self.get_b0(obj)
         obj.d = obj.Area / obj.b0
         obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
@@ -197,7 +197,7 @@ class _Punch:
         obj.Area = makhraj
         if makhraj == 0:
             return None
-        return (sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
+        return FreeCAD.Vector(sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
 
     def moment_inersia(self, obj):
         '''

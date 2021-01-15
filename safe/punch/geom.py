@@ -414,7 +414,7 @@ class Geom(object):
             point = self._safe.obj_geom_points[_id]
             x1, y1 = point.x, point.y
             prop_df[_id] = [I22, I33, I23, punch.Location, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
-            x3, y3 = punch.x3, punch.y3
+            x3, y3, _ = punch.center_of_punch
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
             combos_load.set_index('Combo', inplace=True)
             Vu_df = pd.DataFrame(index=combos)
