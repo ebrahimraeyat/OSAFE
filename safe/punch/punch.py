@@ -81,10 +81,10 @@ class _Punch:
                 "Punch",
                 )
 
-        if not hasattr(obj, "load_center"):
+        if not hasattr(obj, "center_of_load"):
             obj.addProperty(
                 "App::PropertyVector",
-                "load_center",
+                "center_of_load",
                 "Column",
                 )
         #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
