@@ -249,9 +249,9 @@ class _ViewProviderPunch:
         #
         obj.Proxy = self
 
-    def attach(self, obj):
-        ''' Setup the scene sub-graph of the view provider, this method is mandatory '''
-        return
+    def attach(self, vobj):
+        self.ViewObject = vobj
+        self.Object = vobj.Object
 
     def updateData(self, fp, prop):
         ''' If a property of the handled feature has changed we have the chance to handle this here '''
@@ -268,6 +268,10 @@ class _ViewProviderPunch:
                 color = get_color("text_color", 674321151)
             fp.text.ViewObject.TextColor = color
         return
+
+    def claimChildren(self):
+        children = self.Object.faces + [self.Object.text]
+        return children
 
     def getDisplayModes(self, obj):
         ''' Return a list of display modes. '''
