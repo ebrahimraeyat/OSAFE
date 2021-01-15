@@ -274,6 +274,7 @@ class Geom(object):
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
             p.foundation_plane = foundation_plane
+            p.foundation = self.foundation
             value = self._safe.point_loads[key]
             p.bx = value['xdim']
             p.by = value['ydim']

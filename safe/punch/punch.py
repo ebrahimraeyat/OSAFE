@@ -82,6 +82,13 @@ class _Punch:
                 "Punch",
                 )
 
+        if not hasattr(obj, "fondation"):
+            obj.addProperty(
+                "App::PropertyLink",
+                "foundation",
+                "Foundation",
+                )
+
         if not hasattr(obj, "center_of_load"):
             obj.addProperty(
                 "App::PropertyVector",
@@ -119,6 +126,7 @@ class _Punch:
 
 
     def execute(self, obj):
+        FreeCAD.Console.PrintMessage("*" * 20 + "\nrunning execute method\n")
         obj.I22, obj.I33, obj.I23 = self.moment_inersia(obj)
         obj.Area = self._area(obj)
         obj.center_of_punch = self.center_of_mass(obj)
