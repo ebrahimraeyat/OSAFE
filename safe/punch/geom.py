@@ -10,6 +10,7 @@ from safe.punch.allowableStress import allowable_stress
 from safe.punch.punch import _Punch, _ViewProviderPunch
 from safe.punch.axis import create_grids
 from safe.punch.punch_funcs import remove_obj
+from safe.punch import foundation
 
 
 class Geom(object):
@@ -257,8 +258,13 @@ class Geom(object):
             if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
                 foundation_plane = f
                 break
-        punchs = {}
+        d = self.foundation.Shape.BoundBox.ZLength
+        cover = 93
+        h = d + cover
         fc = self._safe.fc
+        foun_obj = foundation.make_foundation(foundation_plane, height=h, cover=cover, fc=fc)
+        remove_obj(self.foundation.Name)
+        punchs = {}
 
         for key in self.columns_number:
             intersection_faces = self.punch_faces.get(key, None)
@@ -271,7 +277,7 @@ class Geom(object):
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
             p.foundation_plane = foundation_plane
-            p.foundation = self.foundation
+            p.foundation = foun_obj
             value = self._safe.point_loads[key]
             p.bx = value['xdim']
             p.by = value['ydim']
