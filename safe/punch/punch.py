@@ -139,7 +139,7 @@ class _Punch:
         obj.Location = punch_funcs.location_of_column(faces)
         obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inersia(faces)
         if 'Corner' in obj.Location:
-            I23 = 0
+            obj.I23 = 0
         obj.Area = punch_funcs.area(faces)
         obj.center_of_punch = punch_funcs.center_of_mass(faces)
         obj.b0 = punch_funcs.lenght_of_edges(edges)

@@ -152,14 +152,14 @@ def location_of_column(
             signy = faces_normals['y'][0] > 0
             if not signy:
                 if not signx:
-                    return 'Corner1'
+                    return 'Corner3'
                 elif signx:
-                    return 'Corner2'
+                    return 'Corner4'
             elif signy:
                 if signx:
-                    return 'Corner3'
+                    return 'Corner1'
                 elif not signx:
-                    return 'Corner4'
+                    return 'Corner2'
             else:
                 return 'Corner'
         elif no_of_faces == 3:
@@ -167,14 +167,14 @@ def location_of_column(
             sumy = sum(faces_normals['y'])
             if sumx == 0:
                 if sumy == -1:
-                    return 'Edge1'
-                elif sumy == 1:
                     return 'Edge3'
+                elif sumy == 1:
+                    return 'Edge1'
             elif sumy == 0:
                 if sumx == 1:
-                    return 'Edge2'
-                elif sumx == -1:
                     return 'Edge4'
+                elif sumx == -1:
+                    return 'Edge2'
             else:
                 return 'Edge'
         else:
