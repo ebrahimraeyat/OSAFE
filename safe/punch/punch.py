@@ -1,4 +1,5 @@
 import math
+from typing import Union
 import Part
 import FreeCAD
 import FreeCADGui as Gui
@@ -36,7 +37,7 @@ class _Punch:
         if not hasattr(obj, "Area"):
             obj.addProperty("App::PropertyFloat", "Area", "Punch")
         if not hasattr(obj, "fc"):
-            obj.addProperty("App::PropertyInteger", "fc", "Punch", "", 1, True)
+            obj.addProperty("App::PropertyFloat", "fc", "Punch", "", 1, True)
         if not hasattr(obj, "bx"):
             obj.addProperty("App::PropertyFloat", "bx", "Column", "", 1, True)
         if not hasattr(obj, "by"):
@@ -268,3 +269,31 @@ def get_color(pref_intity, color=16711935):
 #     g = ((RGBint >> 8) & 255) / 255
 #     r = ((RGBint >> 16) & 255) / 255
 #     return (r, g, b)
+
+
+def make_punch(
+    foundation_plane: Part.Face,
+    foun_obj,
+    bx: Union[float, int],
+    by: Union[float, int],
+    center: FreeCAD.Vector,
+    combos_load: dict,
+    location: str = 'Corner1',
+    ):
+
+    p = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Punch")
+    _Punch(p)
+    _ViewProviderPunch(p.ViewObject)
+    p.foundation_plane = foundation_plane
+    p.foundation = foun_obj
+    p.bx = bx
+    p.by = by
+    p.center_of_load = center
+    p.fc = foun_obj.fc.Value
+    p.combos_load = combos_load
+    p.Location = location
+
+    FreeCAD.ActiveDocument.recompute()
+
+    return p
+

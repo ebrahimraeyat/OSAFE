@@ -7,10 +7,10 @@ import FreeCADGui as Gui
 import pandas as pd
 from safe.punch import safe
 from safe.punch.punch_funcs import allowable_stress
-from safe.punch.punch import _Punch, _ViewProviderPunch
 from safe.punch.axis import create_grids
 from safe.punch.punch_funcs import remove_obj
 from safe.punch import foundation
+from safe.punch.punch import make_punch
 
 
 class Geom(object):
@@ -110,17 +110,30 @@ class Geom(object):
         punchs = {}
 
         for key in self.columns_number:
-            p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
-            _Punch(p)
-            _ViewProviderPunch(p.ViewObject)
-            p.foundation_plane = foundation_plane
-            p.foundation = foun_obj
             value = self._safe.point_loads[key]
-            p.bx = value['xdim']
-            p.by = value['ydim']
-            p.fc = int(fc)
-            length = p.bx * 1.5
-            height = p.by * 1.5
+            bx = value['xdim']
+            by = value['ydim']
+            combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == key]
+            d = {}
+            for row in combos_load.itertuples():
+                combo = row.Combo
+                F = row.Fgrav
+                Mx = row.Mx
+                My = row.My
+                d[combo] = f"{F}, {Mx}, {My}"
+            point = self._safe.obj_geom_points[key]
+            center_of_load = App.Vector(point.x, point.y, 0)
+            p = make_punch(
+                foundation_plane,
+                foun_obj,
+                bx,
+                by,
+                center_of_load,
+                d,
+                )
+            App.ActiveDocument.recompute()
+            length = bx * 1.5
+            height = by * 1.5
             l = p.Location
             if l in ('Corner1', 'Corner4', 'Edge4', 'Interier'):
                 length *= -1
@@ -139,17 +152,6 @@ class Geom(object):
             # pl = App.Vector(v.x, v.y, 0)
             # p.Placement.Base = pl
             p.number = int(key)
-            combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == key]
-            d = {}
-            for row in combos_load.itertuples():
-                combo = row.Combo
-                F = row.Fgrav
-                Mx = row.Mx
-                My = row.My
-                d[combo] = f"{F}, {Mx}, {My}"
-            p.combos_load = d
-            point = self._safe.obj_geom_points[key]
-            p.center_of_load = App.Vector(point.x, point.y, 0)
             punchs[key] = p
         return punchs
 
