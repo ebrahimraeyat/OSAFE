@@ -4,6 +4,8 @@ import FreeCAD
 import FreeCADGui as Gui
 from PySide.QtCore import QT_TRANSLATE_NOOP
 
+from safe.punch import punch_funcs
+
 
 class _Punch:
     def __init__(self, obj):
@@ -127,12 +129,24 @@ class _Punch:
 
     def execute(self, obj):
         FreeCAD.Console.PrintMessage("*" * 20 + "\nrunning execute method\n")
-        obj.I22, obj.I33, obj.I23 = self.moment_inersia(obj)
-        obj.Area = self._area(obj)
-        obj.center_of_punch = self.center_of_mass(obj)
-        obj.b0 = self.get_b0(obj)
-        obj.d = obj.Area / obj.b0
+        d = obj.foundation.d.Value
+        x = obj.bx + d
+        y = obj.by + d
+        offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
+        edges = punch_funcs.punch_area_edges(obj.foundation.shape, offset_shape)
+        faces = punch_funcs.punch_faces(edges, d)
+        obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inersia(faces)
+        if 'Corner' in obj.Location:
+            I23 = 0
+        obj.Area = punch_funcs.area(faces)
+        obj.center_of_punch = punch_funcs.center_of_mass(faces)
+        obj.b0 = punch_funcs.lenght_of_edges(edges)
+        obj.d = d
         obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
+        rect = punch_funcs.rectangle_face(obj.center_of_load, obj.bx, obj.by)
+        col = rect.extrude(FreeCAD.Vector(0, 0, 4000))
+        comp = Part.makeCompound(faces + [col])
+        obj.Shape = comp
         # ratio = obj.Vu.Value / obj.vc.Value
         # t = f"{ratio:.2f}"
         # print(t, type(t))
@@ -160,87 +174,6 @@ class _Punch:
         Vc = min(Vc1, Vc2, Vc3)
         vc = Vc / (b0d)
         return one_way_shear_capacity, Vc, vc
-
-    def get_b0(self, obj):
-        b0 = 0
-        for f in obj.faces:
-            if f.ViewObject.isVisible():
-                for e in f.Shape.Edges:
-                    if e.BoundBox.ZLength == 0:
-                        b0 += e.Length
-                        break
-        return b0
-
-    def _area(self, obj):
-        area = 0
-        for f in obj.faces:
-            if f.ViewObject.Visibility == False:
-                continue
-            f = f.Shape
-            area += f.Area
-        return area
-
-    def center_of_mass(self, obj):
-        '''
-        give a shell and return center of mass coordinate
-        in (x, y, z)
-        '''
-        sorat_x = 0
-        sorat_y = 0
-        sorat_z = 0
-        makhraj = 0
-
-        for f in obj.faces:
-            if f.ViewObject.Visibility == False:
-                continue
-            f = f.Shape
-            area = f.Area
-            x = f.CenterOfMass.x
-            y = f.CenterOfMass.y
-            z = f.CenterOfMass.z
-            sorat_x += area * x
-            sorat_y += area * y
-            sorat_z += area * z
-            makhraj += area
-        obj.Area = makhraj
-        if makhraj == 0:
-            return None
-        return FreeCAD.Vector(sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
-
-    def moment_inersia(self, obj):
-        '''
-        return rotational moment inersia of shell Ixx, Iyy
-        '''
-        Ixx = 0
-        Iyy = 0
-        Ixy = 0
-        if not self.center_of_mass(obj):
-            return 0, 0, 0
-        x_bar, y_bar, z_bar = self.center_of_mass(obj)
-        for f in obj.faces:
-            if f.ViewObject.Visibility == False:
-                continue
-            f = f.Shape
-            A = f.Area
-            x = f.CenterOfMass.x
-            y = f.CenterOfMass.y
-            z = f.CenterOfMass.z
-            ixx = f.MatrixOfInertia.A11
-            iyy = f.MatrixOfInertia.A22
-            dx = abs(x - x_bar)
-            dy = abs(y - y_bar)
-            # dz = z - z_bar
-            normal = f.normalAt(0, 0)
-            if normal.x:
-                Ixx += ixx + A * dy ** 2
-                Iyy += A * (dx ** 2)  # + dz ** 2)
-            elif normal.y:
-                Ixx += A * (dy ** 2)  # + dz ** 2)
-                Iyy += iyy + A * dx ** 2
-            Ixy += A * dx * dy
-        if 'Corner' in obj.Location:
-            Ixy = 0
-        return Ixx, Iyy, Ixy
 
 
 class _ViewProviderPunch:

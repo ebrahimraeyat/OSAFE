@@ -62,3 +62,69 @@ def lenght_of_edges(
 	for e in edges:
 		length += e.Length
 	return length
+
+def area(
+	faces: List[Part.Face],
+	):
+	area = 0
+	for f in faces:
+		area += f.Area
+	return area
+
+def center_of_mass(
+	faces: List[Part.Face],
+	) -> FreeCAD.Vector:
+	'''
+	gives faces and return the center of mass coordinate
+	'''
+	sorat_x = 0
+	sorat_y = 0
+	sorat_z = 0
+	makhraj = 0
+
+	for f in faces:
+		area = f.Area
+		x = f.CenterOfMass.x
+		y = f.CenterOfMass.y
+		z = f.CenterOfMass.z
+		sorat_x += area * x
+		sorat_y += area * y
+		sorat_z += area * z
+		makhraj += area
+	if makhraj == 0:
+		return None
+	return FreeCAD.Vector(sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
+
+def moment_inersia(
+	faces: List[Part.Face],
+	):
+	'''
+	return rotational moment inersia of shell Ixx, Iyy
+	'''
+	Ixx = 0
+	Iyy = 0
+	Ixy = 0
+	if not center_of_mass(faces):
+		return 0, 0, 0
+	x_bar, y_bar, z_bar = center_of_mass(faces)
+	for f in faces:
+		# if f.ViewObject.Visibility == False:
+		#	 continue
+		A = f.Area
+		x = f.CenterOfMass.x
+		y = f.CenterOfMass.y
+		z = f.CenterOfMass.z
+		ixx = f.MatrixOfInertia.A11
+		iyy = f.MatrixOfInertia.A22
+		dx = abs(x - x_bar)
+		dy = abs(y - y_bar)
+		# dz = z - z_bar
+		normal = f.normalAt(0, 0)
+		if normal.x:
+			Ixx += ixx + A * dy ** 2
+			Iyy += A * (dx ** 2)  # + dz ** 2)
+		elif normal.y:
+			Ixx += A * (dy ** 2)  # + dz ** 2)
+			Iyy += iyy + A * dx ** 2
+		Ixy += A * dx * dy
+	return Ixx, Iyy, Ixy
