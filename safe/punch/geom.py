@@ -136,12 +136,6 @@ class Geom(object):
         punchs = {}
 
         for key in self.columns_number:
-            # intersection_faces = self.punch_faces.get(key, None)
-            # if intersection_faces is None:
-            #     continue
-            # location = self.locations.get(key, None)
-            # if location is None:
-            #     continue
             p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
@@ -150,16 +144,6 @@ class Geom(object):
             value = self._safe.point_loads[key]
             p.bx = value['xdim']
             p.by = value['ydim']
-            # faces = []
-            # for f in intersection_faces:
-            #     face = App.ActiveDocument.addObject("Part::Feature", "face")
-            #     face.Shape = f
-            #     face.ViewObject.LineWidth = 1.
-            #     face.ViewObject.PointSize = 1.
-            #     face.ViewObject.DisplayMode = "Shaded"
-            #     faces.append(face)
-            # p.faces = faces
-            # p.Location = self.locations[key]
             p.fc = int(fc)
             length = p.bx * 1.5
             height = p.by * 1.5
@@ -241,21 +225,16 @@ class Geom(object):
         obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
         obj_geom_point_loads = self.create_column(self._safe.point_loads)
         self.columns_number = list(self._safe.point_loads.keys())
-        self.structures = self.create_structures(obj_geom_areas)
+        structures = self.create_structures(obj_geom_areas)
         del obj_geom_areas
-        fusion = self.create_fusion(self.structures, doc)
+        fusion = self.create_fusion(structures, doc)
         doc.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         self.foundation = self.create_foundation(fusion, doc, gui)
-        self.foundation.ViewObject.Transparency = 40
-        # self.foundation.ViewObject.LineWidth = 1.
-        self.foundation.ViewObject.DisplayMode = "Shaded"
         del fusion
         doc.recompute()
-        # self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
         doc.recompute()
         self.grid_lines()
-        # self.locations = self.loacation_of_columns()
         self.punchs = self.create_punches()
         for rec in obj_geom_point_loads.values():
             remove_obj(rec.Name)
