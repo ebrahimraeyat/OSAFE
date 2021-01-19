@@ -133,49 +133,49 @@ def location_of_column(
 	faces: List[Part.Face],
 	) -> str:
 
-        faces_normals = {'x': [], 'y': []}
-        for f in faces:
-            normal = f.normalAt(0, 0)
-            normal_x = normal.x
-            normal_y = normal.y
-            if normal_x:
-                if not normal_x in faces_normals['x']:
-                    faces_normals['x'].append(normal_x)
-            if normal_y:
-                if not normal_y in faces_normals['y']:
-                    faces_normals['y'].append(normal_y)
-        if not (faces_normals['x'] and faces_normals['y']):
-            return None
-        no_of_faces = len(faces_normals['x'] + faces_normals['y'])
-        if no_of_faces == 2:
-            signx = faces_normals['x'][0] > 0
-            signy = faces_normals['y'][0] > 0
-            if not signy:
-                if not signx:
-                    return 'Corner3'
-                elif signx:
-                    return 'Corner4'
-            elif signy:
-                if signx:
-                    return 'Corner1'
-                elif not signx:
-                    return 'Corner2'
-            else:
-                return 'Corner'
-        elif no_of_faces == 3:
-            sumx = sum(faces_normals['x'])
-            sumy = sum(faces_normals['y'])
-            if sumx == 0:
-                if sumy == -1:
-                    return 'Edge3'
-                elif sumy == 1:
-                    return 'Edge1'
-            elif sumy == 0:
-                if sumx == 1:
-                    return 'Edge4'
-                elif sumx == -1:
-                    return 'Edge2'
-            else:
-                return 'Edge'
-        else:
-            return 'Interier'
+	faces_normals = {'x': [], 'y': []}
+	for f in faces:
+		normal = f.normalAt(0, 0)
+		normal_x = normal.x
+		normal_y = normal.y
+		if normal_x:
+			if not normal_x in faces_normals['x']:
+				faces_normals['x'].append(normal_x)
+		if normal_y:
+			if not normal_y in faces_normals['y']:
+				faces_normals['y'].append(normal_y)
+	if not (faces_normals['x'] and faces_normals['y']):
+		return None
+	no_of_faces = len(faces_normals['x'] + faces_normals['y'])
+	if no_of_faces == 2:
+		signx = faces_normals['x'][0] > 0
+		signy = faces_normals['y'][0] > 0
+		if not signy:
+			if not signx:
+				return 'Corner3'
+			elif signx:
+				return 'Corner4'
+		elif signy:
+			if signx:
+				return 'Corner1'
+			elif not signx:
+				return 'Corner2'
+		else:
+			return 'Corner'
+	elif no_of_faces == 3:
+		sumx = sum(faces_normals['x'])
+		sumy = sum(faces_normals['y'])
+		if sumx == 0:
+			if sumy == -1:
+				return 'Edge3'
+			elif sumy == 1:
+				return 'Edge1'
+		elif sumy == 0:
+			if sumx == 1:
+				return 'Edge4'
+			elif sumx == -1:
+				return 'Edge2'
+		else:
+			return 'Edge'
+	else:
+		return 'Interier'
