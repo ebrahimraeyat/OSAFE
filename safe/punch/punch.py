@@ -39,9 +39,9 @@ class _Punch:
         if not hasattr(obj, "fc"):
             obj.addProperty("App::PropertyFloat", "fc", "Punch", "", 1, True)
         if not hasattr(obj, "bx"):
-            obj.addProperty("App::PropertyFloat", "bx", "Column", "", 1, True)
+            obj.addProperty("App::PropertyFloat", "bx", "Column")
         if not hasattr(obj, "by"):
-            obj.addProperty("App::PropertyFloat", "by", "Column", "", 1, True)
+            obj.addProperty("App::PropertyFloat", "by", "Column")
         if not hasattr(obj, "number"):
             obj.addProperty("App::PropertyInteger", "number", "Column", "", 1, True)
         if not hasattr(obj, "I22"):
