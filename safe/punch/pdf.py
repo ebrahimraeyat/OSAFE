@@ -6,7 +6,7 @@ import FreeCAD
 def createPdf(doc, pdfName):
     if not pdfName:
         return
-    foun = doc.Foun
+    foun = doc.Foundation
     fig = plt.figure()
     b = foun.Shape.BoundBox
     XMIN, YMIN, XMAX, YMAX = b.XMin, b.YMin, b.XMax, b.YMax
@@ -37,14 +37,14 @@ def createPdf(doc, pdfName):
             continue
         if 'Punch' in o.Name:
             color = o.ViewObject.ShapeColor[:-1]
-            for f in o.faces:
-                if f.ViewObject.isVisible():
-                    xy = []
-                    for v in f.Shape.Vertexes:
-                        if v.Z == 0:
-                            xy.append([v.X, v.Y])
-                    p = patches.Polygon(xy, edgecolor='black', linewidth=.4, linestyle='--', closed=False)
-                    ax1.add_patch(p)
+            for f in o.faces.Faces:
+                # if f.ViewObject.isVisible():
+                xy = []
+                for v in f.Vertexes:
+                    if v.Z == 0:
+                        xy.append([v.X, v.Y])
+                p = patches.Polygon(xy, edgecolor='black', linewidth=.4, linestyle='--', closed=False)
+                ax1.add_patch(p)
             xy = []
 
             for f in o.Shape.Faces:
@@ -112,6 +112,6 @@ def createPdf(doc, pdfName):
     FreeCAD.Console.PrintMessage("Pdf file saved as: " + pdfName)
     plt.close()
 
-
-# doc = FreeCAD.ActiveDocument
-# createPdf(doc, '/home/ebi/punch.pdf')
+if __name__ == '__main__':
+    doc = FreeCAD.ActiveDocument
+    createPdf(doc, '/home/ebi/punch.pdf')
