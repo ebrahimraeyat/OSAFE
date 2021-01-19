@@ -6,7 +6,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import pandas as pd
 from safe.punch import safe
-from safe.punch.allowableStress import allowable_stress
+from safe.punch.punch_funcs import allowable_stress
 from safe.punch.punch import _Punch, _ViewProviderPunch
 from safe.punch.axis import create_grids
 from safe.punch.punch_funcs import remove_obj
