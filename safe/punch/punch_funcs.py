@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 
 import FreeCAD
 import Part
@@ -46,13 +46,19 @@ def punch_area_edges(
 	return edges
 
 def punch_faces(
-	sh1: Part.Shape,
-	sh2: Part.Shape,
+	edges: List[Part.Edge],
 	d: Union[float, int],
 	):
-	edges = punch_area_edges(sh1, sh2)
 	faces = []
 	for e in edges:
 		face = e.extrude(FreeCAD.Vector(0, 0, -d))
 		faces.append(face)
 	return faces
+
+def lenght_of_edges(
+	edges: List[Part.Edge],
+	):
+	length = 0
+	for e in edges:
+		length += e.Length
+	return length
