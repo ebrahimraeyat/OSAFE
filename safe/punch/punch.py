@@ -28,7 +28,7 @@ class _Punch:
         if not hasattr(obj, "text"):
             obj.addProperty("App::PropertyLink", "text", "Punch")
         if not hasattr(obj, "faces"):
-            obj.addProperty("App::PropertyLinkList", "faces", "Punch", "", 1, False)
+            obj.addProperty("Part::PropertyPartShape", "faces", "Punch", "", 1, False)
         if not hasattr(obj, "d"):
             obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
         if not hasattr(obj, "normals"):
@@ -106,21 +106,21 @@ class _Punch:
         obj.setEditorMode("Area", 2)
         obj.setEditorMode("faces", 2)
 
-    def onChanged(self, fp, prop):
-        if prop == 'Location':
-            loc = fp.Location
-            fp.alpha_s = self.alphas(loc)
-            normals = self._location[loc]
-            if len(normals) >= len(fp.faces):
-                for f in fp.faces:
-                    f.ViewObject.Visibility = True
-                return
-            for f in fp.faces:
-                f.ViewObject.Visibility = True
-                normal = tuple(f.Shape.normalAt(0, 0))
-                if not normal in normals:
-                    f.ViewObject.Visibility = False
-        return
+    # def onChanged(self, fp, prop):
+    #     if prop == 'Location':
+    #         loc = fp.Location
+    #         fp.alpha_s = self.alphas(loc)
+    #         normals = self._location[loc]
+    #         if len(normals) >= len(fp.faces):
+    #             for f in fp.faces:
+    #                 f.ViewObject.Visibility = True
+    #             return
+    #         for f in fp.faces:
+    #             f.ViewObject.Visibility = True
+    #             normal = tuple(f.Shape.normalAt(0, 0))
+    #             if not normal in normals:
+    #                 f.ViewObject.Visibility = False
+    #     return
 
     def onDocumentRestored(self, obj):
         obj.Proxy = self
@@ -135,6 +135,8 @@ class _Punch:
         offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
         edges = punch_funcs.punch_area_edges(obj.foundation.shape, offset_shape)
         faces = punch_funcs.punch_faces(edges, d)
+        obj.faces = Part.makeCompound(faces)
+        obj.Location = punch_funcs.location_of_column(faces)
         obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inersia(faces)
         if 'Corner' in obj.Location:
             I23 = 0
@@ -204,7 +206,7 @@ class _ViewProviderPunch:
         return
 
     def claimChildren(self):
-        children = self.Object.faces + [self.Object.text]
+        children = [self.Object.text]
         return children
 
     def getDisplayModes(self, obj):

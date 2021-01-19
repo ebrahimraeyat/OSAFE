@@ -103,14 +103,6 @@ class Geom(object):
         remove_obj(fusion.Name)
         return foun
 
-    def create_3D_column(self, columns):
-        self.bar_label.setText("Creating 3D Columns")
-        for key, area in columns.items():
-            col = Part.makeBox(area.Length, area.Height, 4000, area.Placement.Base)
-            try:
-                self.punchs[key].Shape = col
-            except KeyError:
-                pass
             # self.punchs[key].number = int(key)
 
     # def point_loads_is_in_witch_areas(self, areas, points_loads, obj_geom_points):
@@ -129,129 +121,6 @@ class Geom(object):
     #       point_loads_areas_contain[_id] = curr_areas
     #   return point_loads_areas_contain
 
-    def create_column_offset(self, column_areas, gui):
-        self.bar_label.setText("Creating offset of d/2 Geometry")
-        offset_structures = {}
-        d = self._safe.max_thickness
-        for key, value in column_areas.items():
-            offset_area = Draft.offset(value, App.Vector(0.0, -(d - 93) / 2, 0), copy=True, occ=False)
-            offset_structure = Arch.makeStructure(offset_area, height=d)
-            Draft.autogroup(offset_structure)
-            Draft.move(offset_structure, App.Vector(0, 0, -d), copy=False)
-            offset_structures[key] = offset_structure
-            gui.getObject(offset_structure.Name).Visibility = False
-        return offset_structures
-
-    def get_intersections_areas(self, obj1, obj2):
-        outer = obj1.Shape.cut(obj2.Shape)
-        inner = obj1.Shape.common(obj2.Shape)
-        doc = obj2.Document
-        remove_obj(obj2.Name)
-        faces_outer = outer.Faces
-        faces_inner = inner.Faces
-        intersection_faces = []
-        for fo in faces_outer:
-            for fi in faces_inner:
-                if -0.01 < fo.Area - fi.Area < 0.01:
-                    if len(fo.Vertexes) == len(fi.Vertexes):
-                        no_same_V = 0
-                        for vo in fo.Vertexes:
-                            for vi in fi.Vertexes:
-                                if -.01 < vo.X - vi.X < .01 and -.01 < vo.Y - vi.Y < .01 and -.01 < vo.Z - vi.Z < .01:
-                                    no_same_V = no_same_V + 1
-                            if no_same_V == len(fo.Vertexes):
-                                intersection_faces.append(fo)
-        return intersection_faces
-
-    def get_punch_faces(self, foun, offset_structures):
-        punch_faces = {}
-        self.bar_label.setText("Get Punch Faces")
-        i = 1
-        for key, value in offset_structures.items():
-            punch_faces[key] = self.get_intersections_areas(foun, value)
-            self.progressbar.setValue(100 * i / len(self.columns_number))
-            i += 1
-        return punch_faces
-
-    def shell_center_of_mass(self, faces):
-        '''
-        give a shell and return center of mass coordinate
-        in (x, y, z)
-        '''
-        sorat_x = 0
-        sorat_y = 0
-        sorat_z = 0
-        makhraj = 0
-
-        for f in faces:
-            f = f.Shape
-            area = f.Area
-            x = f.CenterOfMass.x
-            y = f.CenterOfMass.y
-            z = f.CenterOfMass.z
-            sorat_x += area * x
-            sorat_y += area * y
-            sorat_z += area * z
-            makhraj += area
-        if makhraj == 0:
-            return None
-        return (sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
-
-    def location_of_column(self, faces):
-        faces_normals = {'x': [], 'y': []}
-        for f in faces:
-            normal = f.normalAt(0, 0)
-            normal_x = normal.x
-            normal_y = normal.y
-            if normal_x:
-                if not normal_x in faces_normals['x']:
-                    faces_normals['x'].append(normal_x)
-            if normal_y:
-                if not normal_y in faces_normals['y']:
-                    faces_normals['y'].append(normal_y)
-        if not (faces_normals['x'] and faces_normals['y']):
-            return None
-        no_of_faces = len(faces_normals['x'] + faces_normals['y'])
-        if no_of_faces == 2:
-            signx = faces_normals['x'][0] > 0
-            signy = faces_normals['y'][0] > 0
-            if not signy:
-                if not signx:
-                    return 'Corner1'
-                elif signx:
-                    return 'Corner2'
-            elif signy:
-                if signx:
-                    return 'Corner3'
-                elif not signx:
-                    return 'Corner4'
-            else:
-                return 'Corner'
-        elif no_of_faces == 3:
-            sumx = sum(faces_normals['x'])
-            sumy = sum(faces_normals['y'])
-            if sumx == 0:
-                if sumy == -1:
-                    return 'Edge1'
-                elif sumy == 1:
-                    return 'Edge3'
-            elif sumy == 0:
-                if sumx == 1:
-                    return 'Edge2'
-                elif sumx == -1:
-                    return 'Edge4'
-            else:
-                return 'Edge'
-        else:
-            return 'Interier'
-
-    def loacation_of_columns(self):
-        self.bar_label.setText("Obtain Location of Columns")
-        locations = {}
-        for key, value in self.punch_faces.items():
-            locations[key] = self.location_of_column(value)
-        return locations
-
     def create_punches(self):
         self.bar_label.setText("Creating Punch Objects")
         for f in self.foundation.Shape.Faces:
@@ -267,12 +136,12 @@ class Geom(object):
         punchs = {}
 
         for key in self.columns_number:
-            intersection_faces = self.punch_faces.get(key, None)
-            if intersection_faces is None:
-                continue
-            location = self.locations.get(key, None)
-            if location is None:
-                continue
+            # intersection_faces = self.punch_faces.get(key, None)
+            # if intersection_faces is None:
+            #     continue
+            # location = self.locations.get(key, None)
+            # if location is None:
+            #     continue
             p = App.ActiveDocument.addObject("Part::FeaturePython", "Punch")
             _Punch(p)
             _ViewProviderPunch(p.ViewObject)
@@ -281,16 +150,16 @@ class Geom(object):
             value = self._safe.point_loads[key]
             p.bx = value['xdim']
             p.by = value['ydim']
-            faces = []
-            for f in intersection_faces:
-                face = App.ActiveDocument.addObject("Part::Feature", "face")
-                face.Shape = f
-                face.ViewObject.LineWidth = 1.
-                face.ViewObject.PointSize = 1.
-                face.ViewObject.DisplayMode = "Shaded"
-                faces.append(face)
-            p.faces = faces
-            p.Location = self.locations[key]
+            # faces = []
+            # for f in intersection_faces:
+            #     face = App.ActiveDocument.addObject("Part::Feature", "face")
+            #     face.Shape = f
+            #     face.ViewObject.LineWidth = 1.
+            #     face.ViewObject.PointSize = 1.
+            #     face.ViewObject.DisplayMode = "Shaded"
+            #     faces.append(face)
+            # p.faces = faces
+            # p.Location = self.locations[key]
             p.fc = int(fc)
             length = p.bx * 1.5
             height = p.by * 1.5
@@ -382,14 +251,12 @@ class Geom(object):
         # self.foundation.ViewObject.LineWidth = 1.
         self.foundation.ViewObject.DisplayMode = "Shaded"
         del fusion
-        self.offset_structures = self.create_column_offset(obj_geom_point_loads, gui)
         doc.recompute()
-        self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
+        # self.punch_faces = self.get_punch_faces(self.foundation, self.offset_structures)
         doc.recompute()
         self.grid_lines()
-        self.locations = self.loacation_of_columns()
+        # self.locations = self.loacation_of_columns()
         self.punchs = self.create_punches()
-        self.create_3D_column(obj_geom_point_loads)
         for rec in obj_geom_point_loads.values():
             remove_obj(rec.Name)
         doc.recompute()
@@ -427,8 +294,8 @@ class Geom(object):
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
             combos_load.set_index('Combo', inplace=True)
             Vu_df = pd.DataFrame(index=combos)
-            for col, f in enumerate(punch.faces):
-                f = f.Shape
+            for col, f in enumerate(punch.faces.Faces):
+                # f = f.Shape
                 x4 = f.CenterOfMass.x
                 y4 = f.CenterOfMass.y
                 Vu_df[col] = ""
