@@ -34,6 +34,13 @@ class Foundation:
 				"Foundation",
 				)
 
+		if not hasattr(obj, "d"):
+			obj.addProperty(
+				"App::PropertyLength",
+				"d",
+				"Foundation",
+				)
+
 		if not hasattr(obj, "shape"):
 			obj.addProperty(
 				"Part::PropertyPartShape",
@@ -41,14 +48,16 @@ class Foundation:
 				"Foundation",
 				)
 
+		obj.setEditorMode("d", 2)
+
 
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
 		self.set_properties(obj)
 
 	def execute(self, obj):
-		d = (obj.height - obj.cover).Value
-		sh = obj.shape.extrude(FreeCAD.Vector(0, 0, -d))
+		obj.d = obj.height - obj.cover
+		sh = obj.shape.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
 		obj.Shape = sh
 
 
