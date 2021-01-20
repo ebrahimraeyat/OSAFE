@@ -137,7 +137,6 @@ class _Punch:
 		obj.Proxy = self
 		self.set_properties(obj)
 
-
 	def execute(self, obj):
 		FreeCAD.Console.PrintMessage("*" * 20 + "\nrunning execute method\n")
 		d = obj.foundation.d.Value
@@ -228,17 +227,14 @@ class _Punch:
 
 	def punch_ratios(self, obj):
 		combos_Vu = self.ultimate_shear_stress(obj)
-		print(f"{obj.number}, {combos_Vu}")
 		obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
 		combos_ratio = dict()
 		for combo, Vu in combos_Vu.items():
-			# print(f"{obj.number}, Vu = {Vu}, vc = {obj.vc}")
 			ratio = float(Vu) / obj.vc.Value
 			combos_ratio[combo] = f"{ratio:.2f}"
 		obj.combos_ratio = combos_ratio
 		ratio = obj.combos_ratio["Max"]
 		obj.Ratio = ratio
-		obj.text.Text = [obj.Location, obj.Ratio]
 
 	@staticmethod
 	def __get_color(pref_intity, color=674321151):
@@ -260,20 +256,22 @@ class _ViewProviderPunch:
 		self.ViewObject = vobj
 		self.Object = vobj.Object
 
-	def updateData(self, fp, prop):
+	def updateData(self, obj, prop):
 		''' If a property of the handled feature has changed we have the chance to handle this here '''
 		if prop == "Ratio":
-			if float(fp.Ratio) == 0:
+			if float(obj.Ratio) == 0:
 				return
 			ratio = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1.0)
-			if float(fp.Ratio) > ratio:
+			if float(obj.Ratio) > ratio:
 				color = get_color("Ratio_above_color", 4278190335)
 			else:
 				color = get_color("Ratio_below_color", 16711935)
-			fp.ViewObject.ShapeColor = color
-			if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("is_text_color", False):
-				color = get_color("text_color", 674321151)
-			fp.text.ViewObject.TextColor = color
+			obj.ViewObject.ShapeColor = color
+			if hasattr(obj, "text") and obj.text:
+				if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("is_text_color", False):
+					color = get_color("text_color", 674321151)
+				obj.text.ViewObject.TextColor = color
+				obj.text.Text = [obj.Location, obj.Ratio]
 		return
 
 	def claimChildren(self):
