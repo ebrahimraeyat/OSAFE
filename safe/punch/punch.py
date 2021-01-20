@@ -78,6 +78,13 @@ class _Punch:
                 "Column",
                 )
 
+        if not hasattr(obj, "combos_ratio"):
+            obj.addProperty(
+                "App::PropertyMap",
+                "combos_ratio",
+                "Result",
+                )
+
         if not hasattr(obj, "foundation_plane"):
             obj.addProperty(
                 "Part::PropertyPartShape",

@@ -279,18 +279,20 @@ class Geom(object):
         Vus_df, prop_df = self.ultimate_shear_stress()
         Vcs_series = self.allowable_shear_stress()
         df = Vus_df / Vcs_series
-        df.loc['Combo'] = Vus_df.idxmax()
-        df.loc['properties'] = df.columns
-        df = df.append(prop_df)
-        # insert ratios to Gui
+        combos = list(df.index)
         for key in self.columns_number:
             punch = self.punchs.get(key, None)
             if not punch:
                 continue
-            ratio = df[key]['Max']
-            t = f"{ratio:.2f}"
-            punch.Ratio = t
+            ratios = [f"{r:.2f}" for r in list(df[key])]
+            punch.combos_ratio = dict(zip(combos, ratios))
+            ratio = punch.combos_ratio["Max"]
+            punch.Ratio = ratio
             punch.text.Text = [punch.Location, punch.Ratio]
+        df.loc['Combo'] = Vus_df.idxmax()
+        df.loc['properties'] = df.columns
+        df = df.append(prop_df)
+        # insert ratios to Gui
         return df
 
     @staticmethod
