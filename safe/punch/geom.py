@@ -146,7 +146,7 @@ class Geom(object):
             pl = App.Vector(x, y, 4100)
             t = '0.0'
             p.Ratio = t
-            text = Draft.makeText([t, l], point=pl)
+            text = Draft.make_text([t, l], placement=pl)
             text.ViewObject.FontSize = 200
             p.text = text
             # pl = App.Vector(v.x, v.y, 0)
