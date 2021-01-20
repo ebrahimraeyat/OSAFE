@@ -236,16 +236,14 @@ class Geom(object):
             x1, y1, _ = punch.center_of_load
             prop_df[_id] = [I22, I33, I23, punch.Location, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
             x3, y3, _ = punch.center_of_punch
-            combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
-            combos_load.set_index('Combo', inplace=True)
+            combos_load = punch.combos_load
             Vu_df = pd.DataFrame(index=combos)
             for col, f in enumerate(punch.faces.Faces):
-                # f = f.Shape
                 x4 = f.CenterOfMass.x
                 y4 = f.CenterOfMass.y
                 Vu_df[col] = ""
-                for combo in combos:
-                    _, vu, mx, my = list(combos_load.loc[combo])
+                for combo, forces in combos_load.items():
+                    vu, mx, my = [float(force) for force in forces.split(",")]
                     Vu = vu / b0d + (gamma_vx * (mx - vu * (y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - (gamma_vy * (my - vu * (x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
                     Vu *= 1000
                     Vu_df.at[combo, col] = Vu
