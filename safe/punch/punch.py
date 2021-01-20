@@ -19,7 +19,7 @@ class _Punch:
 			'Corner3': [(0, -1, 0), (-1, 0, 0)],
 			'Corner4': [(0, -1, 0), (1, 0, 0)],
 			'Corner1': [(0, 1, 0), (1, 0, 0)],
-			'Corner1': [(0, 1, 0), (-1, 0, 0)],
+			'Corner2': [(0, 1, 0), (-1, 0, 0)],
 			'Edge3': [(0, -1, 0), (-1, 0, 0), (1, 0, 0)],
 			'Edge4': [(0, -1, 0), (1, 0, 0), (0, 1, 0)],
 			'Edge1': [(0, 1, 0), (1, 0, 0), (-1, 0, 0)],
@@ -105,6 +105,13 @@ class _Punch:
 				"center_of_load",
 				"Column",
 				)
+
+		if not hasattr(obj, "user_location"):
+			obj.addProperty(
+			                "App::PropertyBool",
+			                "user_location",
+			                "Punch",
+			                ).user_location = False
 		#obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
 		#obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
 		#obj.ds = ['8', '10', '12', '14', '16', '18', '20']
@@ -114,21 +121,17 @@ class _Punch:
 		obj.setEditorMode("Area", 2)
 		obj.setEditorMode("faces", 2)
 
-	# def onChanged(self, fp, prop):
-	#	 if prop == 'Location':
-	#		 loc = fp.Location
-	#		 fp.alpha_s = self.alphas(loc)
-	#		 normals = self._location[loc]
-	#		 if len(normals) >= len(fp.faces):
-	#			 for f in fp.faces:
-	#				 f.ViewObject.Visibility = True
-	#			 return
-	#		 for f in fp.faces:
-	#			 f.ViewObject.Visibility = True
-	#			 normal = tuple(f.Shape.normalAt(0, 0))
-	#			 if not normal in normals:
-	#				 f.ViewObject.Visibility = False
-	#	 return
+	def get_user_location_faces(self, faces, location):
+
+		normals = self._location[location]
+		if len(normals) >= len(faces):
+			return faces
+		new_faces = []
+		for f in faces:
+			normal = tuple(f.normalAt(0, 0))
+			if normal in normals:
+				new_faces.append(f)
+		return new_faces
 
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
@@ -143,6 +146,8 @@ class _Punch:
 		offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
 		edges = punch_funcs.punch_area_edges(obj.foundation.shape, offset_shape)
 		faces = punch_funcs.punch_faces(edges, d)
+		if obj.user_location:
+			faces = self.get_user_location_faces(faces, obj.Location)
 		obj.faces = Part.makeCompound(faces)
 		obj.Location = punch_funcs.location_of_column(faces)
 		obj.alpha_s = self.alphas(obj.Location)
