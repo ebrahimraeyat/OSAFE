@@ -138,8 +138,8 @@ class _Punch:
 		self.set_properties(obj)
 
 	def execute(self, obj):
-		FreeCAD.Console.PrintMessage("*" * 20 + "\nrunning execute method\n")
 		d = obj.foundation.d.Value
+		obj.fc = obj.foundation.fc
 		x = obj.bx + d
 		y = obj.by + d
 		offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
