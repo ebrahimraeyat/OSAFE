@@ -233,8 +233,7 @@ class Geom(object):
             I33 = punch.I33
             I23 = punch.I23
             b0d = punch.Area
-            point = self._safe.obj_geom_points[_id]
-            x1, y1 = point.x, point.y
+            x1, y1, _ = punch.center_of_load
             prop_df[_id] = [I22, I33, I23, punch.Location, b0d, gamma_vx, gamma_vy, bx, by, x1, y1]
             x3, y3, _ = punch.center_of_punch
             combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == _id]
