@@ -250,7 +250,8 @@ class _ViewProviderPunch:
 		''' Set this object to the proxy object of the actual view provider '''
 		#
 		vobj.Proxy = self
-		# vobj.LineWidth = 1.
+		vobj.LineWidth = 1.
+		vobj.PointSize = 1.
 
 	def attach(self, vobj):
 		self.ViewObject = vobj
@@ -285,7 +286,7 @@ class _ViewProviderPunch:
 
 	def getDefaultDisplayMode(self):
 		''' Return the name of the default display mode. It must be defined in getDisplayModes. '''
-		return "Shaded"
+		return "Flat Lines"
 
 	def setDisplayMode(self, mode):
 		''' Map the display mode defined in attach with those defined in getDisplayModes.
