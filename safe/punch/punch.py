@@ -163,11 +163,6 @@ class _Punch:
 		comp = Part.makeCompound(faces + [col])
 		obj.Shape = comp
 		self.punch_ratios(obj)
-		# ratio = obj.Vu.Value / obj.vc.Value
-		# t = f"{ratio:.2f}"
-		# print(t, type(t))
-		# obj.Ratio = t
-		# obj.text.Text = [obj.Location, obj.Ratio]
 		return
 
 	def alphas(self, location):
@@ -227,7 +222,6 @@ class _Punch:
 
 	def punch_ratios(self, obj):
 		combos_Vu = self.ultimate_shear_stress(obj)
-		obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
 		combos_ratio = dict()
 		for combo, Vu in combos_Vu.items():
 			ratio = float(Vu) / obj.vc.Value
@@ -248,7 +242,6 @@ class _Punch:
 class _ViewProviderPunch:
 	def __init__(self, vobj):
 		''' Set this object to the proxy object of the actual view provider '''
-		#
 		vobj.Proxy = self
 		vobj.LineWidth = 1.
 		vobj.PointSize = 1.
@@ -330,15 +323,6 @@ def get_color(pref_intity, color=16711935):
 	g = float((c >> 16) & 0xFF) / 255.0
 	b = float((c >> 8) & 0xFF) / 255.0
 	return (r, g, b)
-
-# def get_color(pref_intity, default=11247519):
-#	 RGBint = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, default)
-#	 print(RGBint)
-#	 b = (RGBint & 255) / 255
-#	 g = ((RGBint >> 8) & 255) / 255
-#	 r = ((RGBint >> 16) & 255) / 255
-#	 return (r, g, b)
-
 
 def make_punch(
 	foundation_plane: Part.Face,
