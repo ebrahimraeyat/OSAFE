@@ -7,7 +7,6 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from safe.punch import geom
-from safe.punch import pdf
 # from safe.punch.colorbar import ColorMap
 punch_path = os.path.split(os.path.abspath(__file__))[0]
 

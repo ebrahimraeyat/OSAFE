@@ -9,33 +9,6 @@ import civilwelcome
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
 
-class Punch:
-    def Activated(self):
-        from safe.punch import punchPanel
-        panel = punchPanel.PunchTaskPanel()
-        Gui.Control.showDialog(panel)
-        if panel.setupUi():
-            Gui.Control.closeDialog(panel)
-            return None
-        return panel
-
-    def GetResources(self):
-        MenuText = QtCore.QT_TRANSLATE_NOOP(
-            "Punch",
-            "control Punch")
-        ToolTip = QtCore.QT_TRANSLATE_NOOP(
-            "Punch",
-            "control shear punching")
-        rel_path = "Mod/Civil/images/punch.svg"
-        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        import os
-        if not os.path.exists(path):
-            path = FreeCAD.ConfigGet("UserAppData") + rel_path
-        return {'Pixmap': path,
-                'MenuText': MenuText,
-                'ToolTip': ToolTip}
-
-
 class Copy(DraftTools.Move):
 
     def __init__(self):
@@ -51,10 +24,10 @@ class Copy(DraftTools.Move):
 
 class CivilPdf:
     def Activated(self):
-        from safe.punch import pdf
+        from safe.punch import export
         doc = FreeCAD.ActiveDocument
         filename = get_save_filename('.pdf')
-        pdf.createPdf(doc, filename)
+        export.createPdf(doc, filename)
 
     def GetResources(self):
         MenuText = QtCore.QT_TRANSLATE_NOOP(
@@ -78,12 +51,12 @@ class CivilPdf:
 
 class CivilPictur:
     def Activated(self):
-        from safe.punch import pdf
+        from safe.punch import export
         doc = FreeCAD.ActiveDocument
         i = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetInt("picture_ext", 0)
         ext = ('png', 'jpg', 'pdf')[i]
         filename = get_save_filename(f'.{ext}')
-        pdf.createPdf(doc, filename)
+        export.createPdf(doc, filename)
 
     def GetResources(self):
         MenuText = QtCore.QT_TRANSLATE_NOOP(
@@ -105,6 +78,9 @@ class CivilPictur:
         return not FreeCAD.ActiveDocument is None
 
 
+
+
+
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
     filters = f"{ext[1:]} (*{ext})"
@@ -117,10 +93,9 @@ def get_save_filename(ext):
     return filename
 
 
-Gui.addCommand('Punch', Punch())
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
 Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
 
-command_list = ["Punch", "Copy", "Civil_pdf", "Civil_pic"]
+command_list = ["Copy", "Civil_pdf", "Civil_pic"]

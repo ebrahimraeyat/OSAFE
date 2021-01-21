@@ -31,7 +31,6 @@ def createPdf(doc, pdfName):
             p = patches.Polygon(xy, edgecolor='black', linewidth=.5, closed=False)
             ax1.add_patch(p)
 
-    text_ratio = f''
     for o in doc.Objects:
         if not (hasattr(o, 'ViewObject') and o.ViewObject.Visibility):
             continue
@@ -54,7 +53,6 @@ def createPdf(doc, pdfName):
                     p = patches.Rectangle((xmin, ymin), o.bx, o.by, facecolor=color, edgecolor='black', linewidth=.3)
                     ax1.add_patch(p)
 
-            text_ratio += f'{o.number}:{o.Location}, ratio = {o.Ratio}\n'
             c = o.text.Placement.Base
             ha = 'right'
             va = 'center'
