@@ -266,6 +266,8 @@ class _ViewProviderPunch:
 					color = get_color("text_color", 674321151)
 				obj.text.ViewObject.TextColor = color
 				obj.text.Text = [obj.Location, obj.Ratio]
+
+				self.set_text_placement(obj)
 		return
 
 	def claimChildren(self):
@@ -315,6 +317,51 @@ class _ViewProviderPunch:
 		internals here. Since no data were pickled nothing needs to be done here.
 		'''
 		return None
+
+	def set_text_placement(self, obj):
+		xs = {
+				'Corner1': 'bb.XMin',
+				'Corner2': 'bb.XMax',
+				'Corner3': 'bb.XMax',
+				'Corner4': 'bb.XMin',
+				'Edge1': 'bb.Center.x',
+				'Edge2': 'bb.XMax',
+				'Edge3': 'bb.Center.x',
+				'Edge4': 'bb.XMin',
+				'Interier': 'bb.Center.x',
+			  }
+		ys = {
+				'Corner1': 'bb.Center.y',
+				'Corner2': 'bb.Center.y',
+				'Corner3': 'bb.Center.y',
+				'Corner4': 'bb.Center.y',
+				'Edge1': 'bb.YMin',
+				'Edge2': 'bb.Center.y',
+				'Edge3': 'bb.YMax',
+				'Edge4': 'bb.Center.y',
+				'Interier': 'bb.YMax',
+			  }
+
+		justifications = {
+				'Corner1': 'Right',
+				'Corner2': 'Left',
+				'Corner3': 'Left',
+				'Corner4': 'Right',
+				'Edge1': 'Center',
+				'Edge2': 'Left',
+				'Edge3': 'Center',
+				'Edge4': 'Right',
+				'Interier': 'Center',
+			  }
+		bb = obj.Shape.BoundBox
+		location = obj.Location
+		obj.text.Placement.Base.x = eval(xs[location])
+		obj.text.Placement.Base.y = eval(ys[location])
+		obj.text.ViewObject.Justification = justifications[location]
+		if location in ("Edge3", "Interier"):
+			obj.text.ViewObject.LineSpacing = -1.00
+
+
 
 
 def get_color(pref_intity, color=16711935):
