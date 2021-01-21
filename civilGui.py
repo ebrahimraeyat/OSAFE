@@ -78,8 +78,37 @@ class CivilPictur:
         return not FreeCAD.ActiveDocument is None
 
 
+class CivilExcel:
+
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_excel",
+            "Export to excel")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_excel",
+            "export the result of punches to excel")
+        rel_path = "Mod/Civil/safe/punch/icon/xlsx.png"
+        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        import os
+        if not os.path.exists(path):
+            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    def Activated(self):
+        from safe.punch import export
+        doc = FreeCAD.ActiveDocument
+        punches = []
+        for o in doc.Objects:
+            if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
+                if o.Proxy.Type == "Punch":
+                    punches.append(o)
+        filename = get_save_filename('xlsx')
+        export.to_excel(punches, filename)
 
 
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
 
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
@@ -97,5 +126,6 @@ Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
 Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
+Gui.addCommand('Civil_excel', CivilExcel())
 
-command_list = ["Copy", "Civil_pdf", "Civil_pic"]
+command_list = ["Copy", "Civil_pdf", "Civil_pic", "Civil_excel"]

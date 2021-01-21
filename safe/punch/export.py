@@ -1,3 +1,5 @@
+from typing import List
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import FreeCAD
@@ -109,6 +111,18 @@ def createPdf(doc, pdfName):
     fig.savefig(pdfName, orientation='portrait', papertype='a4', bbox_inches='tight', dpi=600)
     FreeCAD.Console.PrintMessage("Pdf file saved as: " + pdfName)
     plt.close()
+
+def to_excel(
+             punches: List,
+             filename: str,
+             ):
+    import pandas as pd
+    combos_ratios = pd.concat(
+        [
+        pd.Series(p.combos_ratio) for p in punches
+        ],
+        axis=1)
+    combos_ratios.to_excel(filename)
 
 if __name__ == '__main__':
     doc = FreeCAD.ActiveDocument
