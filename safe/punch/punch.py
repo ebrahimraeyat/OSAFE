@@ -8,9 +8,10 @@ from PySide.QtCore import QT_TRANSLATE_NOOP
 from safe.punch import punch_funcs
 
 
-class _Punch:
+class Punch:
 	def __init__(self, obj):
 		obj.Proxy = self
+		self.Type = "Punch"
 		self.set_properties(obj)
 		obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
 
@@ -239,7 +240,7 @@ class _Punch:
 		return (r, g, b)
 
 
-class _ViewProviderPunch:
+class ViewProviderPunch:
 	def __init__(self, vobj):
 		''' Set this object to the proxy object of the actual view provider '''
 		vobj.Proxy = self
@@ -382,8 +383,8 @@ def make_punch(
 	):
 
 	p = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Punch")
-	_Punch(p)
-	_ViewProviderPunch(p.ViewObject)
+	Punch(p)
+	ViewProviderPunch(p.ViewObject)
 	p.foundation_plane = foundation_plane
 	p.foundation = foun_obj
 	p.bx = bx
