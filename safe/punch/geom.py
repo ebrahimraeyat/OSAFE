@@ -87,7 +87,6 @@ class Geom(object):
         h = d + cover
         fc = self._safe.fc
         foun_obj = foundation.make_foundation(foundation_plane, height=h, cover=cover, fc=fc)
-        punchs = {}
 
         for key in self.columns_id:
             value = self._safe.point_loads[key]
@@ -111,26 +110,15 @@ class Geom(object):
                 center_of_load,
                 d,
                 )
-            App.ActiveDocument.recompute()
-            length = bx * 1.5
-            height = by * 1.5
+            # App.ActiveDocument.recompute()
             l = p.Location
-            if l in ('Corner1', 'Corner4', 'Edge4', 'Interier'):
-                length *= -1
-            elif l in ('Edge1', 'Interier'):
-                height *= -1
-            v = self.obj_geom_points[key]
-            x = v.x + length
-            y = v.y + height
-            pl = App.Vector(x, y, 4100)
+            pl = App.Vector(0, 0, 4100)
             t = '0.0'
-            p.Ratio = t
             text = Draft.make_text([t, l], placement=pl)
+            p.Ratio = t
             text.ViewObject.FontSize = 200
             p.text = text
             p.id = str(key)
-            punchs[key] = p
-        return punchs
 
     def grid_lines(self):
         if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
@@ -155,7 +143,7 @@ class Geom(object):
         Gui.SendMsgToActiveView("ViewFit")
         self.foundation = self.create_foundation(fusion)
         self.grid_lines()
-        self.punchs = self.create_punches()
+        self.create_punches()
         App.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
