@@ -89,7 +89,7 @@ class Geom(object):
         foun_obj = foundation.make_foundation(foundation_plane, height=h, cover=cover, fc=fc)
         punchs = {}
 
-        for key in self.columns_number:
+        for key in self.columns_id:
             value = self._safe.point_loads[key]
             bx = value['xdim']
             by = value['ydim']
@@ -128,7 +128,7 @@ class Geom(object):
             text = Draft.make_text([t, l], placement=pl)
             text.ViewObject.FontSize = 200
             p.text = text
-            p.number = int(key)
+            p.id = str(key)
             punchs[key] = p
         return punchs
 
@@ -148,7 +148,7 @@ class Geom(object):
     def plot(self):
         self.obj_geom_points = self.create_vectors(self._safe.obj_geom_points)
         obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
-        self.columns_number = list(self._safe.point_loads.keys())
+        self.columns_id = list(self._safe.point_loads.keys())
         structures = self.create_structures(obj_geom_areas)
         del obj_geom_areas
         fusion = self.create_fusion(structures)
