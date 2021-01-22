@@ -1,9 +1,10 @@
+import os
+from pathlib import Path
 import PySide2
 from PySide2 import QtCore, QtGui
 import FreeCAD
 import FreeCADGui as Gui
 import DraftTools
-import os
 import civilwelcome
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -110,6 +111,38 @@ class CivilExcel:
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
+
+class CivilHelp:
+
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_help",
+            "Help")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_help",
+            "Help")
+        path = str(
+                   Path(civilwelcome.__file__).parent.absolute() / "Resources" / "icons" / "help.svg"
+                   )
+        # rel_path = "Mod/Civil/safe/punch/icon/help.svg"
+        # path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        # import os
+        # if not os.path.exists(path):
+        #     path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    def Activated(self):
+        import webbrowser
+        path = str(
+                   Path(civilwelcome.__file__).parent.absolute() / "safe" / "punch" / "Help.pdf"
+                   )
+        webbrowser.open_new(path)
+
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
+
+
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
     filters = f"{ext[1:]} (*{ext})"
@@ -127,5 +160,12 @@ Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
 Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
 Gui.addCommand('Civil_excel', CivilExcel())
+Gui.addCommand('Civil_help', CivilHelp())
 
-command_list = ["Copy", "Civil_pdf", "Civil_pic", "Civil_excel"]
+command_list = [
+            "Copy",
+            "Civil_pdf",
+            "Civil_pic",
+            "Civil_excel",
+            "Civil_help",
+            ]
