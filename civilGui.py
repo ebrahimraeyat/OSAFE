@@ -142,6 +142,34 @@ class CivilHelp:
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
+class CivilUpdate:
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_update",
+            "Update")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_update",
+            "Update")
+        path = str(
+                   Path(civilwelcome.__file__).parent.absolute() / "Resources" / "icons" / "update.png"
+                   )
+        # rel_path = "Mod/Civil/safe/punch/icon/help.svg"
+        # path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        # import os
+        # if not os.path.exists(path):
+        #     path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    def Activated(self):
+        import update
+        update.update()
+
+    def IsActive(self):
+        return True
+
+
+
 
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
@@ -161,6 +189,7 @@ Gui.addCommand('Civil_pic', CivilPictur())
 Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
 Gui.addCommand('Civil_excel', CivilExcel())
 Gui.addCommand('Civil_help', CivilHelp())
+Gui.addCommand('Civil_update', CivilUpdate())
 
 command_list = [
             "Copy",
@@ -168,4 +197,5 @@ command_list = [
             "Civil_pic",
             "Civil_excel",
             "Civil_help",
+            "Civil_update",
             ]
