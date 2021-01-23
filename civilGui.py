@@ -124,11 +124,6 @@ class CivilHelp:
         path = str(
                    Path(civilwelcome.__file__).parent.absolute() / "Resources" / "icons" / "help.svg"
                    )
-        # rel_path = "Mod/Civil/safe/punch/icon/help.svg"
-        # path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        # import os
-        # if not os.path.exists(path):
-        #     path = FreeCAD.ConfigGet("UserAppData") + rel_path
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -153,17 +148,12 @@ class CivilUpdate:
         path = str(
                    Path(civilwelcome.__file__).parent.absolute() / "Resources" / "icons" / "update.png"
                    )
-        # rel_path = "Mod/Civil/safe/punch/icon/help.svg"
-        # path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        # import os
-        # if not os.path.exists(path):
-        #     path = FreeCAD.ConfigGet("UserAppData") + rel_path
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
     def Activated(self):
-        import update
-        update.update()
+        import civil_update
+        civil_update.update()
 
     def IsActive(self):
         return True
