@@ -265,7 +265,8 @@ class ViewProviderPunch:
 			if hasattr(obj, "text") and obj.text:
 				if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("is_text_color", False):
 					color = get_color("text_color", 674321151)
-				obj.text.ViewObject.TextColor = color
+				if hasattr(obj.text.ViewObject, "TextColor"):
+					obj.text.ViewObject.TextColor = color
 				obj.text.Text = [obj.Location, obj.Ratio]
 
 				self.set_text_placement(obj)
@@ -358,9 +359,11 @@ class ViewProviderPunch:
 		location = obj.Location
 		obj.text.Placement.Base.x = eval(xs[location])
 		obj.text.Placement.Base.y = eval(ys[location])
-		obj.text.ViewObject.Justification = justifications[location]
+		if hasattr(obj.text.ViewObject, "Justification"):
+			obj.text.ViewObject.Justification = justifications[location]
 		if location in ("Edge3", "Interier"):
-			obj.text.ViewObject.LineSpacing = -1.00
+			if hasattr(obj.text.ViewObject, "LineSpacing"):
+				obj.text.ViewObject.LineSpacing = -1.00
 
 
 
