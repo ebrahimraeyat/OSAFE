@@ -100,17 +100,16 @@ def moment_inersia(
 	faces: List[Part.Face],
 	):
 	'''
-	return rotational moment inersia of shell Ixx, Iyy
+	return rotational moment inersia of faces list Ixx, Iyy
 	'''
 	Ixx = 0
 	Iyy = 0
 	Ixy = 0
-	if not center_of_mass(faces):
+	com = center_of_mass(faces)
+	if not com:
 		return 0, 0, 0
-	x_bar, y_bar, z_bar = center_of_mass(faces)
+	x_bar, y_bar, z_bar = com
 	for f in faces:
-		# if f.ViewObject.Visibility == False:
-		#	 continue
 		A = f.Area
 		x = f.CenterOfMass.x
 		y = f.CenterOfMass.y
