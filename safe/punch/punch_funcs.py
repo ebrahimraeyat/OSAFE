@@ -199,3 +199,13 @@ def allowable_stress(bx, by, location, fc, b0, d, ACI2019=False, phi_c=.75):
 	Vc = min(Vc1, Vc2, Vc3)
 	vc = Vc / (b0d)
 	return vc
+
+def gamma_v(
+            bx: Union[float, int],
+            by: Union[float, int],
+            ) -> tuple:
+	gamma_fx = 1 / (1 + (2 / 3) * math.sqrt(by / bx))
+	gamma_fy = 1 / (1 + (2 / 3) * math.sqrt(bx / by))
+	gamma_vx = 1 - gamma_fx
+	gamma_vy = 1 - gamma_fy
+	return (gamma_vx, gamma_vy)

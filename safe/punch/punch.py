@@ -113,6 +113,20 @@ class Punch:
 			                "user_location",
 			                "Punch",
 			                ).user_location = False
+
+		if not hasattr(obj, "gamma_vx"):
+			obj.addProperty(
+			                "App::PropertyFloat",
+			                "gamma_vx",
+			                "Punch",
+			                )
+
+		if not hasattr(obj, "gamma_vy"):
+			obj.addProperty(
+			                "App::PropertyFloat",
+			                "gamma_vy",
+			                "Punch",
+			                )
 		#obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
 		#obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
 		#obj.ds = ['8', '10', '12', '14', '16', '18', '20']
@@ -157,6 +171,7 @@ class Punch:
 		obj.Area = punch_funcs.area(faces)
 		obj.center_of_punch = punch_funcs.center_of_mass(faces)
 		obj.b0 = punch_funcs.lenght_of_edges(edges)
+		obj.gamma_vx, obj.gamma_vy = punch_funcs.gamma_v(obj.bx, obj.by)
 		obj.d = d
 		obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
 		rect = punch_funcs.rectangle_face(obj.center_of_load, obj.bx, obj.by)
@@ -194,10 +209,6 @@ class Punch:
 		by = obj.by
 		location = obj.Location
 		location = location.rstrip('1234').lower()
-		gamma_fx = 1 / (1 + (2 / 3) * math.sqrt(by / bx))
-		gamma_fy = 1 / (1 + (2 / 3) * math.sqrt(bx / by))
-		gamma_vx = 1 - gamma_fx
-		gamma_vy = 1 - gamma_fy
 		I22 = obj.I22
 		I33 = obj.I33
 		I23 = obj.I23
@@ -211,7 +222,9 @@ class Punch:
 				x4 = f.CenterOfMass.x
 				y4 = f.CenterOfMass.y
 				vu, mx, my = [float(force) for force in forces.split(",")]
-				Vu = vu / b0d + (gamma_vx * (mx - vu * (y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - (gamma_vy * (my - vu * (x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
+				Vu = vu / b0d + \
+					(obj.gamma_vx * (mx - vu * (y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - \
+					(obj.gamma_vy * (my - vu * (x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
 				Vu *= 1000
 				faces_ratio.append(Vu)
 			max_ratio_in_combo = max(faces_ratio)
