@@ -16,17 +16,6 @@ class Punch:
 		obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
 
 	def set_properties(self, obj):
-		self._location = {
-			'Corner3': [(0, -1, 0), (-1, 0, 0)],
-			'Corner4': [(0, -1, 0), (1, 0, 0)],
-			'Corner1': [(0, 1, 0), (1, 0, 0)],
-			'Corner2': [(0, 1, 0), (-1, 0, 0)],
-			'Edge3': [(0, -1, 0), (-1, 0, 0), (1, 0, 0)],
-			'Edge4': [(0, -1, 0), (1, 0, 0), (0, 1, 0)],
-			'Edge1': [(0, 1, 0), (1, 0, 0), (-1, 0, 0)],
-			'Edge2': [(0, 1, 0), (-1, 0, 0), (0, -1, 0)],
-			'Interier': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
-		}
 		if not hasattr(obj, "text"):
 			obj.addProperty("App::PropertyLink", "text", "Punch")
 		if not hasattr(obj, "faces"):
@@ -134,18 +123,6 @@ class Punch:
 		obj.setEditorMode("Area", 2)
 		obj.setEditorMode("faces", 2)
 
-	def get_user_location_faces(self, faces, location):
-
-		normals = self._location[location]
-		if len(normals) >= len(faces):
-			return faces
-		new_faces = []
-		for f in faces:
-			normal = tuple(f.normalAt(0, 0))
-			if normal in normals:
-				new_faces.append(f)
-		return new_faces
-
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
 		self.set_properties(obj)
@@ -159,7 +136,7 @@ class Punch:
 		edges = punch_funcs.punch_area_edges(obj.foundation.shape, offset_shape)
 		faces = punch_funcs.punch_faces(edges, d)
 		if obj.user_location:
-			faces = self.get_user_location_faces(faces, obj.Location)
+			faces = punch_funcs.get_user_location_faces(faces, obj.Location)
 		obj.faces = Part.makeCompound(faces)
 		obj.Location = punch_funcs.location_of_column(faces)
 		obj.alpha_s = self.alphas(obj.Location)

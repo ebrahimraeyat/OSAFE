@@ -209,3 +209,30 @@ def gamma_v(
 	gamma_vx = 1 - gamma_fx
 	gamma_vy = 1 - gamma_fy
 	return (gamma_vx, gamma_vy)
+
+def get_user_location_faces(
+                            faces: List[Part.Face],
+                            location: str,
+                            ) -> List[Part.Face]:
+
+	location_normals = {
+			'Corner3': [(0, -1, 0), (-1, 0, 0)],
+			'Corner4': [(0, -1, 0), (1, 0, 0)],
+			'Corner1': [(0, 1, 0), (1, 0, 0)],
+			'Corner2': [(0, 1, 0), (-1, 0, 0)],
+			'Edge3': [(0, -1, 0), (-1, 0, 0), (1, 0, 0)],
+			'Edge4': [(0, -1, 0), (1, 0, 0), (0, 1, 0)],
+			'Edge1': [(0, 1, 0), (1, 0, 0), (-1, 0, 0)],
+			'Edge2': [(0, 1, 0), (-1, 0, 0), (0, -1, 0)],
+			'Interier': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
+			}
+
+	normals = location_normals[location]
+	if len(normals) >= len(faces):
+		return faces
+	new_faces = []
+	for f in faces:
+		normal = tuple(f.normalAt(0, 0))
+		if normal in normals:
+			new_faces.append(f)
+	return new_faces
