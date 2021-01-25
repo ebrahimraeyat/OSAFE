@@ -33,8 +33,6 @@ class Punch:
 			obj.addProperty("Part::PropertyPartShape", "faces", "Punch", "", 1, False)
 		if not hasattr(obj, "d"):
 			obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
-		if not hasattr(obj, "normals"):
-			obj.addProperty("App::PropertyVectorList", "normals", "Punch", "", 1, False)
 		if not hasattr(obj, "Area"):
 			obj.addProperty("App::PropertyFloat", "Area", "Punch")
 		if not hasattr(obj, "fc"):
@@ -83,7 +81,7 @@ class Punch:
 			obj.addProperty(
 				"App::PropertyMap",
 				"combos_ratio",
-				"Result",
+				"Punch",
 				)
 
 		if not hasattr(obj, "foundation_plane"):
