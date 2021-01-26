@@ -104,7 +104,7 @@ class CivilExcel:
             if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
                 if o.Proxy.Type == "Punch":
                     punches.append(o)
-        filename = get_save_filename('xlsx')
+        filename = get_save_filename('.xlsx')
         export.to_excel(punches, filename)
 
 
@@ -137,8 +137,8 @@ class CivilDxf:
         #     if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
         #         if o.Proxy.Type == "Punch":
         #             punches.append(o)
-        filename = get_save_filename('dxf')
-        export.to_excel(doc, filename)
+        filename = get_save_filename('.dxf')
+        export.to_dxf(doc, filename)
 
 
     def IsActive(self):
