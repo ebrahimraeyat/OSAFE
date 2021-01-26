@@ -220,7 +220,7 @@ command_list = [
             "Civil_pdf",
             "Civil_pic",
             "Civil_excel",
-            "Civil_help",
             "Civil_dxf",
             "Civil_update",
+            "Civil_help",
             ]
