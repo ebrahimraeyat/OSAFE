@@ -121,6 +121,13 @@ class Punch:
 			                "edges",
 			                "Punch",
 			                )
+
+		if not hasattr(obj, "rectangle"):
+			obj.addProperty(
+			                "Part::PropertyPartShape",
+			                "rectangle",
+			                "Punch",
+			                )
 		#obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
 		#obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
 		#obj.ds = ['8', '10', '12', '14', '16', '18', '20']
@@ -158,6 +165,7 @@ class Punch:
 		obj.d = d
 		obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
 		rect = punch_funcs.rectangle_face(obj.center_of_load, obj.bx, obj.by)
+		obj.rectangle = rect
 		col = rect.extrude(FreeCAD.Vector(0, 0, 4000))
 		comp = Part.makeCompound(faces + [col])
 		obj.Shape = comp
