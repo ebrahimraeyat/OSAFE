@@ -168,7 +168,7 @@ class CivilHelp:
         webbrowser.open_new(path)
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return True
 
 class CivilUpdate:
     def GetResources(self):
