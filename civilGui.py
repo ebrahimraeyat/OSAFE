@@ -112,6 +112,39 @@ class CivilExcel:
         return not FreeCAD.ActiveDocument is None
 
 
+class CivilDxf:
+
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_dxf",
+            "Export to dxf")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "Civil_dxf",
+            "export the result to dxf")
+        rel_path = "Mod/Civil/safe/punch/Resources/icons/dxf.svg"
+        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
+        import os
+        if not os.path.exists(path):
+            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    def Activated(self):
+        from safe.punch import export
+        doc = FreeCAD.ActiveDocument
+        # punches = []
+        # for o in doc.Objects:
+        #     if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
+        #         if o.Proxy.Type == "Punch":
+        #             punches.append(o)
+        filename = get_save_filename('dxf')
+        export.to_excel(doc, filename)
+
+
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
+
+
 class CivilHelp:
 
     def GetResources(self):
@@ -180,6 +213,7 @@ Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
 Gui.addCommand('Civil_excel', CivilExcel())
 Gui.addCommand('Civil_help', CivilHelp())
 Gui.addCommand('Civil_update', CivilUpdate())
+Gui.addCommand('Civil_dxf', CivilDxf())
 
 command_list = [
             "Copy",
@@ -187,5 +221,6 @@ command_list = [
             "Civil_pic",
             "Civil_excel",
             "Civil_help",
+            "Civil_dxf",
             "Civil_update",
             ]
