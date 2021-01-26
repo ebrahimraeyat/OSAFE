@@ -114,6 +114,13 @@ class Punch:
 			                "gamma_vy",
 			                "Punch",
 			                )
+
+		if not hasattr(obj, "edges"):
+			obj.addProperty(
+			                "Part::PropertyPartShape",
+			                "edges",
+			                "Punch",
+			                )
 		#obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
 		#obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
 		#obj.ds = ['8', '10', '12', '14', '16', '18', '20']
@@ -134,6 +141,7 @@ class Punch:
 		y = obj.by + d
 		offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
 		edges = punch_funcs.punch_area_edges(obj.foundation.shape, offset_shape)
+		obj.edges = Part.makeCompound(edges)
 		faces = punch_funcs.punch_faces(edges, d)
 		if obj.user_location:
 			faces = punch_funcs.get_user_location_faces(faces, obj.Location)
