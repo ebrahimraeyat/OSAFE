@@ -23,14 +23,21 @@ def rectangle_face(
 	by: Union[float, int],
 	):
 
+	v1, v2, v3, v4 = rectangle_vertexes(center, bx, by)
+	return Part.Face(Part.makePolygon([v1, v2, v3, v4, v1]))
+
+def rectangle_vertexes(
+                       center: FreeCAD.Vector,
+                       bx: Union[float, int],
+                       by: Union[float, int],
+                       ):
 	dx = bx / 2
 	dy = by / 2
 	v1 = center.add(FreeCAD.Vector(-dx, -dy, 0))
 	v2 = center.add(FreeCAD.Vector(dx, -dy, 0))
 	v3 = center.add(FreeCAD.Vector(dx, dy, 0))
 	v4 = center.add(FreeCAD.Vector(-dx, dy, 0))
-	return Part.Face(Part.makePolygon([v1, v2, v3, v4, v1]))
-
+	return [v1, v2, v3, v4]
 
 def punch_area_edges(
 	sh1: Part.Shape,
