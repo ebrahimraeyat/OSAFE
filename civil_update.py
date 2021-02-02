@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import FreeCAD as App
 
 from PySide2.QtCore import *
