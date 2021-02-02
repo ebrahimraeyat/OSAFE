@@ -3,7 +3,7 @@ from typing import Union
 import Part
 import FreeCAD
 import FreeCADGui as Gui
-from PySide.QtCore import QT_TRANSLATE_NOOP
+# from PySide.QtCore import QT_TRANSLATE_NOOP
 
 from safe.punch import punch_funcs
 

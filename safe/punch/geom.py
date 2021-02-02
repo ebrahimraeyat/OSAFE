@@ -113,7 +113,11 @@ class Geom(object):
             l = p.Location
             pl = App.Vector(0, 0, 4100)
             t = '0.0'
-            text = Draft.make_text([t, l], placement=pl)
+            version = App.Version()[1]
+            if int(version) < 19:
+                text = Draft.makeText([t, l], point=pl)
+            else:
+                text = Draft.make_text([t, l], placement=pl)
             p.Ratio = t
             text.ViewObject.FontSize = 200
             p.text = text
