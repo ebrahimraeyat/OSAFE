@@ -17,7 +17,7 @@ def update():
 
 	civil_path = Path(__file__).parent.absolute()
 	user_data_dir = App.getUserAppDataDir()
-	if not user_data_dir in civil_path:
+	if not user_data_dir in str(civil_path):
 		mod_path = Path.joinpath(Path(user_data_dir), 'Mod')
 		if not mod_path.exists():
 			os.mkdir(mod_path)
