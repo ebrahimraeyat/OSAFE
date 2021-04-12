@@ -188,9 +188,6 @@ class Punch:
 		return one_way_shear_capacity, Vc, vc
 
 	def ultimate_shear_stress(self, obj):
-		combos = list(obj.combos_load.keys())
-		bx = obj.bx
-		by = obj.by
 		location = obj.Location
 		location = location.rstrip('1234').lower()
 		I22 = obj.I22
@@ -230,7 +227,7 @@ class Punch:
 
 	@staticmethod
 	def __get_color(pref_intity, color=674321151):
-		c = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
+		c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
 		r = float((c >> 24) & 0xFF) / 255.0
 		g = float((c >> 16) & 0xFF) / 255.0
 		b = float((c >> 8) & 0xFF) / 255.0
@@ -352,7 +349,6 @@ class ViewProviderPunch:
 				'Edge4': 'Right',
 				'Interier': 'Center',
 			  }
-		bb = obj.Shape.BoundBox
 		location = obj.Location
 		obj.text.Placement.Base.x = eval(xs[location])
 		obj.text.Placement.Base.y = eval(ys[location])
