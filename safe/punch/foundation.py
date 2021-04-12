@@ -9,6 +9,7 @@ import Part
 class Foundation:
 	def __init__(self, obj):
 		obj.Proxy = self
+		self.Type = "Foundation"
 		self.set_properties(obj)
 
 	def set_properties(self, obj):

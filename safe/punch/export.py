@@ -136,14 +136,6 @@ def to_dxf(
     
     if not filename:
         return
-    foun = doc.Foundation
-    b = foun.Shape.BoundBox
-    height = max(b.XLength, b.YLength)
-    center = (b.Center.x, b.Center.y)
-    # draw foundation
-    block_foun = dwg.blocks.new(name=foun.Name)
-    add_edges_to_dxf(foun.shape.Edges, {'color': 4}, block_foun)
-    msp.add_blockref(foun.Name, (0 , 0))
     for o in doc.Objects:
         if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
             if o.Proxy.Type == "Punch":
@@ -164,6 +156,14 @@ def to_dxf(
                 mtext.set_location(insert=(dx, dy, 0), attachment_point=align)
                 mtext.dxf.char_height = t.ViewObject.FontSize.Value
                 mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
+            elif o.Proxy.Type == "Foundation":
+                b = o.Shape.BoundBox
+                height = max(b.XLength, b.YLength)
+                center = (b.Center.x, b.Center.y)
+                # draw foundation
+                block_foun = dwg.blocks.new(name=o.Name)
+                add_edges_to_dxf(o.shape.Edges, {'color': 4}, block_foun)
+                msp.add_blockref(o.Name, (0 , 0))
 
 
     dwg.set_modelspace_vport(height=height, center=center)
