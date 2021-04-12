@@ -349,6 +349,7 @@ class ViewProviderPunch:
 				'Edge4': 'Right',
 				'Interier': 'Center',
 			  }
+		bb = obj.Shape.BoundBox
 		location = obj.Location
 		obj.text.Placement.Base.x = eval(xs[location])
 		obj.text.Placement.Base.y = eval(ys[location])
