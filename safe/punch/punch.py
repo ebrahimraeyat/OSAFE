@@ -3,6 +3,7 @@ from typing import Union
 import Part
 import FreeCAD
 import FreeCADGui as Gui
+import PySide2
 # from PySide.QtCore import QT_TRANSLATE_NOOP
 
 from safe.punch import punch_funcs
@@ -96,31 +97,31 @@ class Punch:
 
 		if not hasattr(obj, "user_location"):
 			obj.addProperty(
-			                "App::PropertyBool",
-			                "user_location",
-			                "Punch",
-			                ).user_location = False
+							"App::PropertyBool",
+							"user_location",
+							"Punch",
+							).user_location = False
 
 		if not hasattr(obj, "gamma_vx"):
 			obj.addProperty(
-			                "App::PropertyFloat",
-			                "gamma_vx",
-			                "Punch",
-			                )
+							"App::PropertyFloat",
+							"gamma_vx",
+							"Punch",
+							)
 
 		if not hasattr(obj, "gamma_vy"):
 			obj.addProperty(
-			                "App::PropertyFloat",
-			                "gamma_vy",
-			                "Punch",
-			                )
+							"App::PropertyFloat",
+							"gamma_vy",
+							"Punch",
+							)
 
 		if not hasattr(obj, "edges"):
 			obj.addProperty(
-			                "Part::PropertyPartShape",
-			                "edges",
-			                "Punch",
-			                )
+							"Part::PropertyPartShape",
+							"edges",
+							"Punch",
+							)
 
 		#obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
 		#obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
@@ -245,6 +246,20 @@ class ViewProviderPunch:
 		self.ViewObject = vobj
 		self.Object = vobj.Object
 
+	def setEdit(self, vobj, mode=0):
+		obj = vobj.Object
+		ui = Ui(obj)
+		ui.setupUi()
+		Gui.Control.showDialog(ui)
+		return True
+	
+	def unsetEdit(self, vobj, mode):
+		Gui.Control.closeDialog()
+		return
+		
+	def doubleClicked(self,vobj):
+		self.setEdit(vobj)
+
 	def updateData(self, obj, prop):
 		''' If a property of the handled feature has changed we have the chance to handle this here '''
 		if prop == "Ratio":
@@ -359,7 +374,44 @@ class ViewProviderPunch:
 			if hasattr(obj.text.ViewObject, "LineSpacing"):
 				obj.text.ViewObject.LineSpacing = -1.00
 
+class Ui:
+	def __init__(self, punch_obj=None):
+		import os
+		self.form = Gui.PySideUic.loadUi(os.path.join(
+			os.path.dirname(__file__), 'Resources/ui/column.ui'))
+		self.punch_obj = punch_obj
 
+	def setupUi(self):
+		self.fill_form(self.punch_obj)
+
+	def fill_form(self, punch_obj):
+		location = punch_obj.Location
+		index = self.form.location.findText(location)
+		bx = punch_obj.bx
+		by = punch_obj.by
+		user_modified = punch_obj.user_location
+
+		self.form.location.setCurrentIndex(index)
+		self.form.bx.setValue(int(bx))
+		self.form.by.setValue(int(by))
+		if user_modified:
+			self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Checked)
+		else:
+			self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Unchecked)
+
+	def accept(self):
+		self.modify_punch()
+		self.punch_obj.recompute(True)
+		Gui.Control.closeDialog()
+
+	def reject(self):
+		Gui.Control.closeDialog()
+
+	def modify_punch(self):
+		self.punch_obj.Location = self.form.location.currentText()
+		self.punch_obj.user_location = self.form.user_modified.isChecked()
+		self.punch_obj.bx = float(self.form.bx.value())
+		self.punch_obj.by = float(self.form.by.value())
 
 
 def get_color(pref_intity, color=16711935):

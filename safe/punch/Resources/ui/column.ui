@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Stories</class>
+ <widget class="QDialog" name="Stories">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>295</width>
+    <height>195</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Columns</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Column</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Location</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="location">
+        <item>
+         <property name="text">
+          <string>Corner1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Corner2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Corner3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Corner4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Edge1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Edge2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Edge3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Edge4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Interier</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="user_modified">
+        <property name="text">
+         <string>user Modified</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>bx</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="bx">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="minimum">
+         <number>200</number>
+        </property>
+        <property name="maximum">
+         <number>3000</number>
+        </property>
+        <property name="singleStep">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>by</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="by">
+        <property name="suffix">
+         <string> mm</string>
+        </property>
+        <property name="minimum">
+         <number>200</number>
+        </property>
+        <property name="maximum">
+         <number>3000</number>
+        </property>
+        <property name="singleStep">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
