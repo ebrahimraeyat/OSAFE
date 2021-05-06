@@ -1,0 +1,116 @@
+\documentclass[hidelinks, a4paper,twoside]{punch_report}
+\usepackage{array, boldline, makecell, booktabs}
+\newcommand\btrule[1]{\specialrule{#1}{0pt}{0pt}}
+\usepackage{colortbl}
+\usepackage{multicol,caption}               % three-column layout
+\usepackage[font={footnotesize}]{caption}
+\usepackage{xcolor}
+\usepackage{amsmath}
+% \usepackage{ae}
+\usepackage{geometry}
+\usepackage{multirow}
+\usepackage{siunitx}
+\usepackage[title]{appendix}
+\usepackage{longtable} 
+\usepackage{hyperref}
+\usepackage{flafter}
+\usepackage{afterpage}
+\usepackage{varioref}
+% \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{setspace}
+\setstretch{2}
+\usepackage[many]{tcolorbox}
+\usepackage{float}
+\usepackage{xcolor}
+\hypersetup{
+    colorlinks,
+    linkcolor={blue!70!black},
+    citecolor={blue!50!black},
+    urlcolor={blue!80!black}
+    }
+\usepackage{xepersian-multiplechoice}
+\usepackage{xepersian}
+\settextfont[Scale=1.4]{XB Niloofar}
+% \setlatintextfont[Scale=1.3]{Times New Roman}
+%\usepackage{draftwatermark}
+%\SetWatermarkText{Draft}
+%\SetWatermarkScale{1}
+
+% \newenvironment{Figure}
+%   {\par\medskip\noindent\minipage{\linewidth}}
+%   {\endminipage\par\medskip}
+
+  
+% \title{دفترچه محاسبات سازه}
+% \newcommand{\punch}{نرم افزار برش پانچ}
+% \newcommand{\address}{شهرک شکوهیه فاز 2 خ بابایی خ تهرانی مقدم نبش فرعی 5}
+% \author{ابراهیم رعیت رکن آبادی}
+% % \date{}
+% \today{}
+
+%\vspace{3cm}\textbf{NOTE: This preliminary  report is simply deemed suitable for the purpose of pre-dimensioning the structures addressed and obtaining the loads transmitted by them upon the foundation. The equipment modelling doesn't reflect its final geometric characteristics.}}
+% \renewcommand{\revision}{1.0}
+
+\begin{document}
+% \begin{center}
+%   بنام خدا \newline
+%   \maketitle
+%   \vspace{10cm}
+%   مالک: شرکت سلامت گستران پردیس پارت
+%   \newline
+%   پلاک ثبتی:
+% \end{center}
+
+
+% \newpage
+% \renewcommand{\abstractname}{Executive Summary}.
+% \maxdeadcycles=200
+
+% %\maketitle
+% \tableofcontents
+% \listoftables
+% \listoffigures
+% \newpage
+\input{cover}
+\pagenumbering{arabic}
+\input{introduction}
+% \begin{twocolumn}
+\input{safe}
+\input{freecad}
+\input{modify}
+\input{export}
+\input{update}
+\input{faq}
+
+% \end{twocolumn}
+% \section{Combination of loads}
+% \input{combinations.tex}
+% \input{xc_design_technique.tex}
+
+% \clearpage
+% \input{appendix}
+
+% \clearpage
+% -----
+%------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+%\phantomsection
+%\nocite{OpenSeesManual,FeynmanVolI,Thomson}   % writes also non-cited references
+% \nocite{*}
+% \bibliography{jubail}  %file .bib 
+% \bibliographystyle{plain} %normal style - listed in ABC order and labeled numerically
+%\bibliographystyle{unsrt} %same as plain except entries appear in order of citation
+
+% to compile the document run:
+%    latex structural_design_report   to create the .aux file
+%    bibtex structural_design_report  to get some of the citations and create a .bbl file
+%    latex structural_design_report   again so that the cross references between latex file and bibliography
+%                               are correct
+
+%----------------------------------------------------------------------------------------
+
+\end{document}

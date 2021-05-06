@@ -109,3 +109,11 @@ venv.bak/
 # Dolphin file manager
 .directory
 
+# tex
+*.aux
+*.fls
+*.log
+*.out
+*.toc
+*.xdv
+*.fdb_latexmk

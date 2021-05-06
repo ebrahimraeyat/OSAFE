@@ -163,7 +163,7 @@ class CivilHelp:
     def Activated(self):
         import webbrowser
         path = str(
-                   Path(civilwelcome.__file__).parent.absolute() / "safe" / "punch" / "Help.pdf"
+                   Path(civilwelcome.__file__).parent.absolute() / "help" / "help.pdf"
                    )
         webbrowser.open_new(path)
 
