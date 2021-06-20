@@ -20,7 +20,7 @@ filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 
 document= FreeCAD.openDocument(str(filename))
 
 def test_get_punch_picture():
-	punch = document.Punch
+	punch = document.Punch004
 	fname = report.get_punch_picture(punch, 'jafari')
 	assert True
 	assert str(fname) == '/tmp/jafari.jpg'
@@ -44,5 +44,28 @@ def test_create_report():
 	filename = '/home/ebi/alaki/jafari.docx'
 	report.create_report(punch, filename)
 
-test_get_punch_picture()
-test_create_report()
+def test_get_edges_direction_in_punch():
+	punch = document.Punch
+	edges_direction = report.get_edges_direction_in_punch(punch)
+	assert list(edges_direction.values()) == ['BOT', 'RIGHT', 'TOP']
+
+def test_export_dict_to_doc():
+	d = {'location': 'center', 'id': 227}
+	doc = report.export_dict_to_doc(d, [])
+	doc.save('/home/ebi/alaki/jafari.docx')
+	assert True
+
+def test_add_punch_properties_to_doc():
+	punch = document.Punch
+	doc = report.add_punch_properties_to_doc(punch)
+	doc.save('/home/ebi/alaki/jafari.docx')
+	assert True
+
+def test_create_punches_report():
+	report.create_punches_report(document, '/home/ebi/alaki/jafari.docx')
+
+# test_get_punch_picture()
+# test_create_report()
+# test_add_punch_properties_to_doc()
+# test_export_dict_to_doc()
+test_create_punches_report()
