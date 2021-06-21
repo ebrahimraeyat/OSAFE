@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 punch_path = Path(__file__).absolute().parent
-# civil_path = punch_path.parent.parent
-# sys.path.insert(0, civil_path)
 try:
 	import safe.punch.punch_funcs as punch_funcs
 except:
@@ -36,14 +34,11 @@ def add_edges_to_ax(obj, ax, linewidth=.5):
 
 
 def add_key_plan_edges_to_ax(punch, ax):
-	# column = punch_funcs.rectangle_face(punch.center_of_load, punch.bx, punch.by)
 	comp = Part.makeCompound([
 			punch.foundation_plane,
 			punch.edges,
-			# column,
 		])
 	add_edges_to_ax(comp, ax, linewidth=.1)
-	# add_edges_to_ax(column, ax, linewidth=.5)
 	add_column_to_ax(punch, ax)
 	set_ax_boundbox(comp, ax)
 	return comp
@@ -81,9 +76,6 @@ def add_punch_edges_dimension_to_ax(punch, ax):
 		else:
 			offset = 80
 		annotate_dim(ax,(v1.X, v1.Y), (v2.X, v2.Y), direction=loc, offset=offset)
-		# annotate_dim(ax,(v1.X, v1.Y), (v2.X, v2.Y), direction=loc, offset=100)
-
-
 
 def set_ax_boundbox(shape, ax, scale=1, bb_add=120):
 	b = shape.BoundBox
@@ -182,7 +174,6 @@ def export_dataframe_to_docx(df, doc=None):
 	for i in range(df.shape[0]):
 		for j in range(df.shape[-1]):
 			t.cell(i+1,j).text = str(df.values[i,j])
-	# doc.save(str(filepath))
 	return doc
 
 def export_dict_to_doc(
@@ -209,24 +200,18 @@ def export_dict_to_doc(
 	for j, header in enumerate(headers):
 		cell = t.cell(0, j)
 		cell.text = str(header)
-		# run = cell.paragraphs[0].runs[0]
-		# run.font.bold = True
+		# run = cell.paragK
 
 	# add the rest of the data frame
 
 	for i, (key, value) in enumerate(d.items(), start=start_row):
-		# for j in range(num_cols):
 		t.cell(i,0).text = str(key)
 		t.cell(i,1).text = str(value)
-	# doc.save(str(filepath))
 	return doc
 	
 
 def add_punch_ratios_to_doc(punch, doc=None):
-	# import pandas as pd
-	# df = pd.DataFrame(list(punch.combos_ratio.items()), columns=['Combo', 'Ratio'])
 	doc = export_dict_to_doc(punch.combos_ratio, ['Combo', 'Ratio'], doc)
-	# doc = export_dataframe_to_docx(df, doc)
 	return doc
 
 def add_punch_properties_to_doc(punch, doc=None):
