@@ -130,6 +130,8 @@ def get_punch_picture(
 	fig.savefig(str(filename_path), orientation='portrait',
 		# papertype='a4',
 		bbox_inches='tight', dpi=600)
+	plt.clf()
+	plt.close(fig)
 	return filename_path
 
 def move_xy(xy, direction, dist=200):
