@@ -81,7 +81,7 @@ class Punch:
 				"Punch",
 				)
 
-		if not hasattr(obj, "fondation"):
+		if not hasattr(obj, "foundation"):
 			obj.addProperty(
 				"App::PropertyLink",
 				"foundation",
