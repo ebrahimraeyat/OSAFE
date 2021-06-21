@@ -20,10 +20,10 @@ filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 
 document= FreeCAD.openDocument(str(filename))
 
 def test_get_punch_picture():
-	punch = document.Punch004
-	fname = report.get_punch_picture(punch, 'jafari')
+	punch = document.Punch
+	fname = report.get_punch_picture(punch)
 	assert True
-	assert str(fname) == '/tmp/jafari.jpg'
+	assert str(fname) == '/tmp/Punch.jpg'
 
 def test_add_punch_edges_to_ax():
 	punch = document.Punch
@@ -66,6 +66,6 @@ def test_create_punches_report():
 
 # test_get_punch_picture()
 # test_create_report()
-test_add_punch_properties_to_doc()
+# test_add_punch_properties_to_doc()
 # test_export_dict_to_doc()
 # test_create_punches_report()

@@ -120,7 +120,7 @@ def get_punch_picture(
 	import tempfile
 	default_tmp_dir = tempfile._get_default_tempdir()
 	if not filename:
-		filename = next(tempfile._get_candidate_names())
+		filename = punch.Name
 	filename_path = Path(default_tmp_dir) / f'{filename}.jpg'
 	fig.savefig(str(filename_path), orientation='portrait',
 		# papertype='a4',
