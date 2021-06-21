@@ -66,6 +66,6 @@ def test_create_punches_report():
 
 # test_get_punch_picture()
 # test_create_report()
-# test_add_punch_properties_to_doc()
+test_add_punch_properties_to_doc()
 # test_export_dict_to_doc()
-test_create_punches_report()
+# test_create_punches_report()

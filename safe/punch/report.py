@@ -10,7 +10,8 @@ import matplotlib.patches as patches
 punch_path = Path(__file__).absolute().parent
 # civil_path = punch_path.parent.parent
 # sys.path.insert(0, civil_path)
-import safe.punch.punch_funcs as punch_funcs
+# import safe.punch.punch_funcs as punch_funcs
+import  punch_funcs
 import Part
 
 try:
@@ -239,7 +240,7 @@ def add_punch_properties_to_doc(punch, doc=None):
 	d['I22'] = f'{Decimal(punch.I22):.2E} mm^4'
 	d['I33'] = f'{Decimal(punch.I33):.2E} mm^4'
 	d['I23'] = f'{Decimal(punch.I23):.2E} mm^4'
-	d['fc'] = f'{punch.fc.getValueAs("N/mm^2")} Mpa'
+	d['fc'] = f'{float(punch.fc.getValueAs("N/mm^2")):.1f} Mpa'
 	d['gamma vx'] = f'{punch.gamma_vx:.2f}'
 	d['gamma vy'] = f'{punch.gamma_vy:.2f}'
 	doc = export_dict_to_doc(d, [], doc, 'connection')
