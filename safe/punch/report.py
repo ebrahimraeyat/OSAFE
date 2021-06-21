@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 punch_path = Path(__file__).absolute().parent
-sys.path.insert(0, punch_path)
-import punch_funcs
+# civil_path = punch_path.parent.parent
+# sys.path.insert(0, civil_path)
+import safe.punch.punch_funcs as punch_funcs
 import Part
 
 try:
@@ -183,6 +184,7 @@ def export_dict_to_doc(
 						d: dict,
 						headers: list,
 						doc: 'docx.Document' = None,
+						style: str = 'vazhgooni'
 						) -> 'docx.Document':
 	if not doc:
 		doc = create_doc()
@@ -194,7 +196,7 @@ def export_dict_to_doc(
 		start_row = 1
 	# add a table to the end and create a reference variable
 	# extra row is so we can add the header row
-	t = doc.add_table(num_rows, num_cols, style='DATAFRAME')
+	t = doc.add_table(num_rows, num_cols, style=style)
 	from docx.enum.table import WD_TABLE_ALIGNMENT
 	t.alignment = WD_TABLE_ALIGNMENT.CENTER
 
@@ -238,7 +240,7 @@ def add_punch_properties_to_doc(punch, doc=None):
 	d['fc'] = f'{punch.fc.getValueAs("N/mm^2")} Mpa'
 	d['gamma vx'] = f'{punch.gamma_vx:.2f}'
 	d['gamma vy'] = f'{punch.gamma_vy:.2f}'
-	doc = export_dict_to_doc(d, [], doc)
+	doc = export_dict_to_doc(d, [], doc, 'connection')
 	return doc
 
 def create_doc():
