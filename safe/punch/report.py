@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+from docx.shared import Inches
+
 punch_path = Path(__file__).absolute().parent
 try:
 	import safe.punch.punch_funcs as punch_funcs
@@ -250,7 +252,7 @@ def create_report(
 		doc = create_doc()
 	doc.add_heading(f'PUNCH ID = {punch.id}',0)
 	image_file_path = get_punch_picture(punch)
-	doc.add_picture(str(image_file_path))
+	doc.add_picture(str(image_file_path), width=Inches(3.5))
 	doc.add_paragraph()
 	doc = add_punch_properties_to_doc(punch, doc)
 	doc.add_paragraph()
