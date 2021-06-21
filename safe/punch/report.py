@@ -10,8 +10,10 @@ import matplotlib.patches as patches
 punch_path = Path(__file__).absolute().parent
 # civil_path = punch_path.parent.parent
 # sys.path.insert(0, civil_path)
-# import safe.punch.punch_funcs as punch_funcs
-import  punch_funcs
+try:
+	import safe.punch.punch_funcs as punch_funcs
+except:
+	import  punch_funcs
 import Part
 
 try:
