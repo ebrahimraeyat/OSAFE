@@ -256,20 +256,11 @@ def allowed_to_continue(
         return True, check
     else:
         if text in ('INTERNET', 'SERIAL'):
-            serial_ui = str(
-            Path(civilwelcome.__file__).parent.absolute() / 'Resources' / 'ui' / 'serial.ui'
-            )
-            ui_file = QFile(serial_ui)
-            if not ui_file.open(QIODevice.ReadOnly):
-                print("Cannot open {}: {}".format(ui_file_name, ui_file.errorString()))
-                sys.exit(-1)
-            loader = QUiLoader()
-            window = loader.load(ui_file)
-            ui_file.close()
-            if not window:
-                print(loader.errorString())
-                sys.exit(-1)
-            window.show()
+            ui = SerialForm()
+            ui.form.serial.setText(check.serial)
+            Gui.Control.showDialog(ui)
+            # if ui.setupUi():
+            #     Gui.Control.closeDialog(ui)
             return False, check
         elif text == 'REGISTERED':
             msg = "Congrajulation! You are now registered, enjoy using this features!"
@@ -285,11 +276,12 @@ def show_warning_about_number_of_use(check):
         msg = f"You can use this feature {n} more times!\n then you must register the software."
         QMessageBox.warning(None, 'Not registered!', str(msg))
 
-
-# class SerialForm(serial_base, serial_window):
-#     def __init__(self, parent=None):
-#         super(SerialForm, self).__init__()
-#         self.setupUi(self)
+class SerialForm:
+    def __init__(self):
+        serial_ui = str(
+            Path(civilwelcome.__file__).parent.absolute() / 'Resources' / 'ui' / 'serial.ui'
+            )
+        self.form = Gui.PySideUic.loadUi(serial_ui)
 
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
