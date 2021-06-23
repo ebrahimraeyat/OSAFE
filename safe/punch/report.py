@@ -6,8 +6,15 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+try:
+	from docx.shared import Inches
+except ImportError:
+	import subprocess
+	import sys
+	package = 'python-docx'
+	subprocess.check_call(['python', "-m", "pip", "install", package])
 
-from docx.shared import Inches
+
 
 punch_path = Path(__file__).absolute().parent
 try:
