@@ -42,7 +42,7 @@ class CheckLegal:
     def initiate(self):
         if not self.filename.exists():
             with open(self.filename, 'wb') as f:
-                b = base64.b64encode('00'.encode('utf8'))
+                b = base64.b64encode('0-0'.encode('utf-8'))
                 f.write(b)
 
     @property
@@ -62,7 +62,7 @@ class CheckLegal:
             self.initiate()
         with open(self.filename, 'rb') as f:
             b = f.read()
-            text = base64.b64decode(b).decode('utf8').split('')
+            text = base64.b64decode(b).decode('utf-8').split('-')
             return int(text[0]), int(text[1])
 
     def add_using_feature(self):
@@ -70,11 +70,11 @@ class CheckLegal:
             self.initiate()
         with open(self.filename, 'rb') as f:
             b = f.read()
-            text = base64.b64decode(b).decode('utf8').split('')
+            text = base64.b64decode(b).decode('utf-8').split('-')
             text[1] = str(int(text[1]) + 1)
-            text = ''.join(*[text])
+            text = '-'.join(*[text])
         with open(self.filename, 'wb') as f:
-            b = base64.b64encode(text.encode('utf8'))
+            b = base64.b64encode(text.encode('utf-8'))
             f.write(b)
         return
 
@@ -83,18 +83,18 @@ class CheckLegal:
             self.initiate()
         with open(self.filename, 'rb') as f:
             b = f.read()
-            text = base64.b64decode(b).decode('utf8').split('')
+            text = base64.b64decode(b).decode('utf-8').split('-')
             text[0] = '1'
-            text = ''.join([*text])
+            text = '-'.join([*text])
         with open(self.filename, 'wb') as f:
-            b = base64.b64encode(text.encode('utf8'))
+            b = base64.b64encode(text.encode('utf-8'))
             f.write(b)
 
     def serial_number(self, serial):
         import urllib.request
         response = urllib.request.urlopen(self.gist_url)
         data = response.read()      # a `bytes` object
-        text = data.decode('utf8')
+        text = data.decode('utf-8')
         return serial in text
 
 def internet(host="8.8.8.8", port=53, timeout=3):
