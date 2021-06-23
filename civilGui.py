@@ -2,10 +2,14 @@ import os
 from pathlib import Path
 import PySide2
 from PySide2 import QtCore, QtGui
+from PySide2.QtUiTools import QUiLoader
+from PySide2.QtCore import QFile, QIODevice
+from PySide2.QtWidgets import QMessageBox
 import FreeCAD
 import FreeCADGui as Gui
 import DraftTools
 import civilwelcome
+
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
@@ -159,16 +163,18 @@ class CivilDocx:
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
     def Activated(self):
+        allow, check = allowed_to_continue(
+            'punch_docx.bin',
+            'https://gist.githubusercontent.com/ebrahimraeyat/b45fcd6577c27e5f89390b1c5eef0d1f/raw',
+            'punch'
+            )
+        if not allow:
+            return
         from safe.punch import report
         doc = FreeCAD.ActiveDocument
-        # punches = []
-        # for o in doc.Objects:
-        #     if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
-        #         if o.Proxy.Type == "Punch":
-        #             punches.append(o)
         filename = get_save_filename('.docx')
         report.create_punches_report(doc, filename)
-
+        show_warning_about_number_of_use(check)
 
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
@@ -234,6 +240,56 @@ def get_save_filename(ext):
         filename += ext
     return filename
 
+def allowed_to_continue(
+                        filename,
+                        gist_url,
+                        dir_name,
+                        ):
+    import check_legal
+    check = check_legal.CheckLegal(
+                                filename,
+                                gist_url,
+                                dir_name,
+    )
+    allow, text = check.allowed_to_continue()
+    if allow and not text:
+        return True, check
+    else:
+        if text in ('INTERNET', 'SERIAL'):
+            serial_ui = str(
+            Path(civilwelcome.__file__).parent.absolute() / 'Resources' / 'ui' / 'serial.ui'
+            )
+            ui_file = QFile(serial_ui)
+            if not ui_file.open(QIODevice.ReadOnly):
+                print("Cannot open {}: {}".format(ui_file_name, ui_file.errorString()))
+                sys.exit(-1)
+            loader = QUiLoader()
+            window = loader.load(ui_file)
+            ui_file.close()
+            if not window:
+                print(loader.errorString())
+                sys.exit(-1)
+            window.show()
+            return False, check
+        elif text == 'REGISTERED':
+            msg = "Congrajulation! You are now registered, enjoy using this features!"
+            QMessageBox.information(None, 'Registered', str(msg))
+            return True, check
+    return False, check
+
+def show_warning_about_number_of_use(check):
+    check.add_using_feature()
+    _, no_of_use = check.get_registered_numbers()
+    n = check.n - no_of_use
+    if n > 0:
+        msg = f"You can use this feature {n} more times!\n then you must register the software."
+        QMessageBox.warning(None, 'Not registered!', str(msg))
+
+
+# class SerialForm(serial_base, serial_window):
+#     def __init__(self, parent=None):
+#         super(SerialForm, self).__init__()
+#         self.setupUi(self)
 
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
