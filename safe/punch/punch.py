@@ -1,12 +1,15 @@
 import math
 from typing import Union
-import Part
 import FreeCAD
+import Part
 import FreeCADGui as Gui
 import PySide2
 # from PySide.QtCore import QT_TRANSLATE_NOOP
 
-from safe.punch import punch_funcs
+try:
+	from safe.punch import punch_funcs
+except:
+	import punch_funcs
 
 
 class Punch:
