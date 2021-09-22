@@ -1,13 +1,13 @@
 try:
     from safe.punch.axis import create_grids
     # from safe.punch.punch_funcs import remove_obj
-    from safe.punch import foundation
+    from safe.punch import etabs_foundation
     from safe.punch import rectangle_slab
     from safe.punch.punch import make_punch
 except:
     from axis import create_grids
     # from punch_funcs import remove_obj
-    import foundation
+    import etabs_foundation
     import rectangle_slab
     from punch import make_punch
 import Draft
@@ -18,9 +18,14 @@ from typing import Union
 
 
 class EtabsPunch(object):
-    def __init__(self):
+    def __init__(self,
+            cover : float = 7.5,
+            fc : int = 30,
+            ):
         self.etabs = etabs_obj.EtabsModel(backup=False)
         self.SapModel = self.etabs.SapModel
+        self.cover = cover
+        self.fc = fc
         # self.joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         # self.base_columns_summary = self.etabs.database.get_base_column_summary_with_section_dimensions()
         # if filename:
@@ -52,34 +57,13 @@ class EtabsPunch(object):
             slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2)
         return slabs
 
-    def create_fusion(self,
-        structures : Union[list, bool] = None):
-        # self.bar_label.setText("Creating One Slab Geometry")
-        
-        slab_struc = []
-        slab_opening = []
-        for key, value in structures.items():
-            if self.slab_prop_assignment[key] == 'None':
-                slab_opening.append(value)
-            else:
-                slab_struc.append(value)
-        if len(slab_struc) == 1:
-            print('one slab')
-            fusion = slab_struc[0]
-        else:
-            s1 = slab_struc[0]
-            fusion = s1.fuse(slab_struc[1:])
-        if bool(slab_opening):
-            print('openings')
-            fusion = fusion.cut(slab_opening)
-            
-        return fusion
+    def create_foundation(self,
+        beam_names : Union[list, bool] = None,
+        z=0,
+        ):
+        self.create_slabs(beam_names, z)
+        etabs_foundation.make_foundation(self.cover, self.fc)
 
-    def create_foundation(self, fusion):
-        # self.bar_label.setText("Creating Foundation Geometry")
-        if hasattr(fusion, "removeSplitter"):
-            return fusion.removeSplitter()
-        return fusion
 
     def create_punches(self):
         # self.bar_label.setText("Creating Punch Objects")

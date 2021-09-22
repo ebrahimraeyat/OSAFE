@@ -38,7 +38,7 @@ class EtabsTaskPanel:
         etabs = etabs_punch.EtabsPunch()
         name = etabs.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
-        etabs.create_slabs()
+        etabs.create_foundation()
 
     def update_shape(self):
         self.shape = geom.Geom(filename, self.form)

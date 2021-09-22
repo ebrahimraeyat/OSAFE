@@ -19,5 +19,8 @@ def test_create_vectors():
 def test_create_slabs():
 	etabs.create_slabs(['114', '115', '116'])
 
+def test_create_foundation():
+	etabs.create_foundation(['114', '115', '116'])
+
 if __name__ == '__main__':
 	test_create_slabs()
