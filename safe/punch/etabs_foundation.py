@@ -21,12 +21,12 @@ class Foundation:
 				"Foundation",
 				)
 
-		# if not hasattr(obj, "height"):
-		# 	obj.addProperty(
-		# 		"App::PropertyLength",
-		# 		"height",
-		# 		"Foundation",
-		# 		)
+		if not hasattr(obj, "height"):
+			obj.addProperty(
+				"App::PropertyLength",
+				"height",
+				"Foundation",
+				)
 
 		if not hasattr(obj, "cover"):
 			obj.addProperty(
@@ -35,7 +35,7 @@ class Foundation:
 				"Foundation",
 				)
 
-		if not hasattr(obj, "shape"):
+		if not hasattr(obj, "tape_slabs"):
 			obj.addProperty(
 				"App::PropertyLinkList",
 				"tape_slabs",
@@ -102,6 +102,7 @@ class ViewProviderFoundation:
 def make_foundation(
 	cover: float = 75,
 	fc: int = 25,
+	height : int = 800,
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
 	Foundation(obj)
@@ -109,6 +110,7 @@ def make_foundation(
 		ViewProviderFoundation(obj.ViewObject)
 	obj.cover = cover
 	obj.fc = f"{fc} MPa"
+	obj.height = height
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 

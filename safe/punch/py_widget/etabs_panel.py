@@ -35,7 +35,16 @@ class EtabsTaskPanel:
     def import_from_etabs(self):
         # sys.path.insert(0, str(punch_path))
         from safe.punch import etabs_punch
-        etabs = etabs_punch.EtabsPunch()
+        cover = self.form.cover.value() * 10
+        fc = self.form.fc.value()
+        height = self.form.height_spinbox.value() * 10
+        width = self.form.width_spinbox.value() * 10
+        etabs = etabs_punch.EtabsPunch(
+                cover = cover,
+                fc = fc,
+                height = height,
+                width = width,
+            )
         name = etabs.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
         etabs.create_foundation()

@@ -19,13 +19,18 @@ from typing import Union
 
 class EtabsPunch(object):
     def __init__(self,
-            cover : float = 7.5,
+            cover : float = 75,
             fc : int = 30,
+            height : int = 800,
+            width : int = 1000,
             ):
         self.etabs = etabs_obj.EtabsModel(backup=False)
+        self.etabs.set_current_unit('kgf', 'mm')
         self.SapModel = self.etabs.SapModel
         self.cover = cover
         self.fc = fc
+        self.height = height
+        self.width = width
         # self.joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         # self.base_columns_summary = self.etabs.database.get_base_column_summary_with_section_dimensions()
         # if filename:
@@ -35,12 +40,12 @@ class EtabsPunch(object):
         #     self.load_combinations = self._safe.load_combinations
         #     self.point_loads = self._safe.points_loads
 
-    def create_vectors(self):
-        vectors = {}
-        for name in self.joint_design_reactions['UniqueName'].unique():
-            x, y, z, _ = self.SapModel.PointObj.GetCoordCartesian(name)
-            vectors[name] = App.Vector(round(x, 4), round(y, 4), int(z))
-        return vectors
+    # def create_vectors(self):
+    #     vectors = {}
+    #     for name in self.joint_design_reactions['UniqueName'].unique():
+    #         x, y, z, _ = self.SapModel.PointObj.GetCoordCartesian(name)
+    #         vectors[name] = App.Vector(round(x, 4), round(y, 4), int(z))
+    #     return vectors
 
     def create_slabs(self,
         beam_names : Union[list, bool] = None,
@@ -54,7 +59,7 @@ class EtabsPunch(object):
             xj, yj = row['xj'], row['yj']
             v1 = App.Vector(xi, yi, z)
             v2 = App.Vector(xj, yj, z)
-            slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2)
+            slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2, self.width, self.height)
         return slabs
 
     def create_foundation(self,
@@ -62,8 +67,7 @@ class EtabsPunch(object):
         z=0,
         ):
         self.create_slabs(beam_names, z)
-        etabs_foundation.make_foundation(self.cover, self.fc)
-
+        etabs_foundation.make_foundation(self.cover, self.fc, self.height)
 
     def create_punches(self):
         # self.bar_label.setText("Creating Punch Objects")
