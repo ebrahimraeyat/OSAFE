@@ -1,19 +1,18 @@
 try:
     from safe.punch.axis import create_grids
-    from safe.punch.punch_funcs import remove_obj
+    # from safe.punch.punch_funcs import remove_obj
     from safe.punch import foundation
     from safe.punch import rectangle_slab
     from safe.punch.punch import make_punch
 except:
     from axis import create_grids
-    from punch_funcs import remove_obj
+    # from punch_funcs import remove_obj
     import foundation
     import rectangle_slab
     from punch import make_punch
 import Draft
 import FreeCAD as App
 import FreeCADGui as Gui
-# from safe.punch import safe
 from etabs_api import etabs_obj
 from typing import Union
 
@@ -22,11 +21,8 @@ class EtabsPunch(object):
     def __init__(self):
         self.etabs = etabs_obj.EtabsModel(backup=False)
         self.SapModel = self.etabs.SapModel
-        self.joint_design_reactions = self.etabs.database.get_joint_design_reactions()
-        self.base_columns_summary = self.etabs.database.get_base_column_summary_with_section_dimensions()
-
-
-
+        # self.joint_design_reactions = self.etabs.database.get_joint_design_reactions()
+        # self.base_columns_summary = self.etabs.database.get_base_column_summary_with_section_dimensions()
         # if filename:
         #     self._safe = safe.Safe(filename)
         #     self.solid_slabs = self._safe.solid_slabs

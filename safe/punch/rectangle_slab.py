@@ -45,7 +45,7 @@ class RectangleSlab:
         ye = obj.end_point.y
         w = obj.width.Value / 2
         teta = obj.angle
-        FreeCAD.Console.PrintMessage(f"teta = {teta}")
+        # FreeCAD.Console.PrintMessage(f"teta = {teta}")
         _sin = math.sin(teta)
         _cos = math.cos(teta)
         x = xs - w * _sin

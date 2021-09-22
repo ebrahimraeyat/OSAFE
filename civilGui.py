@@ -1,9 +1,6 @@
 import os
 from pathlib import Path
-import PySide2
-from PySide2 import QtCore, QtGui
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtCore import QFile, QIODevice
+from PySide2 import QtCore
 from PySide2.QtWidgets import QMessageBox
 import FreeCAD
 import FreeCADGui as Gui
@@ -179,6 +176,41 @@ class CivilDocx:
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
+class CivilEtabs:
+
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "civil_etabs",
+            "Import From Etabs")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "civil_etabs",
+            "Read Data From Etabs")
+        path = str(
+                   Path(civilwelcome.__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "etabs.png"
+                   )
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    def Activated(self):
+        allow, check = allowed_to_continue(
+            'punch_etabs.bin',
+            'https://gist.githubusercontent.com/ebrahimraeyat/9f32da1884e7b3f1a605e12d292c4fd0/raw',
+            'punch'
+            )
+        if not allow:
+            return
+        from safe.punch.py_widget import etabs_panel
+        panel = etabs_panel.EtabsTaskPanel()
+        Gui.Control.showDialog(panel)
+        # panel.setup_ui()
+            # Gui.Control.closeDialog(panel)
+            # return None
+        show_warning_about_number_of_use(check)
+        return panel
+
+    def IsActive(self):
+        return True
+
 
 class CivilHelp:
 
@@ -283,6 +315,7 @@ class SerialForm:
             )
         self.form = Gui.PySideUic.loadUi(serial_ui)
 
+Gui.addCommand('Civil_etabs', CivilEtabs())
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
@@ -294,6 +327,7 @@ Gui.addCommand('Civil_update', CivilUpdate())
 Gui.addCommand('Civil_dxf', CivilDxf())
 
 command_list = [
+            "Civil_etabs",
             "Copy",
             "Civil_pdf",
             "Civil_pic",
