@@ -20,6 +20,7 @@ def make_rectangle_slab(p1, p2, width=1, height=1):
 class RectangleSlab:
     def __init__(self, obj):
         obj.Proxy = self
+        self.Type = "tape_slab"
         self.set_properties(obj)
 
     def set_properties(self, obj):

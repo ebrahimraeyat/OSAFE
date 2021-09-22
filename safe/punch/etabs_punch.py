@@ -52,17 +52,10 @@ class EtabsPunch(object):
             slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2)
         return slabs
 
-    def create_structures(self, areas):
-        # self.bar_label.setText("Creating structures Geometry")
-        areas_thickness = self._safe.get_thickness(areas)
-        structures = {}
-        for key, area in areas.items():
-            thickness = areas_thickness[key] - 93
-            structures[key] = area.extrude(App.Vector(0, 0, -thickness))
-        return structures
-
-    def create_fusion(self, structures):
+    def create_fusion(self,
+        structures : Union[list, bool] = None):
         # self.bar_label.setText("Creating One Slab Geometry")
+        
         slab_struc = []
         slab_opening = []
         for key, value in structures.items():

@@ -97,6 +97,7 @@ class CivilExcel:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
+    
     def Activated(self):
         from safe.punch import export
         doc = FreeCAD.ActiveDocument
@@ -133,11 +134,6 @@ class CivilDxf:
     def Activated(self):
         from safe.punch import export
         doc = FreeCAD.ActiveDocument
-        # punches = []
-        # for o in doc.Objects:
-        #     if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
-        #         if o.Proxy.Type == "Punch":
-        #             punches.append(o)
         filename = get_save_filename('.dxf')
         export.to_dxf(doc, filename)
 
@@ -159,6 +155,7 @@ class CivilDocx:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
+    
     def Activated(self):
         allow, check = allowed_to_continue(
             'punch_docx.bin',
@@ -176,6 +173,7 @@ class CivilDocx:
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
+
 class CivilEtabs:
 
     def GetResources(self):
@@ -191,6 +189,7 @@ class CivilEtabs:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
+    
     def Activated(self):
         allow, check = allowed_to_continue(
             'punch_etabs.bin',
@@ -202,9 +201,6 @@ class CivilEtabs:
         from safe.punch.py_widget import etabs_panel
         panel = etabs_panel.EtabsTaskPanel()
         Gui.Control.showDialog(panel)
-        # panel.setup_ui()
-            # Gui.Control.closeDialog(panel)
-            # return None
         show_warning_about_number_of_use(check)
         return panel
 
@@ -257,9 +253,6 @@ class CivilUpdate:
 
     def IsActive(self):
         return True
-
-
-
 
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
