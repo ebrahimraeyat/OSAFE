@@ -463,8 +463,11 @@ class DatabaseTables:
             df_props[t] = df_props['DesignSect'].map(s)
         return df_props
 
-    def get_beam_connectivity(self):
-        table_key = 'Beam Object Connectivity'
+    def get_frame_connectivity(self, frame_type='Beam'):
+        '''
+        frame type : 'Beam', 'Column'
+        '''
+        table_key = f'{frame_type} Object Connectivity'
         cols = ['UniqueName', 'UniquePtI', 'UniquePtJ']
         df = self.read(table_key, to_dataframe=True, cols=cols)
         return df
@@ -477,26 +480,72 @@ class DatabaseTables:
         df[['X', 'Y', 'Z']] = df[['X', 'Y', 'Z']].apply(pd.to_numeric, downcast='float')
         return df
 
-    def get_beams_points_xyz(self,
-            beams : Union[list, None] = None,
+    def get_frame_points_xyz(self,
+            frames : Union[list, None] = None,
             ) -> 'pandas.DataFrame':
-        if beams is None:
-            beams = self.SapModel.SelectObj.GetSelected()[2]
-        df_beam = self.get_beam_connectivity()
-        filt = df_beam['UniqueName'].isin(beams)
-        df_beam = df_beam.loc[filt]
+        if frames is None:
+            frames = self.SapModel.SelectObj.GetSelected()[2]
+        df_frames = self.get_frame_connectivity()
+        filt = df_frames['UniqueName'].isin(frames)
+        df_frames = df_frames.loc[filt]
         df_points = self.get_points_connectivity()
         for i in ['X', 'Y', 'Z']:
             col_name = f'{i.lower()}i'
             s = df_points[i]
             s.index = df_points['UniqueName']
-            df_beam[col_name] = df_beam['UniquePtI'].map(s)
+            df_frames[col_name] = df_frames['UniquePtI'].map(s)
         for i in ['X', 'Y', 'Z']:
             col_name = f'{i.lower()}j'
             s = df_points[i]
             s.index = df_points['UniqueName']
-            df_beam[col_name] = df_beam['UniquePtJ'].map(s)
-        return df_beam
+            df_frames[col_name] = df_frames['UniquePtJ'].map(s)
+        return df_frames
+
+    def get_basepoints_coord_and_dims(self,
+        joint_design_reactions_df : Union['pandas.DataFrame', None] = None,
+        base_columns_df : Union['pandas.DataFrame', None] = None,
+        ):
+        '''
+        get base points coordinates and related column dimensions
+        '''
+        if joint_design_reactions_df is None:
+            joint_design_reactions_df = self.get_joint_design_reactions()
+        df = pd.DataFrame()
+        points = joint_design_reactions_df['UniqueName'].unique()
+        df['UniqueName'] = points
+        points_and_columns = self.get_points_connectivity_with_type(points, 2)
+        dic_x = {}
+        dic_y = {}
+        dic_z = {}
+        for name in points:
+            x, y, z, _ = self.SapModel.PointObj.GetCoordCartesian(name)
+            dic_x[name] = x
+            dic_y[name] = y
+            dic_z[name] = z
+        for col, dic in zip(('column', 'x', 'y', 'z'), (points_and_columns, dic_x, dic_y, dic_z)):
+            df[col] = df['UniqueName'].map(dic)
+        if base_columns_df is None:
+            base_columns_df = self.get_base_column_summary_with_section_dimensions()
+        st2 = pd.Series(base_columns_df['t2'])
+        st2.index = base_columns_df['UniqueName']
+        st3 = pd.Series(base_columns_df['t3'])
+        st3.index = base_columns_df['UniqueName']
+        df['t2'] = df['column'].map(st2)
+        df['t3'] = df['column'].map(st3)
+        return df
+
+    def get_point_connectivity_with_type(self, point, type_=2):
+        types, names = self.SapModel.PointObj.GetConnectivity(point)[1:3]
+        for t, name in zip(types, names):
+            if t == type_:
+                return name
+        return None
+
+    def get_points_connectivity_with_type(self, points, type_=2) -> dict:
+        connections = {}
+        for p in points:
+            connections[p] = self.get_point_connectivity_with_type(p, type_)
+        return connections
 
     
 
@@ -510,5 +559,5 @@ if __name__ == '__main__':
     from etabs_obj import EtabsModel
     etabs = EtabsModel()
     SapModel = etabs.SapModel
-    ret = etabs.database.get_beams_points_xyz()
+    ret = etabs.database.get_basepoints_coord_and_dims()
     print('Wow')

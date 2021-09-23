@@ -34,11 +34,24 @@ class Foundation:
 				"cover",
 				"Foundation",
 				)
+		if not hasattr(obj, "d"):
+			obj.addProperty(
+				"App::PropertyLength",
+				"d",
+				"Foundation",
+				)
 
 		if not hasattr(obj, "tape_slabs"):
 			obj.addProperty(
 				"App::PropertyLinkList",
 				"tape_slabs",
+				"Foundation",
+				)
+
+		if not hasattr(obj, "shape"):
+			obj.addProperty(
+				"Part::PropertyPartShape",
+				"shape",
 				"Foundation",
 				)
 
@@ -53,7 +66,13 @@ class Foundation:
 				]):
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
-		obj.Shape = Part.CompSolid([o.Shape for o in tape_slabs])
+		new_shape = tape_slabs[0].Shape
+		for i in tape_slabs[1:]:
+			new_shape = new_shape.fuse(i.Shape)
+		obj.Shape = new_shape.removeSplitter()
+		if FreeCAD.GuiUp:
+			for slab in obj.tape_slabs:
+				slab.ViewObject.Visibility = False
         # if bool(slab_opening):
         #     print('openings')
         #     base = fusion
@@ -77,7 +96,6 @@ class ViewProviderFoundation:
 		vobj.Transparency = 40
 		vobj.DisplayMode = "Shaded"
 
-
 	def attach(self, vobj):
 		self.ViewObject = vobj
 		self.Object = vobj.Object
@@ -95,22 +113,20 @@ class ViewProviderFoundation:
 		children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.tape_slabs]
 		return children
 
-	
-
-	
-
 def make_foundation(
 	cover: float = 75,
 	fc: int = 25,
 	height : int = 800,
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
+	# obj = FreeCAD.ActiveDocument.addObject("Part::MultiFuse", "Fusion")
 	Foundation(obj)
 	if FreeCAD.GuiUp:
 		ViewProviderFoundation(obj.ViewObject)
 	obj.cover = cover
 	obj.fc = f"{fc} MPa"
 	obj.height = height
+	obj.d = height - cover
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 

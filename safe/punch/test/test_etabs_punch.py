@@ -12,15 +12,18 @@ import etabs_punch
 document= FreeCAD.newDocument()
 etabs = etabs_punch.EtabsPunch()
 
-def test_create_vectors():
-	etabs.create_vectors()
-	assert True
+# def test_create_vectors():
+# 	etabs.create_vectors()
+# 	assert True
 
 def test_create_slabs():
 	etabs.create_slabs(['114', '115', '116'])
 
 def test_create_foundation():
 	etabs.create_foundation(['114', '115', '116'])
+def test_create_punches():
+	etabs.create_foundation(['114', '115', '116'])
+	etabs.create_punches()
 
 if __name__ == '__main__':
 	test_create_slabs()

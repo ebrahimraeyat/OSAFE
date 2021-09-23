@@ -436,7 +436,8 @@ def make_punch(
 
 	p = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Punch")
 	Punch(p)
-	ViewProviderPunch(p.ViewObject)
+	if FreeCAD.GuiUp:
+		ViewProviderPunch(p.ViewObject)
 	p.foundation_plane = foundation_plane
 	p.foundation = foun_obj
 	p.bx = bx

@@ -25,8 +25,8 @@ class EtabsPunch(object):
             width : int = 1000,
             ):
         self.etabs = etabs_obj.EtabsModel(backup=False)
-        self.etabs.set_current_unit('kgf', 'mm')
-        self.SapModel = self.etabs.SapModel
+        self.etabs.set_current_unit('kN', 'mm')
+        # self.SapModel = self.etabs.SapModel
         self.cover = cover
         self.fc = fc
         self.height = height
@@ -52,7 +52,7 @@ class EtabsPunch(object):
         z=0,
         ):
         slabs = {}
-        df_beams = self.etabs.database.get_beams_points_xyz(beam_names)
+        df_beams = self.etabs.database.get_frame_points_xyz(beam_names)
         for i, row in df_beams.iterrows():
             slab_name = row['UniqueName']
             xi, yi = row['xi'], row['yi']
@@ -67,43 +67,42 @@ class EtabsPunch(object):
         z=0,
         ):
         self.create_slabs(beam_names, z)
-        etabs_foundation.make_foundation(self.cover, self.fc, self.height)
+        self.foundation = etabs_foundation.make_foundation(self.cover, self.fc, self.height)
 
     def create_punches(self):
-        # self.bar_label.setText("Creating Punch Objects")
-        for f in self.foundation.Faces:
+        joint_design_reactions = self.etabs.database.get_joint_design_reactions()
+        basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
+                joint_design_reactions
+            )
+        for f in self.foundation.Shape.Faces:
             if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
                 foundation_plane = f
                 break
-        d = self.foundation.BoundBox.ZLength
-        cover = 93
-        h = d + cover
-        fc = self._safe.fc
-        foun_obj = foundation.make_foundation(foundation_plane, height=h, cover=cover, fc=fc)
-
-        for key in self.columns_id:
-            value = self._safe.point_loads[key]
-            bx = value['xdim']
-            by = value['ydim']
-            combos_load = self._safe.points_loads_combinations[self._safe.points_loads_combinations['Point'] == key]
+        self.foundation.shape = foundation_plane
+        for _, row in basepoints_coord_and_dims.iterrows():
+            name = row['UniqueName']
+            bx = float(row['t2'])
+            by = float(row['t3'])
+            x = row['x']
+            y = row['y']
+            z = row['z']
             d = {}
-            for row in combos_load.itertuples():
-                combo = row.Combo
-                F = row.Fgrav
-                Mx = row.Mx
-                My = row.My
-                d[combo] = f"{F}, {Mx}, {My}"
-            point = self._safe.obj_geom_points[key]
-            center_of_load = App.Vector(point.x, point.y, 0)
+            df = joint_design_reactions[joint_design_reactions['UniqueName'] == name]
+            for _, row2 in df.iterrows():
+                combo = row2['OutputCase']
+                F = row2['FX']
+                mx = row2['MX']
+                my = row2['MY']
+                d[combo] = f"{F}, {mx}, {my}"
+            center_of_load = App.Vector(x, y, z)
             p = make_punch(
                 foundation_plane,
-                foun_obj,
+                self.foundation,
                 bx,
                 by,
                 center_of_load,
                 d,
                 )
-            # App.ActiveDocument.recompute()
             l = p.Location
             pl = App.Vector(0, 0, 4100)
             t = '0.0'
@@ -113,9 +112,14 @@ class EtabsPunch(object):
             else:
                 text = Draft.make_text([t, l], placement=pl)
             p.Ratio = t
-            text.ViewObject.FontSize = 200
+            if App.GuiUp:
+                text.ViewObject.FontSize = 200
+            print(text)
             p.text = text
-            p.id = str(key)
+            p.id = name
+        App.ActiveDocument.recompute()
+        Gui.SendMsgToActiveView("ViewFit")
+        Gui.activeDocument().activeView().viewAxonometric()
 
     def grid_lines(self):
         if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):

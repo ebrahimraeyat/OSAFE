@@ -51,7 +51,6 @@ class Foundation:
 
 		obj.setEditorMode("d", 2)
 
-
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
 		self.set_properties(obj)

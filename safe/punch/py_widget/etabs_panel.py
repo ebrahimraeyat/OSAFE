@@ -48,13 +48,8 @@ class EtabsTaskPanel:
         name = etabs.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
         etabs.create_foundation()
+        etabs.create_punches()
 
-    def update_shape(self):
-        self.shape = geom.Geom(filename, self.form)
-        self.ratios_df = self.shape.punch_ratios()
-        self.form.export_excel_button.setEnabled(True)
-        self.form.export_pdf_button.setEnabled(True)
-        self.form.export_image_button.setEnabled(True)
 
 if __name__ == '__main__':
     panel = EtabsTaskPanel()
