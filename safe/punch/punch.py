@@ -145,7 +145,7 @@ class Punch:
 		x = obj.bx + d
 		y = obj.by + d
 		offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
-		edges = punch_funcs.punch_area_edges(obj.foundation.shape, offset_shape)
+		edges = punch_funcs.punch_area_edges(obj.foundation.plane, offset_shape)
 		obj.edges = Part.makeCompound(edges)
 		faces = punch_funcs.punch_faces(edges, d)
 		if obj.user_location:
@@ -425,7 +425,7 @@ def get_color(pref_intity, color=16711935):
 	return (r, g, b)
 
 def make_punch(
-	foundation_plane: Part.Face,
+	# foundation_plane: Part.Face,
 	foun_obj,
 	bx: Union[float, int],
 	by: Union[float, int],
@@ -438,7 +438,7 @@ def make_punch(
 	Punch(p)
 	if FreeCAD.GuiUp:
 		ViewProviderPunch(p.ViewObject)
-	p.foundation_plane = foundation_plane
+	# p.foundation_plane = foundation_plane
 	p.foundation = foun_obj
 	p.bx = bx
 	p.by = by

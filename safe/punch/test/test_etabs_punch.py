@@ -22,16 +22,17 @@ def test_create_slabs():
 def test_create_foundation():
 	etabs.create_foundation(['114', '115', '116'])
 def test_create_punches():
-	# etabs.create_foundation(['114', '115', '116'])
-	etabs.create_foundation(['21', '24', '27', '30', '39', '27'])
+	etabs.create_foundation(['114', '115', '116'])
+	# etabs.create_foundation(['21', '24', '27', '30', '39', '27'])
 	punches = etabs.create_punches()
-	assert len(punches) == 6
+	document.recompute()
+	assert len(punches) == 11
 	p1 = punches[0]
 	assert p1.Ratio == '0.0'
 	document.recompute()
 	# assert p1.Ratio == '.5'
 	assert type(p1.combos_load) == dict
-	assert len(p1.combos_load.keys()) == 38
+	assert len(p1.combos_load.keys()) == 35
 
 
 if __name__ == '__main__':

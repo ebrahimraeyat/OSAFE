@@ -42,10 +42,10 @@ class Foundation:
 				"Foundation",
 				)
 
-		if not hasattr(obj, "shape"):
+		if not hasattr(obj, "plane"):
 			obj.addProperty(
 				"Part::PropertyPartShape",
-				"shape",
+				"plane",
 				"Foundation",
 				)
 
@@ -57,7 +57,7 @@ class Foundation:
 
 	def execute(self, obj):
 		obj.d = obj.height - obj.cover
-		sh = obj.shape.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
+		sh = obj.plane.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
 		obj.Shape = sh
 
 

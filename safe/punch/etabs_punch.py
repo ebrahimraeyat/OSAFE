@@ -78,7 +78,7 @@ class EtabsPunch(object):
             if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
                 foundation_plane = f
                 break
-        self.foundation.shape = foundation_plane
+        self.foundation.plane = foundation_plane
         punches = []
         for _, row in basepoints_coord_and_dims.iterrows():
             name = row['UniqueName']
@@ -97,7 +97,7 @@ class EtabsPunch(object):
                 d[combo] = f"{F}, {mx}, {my}"
             center_of_load = FreeCAD.Vector(x, y, 0)
             p = make_punch(
-                None,
+                # foundation_plane,
                 self.foundation,
                 bx,
                 by,

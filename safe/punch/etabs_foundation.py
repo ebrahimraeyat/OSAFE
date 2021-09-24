@@ -48,10 +48,10 @@ class Foundation:
 				"Foundation",
 				)
 
-		if not hasattr(obj, "shape"):
+		if not hasattr(obj, "plane"):
 			obj.addProperty(
 				"Part::PropertyPartShape",
-				"shape",
+				"plane",
 				"Foundation",
 				)
 
@@ -73,6 +73,11 @@ class Foundation:
 		if FreeCAD.GuiUp:
 			for slab in obj.tape_slabs:
 				slab.ViewObject.Visibility = False
+		for f in obj.Shape.Faces:
+			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+				foundation_plane = f
+				break
+		obj.plane = foundation_plane
         # if bool(slab_opening):
         #     print('openings')
         #     base = fusion
