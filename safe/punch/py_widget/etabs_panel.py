@@ -45,10 +45,7 @@ class EtabsTaskPanel:
                 height = height,
                 width = width,
             )
-        name = etabs.etabs.get_file_name_without_suffix()
-        FreeCAD.newDocument(name)
-        etabs.create_foundation()
-        etabs.create_punches()
+        etabs.import_data()
 
 
 if __name__ == '__main__':

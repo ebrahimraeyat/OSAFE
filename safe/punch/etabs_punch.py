@@ -11,7 +11,7 @@ except:
     import rectangle_slab
     from punch import make_punch
 import Draft
-import FreeCAD as App
+import FreeCAD
 import FreeCADGui as Gui
 from etabs_api import etabs_obj
 from typing import Union
@@ -44,7 +44,7 @@ class EtabsPunch(object):
     #     vectors = {}
     #     for name in self.joint_design_reactions['UniqueName'].unique():
     #         x, y, z, _ = self.SapModel.PointObj.GetCoordCartesian(name)
-    #         vectors[name] = App.Vector(round(x, 4), round(y, 4), int(z))
+    #         vectors[name] = FreeCAD.Vector(round(x, 4), round(y, 4), int(z))
     #     return vectors
 
     def create_slabs(self,
@@ -57,8 +57,8 @@ class EtabsPunch(object):
             slab_name = row['UniqueName']
             xi, yi = row['xi'], row['yi']
             xj, yj = row['xj'], row['yj']
-            v1 = App.Vector(xi, yi, z)
-            v2 = App.Vector(xj, yj, z)
+            v1 = FreeCAD.Vector(xi, yi, z)
+            v2 = FreeCAD.Vector(xj, yj, z)
             slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2, self.width, self.height)
         return slabs
 
@@ -79,13 +79,14 @@ class EtabsPunch(object):
                 foundation_plane = f
                 break
         self.foundation.shape = foundation_plane
+        punches = []
         for _, row in basepoints_coord_and_dims.iterrows():
             name = row['UniqueName']
             bx = float(row['t2'])
             by = float(row['t3'])
             x = row['x']
             y = row['y']
-            z = row['z']
+            # z = row['z']
             d = {}
             df = joint_design_reactions[joint_design_reactions['UniqueName'] == name]
             for _, row2 in df.iterrows():
@@ -94,9 +95,9 @@ class EtabsPunch(object):
                 mx = row2['MX']
                 my = row2['MY']
                 d[combo] = f"{F}, {mx}, {my}"
-            center_of_load = App.Vector(x, y, z)
+            center_of_load = FreeCAD.Vector(x, y, 0)
             p = make_punch(
-                foundation_plane,
+                None,
                 self.foundation,
                 bx,
                 by,
@@ -104,25 +105,24 @@ class EtabsPunch(object):
                 d,
                 )
             l = p.Location
-            pl = App.Vector(0, 0, 4100)
+            pl = FreeCAD.Vector(0, 0, 4100)
             t = '0.0'
-            version = App.Version()[1]
+            version = FreeCAD.Version()[1]
             if int(version) < 19:
                 text = Draft.makeText([t, l], point=pl)
             else:
                 text = Draft.make_text([t, l], placement=pl)
             p.Ratio = t
-            if App.GuiUp:
+            if FreeCAD.GuiUp:
                 text.ViewObject.FontSize = 200
             print(text)
             p.text = text
             p.id = name
-        App.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewAxonometric()
+            punches.append(p)
+        return punches
 
     def grid_lines(self):
-        if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
+        if not FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
             return
 
         gridLines = self._safe.grid_lines()
@@ -134,27 +134,20 @@ class EtabsPunch(object):
         create_grids(x_grids, b, 'x')
         create_grids(y_grids, b, 'y')
 
-    def plot(self):
-        self.obj_geom_points = self.create_vectors(self._safe.obj_geom_points)
-        obj_geom_areas = self.create_areas(self._safe.obj_geom_areas)
-        self.columns_id = list(self._safe.point_loads.keys())
-        structures = self.create_structures(obj_geom_areas)
-        del obj_geom_areas
-        fusion = self.create_fusion(structures)
-        Gui.SendMsgToActiveView("ViewFit")
-        self.foundation = self.create_foundation(fusion)
-        self.grid_lines()
+    def import_data(self):
+        name = self.etabs.get_file_name_without_suffix()
+        FreeCAD.newDocument(name)
+        self.create_foundation()
         self.create_punches()
-        App.ActiveDocument.recompute()
+        FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
-        # self.bar_label.setText("")
 
 
 def open(filename):
     import os
     docname = os.path.splitext(os.path.basename(filename))[0]
-    doc = App.newDocument(docname)
+    doc = FreeCAD.newDocument(docname)
     doc.Label = docname
     doc = insert(filename, doc.Name)
     return doc
