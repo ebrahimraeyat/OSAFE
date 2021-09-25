@@ -2,13 +2,13 @@ try:
     from safe.punch.axis import create_grids
     # from safe.punch.punch_funcs import remove_obj
     from safe.punch import etabs_foundation
-    from safe.punch import trapezoidal_slab
+    from safe.punch import rectangle_slab
     from safe.punch.punch import make_punch
 except:
     from axis import create_grids
     # from punch_funcs import remove_obj
     import etabs_foundation
-    import trapezoidal_slab
+    import rectangle_slab
     from punch import make_punch
 import Draft
 import FreeCAD
@@ -64,8 +64,7 @@ class EtabsPunch(object):
             xj, yj = row['xj'], row['yj']
             v1 = FreeCAD.Vector(xi, yi, self.top_of_foundation)
             v2 = FreeCAD.Vector(xj, yj, self.top_of_foundation)
-            swl = swr = ewl = ewr = self.width / 2
-            slabs[slab_name] = trapezoidal_slab.make_trapezoidal_slab(v1, v2, swl, swr, ewl, ewr, self.height)
+            slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2, self.width, self.height)
         return slabs
 
     def create_foundation(self,

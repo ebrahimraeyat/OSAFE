@@ -3,7 +3,7 @@ import Part
 import FreeCAD
 from etabs_api.frame_obj import FrameObj
 
-def make_rectangle_slab(p1, p2, width=1, height=1, extend=2, offset=0):
+def make_rectangle_slab(p1, p2, width=1, height=1, extend=50, offset=0):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Slab")
     RectangleSlab(obj)
     obj.start_point = p1
@@ -67,12 +67,27 @@ class RectangleSlab:
             "extend",
             "slab",
             )
+        if not hasattr(obj, "plane"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "plane",
+                "slab",
+                )
+        if not hasattr(obj, "solid"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "solid",
+                "slab",
+                )
 
     def onChanged(self, obj, prop):
         return
 
     def execute(self, obj):
-        v = obj.end_point - obj.start_point
+        p1 = obj.start_point
+        p2 = obj.end_point
+        obj.Shape = Part.makeLine(p1, p2)
+        v = p2 - p1
         obj.angle = math.atan2(v.y, v.x)
         self.create_width(obj)
 
@@ -101,8 +116,8 @@ class RectangleSlab:
         y = ye + w * _cos
         points.append(FreeCAD.Vector(x, y, 0))
         points.append(points[0])
-        face = Part.Face(Part.makePolygon(points))
-        obj.Shape = face.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+        obj.plane = Part.Face(Part.makePolygon(points))
+        obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
     def get_new_points(self, obj):
         xs = obj.start_point.x
