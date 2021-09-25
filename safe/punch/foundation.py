@@ -97,7 +97,7 @@ def make_foundation(
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
 	Foundation(obj)
 	ViewProviderFoundation(obj.ViewObject)
-	obj.shape = base
+	obj.plane = base
 	obj.height = height
 	obj.cover = cover
 	obj.fc = f"{fc} MPa"

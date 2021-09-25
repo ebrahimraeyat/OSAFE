@@ -102,7 +102,6 @@ class Geom(object):
             point = self._safe.obj_geom_points[key]
             center_of_load = App.Vector(point.x, point.y, 0)
             p = make_punch(
-                foundation_plane,
                 foun_obj,
                 bx,
                 by,
