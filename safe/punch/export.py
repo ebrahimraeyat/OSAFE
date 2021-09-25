@@ -12,7 +12,7 @@ def createPdf(doc, pdfName):
         return
     foun = doc.Foundation
     fig = plt.figure()
-    b = foun.Shape.BoundBox
+    b = foun.plane.BoundBox
     XMIN, YMIN, XMAX, YMAX = b.XMin, b.YMin, b.XMax, b.YMax
     XMIN -= .2 * abs(XMIN)
     YMIN -= .2 * abs(YMIN)
@@ -26,14 +26,14 @@ def createPdf(doc, pdfName):
     ax1 = fig.add_subplot(111, aspect='equal')
     plt.axis('off')
 
-    for e in foun.Shape.Edges:
+    for e in foun.plane.Edges:
         if not len(e.Vertexes) == 2:
             continue
-        if e.BoundBox.ZLength == 0 and e.Vertexes[0].Z == 0:
-            v1, v2 = e.Vertexes
-            xy = [[v1.X, v1.Y], [v2.X, v2.Y]]
-            p = patches.Polygon(xy, edgecolor='black', linewidth=.5, closed=False)
-            ax1.add_patch(p)
+        # if e.BoundBox.ZLength == 0 and e.Vertexes[0].Z == 0:
+        v1, v2 = e.Vertexes
+        xy = [[v1.X, v1.Y], [v2.X, v2.Y]]
+        p = patches.Polygon(xy, edgecolor='black', linewidth=.5, closed=False)
+        ax1.add_patch(p)
 
     for o in doc.Objects:
         if not (hasattr(o, 'ViewObject') and o.ViewObject.Visibility):
@@ -52,7 +52,7 @@ def createPdf(doc, pdfName):
 
             for f in o.Shape.Faces:
                 b = f.BoundBox
-                if b.ZLength == 0 and b.ZMax == 0:
+                if b.ZLength == 0:
                     xmin, ymin = b.XMin, b.YMin
                     p = patches.Rectangle((xmin, ymin), o.bx, o.by, facecolor=color, edgecolor='black', linewidth=.3)
                     ax1.add_patch(p)
@@ -162,7 +162,7 @@ def to_dxf(
                 center = (b.Center.x, b.Center.y)
                 # draw foundation
                 block_foun = dwg.blocks.new(name=o.Name)
-                add_edges_to_dxf(o.shape.Edges, {'color': 4}, block_foun)
+                add_edges_to_dxf(o.plane.Edges, {'color': 4}, block_foun)
                 msp.add_blockref(o.Name, (0 , 0))
 
 
