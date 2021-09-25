@@ -2,13 +2,13 @@ try:
     from safe.punch.axis import create_grids
     # from safe.punch.punch_funcs import remove_obj
     from safe.punch import etabs_foundation
-    from safe.punch import rectangle_slab
+    from safe.punch import trapezoidal_slab
     from safe.punch.punch import make_punch
 except:
     from axis import create_grids
     # from punch_funcs import remove_obj
     import etabs_foundation
-    import rectangle_slab
+    import trapezoidal_slab
     from punch import make_punch
 import Draft
 import FreeCAD
@@ -47,26 +47,27 @@ class EtabsPunch(object):
     #         vectors[name] = FreeCAD.Vector(round(x, 4), round(y, 4), int(z))
     #     return vectors
 
-    def create_slabs(self,
+    def create_slabs_plane(self,
         beam_names : Union[list, bool] = None,
         z=0,
         ):
         slabs = {}
         df_beams = self.etabs.database.get_frame_points_xyz(beam_names)
-        for i, row in df_beams.iterrows():
+        for _, row in df_beams.iterrows():
             slab_name = row['UniqueName']
             xi, yi = row['xi'], row['yi']
             xj, yj = row['xj'], row['yj']
             v1 = FreeCAD.Vector(xi, yi, z)
             v2 = FreeCAD.Vector(xj, yj, z)
-            slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2, self.width, self.height)
+            swl = swr = ewl = ewr = self.width / 2
+            slabs[slab_name] = trapezoidal_slab.make_trapezoidal_slab(v1, v2, swl, swr, ewl, ewr, self.height)
         return slabs
 
     def create_foundation(self,
         beam_names : Union[list, bool] = None,
         z=0,
         ):
-        self.create_slabs(beam_names, z)
+        self.create_slabs_plane(beam_names, z)
         self.foundation = etabs_foundation.make_foundation(self.cover, self.fc, self.height)
 
     def create_punches(self):

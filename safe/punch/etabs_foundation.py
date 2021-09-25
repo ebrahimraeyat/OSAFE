@@ -62,17 +62,14 @@ class Foundation:
 			if all(
 				[hasattr(o, "Proxy"),
 				hasattr(o.Proxy, "Type"),
-				o.Proxy.Type == "tape_slab",
+				o.Proxy.Type in ("tape_slab", "trapezoidal_slab"),
 				]):
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
-		new_shape = tape_slabs[0].Shape
+		new_shape = tape_slabs[0].solid
 		for i in tape_slabs[1:]:
-			new_shape = new_shape.fuse(i.Shape)
+			new_shape = new_shape.fuse(i.solid)
 		obj.Shape = new_shape.removeSplitter()
-		if FreeCAD.GuiUp:
-			for slab in obj.tape_slabs:
-				slab.ViewObject.Visibility = False
 		for f in obj.Shape.Faces:
 			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
 				foundation_plane = f

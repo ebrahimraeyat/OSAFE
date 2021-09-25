@@ -16,11 +16,12 @@ etabs = etabs_punch.EtabsPunch()
 # 	etabs.create_vectors()
 # 	assert True
 
-def test_create_slabs():
-	etabs.create_slabs(['114', '115', '116'])
+def test_create_slabs_plane():
+	etabs.create_slabs_plane(['114', '115', '116'])
 
 def test_create_foundation():
 	etabs.create_foundation(['114', '115', '116'])
+	assert len(etabs.foundation.Shape.Faces) > 1
 def test_create_punches():
 	etabs.create_foundation(['114', '115', '116'])
 	# etabs.create_foundation(['21', '24', '27', '30', '39', '27'])
@@ -36,4 +37,4 @@ def test_create_punches():
 
 
 if __name__ == '__main__':
-	test_create_punches()
+	test_create_foundation()

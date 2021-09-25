@@ -3,7 +3,7 @@ import Part
 import FreeCAD
 
 
-def make_trapezoidal_slab(p1, p2, layer, design_type, swl, swr, ewl, ewr):
+def make_trapezoidal_slab(p1, p2, swl, swr, ewl, ewr, height=1000, layer='A', design_type='column'):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "TrapezoidalSlab")
 	TrapezoidalSlab(obj)
 	obj.start_point = p1
@@ -14,6 +14,7 @@ def make_trapezoidal_slab(p1, p2, layer, design_type, swl, swr, ewl, ewr):
 	obj.start_width_right = swr
 	obj.end_width_left = ewl
 	obj.end_width_right = ewr
+	obj.height = height
 	if FreeCAD.GuiUp:
 		_ViewProviderStrip(obj.ViewObject)
 	FreeCAD.ActiveDocument.recompute()
@@ -23,7 +24,7 @@ def make_trapezoidal_slab(p1, p2, layer, design_type, swl, swr, ewl, ewr):
 class TrapezoidalSlab:
 	def __init__(self, obj):
 		obj.Proxy = self
-		self.Type = 'TrapezoidalSlab'
+		self.Type = 'trapezoidal_slab'
 		self.set_properties(obj)
 
 	def set_properties(self, obj):
@@ -75,6 +76,12 @@ class TrapezoidalSlab:
 				"end_width_right",
 				"TrapezoidalSlab",
 				)
+		if not hasattr(obj, "height"):
+			obj.addProperty(
+			"App::PropertyLength",
+			"height",
+			"slab",
+			)
 		if not hasattr(obj, "angle"):
 			obj.addProperty(
 				"App::PropertyAngle",
@@ -84,6 +91,12 @@ class TrapezoidalSlab:
 			obj.addProperty(
 				"Part::PropertyPartShape",
 				"plane",
+				"TrapezoidalSlab",
+				)
+		if not hasattr(obj, "solid"):
+			obj.addProperty(
+				"Part::PropertyPartShape",
+				"solid",
 				"TrapezoidalSlab",
 				)
 
@@ -125,6 +138,7 @@ class TrapezoidalSlab:
 		points.append(FreeCAD.Vector(x, y, 0))
 		points.append(points[0])
 		obj.plane = Part.Face(Part.makePolygon(points))
+		obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
 
 class _ViewProviderStrip:
@@ -186,10 +200,10 @@ class _ViewProviderStrip:
 if __name__ == "__main__":
 	make_trapezoidal_slab(p1=FreeCAD.Vector(0, 16400, 0),
 			   p2=FreeCAD.Vector(12210, 16400, 0),
-			   layer='A',
-			   design_type='column',
 			   swl='25 cm',
 			   swr=250,
 			   ewl=250,
 			   ewr=250,
+			   layer='A',
+			   design_type='column',
 			   )
