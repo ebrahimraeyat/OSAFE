@@ -10,20 +10,20 @@ punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
 import etabs_punch
 document= FreeCAD.newDocument()
-etabs = etabs_punch.EtabsPunch()
+etabs = etabs_punch.EtabsPunch(beam_names=['114', '115', '116'])
 
 # def test_create_vectors():
 # 	etabs.create_vectors()
 # 	assert True
 
 def test_create_slabs_plane():
-	etabs.create_slabs_plane(['114', '115', '116'])
+	etabs.create_slabs_plane()
 
 def test_create_foundation():
-	etabs.create_foundation(['114', '115', '116'])
+	etabs.create_foundation()
 	assert len(etabs.foundation.Shape.Faces) > 1
 def test_create_punches():
-	etabs.create_foundation(['114', '115', '116'])
+	etabs.create_foundation()
 	# etabs.create_foundation(['21', '24', '27', '30', '39', '27'])
 	punches = etabs.create_punches()
 	document.recompute()

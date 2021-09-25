@@ -13,7 +13,6 @@ except:
 import Draft
 import FreeCAD
 import FreeCADGui as Gui
-from etabs_api import etabs_obj
 from typing import Union
 
 
@@ -23,14 +22,22 @@ class EtabsPunch(object):
             fc : int = 30,
             height : int = 800,
             width : int = 1000,
+            beam_names : Union[list, bool] = None,
+            etabs_model : Union['etabs_obj.EtabsModel' , bool] = None,
+            top_of_foundation : float = 0,
             ):
-        self.etabs = etabs_obj.EtabsModel(backup=False)
+        if etabs_model is None:
+            from etabs_api import etabs_obj
+            self.etabs = etabs_obj.EtabsModel(backup=False)
+        else:
+            self.etabs = etabs_model
         self.etabs.set_current_unit('kN', 'mm')
-        # self.SapModel = self.etabs.SapModel
         self.cover = cover
         self.fc = fc
         self.height = height
         self.width = width
+        self.beam_names = beam_names
+        self.top_of_foundation = top_of_foundation
         # self.joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         # self.base_columns_summary = self.etabs.database.get_base_column_summary_with_section_dimensions()
         # if filename:
@@ -48,26 +55,22 @@ class EtabsPunch(object):
     #     return vectors
 
     def create_slabs_plane(self,
-        beam_names : Union[list, bool] = None,
-        z=0,
         ):
         slabs = {}
-        df_beams = self.etabs.database.get_frame_points_xyz(beam_names)
+        df_beams = self.etabs.database.get_frame_points_xyz(self.beam_names)
         for _, row in df_beams.iterrows():
             slab_name = row['UniqueName']
             xi, yi = row['xi'], row['yi']
             xj, yj = row['xj'], row['yj']
-            v1 = FreeCAD.Vector(xi, yi, z)
-            v2 = FreeCAD.Vector(xj, yj, z)
+            v1 = FreeCAD.Vector(xi, yi, self.top_of_foundation)
+            v2 = FreeCAD.Vector(xj, yj, self.top_of_foundation)
             swl = swr = ewl = ewr = self.width / 2
             slabs[slab_name] = trapezoidal_slab.make_trapezoidal_slab(v1, v2, swl, swr, ewl, ewr, self.height)
         return slabs
 
     def create_foundation(self,
-        beam_names : Union[list, bool] = None,
-        z=0,
         ):
-        self.create_slabs_plane(beam_names, z)
+        self.create_slabs_plane()
         self.foundation = etabs_foundation.make_foundation(self.cover, self.fc, self.height)
 
     def create_punches(self):
@@ -96,7 +99,7 @@ class EtabsPunch(object):
                 mx = row2['MX']
                 my = row2['MY']
                 d[combo] = f"{F}, {mx}, {my}"
-            center_of_load = FreeCAD.Vector(x, y, 0)
+            center_of_load = FreeCAD.Vector(x, y, self.top_of_foundation)
             p = make_punch(
                 # foundation_plane,
                 self.foundation,
@@ -106,7 +109,7 @@ class EtabsPunch(object):
                 d,
                 )
             l = p.Location
-            pl = FreeCAD.Vector(0, 0, 4100)
+            pl = FreeCAD.Vector(0, 0, self.top_of_foundation + 4100)
             t = '0.0'
             version = FreeCAD.Version()[1]
             if int(version) < 19:

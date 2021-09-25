@@ -29,9 +29,16 @@ class FrameObj:
     def is_beam(self, name):
         return self.SapModel.FrameObj.GetDesignOrientation(name)[0] == 2
 
+    def is_frame_on_story(self, frame, story=None):
+        if story is None:
+            return True
+        st = self.SapModel.FrameObj.GetLabelFromName(frame)[1]
+        return st == story
+
     def get_beams_columns(
             self,
             type_=2,
+            story : Union[str, bool] = None,
             ):
         '''
         type_: 1=steel and 2=concrete
@@ -40,7 +47,10 @@ class FrameObj:
         columns = []
         others = []
         for label in self.SapModel.FrameObj.GetLabelNameList()[1]:
-            if self.SapModel.FrameObj.GetDesignProcedure(label)[0] == type_: 
+            if (
+                self.SapModel.FrameObj.GetDesignProcedure(label)[0] == type_ and
+                self.is_frame_on_story(label, story)
+                ): 
                 if self.is_column(label):
                     columns.append(label)
                 elif self.is_beam(label):
