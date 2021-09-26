@@ -38,11 +38,7 @@ class CivilPdf:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_pdf",
             "export to pdf")
-        rel_path = "Mod/Civil/safe/punch/icon/pdf.svg"
-        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        import os
-        if not os.path.exists(path):
-            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "pdf.svg")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -67,11 +63,7 @@ class CivilPictur:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_pic",
             "export to picture")
-        rel_path = "Mod/Civil/safe/punch/icon/png.png"
-        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        import os
-        if not os.path.exists(path):
-            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "png.png")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -89,11 +81,7 @@ class CivilExcel:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_excel",
             "export the result of punches to excel")
-        rel_path = "Mod/Civil/safe/punch/icon/xlsx.png"
-        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        import os
-        if not os.path.exists(path):
-            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "xlsx.png")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -123,11 +111,7 @@ class CivilDxf:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_dxf",
             "export the result to dxf")
-        rel_path = "Mod/Civil/safe/punch/Resources/icons/dxf.svg"
-        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        import os
-        if not os.path.exists(path):
-            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "dxf.svg")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -136,6 +120,9 @@ class CivilDxf:
         doc = FreeCAD.ActiveDocument
         filename = get_save_filename('.dxf')
         export.to_dxf(doc, filename)
+
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
 
 
 class CivilDocx:
@@ -147,11 +134,7 @@ class CivilDocx:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_docx",
             "export the result to Word")
-        rel_path = "Mod/Civil/safe/punch/Resources/icons/word.png"
-        path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-        import os
-        if not os.path.exists(path):
-            path = FreeCAD.ConfigGet("UserAppData") + rel_path
+        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "word.png")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}

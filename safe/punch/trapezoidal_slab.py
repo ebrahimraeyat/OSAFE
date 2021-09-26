@@ -1,4 +1,5 @@
 import math
+from pathlib import Path
 import Part
 import FreeCAD
 
@@ -178,10 +179,7 @@ class _ViewProviderStrip:
 		return
 
 	def getIcon(self):
-		''' Return the icon in XMP format which will appear in the tree view. This method is optional
-		and if not defined a default icon is shown.
-		'''
-		return None
+		return str(Path(__file__).parent / "Resources" / "icons" / "trapozeidal.svg")
 
 	def __getstate__(self):
 		''' When saving the document this object gets stored using Python's cPickle module.

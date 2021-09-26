@@ -1,10 +1,10 @@
 import math
+from pathlib import Path
 from typing import Union
 import FreeCAD
 import Part
 import FreeCADGui as Gui
 import PySide2
-# from PySide.QtCore import QT_TRANSLATE_NOOP
 
 try:
 	from safe.punch import punch_funcs
@@ -312,12 +312,7 @@ class ViewProviderPunch:
 		''' Return the icon in XMP format which will appear in the tree view. This method is optional
 		and if not defined a default icon is shown.
 		'''
-		rel_path = "Mod/Civil/images/punch.svg"
-		icon_path = FreeCAD.ConfigGet("AppHomePath") + rel_path
-		import os
-		if not os.path.exists(icon_path):
-			icon_path = FreeCAD.ConfigGet("UserAppData") + rel_path
-		return icon_path
+		return str(Path(__file__).parent / "Resources" / "icons" / "punch.svg")
 
 	def __getstate__(self):
 		''' When saving the document this object gets stored using Python's cPickle module.
