@@ -73,8 +73,7 @@ class Foundation:
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
 		new_shape = tape_slabs[0].solid
-		for i in tape_slabs[1:]:
-			new_shape = new_shape.fuse(i.solid)
+		new_shape = new_shape.fuse([i.solid for i in tape_slabs[1:]])
 		if len(obj.openings) > 0:
 			new_shape = new_shape.cut([o.Shape for o in obj.openings])
 		obj.Shape = new_shape.removeSplitter()
