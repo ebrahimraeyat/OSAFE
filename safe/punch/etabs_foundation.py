@@ -54,6 +54,12 @@ class Foundation:
 				"plane",
 				"Foundation",
 				)
+		if not hasattr(obj, "openings"):
+			obj.addProperty(
+				"App::PropertyLinkList",
+				"openings",
+				"Foundation",
+				)
 
 	def execute(self, obj):
 		doc = obj.Document
@@ -69,6 +75,8 @@ class Foundation:
 		new_shape = tape_slabs[0].solid
 		for i in tape_slabs[1:]:
 			new_shape = new_shape.fuse(i.solid)
+		if len(obj.openings) > 0:
+			new_shape = new_shape.cut([o.Shape for o in obj.openings])
 		obj.Shape = new_shape.removeSplitter()
 		for f in obj.Shape.Faces:
 			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
@@ -114,7 +122,8 @@ class ViewProviderFoundation:
 		return None
 
 	def claimChildren(self):
-		children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.tape_slabs]
+		children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.tape_slabs] + \
+				[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
 		return children
 
 def make_foundation(

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from safe.punch.etabs_foundation import Foundation
 from PySide2 import QtCore
 from PySide2.QtWidgets import QMessageBox
 import FreeCAD
@@ -214,10 +215,20 @@ class CivilOpeningEtabs:
         points = etabs.select_obj.get_selected_obj_type(1)
         if len(points) > 2:
             points_xyz = list(etabs.points.get_points_coords(points).values())
+        height = 2000
+        foun = None
+        doc = FreeCAD.ActiveDocument
+        if hasattr(doc, 'Foundation'):
+            foun = doc.Foundation
+            height = foun.height.Value
         points_xy0 = [(p[0], p[1], 0) for p in points_xyz]
         points_vec = [FreeCAD.Vector(*p) for p in points_xy0]
-        opening.make_opening(points=points_vec)
-
+        opening_obj = opening.make_opening(points=points_vec, height=height)
+        if foun is not None:
+            opening_objs = foun.openings + [opening_obj]
+            foun.openings = opening_objs
+        doc.recompute()
+        
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
