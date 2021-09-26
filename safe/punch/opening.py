@@ -72,9 +72,9 @@ class Opening:
 class _ViewProviderOpening:
     def __init__(self, vobj):
         vobj.Proxy = self
-        vobj.Transparency = 50
+        vobj.Transparency = 70
         vobj.ShapeColor = (0.00,1.00,1.00)
-        vobj.DisplayMode = "Flat Lines"
+        vobj.DisplayMode = "Shaded"
 
     def attach(self, vobj):
         self.ViewObject = vobj

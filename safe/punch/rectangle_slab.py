@@ -14,7 +14,7 @@ def make_rectangle_slab(p1, p2, width=1, height=1, extend=50, offset=0):
     obj.extend = extend
     obj.offset = offset
     if FreeCAD.GuiUp:
-        _ViewProviderStrip(obj.ViewObject)
+        ViewProviderRectangle(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -171,56 +171,23 @@ class RectangleSlab:
             new_end_point = FreeCAD.Vector(x2, y2, obj.end_point.z)
         return new_start_point, new_end_point
 
-class _ViewProviderStrip:
-    def __init__(self, obj):
-        obj.Proxy = self
-        obj.addProperty("App::PropertyBool", "show_width", "display", "")
+class ViewProviderRectangle:
+    def __init__(self, vobj):
+        vobj.Proxy = self
+        vobj.LineColor = (1.00,0.00,0.00)
+        # obj.addProperty("App::PropertyBool", "show_width", "display", "")
 
-    def attach(self, obj):
-        ''' Setup the scene sub-graph of the view provider, this method is mandatory '''
-        return
-
-    def updateData(self, fp, prop):
-        ''' If a property of the handled feature has changed we have the chance to handle this here '''
-        return
-
-    def execute(self, obj):
-        print("view execute!")
-
-    def getDisplayModes(self, obj):
-        ''' Return a list of display modes. '''
-        modes = []
-        return modes
-
-    def getDefaultDisplayMode(self):
-        ''' Return the name of the default display mode. It must be defined in getDisplayModes. '''
-        return "Flat Line"
-
-    def setDisplayMode(self, mode):
-        ''' Map the display mode defined in attach with those defined in getDisplayModes.
-        Since they have the same names nothing needs to be done. This method is optional.
-        '''
-        return mode
-
-    def onChanged(self, vp, prop):
-        ''' Print the name of the property that has changed '''
-        # FreeCAD.Console.PrintMessage("Change View property: " + str(prop) + "\n")
-        return
+    def attach(self, vobj):
+        self.ViewObject = vobj
+        self.Object = vobj.Object
 
     def getIcon(self):
         return str(Path(__file__).parent / "Resources" / "icons" / "rectangle.svg")
 
     def __getstate__(self):
-        ''' When saving the document this object gets stored using Python's cPickle module.
-        Since we have some un-pickable here -- the Coin stuff -- we must define this method
-        to return a tuple of all pickable objects or None.
-        '''
         return None
 
     def __setstate__(self, state):
-        ''' When restoring the pickled object from document we have the chance to set some
-        internals here. Since no data were pickled nothing needs to be done here.
-        '''
         return None
 
 

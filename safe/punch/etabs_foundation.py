@@ -97,6 +97,7 @@ class ViewProviderFoundation:
 
 		vobj.Proxy = self
 		vobj.Transparency = 40
+		vobj.ShapeColor = (0.32,0.42,1.00)
 		vobj.DisplayMode = "Shaded"
 
 	def attach(self, vobj):
