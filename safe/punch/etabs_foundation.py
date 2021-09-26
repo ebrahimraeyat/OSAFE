@@ -75,6 +75,7 @@ class Foundation:
 				foundation_plane = f
 				break
 		obj.plane = foundation_plane
+		obj.d = obj.height - obj.cover
         # if bool(slab_opening):
         #     print('openings')
         #     base = fusion
