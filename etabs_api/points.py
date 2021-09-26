@@ -1,5 +1,4 @@
-from typing import Union
-
+from typing import Iterable, Union
 
 class Points:
     def __init__(
@@ -34,4 +33,13 @@ class Points:
         import math
         d = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         return d
+
+    def get_points_coords(self, points : Iterable):
+        points_xyz = {}
+        for p in points:
+            x, y, z, _ = self.SapModel.PointObj.GetCoordCartesian(p)
+            points_xyz[p] = (x, y, z)
+        return points_xyz
+
+
 

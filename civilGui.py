@@ -97,7 +97,6 @@ class CivilExcel:
         filename = get_save_filename('.xlsx')
         export.to_excel(punches, filename)
 
-
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
@@ -115,6 +114,7 @@ class CivilDxf:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
+    
     def Activated(self):
         from safe.punch import export
         doc = FreeCAD.ActiveDocument
@@ -189,6 +189,37 @@ class CivilEtabs:
 
     def IsActive(self):
         return True
+
+
+class CivilOpeningEtabs:
+
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "civil",
+            "Add openning From Etabs")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "civil",
+            "create an opening from selected points in etabs model")
+        path = str(
+                   Path(civilwelcome.__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "opening.svg"
+                   )
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    
+    def Activated(self):
+        from safe.punch import opening
+        from etabs_api import etabs_obj
+        etabs = etabs_obj.EtabsModel(backup=False)
+        points = etabs.select_obj.get_selected_obj_type(1)
+        if len(points) > 2:
+            points_xyz = list(etabs.points.get_points_coords(points).values())
+        points_xy0 = [(p[0], p[1], 0) for p in points_xyz]
+        points_vec = [FreeCAD.Vector(*p) for p in points_xy0]
+        opening.make_opening(points=points_vec)
+
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
 
 
 class CivilHelp:
@@ -292,6 +323,7 @@ class SerialForm:
         self.form = Gui.PySideUic.loadUi(serial_ui)
 
 Gui.addCommand('Civil_etabs', CivilEtabs())
+Gui.addCommand('Civil_opening_etabs', CivilOpeningEtabs())
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
@@ -304,6 +336,7 @@ Gui.addCommand('Civil_dxf', CivilDxf())
 
 command_list = [
             "Civil_etabs",
+            "Civil_opening_etabs",
             "Copy",
             "Civil_pdf",
             "Civil_pic",
