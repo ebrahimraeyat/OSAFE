@@ -25,14 +25,14 @@
         <item>
          <widget class="QRadioButton" name="mat">
           <property name="text">
-           <string>Mat</string>
+           <string>Mat Foundation</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="tape">
           <property name="text">
-           <string>Tape</string>
+           <string>Strip Foundation</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -51,7 +51,7 @@
               <string>All Beams</string>
              </property>
              <property name="checked">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -61,7 +61,7 @@
               <string>Selected Beams</string>
              </property>
              <property name="checked">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -80,7 +80,7 @@
           <item>
            <widget class="QLabel" name="story_label">
             <property name="text">
-             <string>Story</string>
+             <string>From Story</string>
             </property>
            </widget>
           </item>
@@ -212,7 +212,7 @@
      <item>
       <widget class="QPushButton" name="import_button">
        <property name="text">
-        <string>Import</string>
+        <string>import</string>
        </property>
       </widget>
      </item>
