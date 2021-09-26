@@ -243,3 +243,9 @@ def get_user_location_faces(
 		if normal in normals:
 			new_faces.append(f)
 	return new_faces
+
+def sort_vertex(coords):
+	from functools import reduce
+	import operator
+	center = tuple(map(operator.truediv, reduce(lambda x, y: map(operator.add, x, y), coords), [len(coords)] * 2))
+	return sorted(coords, key=lambda coord: (-135 - math.degrees(math.atan2(*tuple(map(operator.sub, coord, center))[::-1]))) % 360)

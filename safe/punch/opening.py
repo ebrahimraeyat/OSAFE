@@ -1,10 +1,13 @@
-import math
 from pathlib import Path
 import Part
 import FreeCAD
-from etabs_api.frame_obj import FrameObj
+try:
+    from safe.punch.punch_funcs import sort_vertex
+except:
+    from punch_funcs import sort_vertex
 
-def make_opening(points, height):
+
+def make_opening(points, height=2000):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Opening")
     Opening(obj)
     obj.points = points
@@ -57,7 +60,11 @@ class Opening:
         return
 
     def execute(self, obj):
-        points = obj.points + [obj.points[0]]
+        z = obj.points[0].z
+        points_xy = sort_vertex([[p.x, p.y] for p in obj.points])
+        points_vec = [FreeCAD.Vector(p[0], p[1], z) for p in points_xy]
+    
+        points = points_vec + [points_vec[0]]
         obj.plane = Part.Face(Part.makePolygon(points))
         obj.Shape = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
