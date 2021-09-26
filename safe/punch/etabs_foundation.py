@@ -83,16 +83,6 @@ class Foundation:
 				break
 		obj.plane = foundation_plane
 		obj.d = obj.height - obj.cover
-        # if bool(slab_opening):
-        #     print('openings')
-        #     base = fusion
-        #     for opening in slab_opening:
-        #         cut = doc.addObject("Part::Cut", "Cut")
-        #         cut.Base = base
-        #         cut.Tool = opening
-        #         base = cut
-        #     return cut
-        # return fusion
 
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self

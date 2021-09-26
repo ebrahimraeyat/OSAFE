@@ -4,14 +4,13 @@ import Part
 import FreeCAD
 from etabs_api.frame_obj import FrameObj
 
-def make_rectangle_slab(p1, p2, width=1, height=1, extend=50, offset=0):
+def make_rectangle_slab(p1, p2, width=1, height=1, offset=0):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Slab")
     RectangleSlab(obj)
     obj.start_point = p1
     obj.end_point = p2
     obj.width = width
     obj.height = height
-    obj.extend = extend
     obj.offset = offset
     if FreeCAD.GuiUp:
         ViewProviderRectangle(obj.ViewObject)
@@ -62,12 +61,6 @@ class RectangleSlab:
             "angle",
             "slab",
             )
-        if not hasattr(obj, "extend"):
-            obj.addProperty(
-            "App::PropertyLength",
-            "extend",
-            "slab",
-            )
         if not hasattr(obj, "plane"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -93,15 +86,10 @@ class RectangleSlab:
         self.create_width(obj)
 
     def create_width(self, obj):
-        new_start_point, new_end_point = self.get_new_points(obj)
+        xs, ys, xe, ye = self.get_new_points(obj)
         points = []
-        xs = new_start_point.x
-        ys = new_start_point.y
-        xe = new_end_point.x
-        ye = new_end_point.y
         w = obj.width.Value / 2
         teta = obj.angle
-        # FreeCAD.Console.PrintMessage(f"teta = {teta}")
         _sin = math.sin(teta)
         _cos = math.cos(teta)
         x = xs - w * _sin
@@ -121,55 +109,16 @@ class RectangleSlab:
         obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
     def get_new_points(self, obj):
-        xs = obj.start_point.x
-        ys = obj.start_point.y
-        xe = obj.end_point.x
-        ye = obj.end_point.y
-        new_start_point = obj.start_point
-        new_end_point = obj.end_point
-        if obj.extend.Value > 0:
-            delta_x = xe - xs
-            delta_y = ye - ys
-            d = obj.start_point.distanceToPoint(obj.end_point)
-            if delta_x == 0:
-                dx = 0
-                dy = obj.extend.Value
-                new_start_point = obj.start_point.add(FreeCAD.Vector(dx, -dy, 0))
-                new_d = new_start_point.distanceToPoint(obj.end_point)
-                if new_d > d:
-                    new_end_point = obj.end_point.add(FreeCAD.Vector(dx, dy, 0))
-                else:
-                    new_start_point = obj.start_point.add(FreeCAD.Vector(dx, dy, 0))
-                    new_end_point = obj.end_point.add(FreeCAD.Vector(dx, -dy, 0))
-            else:
-                m = delta_y / delta_x
-                dx = obj.extend.Value / math.sqrt(1 + m ** 2)
-                dy = m * abs(dx)
-                if m >= 0:
-                    if xe > xs:
-                        new_start_point = obj.start_point.add(FreeCAD.Vector(-dx, -dy, 0))
-                        new_end_point = obj.end_point.add(FreeCAD.Vector(dx, dy, 0))
-                    else:
-                        new_start_point = obj.start_point.add(FreeCAD.Vector(dx, dy, 0))
-                        new_end_point = obj.end_point.add(FreeCAD.Vector(-dx, -dy, 0))
-                elif m < 0:
-                    if xe > xs:
-                        new_start_point = obj.start_point.add(FreeCAD.Vector(-dx, dy, 0))
-                        new_end_point = obj.end_point.add(FreeCAD.Vector(dx, -dy, 0))
-                    else:
-                        new_start_point = obj.start_point.add(FreeCAD.Vector(dx, -dy, 0))
-                        new_end_point = obj.end_point.add(FreeCAD.Vector(-dx, dy, 0))
+        x1 = obj.start_point.x
+        y1 = obj.start_point.y
+        x2 = obj.end_point.x
+        y2 = obj.end_point.y
         if obj.offset != 0:
             neg = False if obj.offset >= 0 else True
-            x1 = new_start_point.x
-            y1 = new_start_point.y
-            x2 = new_end_point.x
-            y2 = new_end_point.y
             distance = abs(obj.offset)
             x1, y1, x2, y2 = FrameObj.offset_frame_points(x1, y1, x2, y2, distance, neg)
-            new_start_point = FreeCAD.Vector(x1, y1, obj.start_point.z)
-            new_end_point = FreeCAD.Vector(x2, y2, obj.end_point.z)
-        return new_start_point, new_end_point
+        return x1, y1, x2, y2
+
 
 class ViewProviderRectangle:
     def __init__(self, vobj):
