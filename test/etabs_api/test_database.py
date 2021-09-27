@@ -128,3 +128,8 @@ def test_get_section_cuts_angle(shayesteh):
 def test_get_basepoints_coord_and_dims(shayesteh):
     d = shayesteh.database.get_basepoints_coord_and_dims()
     assert len(d) == 11
+
+@pytest.mark.getmethod
+def test_get_frame_points_xyz(shayesteh):
+    d = shayesteh.database.get_frame_points_xyz(frames=('114', '115'))
+    assert len(d) == 2

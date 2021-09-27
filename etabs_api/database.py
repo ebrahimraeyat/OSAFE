@@ -430,10 +430,16 @@ class DatabaseTables:
     def get_joint_design_reactions(self):
         self.select_design_load_combinations()
         table_key = 'Joint Design Reactions'
-        cols = ['UniqueName', 'OutputCase', 'StepType', 'FZ', 'MX', 'MY']
-        df = self.read(table_key, to_dataframe=True, cols=cols)
-        df['StepType'].fillna('Max', inplace=True)
-        df['OutputCase'] = df['OutputCase'] + '_' + df['StepType']
+        df = self.read(table_key, to_dataframe=True)
+        if 'StepType' in df.columns:
+            cols = ['UniqueName', 'OutputCase', 'StepType', 'FZ', 'MX', 'MY']
+            df = df[cols]
+            df['StepType'].fillna('Max', inplace=True)
+            df['OutputCase'] = df['OutputCase'] + '_' + df['StepType']
+            df.drop(columns=['StepType'], inplace=True)
+        else:
+            cols = ['UniqueName', 'OutputCase', 'FZ', 'MX', 'MY']
+            df = df[cols]
         return df
 
     def get_frame_assignment_summary(self):
