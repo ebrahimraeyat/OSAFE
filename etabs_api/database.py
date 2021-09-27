@@ -436,8 +436,15 @@ class DatabaseTables:
 
     def get_frame_assignment_summary(self):
         table_key = 'Frame Assignments - Summary'
-        cols = ['Story', 'Label', 'UniqueName', 'Type', 'DesignSect', 'AxisAngle']
-        df = self.read(table_key, to_dataframe=True, cols=cols)
+        df = self.read(table_key, to_dataframe=True)
+        if 'AxisAngle' in df.columns:
+            cols = ['Story', 'Label', 'UniqueName', 'Type', 'DesignSect', 'AxisAngle']
+            df = df[cols]
+            df['AxisAngle'].fillna(0, inplace=True)
+        else:
+            cols = ['Story', 'Label', 'UniqueName', 'Type', 'DesignSect']
+            df = df[cols]
+            df['AxisAngle'] = 0
         return df
 
     def get_base_columns_summary(self):
@@ -559,5 +566,5 @@ if __name__ == '__main__':
     from etabs_obj import EtabsModel
     etabs = EtabsModel()
     SapModel = etabs.SapModel
-    ret = etabs.database.get_basepoints_coord_and_dims()
+    ret = etabs.database.get_frame_assignment_summary()
     print('Wow')
