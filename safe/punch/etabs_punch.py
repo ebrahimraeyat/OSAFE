@@ -94,7 +94,7 @@ class EtabsPunch(object):
             df = joint_design_reactions[joint_design_reactions['UniqueName'] == name]
             for _, row2 in df.iterrows():
                 combo = row2['OutputCase']
-                F = row2['FX']
+                F = row2['FZ']
                 mx = row2['MX']
                 my = row2['MY']
                 d[combo] = f"{F}, {mx}, {my}"

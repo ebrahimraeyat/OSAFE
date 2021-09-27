@@ -430,8 +430,10 @@ class DatabaseTables:
     def get_joint_design_reactions(self):
         self.select_design_load_combinations()
         table_key = 'Joint Design Reactions'
-        cols = ['UniqueName', 'OutputCase', 'FX', 'MX', 'MY']
+        cols = ['UniqueName', 'OutputCase', 'StepType', 'FZ', 'MX', 'MY']
         df = self.read(table_key, to_dataframe=True, cols=cols)
+        df['StepType'].fillna('Max', inplace=True)
+        df['OutputCase'] = df['OutputCase'] + '_' + df['StepType']
         return df
 
     def get_frame_assignment_summary(self):
@@ -566,5 +568,5 @@ if __name__ == '__main__':
     from etabs_obj import EtabsModel
     etabs = EtabsModel()
     SapModel = etabs.SapModel
-    ret = etabs.database.get_frame_assignment_summary()
+    ret = etabs.database.get_joint_design_reactions()
     print('Wow')
