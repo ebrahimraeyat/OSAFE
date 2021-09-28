@@ -60,6 +60,12 @@ class Foundation:
 				"openings",
 				"Foundation",
 				)
+		if not hasattr(obj, "foundation_type"):
+			obj.addProperty(
+				"App::PropertyEnumeration",
+				"foundation_type",
+				"Foundation",
+				).foundation_type = ['Strip', 'Mat']
 
 	def execute(self, obj):
 		doc = obj.Document
@@ -74,14 +80,23 @@ class Foundation:
 		obj.tape_slabs = tape_slabs
 		new_shape = tape_slabs[0].solid
 		new_shape = new_shape.fuse([i.solid for i in tape_slabs[1:]])
-		if len(obj.openings) > 0:
-			new_shape = new_shape.cut([o.Shape for o in obj.openings])
-		obj.Shape = new_shape.removeSplitter()
-		for f in obj.Shape.Faces:
+		new_shape = new_shape.removeSplitter()
+		for f in new_shape.Faces:
 			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
 				foundation_plane = f
 				break
-		obj.plane = foundation_plane
+		if obj.foundation_type == 'Strip':
+			plan = foundation_plane
+		elif obj.foundation_type == 'Mat':
+			plan = Part.Face(foundation_plane.OuterWire)
+		new_shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+		if len(obj.openings) > 0:
+			new_shape = new_shape.cut([o.Shape for o in obj.openings])
+		obj.Shape = new_shape
+		for f in new_shape.Faces:
+			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+				obj.plane = f
+				break
 		obj.d = obj.height - obj.cover
 
 	def onDocumentRestored(self, obj):
@@ -119,6 +134,7 @@ def make_foundation(
 	cover: float = 75,
 	fc: int = 25,
 	height : int = 800,
+	foundation_type : str = 'Strip',
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
 	# obj = FreeCAD.ActiveDocument.addObject("Part::MultiFuse", "Fusion")
@@ -129,6 +145,7 @@ def make_foundation(
 	obj.fc = f"{fc} MPa"
 	obj.height = height
 	obj.d = height - cover
+	obj.foundation_type = foundation_type
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 

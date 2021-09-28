@@ -1,13 +1,7 @@
-import sys
-import FreeCAD
+from pathlib import Path
+
 import FreeCADGui as Gui
 
-# from PySide2.QtCore import *
-# from PySide2.QtGui import *
-# from PySide2.QtWidgets import *
-from safe.punch import geom
-from pathlib import Path
-# from safe.punch.colorbar import ColorMap
 punch_path = Path(__file__).parent.parent
 from etabs_api import etabs_obj
 
@@ -22,31 +16,22 @@ class EtabsTaskPanel:
 
     def create_connections(self):
         self.form.import_button.clicked.connect(self.import_from_etabs)
-        self.form.mat.clicked.connect(self.update_ui)
-        self.form.tape.clicked.connect(self.update_ui)
 
     def set_story(self):
         stories = self.etabs.SapModel.Story.GetNameList()[1]
         self.form.story.addItems(stories)
         self.form.story.setCurrentIndex(len(stories) - 1)
 
-    def update_ui(self):
-        if self.form.mat.isChecked():
-            self.form.beams_group.setEnabled(False)
-            self.form.width_label.setEnabled(False)
-            self.form.width_spinbox.setEnabled(False)
-        elif self.form.tape.isChecked():
-            self.form.beams_group.setEnabled(True)
-            self.form.width_label.setEnabled(True)
-            self.form.width_spinbox.setEnabled(True)
-
     def import_from_etabs(self):
-        # sys.path.insert(0, str(punch_path))
         from safe.punch import etabs_punch
         cover = self.form.cover.value() * 10
         fc = self.form.fc.value()
         height = self.form.height_spinbox.value() * 10
         width = self.form.width_spinbox.value() * 10
+        if self.form.mat.isChecked():
+            foundation_type = 'Mat'
+        elif self.form.strip.isChecked():
+            foundation_type = 'Strip'
         story = self.form.story.currentText()
         selected_beams = self.form.selected_beams.isChecked()
         exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
@@ -67,7 +52,8 @@ class EtabsTaskPanel:
                 height = height,
                 width = width,
                 etabs_model = self.etabs,
-                beam_names = beams_names
+                beam_names = beams_names,
+                foundation_type = foundation_type,
             )
         punch.import_data()
 

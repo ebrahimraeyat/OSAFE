@@ -25,6 +25,7 @@ class EtabsPunch(object):
             beam_names : Union[list, bool] = None,
             etabs_model : Union['etabs_obj.EtabsModel' , bool] = None,
             top_of_foundation : float = 0,
+            foundation_type : str = 'Strip',
             ):
         if etabs_model is None:
             from etabs_api import etabs_obj
@@ -38,6 +39,7 @@ class EtabsPunch(object):
         self.width = width
         self.beam_names = beam_names
         self.top_of_foundation = top_of_foundation
+        self.foundation_type = foundation_type
         # self.joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         # self.base_columns_summary = self.etabs.database.get_base_column_summary_with_section_dimensions()
         # if filename:
@@ -70,7 +72,7 @@ class EtabsPunch(object):
     def create_foundation(self,
         ):
         self.create_slabs_plane()
-        self.foundation = etabs_foundation.make_foundation(self.cover, self.fc, self.height)
+        self.foundation = etabs_foundation.make_foundation(self.cover, self.fc, self.height, self.foundation_type)
 
     def create_punches(self):
         joint_design_reactions = self.etabs.database.get_joint_design_reactions()
