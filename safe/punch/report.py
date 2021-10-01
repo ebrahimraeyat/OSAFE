@@ -53,13 +53,13 @@ def add_key_plan_edges_to_ax(punch, ax):
 	return comp
 
 def add_column_to_ax(punch, ax):
-	xmin = punch.center_of_load.x - punch.bx / 2
-	ymin = punch.center_of_load.y - punch.by / 2
 	if FreeCAD.GuiUp:
 		color = punch.ViewObject.ShapeColor[:-1]
 	else:
 		color = (.5, 0.5, 0.5)
-	p = patches.Rectangle((xmin, ymin), punch.bx, punch.by, facecolor=color, edgecolor='black', linewidth=.8)
+	xy = [[v.X, v.Y] for v in punch.rect.Vertexes]
+	xy = punch_funcs.sort_vertex(xy)
+	p = patches.Polygon(xy, edgecolor='black', linewidth=.8, facecolor=color, closed=True)
 	ax.add_patch(p)
 
 
@@ -84,7 +84,8 @@ def add_punch_edges_dimension_to_ax(punch, ax):
 			offset = 120
 		else:
 			offset = 80
-		annotate_dim(ax,(v1.X, v1.Y), (v2.X, v2.Y), direction=loc, offset=offset)
+		annotate_dim(ax,(v1.X, v1.Y), (v2.X, v2.Y), direction=loc, offset=offset,
+			rotation=48)
 
 def set_ax_boundbox(shape, ax, scale=1, bb_add=120):
 	b = shape.BoundBox
@@ -98,12 +99,12 @@ def get_edges_direction_in_punch(punch):
 	y_center = punch.center_of_load.y
 	for e in punch.edges.Edges:
 		bb = e.BoundBox
-		if bb.XLength == 0:
+		if bb.XLength <= bb.YLength:
 			if bb.XMax > x_center:
 				edges_direction[e] = 'RIGHT'
 			elif bb.XMax < x_center:
 				edges_direction[e] = 'LEFT'
-		elif bb.YLength == 0:
+		elif bb.XLength > bb.YLength:
 			if bb.YMax > y_center:
 				edges_direction[e] = 'TOP'
 			elif bb.YMax < y_center:
@@ -147,7 +148,7 @@ def move_xy(xy, direction, dist=200):
 		return (xy[0] + dist, xy[1])
 
 
-def annotate_dim(ax,xyfrom,xyto, direction='TOP', offset=200, text=None):
+def annotate_dim(ax,xyfrom,xyto, direction='TOP', offset=200, text=None, rotation=0):
 	'''
 	direction: dimension arrow offset. can be: 'TOP', 'BOT', 'LEFT', 'RIGHT'
 	'''
@@ -160,7 +161,9 @@ def annotate_dim(ax,xyfrom,xyto, direction='TOP', offset=200, text=None):
 	ax.annotate("",xyfrom,xyto,arrowprops=dict(arrowstyle='<->', lw=.2, edgecolor=color))
 	ax.annotate("",xyfrom,xyto,arrowprops=dict(arrowstyle='|-|', lw=.2, edgecolor=color))
 	bbox=dict(fc="white", ec="none")
-	ax.text((xyto[0]+xyfrom[0])/2,(xyto[1]+xyfrom[1])/2,text,fontsize=7, color=color,ha="center", va="center", bbox=bbox)
+	ax.text((xyto[0]+xyfrom[0])/2,(xyto[1]+xyfrom[1])/2,text,fontsize=7,
+		color=color,ha="center", va="center", bbox=bbox,
+		rotation=rotation)
 
 def export_dataframe_to_docx(df, doc=None):
 	if not doc:

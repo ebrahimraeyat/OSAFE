@@ -5,7 +5,7 @@ import matplotlib.patches as patches
 import FreeCAD as App
 
 import safe.punch.punch_funcs as punch_funcs
-
+from safe.punch.punch_funcs import sort_vertex
 
 def createPdf(doc, pdfName):
     if not pdfName:
@@ -40,22 +40,17 @@ def createPdf(doc, pdfName):
             continue
         if 'Punch' in o.Name:
             color = o.ViewObject.ShapeColor[:-1]
-            for f in o.faces.Faces:
+            for e in o.edges.Edges:
                 # if f.ViewObject.isVisible():
                 xy = []
-                for v in f.Vertexes:
-                    if v.Z == 0:
-                        xy.append([v.X, v.Y])
+                for v in e.Vertexes:
+                    xy.append([v.X, v.Y])
                 p = patches.Polygon(xy, edgecolor='black', linewidth=.4, linestyle='--', closed=False)
                 ax1.add_patch(p)
-            xy = []
-
-            for f in o.Shape.Faces:
-                b = f.BoundBox
-                if b.ZLength == 0:
-                    xmin, ymin = b.XMin, b.YMin
-                    p = patches.Rectangle((xmin, ymin), o.bx, o.by, facecolor=color, edgecolor='black', linewidth=.3)
-                    ax1.add_patch(p)
+            xy = [[v.X, v.Y] for v in o.rect.Vertexes]
+            xy = punch_funcs.sort_vertex(xy)
+            p = patches.Polygon(xy, edgecolor='black', linewidth=.3, facecolor=color, closed=True)
+            ax1.add_patch(p)
 
             c = o.text.Placement.Base
             ha = 'right'
@@ -64,7 +59,7 @@ def createPdf(doc, pdfName):
                 ha = 'left'
             if o.Location in ('Corner3', 'Edge3', 'Corner4', 'Interier'):
                 va = 'bottom'
-            ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=0, annotation_clip=False)
+            ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=o.angle.Value, annotation_clip=False)
 
         elif 'sketch' in o.Name:
             for g in o.Geometry:
@@ -140,8 +135,8 @@ def to_dxf(
         if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
             if o.Proxy.Type == "Punch":
                 # draw rectangle column via hatch
-                vectors = punch_funcs.rectangle_vertexes(o.center_of_load, o.bx, o.by)
-                points = [(v.x, v.y) for v in vectors]
+                xy = [[v.X, v.Y] for v in o.rect.Vertexes]
+                points = punch_funcs.sort_vertex(xy)
                 hatch = msp.add_hatch()
                 hatch.rgb = [int(i * 255) for i in o.ViewObject.ShapeColor[0:-1]]
                 hatch.paths.add_polyline_path(points, is_closed=1)
@@ -155,6 +150,7 @@ def to_dxf(
                 align = get_alignment(o)
                 mtext.set_location(insert=(dx, dy, 0), attachment_point=align)
                 mtext.dxf.char_height = t.ViewObject.FontSize.Value
+                mtext.dxf.rotation = o.angle.Value
                 mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
             elif o.Proxy.Type == "Foundation":
                 b = o.Shape.BoundBox
@@ -258,4 +254,5 @@ def get_alignment(
 
 if __name__ == '__main__':
     doc = App.ActiveDocument
-    to_dxf(doc, "/home/ebi/alaki/punch.dxf")
+    createPdf(doc, "c:\\alaki\\punch.pdf")
+    to_dxf(doc, "c:\\alaki\\punch.dxf")

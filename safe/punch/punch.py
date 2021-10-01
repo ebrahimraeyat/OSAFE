@@ -83,6 +83,12 @@ class Punch:
 				"foundation_plane",
 				"Punch",
 				)
+		if not hasattr(obj, "rect"):
+			obj.addProperty(
+				"Part::PropertyPartShape",
+				"rect",
+				"Punch",
+				)
 
 		if not hasattr(obj, "foundation"):
 			obj.addProperty(
@@ -125,6 +131,12 @@ class Punch:
 							"edges",
 							"Punch",
 							)
+		if not hasattr(obj, "angle"):
+			obj.addProperty(
+			"App::PropertyAngle",
+			"angle",
+			"Column",
+			)
 
 		#obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
 		#obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
@@ -145,12 +157,17 @@ class Punch:
 		x = obj.bx + d
 		y = obj.by + d
 		offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
-		edges = punch_funcs.punch_area_edges(obj.foundation.plane, offset_shape)
-		obj.edges = Part.makeCompound(edges)
+		foun_plan = obj.foundation.plane.copy()
+		if obj.angle != 0:
+			foun_plan.rotate(
+				obj.center_of_load,
+				FreeCAD.Vector(0, 0, 1),
+				-obj.angle.Value,
+				)
+		edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
 		faces = punch_funcs.punch_faces(edges, d)
 		if obj.user_location:
 			faces = punch_funcs.get_user_location_faces(faces, obj.Location)
-		obj.faces = Part.makeCompound(faces)
 		obj.Location = punch_funcs.location_of_column(faces)
 		obj.alpha_s = self.alphas(obj.Location)
 		obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inersia(faces)
@@ -162,8 +179,29 @@ class Punch:
 		obj.gamma_vx, obj.gamma_vy = punch_funcs.gamma_v(obj.bx, obj.by)
 		obj.d = d
 		obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
+		edges = Part.makeCompound(edges)
+		obj.edges = edges.rotate(
+			obj.center_of_load,
+			FreeCAD.Vector(0, 0, 1),
+			obj.angle.Value,
+			)
+		# faces = Part.makeCompound(faces)
 		rect = punch_funcs.rectangle_face(obj.center_of_load, obj.bx, obj.by)
-		col = rect.extrude(FreeCAD.Vector(0, 0, 4000))
+		if obj.angle.Value != 0:
+			rect.rotate(
+				obj.center_of_load,
+				FreeCAD.Vector(0, 0, 1),
+				obj.angle.Value,
+			)
+		obj.rect = rect
+		col = obj.rect.extrude(FreeCAD.Vector(0, 0, 4000))
+		obj.faces = Part.makeCompound(faces)
+		if obj.angle.Value != 0:
+			faces = [f.rotate(
+					obj.center_of_load,
+					FreeCAD.Vector(0, 0, 1),
+					obj.angle.Value,
+				) for f in faces]
 		comp = Part.makeCompound(faces + [col])
 		obj.Shape = comp
 		self.punch_ratios(obj)
@@ -366,6 +404,9 @@ class ViewProviderPunch:
 		location = obj.Location
 		obj.text.Placement.Base.x = eval(xs[location])
 		obj.text.Placement.Base.y = eval(ys[location])
+		rot = FreeCAD.Rotation()
+		rot.Angle = obj.angle.Value * math.pi / 180
+		obj.text.Placement.Rotation = rot
 		if hasattr(obj.text.ViewObject, "Justification"):
 			obj.text.ViewObject.Justification = justifications[location]
 		if location in ("Edge3", "Interier"):
@@ -427,6 +468,7 @@ def make_punch(
 	center: FreeCAD.Vector,
 	combos_load: dict,
 	location: str = 'Corner1',
+	angle : float = 0,
 	):
 
 	p = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Punch")
@@ -441,7 +483,7 @@ def make_punch(
 	p.fc = foun_obj.fc
 	p.combos_load = combos_load
 	p.Location = location
-
+	p.angle = angle
 	FreeCAD.ActiveDocument.recompute()
 
 	return p

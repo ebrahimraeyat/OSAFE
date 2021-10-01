@@ -545,8 +545,11 @@ class DatabaseTables:
         st2.index = base_columns_df['UniqueName']
         st3 = pd.Series(base_columns_df['t3'])
         st3.index = base_columns_df['UniqueName']
+        s_axisangle = pd.Series(base_columns_df['AxisAngle'])
+        s_axisangle.index = base_columns_df['UniqueName']
         df['t2'] = df['column'].map(st2)
         df['t3'] = df['column'].map(st3)
+        df['AxisAngle'] = df['column'].map(s_axisangle)
         return df
 
     def get_point_connectivity_with_type(self, point, type_=2):

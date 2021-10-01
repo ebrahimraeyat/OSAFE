@@ -89,6 +89,7 @@ class EtabsPunch(object):
             name = row['UniqueName']
             bx = float(row['t2'])
             by = float(row['t3'])
+            angle = float(row['AxisAngle'])
             x = row['x']
             y = row['y']
             # z = row['z']
@@ -108,6 +109,7 @@ class EtabsPunch(object):
                 by,
                 center_of_load,
                 d,
+                angle=angle,
                 )
             l = p.Location
             pl = FreeCAD.Vector(0, 0, self.top_of_foundation + 4100)
