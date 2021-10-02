@@ -73,6 +73,12 @@ class RectangleSlab:
                 "solid",
                 "slab",
                 )
+        if not hasattr(obj, "points"):
+            obj.addProperty(
+                "Part::PropertyVectorList",
+                "points",
+                "slab",
+                )
 
     def onChanged(self, obj, prop):
         return
@@ -104,6 +110,7 @@ class RectangleSlab:
         x = xe - w * _sin
         y = ye + w * _cos
         points.append(FreeCAD.Vector(x, y, 0))
+        obj.points = points
         points.append(points[0])
         obj.plane = Part.Face(Part.makePolygon(points))
         obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))

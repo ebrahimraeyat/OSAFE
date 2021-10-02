@@ -21,6 +21,7 @@ from etabs_api.points import Points
 from etabs_api.group import Group
 from etabs_api.select_obj import SelectObj
 from etabs_api.material import Material
+from etabs_api.area import Area
 
 __all__ = ['EtabsModel']
 
@@ -33,12 +34,13 @@ class EtabsModel:
                 self,
                 attach_to_instance: bool = True,
                 backup : bool = True,
+                software : str = 'ETABS' # 'SAFE'
                 # model_path: Path = '',
                 # etabs_path: Path = '',
                 ):
         if attach_to_instance:
             try:
-                self.etabs = comtypes.client.GetActiveObject("CSI.ETABS.API.ETABSObject")
+                self.etabs = comtypes.client.GetActiveObject(f"CSI.{software}.API.ETABSObject")
                 self.success = True
             except (OSError, comtypes.COMError):
                 print("No running instance of the program found or failed to attach.")
@@ -83,6 +85,7 @@ class EtabsModel:
             self.group = Group(self)
             self.select_obj = SelectObj(self)
             self.material = Material(self)
+            self.area = Area(self)
     
     def close_etabs(self):
         self.SapModel.SetModelIsLocked(False)

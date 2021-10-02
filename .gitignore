@@ -117,3 +117,12 @@ venv.bak/
 *.toc
 *.xdv
 *.fdb_latexmk
+
+# ETABS
+*.$et
+*.ico
+*.ebk
+
+# test
+test/etabs_api/test.*
+
