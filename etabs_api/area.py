@@ -17,8 +17,10 @@ class Area:
         self.etabs = etabs
         self.SapModel = etabs.SapModel
 
-    def export_freecad_slabs(self, doc : 'App.Document'):
+    def export_freecad_slabs(self, doc : 'App.Document' = None):
         self.etabs.set_current_unit('kN', 'mm')
+        if doc is None:
+            doc = FreeCAD.ActiveDocument
         foun = doc.Foundation
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs
@@ -41,7 +43,11 @@ class Area:
         zs = [p.z for p in points]
         self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
 
-    def export_freecad_openings(self, openings):
+    def export_freecad_openings(self, doc : 'App.Document' = None):
+        self.etabs.set_current_unit('kN', 'mm')
+        if doc is None:
+            doc = FreeCAD.ActiveDocument
+        openings = doc.Foundation.openings
         for opening in openings:
             points = opening.points
             n = len(points)
