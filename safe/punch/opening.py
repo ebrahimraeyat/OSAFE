@@ -63,6 +63,7 @@ class Opening:
         z = obj.points[0].z
         points_xy = sort_vertex([[p.x, p.y] for p in obj.points])
         points_vec = [FreeCAD.Vector(p[0], p[1], z) for p in points_xy]
+        obj.points = points_vec
         points = points_vec + [points_vec[0]]
         obj.plane = Part.Face(Part.makePolygon(points))
         obj.Shape = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))

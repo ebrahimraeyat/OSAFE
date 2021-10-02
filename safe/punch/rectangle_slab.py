@@ -75,11 +75,11 @@ class RectangleSlab:
                 )
         if not hasattr(obj, "points"):
             obj.addProperty(
-                "Part::PropertyVectorList",
+                "App::PropertyVectorList",
                 "points",
                 "slab",
                 )
-
+        
     def onChanged(self, obj, prop):
         return
 

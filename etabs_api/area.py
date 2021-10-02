@@ -12,7 +12,7 @@ class Area:
     def export_freecad_slabs(self, slabs):
         self.etabs.set_current_unit('kN', 'mm')
         for slab in slabs:
-            points = slab.plane.Vertexes
+            points = slab.points
             n = len(points)
             xs = [p.X for p in points]
             ys = [p.Y for p in points]
@@ -21,7 +21,7 @@ class Area:
 
     def export_freecad_openings(self, openings):
         for opening in openings:
-            points = opening.plane.Vertexes
+            points = opening.points
             n = len(points)
             xs = [p.X for p in points]
             ys = [p.Y for p in points]
