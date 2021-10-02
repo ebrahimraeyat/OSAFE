@@ -14,18 +14,18 @@ class Area:
         for slab in slabs:
             points = slab.points
             n = len(points)
-            xs = [p.X for p in points]
-            ys = [p.Y for p in points]
-            zs = [p.Z for p in points]
+            xs = [p.x for p in points]
+            ys = [p.y for p in points]
+            zs = [p.z for p in points]
             self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
 
     def export_freecad_openings(self, openings):
         for opening in openings:
             points = opening.points
             n = len(points)
-            xs = [p.X for p in points]
-            ys = [p.Y for p in points]
-            zs = [p.Z for p in points]
+            xs = [p.x for p in points]
+            ys = [p.y for p in points]
+            zs = [p.z for p in points]
             ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
             name = ret[3]
             self.SapModel.AreaObj.SetOpening(name, True)
@@ -38,15 +38,18 @@ if __name__ == '__main__':
     FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
     sys.path.append(FREECADPATH)
     import FreeCAD
-    filename = Path(__file__).absolute().parent.parent / 'test' / 'etabs_api' / 'test_files' / 'freecad' / '2.FCStd'
-    document= FreeCAD.openDocument(str(filename))
+    if FreeCAD.GuiUp:
+        document = FreeCAD.ActiveDocument
+    else:
+        filename = Path(__file__).absolute().parent.parent / 'test' / 'etabs_api' / 'test_files' / 'freecad' / '2.FCStd'
+        document= FreeCAD.openDocument(str(filename))
     slabs = document.Foundation.tape_slabs
     openings = document.Foundation.openings
 
     current_path = Path(__file__).parent
     sys.path.insert(0, str(current_path))
     from etabs_obj import EtabsModel
-    etabs = EtabsModel(software='SAFE')
+    etabs = EtabsModel(backup=False, software='SAFE')
     SapModel = etabs.SapModel
     ret = etabs.area.export_freecad_slabs(slabs)
     ret = etabs.area.export_freecad_openings(openings)
