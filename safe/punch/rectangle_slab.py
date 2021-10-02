@@ -3,6 +3,8 @@ from pathlib import Path
 import Part
 import FreeCAD
 from etabs_api.frame_obj import FrameObj
+from safe.punch.strip import make_strip
+
 
 def make_rectangle_slab(p1, p2, width=1, height=1, offset=0):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Slab")
@@ -12,6 +14,17 @@ def make_rectangle_slab(p1, p2, width=1, height=1, offset=0):
     obj.width = width
     obj.height = height
     obj.offset = offset
+    swl = ewl = width / 2 + offset
+    swr = ewr = width / 2 - offset
+    dx = abs(p1.x - p2.x)
+    dy = abs(p1.y - p2.y)
+    if dx > dy:
+        layer = 'A'
+    else:
+        layer = 'B'
+    strip = make_strip(p1, p2, layer, 'column',
+        swl, swr, ewl, ewr)
+    obj.strip = strip
     if FreeCAD.GuiUp:
         ViewProviderRectangle(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -79,7 +92,13 @@ class RectangleSlab:
                 "points",
                 "slab",
                 )
-        
+        if not hasattr(obj, "strip"):
+            obj.addProperty(
+                "App::PropertyLink",
+                "strip",
+                "slab",
+                )
+
     def onChanged(self, obj, prop):
         return
 
@@ -90,6 +109,16 @@ class RectangleSlab:
         v = p2 - p1
         obj.angle = math.atan2(v.y, v.x)
         self.create_width(obj)
+        if hasattr(obj, 'strip') and obj.strip is not None:
+            obj.strip.start_point = obj.start_point
+            obj.strip.end_point = obj.end_point
+            obj.strip.angle = obj.angle
+            swl = ewl = obj.width.Value / 2 + obj.offset
+            swr = ewr = obj.width.Value / 2 - obj.offset
+            obj.strip.start_width_left = swl
+            obj.strip.start_width_right = swr
+            obj.strip.end_width_left = ewl
+            obj.strip.end_width_right = ewr
 
     def create_width(self, obj):
         xs, ys, xe, ye = self.get_new_points(obj)
@@ -146,11 +175,18 @@ class ViewProviderRectangle:
     def __setstate__(self, state):
         return None
 
+    def claimChildren(self):
+        o = self.Object.strip
+        if o is not None:
+            children=[FreeCAD.ActiveDocument.getObject(o.Name)]
+            return children
+        return []
+
 
 if __name__ == "__main__":
     make_rectangle_slab(
             p1=FreeCAD.Vector(0, 0, 0),
-            p2=FreeCAD.Vector(1, 1, 0),
-            width = 5,
-            height = 3,
+            p2=FreeCAD.Vector(1000, 1000, 0),
+            width = 200,
+            height = 200,
                )
