@@ -54,6 +54,12 @@ class Foundation:
 				"plane",
 				"Foundation",
 				)
+		if not hasattr(obj, "plane_without_openings"):
+			obj.addProperty(
+				"Part::PropertyPartShape",
+				"plane_without_openings",
+				"Foundation",
+				)
 		if not hasattr(obj, "openings"):
 			obj.addProperty(
 				"App::PropertyLinkList",
@@ -89,6 +95,7 @@ class Foundation:
 			plan = foundation_plane
 		elif obj.foundation_type == 'Mat':
 			plan = Part.Face(foundation_plane.OuterWire)
+		obj.plane_without_openings = plan
 		new_shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 		if len(obj.openings) > 0:
 			new_shape = new_shape.cut([o.Shape for o in obj.openings])
