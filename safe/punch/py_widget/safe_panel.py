@@ -23,6 +23,8 @@ class SafeTaskPanel:
             etabs.area.export_freecad_slabs()
         if self.form.openings_checkbox.isChecked():
             etabs.area.export_freecad_openings()
+        if self.form.strips_checkbox.isChecked():
+            etabs.area.export_freecad_strips()
         etabs.SapModel.View.RefreshView()
 
 

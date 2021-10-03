@@ -62,12 +62,17 @@ class DatabaseTables:
             table_data += i
         return table_data
 
-    def apply_df(self, table_key, df):
-        data = list(df.values.reshape(1, df.size)[0])
-        fields = list(df.columns)
+    def apply_data(self,
+            table_key : str,
+            data : Union[list, pd.core.frame.DataFrame],
+            fields : Union[list, bool] = None,
+            ) -> None:
+        if type(data) == pd.core.frame.DataFrame:
+            fields = list(data.columns)
+            data = list(data.values.reshape(1, data.size)[0])
         self.SapModel.DatabaseTables.SetTableForEditingArray(table_key, 0, fields, 0, data)
         self.apply_table()
-
+    
     def apply_table(self):
         if self.SapModel.GetModelIsLocked():
             self.SapModel.SetModelIsLocked(False)

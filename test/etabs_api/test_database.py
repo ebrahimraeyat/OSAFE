@@ -33,6 +33,31 @@ def shayesteh(edb="shayesteh.EDB"):
         etabs = etabs_obj.EtabsModel(backup=False)
         return etabs
 
+@pytest.fixture
+def shayesteh_safe(edb="shayesteh.FDB"):
+    try:
+        etabs = etabs_obj.EtabsModel(backup=False, software='SAFE')
+        if etabs.success:
+            filepath = Path(etabs.SapModel.GetModelFilename())
+            if 'test.' in filepath.name:
+                return etabs
+            else:
+                raise NameError
+    except:
+        helper = comtypes.client.CreateObject('SAFEv1.Helper') 
+        helper = helper.QueryInterface(comtypes.gen.SAFEv1.cHelper)
+        SAFEObject = helper.CreateObjectProgID("CSI.SAFE.API.ETABSObject")
+        SAFEObject.ApplicationStart()
+        SapModel = SAFEObject.SapModel
+        SapModel.InitializeNewModel()
+        SapModel.File.OpenFile(str(Path(__file__).parent / edb))
+        asli_file_path = Path(SapModel.GetModelFilename())
+        dir_path = asli_file_path.parent.absolute()
+        test_file_path = dir_path / "test.EDB"
+        SapModel.File.Save(str(test_file_path))
+        etabs = etabs_obj.EtabsModel(backup=False)
+        return etabs
+
 def test_get_story_mass(shayesteh):
     story_mass = shayesteh.database.get_story_mass()
     assert len(story_mass) == 5
@@ -133,3 +158,9 @@ def test_get_basepoints_coord_and_dims(shayesteh):
 def test_get_frame_points_xyz(shayesteh):
     d = shayesteh.database.get_frame_points_xyz(frames=('114', '115'))
     assert len(d) == 2
+
+@pytest.mark.getmethod
+def test_get_strip_connectivity(shayesteh_safe):
+    df = shayesteh_safe.database.get_strip_connectivity()
+    assert len(df) == shayesteh_safe.SapModel.DesignConcreteSlab.DesignStrip.GetNameList()[0]
+

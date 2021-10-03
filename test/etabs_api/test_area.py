@@ -15,9 +15,9 @@ sys.path.insert(0, str(civil_path))
 from etabs_api import etabs_obj
 
 @pytest.fixture
-def shayesteh(edb="shayesteh.FDB", software='SAFE'):
+def shayesteh_safe(edb="shayesteh.FDB"):
     try:
-        etabs = etabs_obj.EtabsModel(backup=False, software=software)
+        etabs = etabs_obj.EtabsModel(backup=False, software='SAFE')
         if etabs.success:
             filepath = Path(etabs.SapModel.GetModelFilename())
             if 'test.' in filepath.name:
@@ -25,9 +25,9 @@ def shayesteh(edb="shayesteh.FDB", software='SAFE'):
             else:
                 raise NameError
     except:
-        helper = comtypes.client.CreateObject(f'{software}v1.Helper') 
-        helper = helper.QueryInterface(f'comtypes.gen.{software}v1.cHelper')
-        ETABSObject = helper.CreateObjectProgID(f"CSI.{software}.API.ETABSObject")
+        helper = comtypes.client.CreateObject('SAFEv1.Helper') 
+        helper = helper.QueryInterface('comtypes.gen.SAFEv1.cHelper')
+        ETABSObject = helper.CreateObjectProgID("CSI.SAFE.API.ETABSObject")
         ETABSObject.ApplicationStart()
         SapModel = ETABSObject.SapModel
         SapModel.InitializeNewModel()
@@ -39,10 +39,13 @@ def shayesteh(edb="shayesteh.FDB", software='SAFE'):
         etabs = etabs_obj.EtabsModel(backup=False)
         return etabs
 
-def test_export_freecad_slabs(shayesteh):
+def test_export_freecad_slabs(shayesteh_safe):
     slabs = document.Foundation.tape_slabs
-    shayesteh.area.export_freecad_slabs(slabs)
-    assert shayesteh.SapModel.AreaObj.GetNameList()[0] == len(slabs)
+    shayesteh_safe.area.export_freecad_slabs(slabs)
+    assert shayesteh_safe.SapModel.AreaObj.GetNameList()[0] == len(slabs)
+
+def test_export_freecad_strips(shayesteh_safe):
+    shayesteh_safe.area.export_freecad_strips(document)
 
 if __name__ == '__main__':
     test_export_freecad_slabs(shayesteh)
