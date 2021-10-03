@@ -38,6 +38,7 @@ class EtabsModel:
                 # model_path: Path = '',
                 # etabs_path: Path = '',
                 ):
+        self.software = software
         if attach_to_instance:
             try:
                 self.etabs = comtypes.client.GetActiveObject(f"CSI.{software}.API.ETABSObject")

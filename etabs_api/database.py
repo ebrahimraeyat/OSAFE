@@ -565,6 +565,15 @@ class DatabaseTables:
             connections[p] = self.get_point_connectivity_with_type(p, type_)
         return connections
 
+    def get_strip_connectivity(self):
+        table_key = 'Strip Object Connectivity'
+        cols = ['Name', 'NumSegs', 'StartPoint', 'EndPoint', 'WStartLeft',
+            'WStartRight', 'WEndLeft', 'WEndRight', 'AutoWiden', 'Layer']
+        if self.etabs.software == 'ETABS':
+            cols.insert(1, 'Story')
+        df = self.read(table_key, to_dataframe=True, cols=cols)
+        return df
+
     
 
 
