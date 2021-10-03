@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>131</width>
-    <height>120</height>
+    <width>151</width>
+    <height>162</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,31 @@
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Software</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="software">
+       <item>
+        <property name="text">
+         <string>SAFE</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ETABS</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">

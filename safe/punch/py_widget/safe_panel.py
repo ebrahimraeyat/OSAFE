@@ -10,18 +10,20 @@ class SafeTaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
-        self.etabs = etabs_obj.EtabsModel(backup=False, software='SAFE')
         self.create_connections()
 
     def create_connections(self):
         self.form.export_button.clicked.connect(self.export_to_safe)
 
     def export_to_safe(self):
+        software = self.form.software.currentText()
+        etabs = etabs_obj.EtabsModel(backup=False, software=software)
+        etabs.unlock_model()
         if self.form.slabs_checkbox.isChecked():
-            self.etabs.area.export_freecad_slabs()
+            etabs.area.export_freecad_slabs()
         if self.form.openings_checkbox.isChecked():
-            self.etabs.area.export_freecad_openings()
-        self.etabs.SapModel.View.RefreshView()
+            etabs.area.export_freecad_openings()
+        etabs.SapModel.View.RefreshView()
 
 
 if __name__ == '__main__':
