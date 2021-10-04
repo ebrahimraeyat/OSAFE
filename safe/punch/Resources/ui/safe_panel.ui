@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>151</width>
-    <height>164</height>
+    <height>191</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,6 +38,16 @@
     <widget class="QCheckBox" name="strips_checkbox">
      <property name="text">
       <string>Strips</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="stiff_elements_checkbox">
+     <property name="text">
+      <string>Stiff Elements</string>
      </property>
      <property name="checked">
       <bool>true</bool>

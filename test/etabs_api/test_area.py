@@ -47,5 +47,8 @@ def test_export_freecad_slabs(shayesteh_safe):
 def test_export_freecad_strips(shayesteh_safe):
     shayesteh_safe.area.export_freecad_strips(document)
 
+def test_export_freecad_stiff_elements(shayesteh_safe):
+    shayesteh_safe.area.export_freecad_stiff_elements(document)
+
 if __name__ == '__main__':
-    test_export_freecad_slabs(shayesteh)
+    test_export_freecad_stiff_elements(shayesteh)

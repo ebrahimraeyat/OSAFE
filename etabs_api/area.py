@@ -1,3 +1,6 @@
+from typing import Union
+
+
 if __name__ == '__main__':
     import sys
     FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
@@ -39,15 +42,21 @@ class Area:
         edges = Part.__sortEdges__(edges)
         for e in edges:
             v = e.firstVertex()
-        points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+            points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
         return points
 
-    def create_area_by_coord(self, points : 'Base.Vector'):
+    def create_area_by_coord(self,
+            points : 'Base.Vector',
+            prop_name : Union[str, bool] = None,
+            ):
         n = len(points)
         xs = [p.x for p in points]
         ys = [p.y for p in points]
         zs = [p.z for p in points]
-        self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
+        if prop_name is None:
+            self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
+        else:
+            self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, PropName=prop_name)
 
     def export_freecad_openings(self, doc : 'App.Document' = None):
         self.etabs.set_current_unit('kN', 'mm')
@@ -111,7 +120,24 @@ class Area:
             fields.insert(1, 'Story')
         assert len(fields) == len(data) / len(slabs)
         self.etabs.database.apply_data(table_key, data, fields)
-                
+
+    def export_freecad_stiff_elements(self, doc : 'App.Document' = None):
+        self.etabs.set_current_unit('kN', 'mm')
+        self.SapModel.PropMaterial.SetMaterial('CONCRETE_ZERO', 2)
+        self.SapModel.PropMaterial.SetWeightAndMass('CONCRETE_ZERO', 1, 0)
+        self.SapModel.PropMaterial.SetWeightAndMass('CONCRETE_ZERO', 2, 0)
+        self.SapModel.PropArea.SetSlab('COL_STIFF', 2, 2, 'CONCRETE_ZERO', 1500)
+
+        if doc is None:
+            doc = FreeCAD.ActiveDocument
+        for o in doc.Objects:
+            if (hasattr(o, "Proxy") and 
+                hasattr(o.Proxy, "Type") and 
+                o.Proxy.Type == "Punch"
+                ):
+                points = self.get_sort_points(o.rect.Edges)
+                self.create_area_by_coord(points, prop_name='COL_STIFF')
+ 
 
 if __name__ == '__main__':
     import sys
@@ -133,6 +159,6 @@ if __name__ == '__main__':
     from etabs_obj import EtabsModel
     etabs = EtabsModel(backup=False, software='SAFE')
     SapModel = etabs.SapModel
-    ret = etabs.area.export_freecad_slabs(document)
+    ret = etabs.area.export_freecad_stiff_elements(document)
     ret = etabs.area.export_freecad_openings(openings)
     print('Wow')

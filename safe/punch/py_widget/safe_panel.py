@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import FreeCAD
 import FreeCADGui as Gui
 
 punch_path = Path(__file__).parent.parent
@@ -19,12 +20,15 @@ class SafeTaskPanel:
         software = self.form.software.currentText()
         etabs = etabs_obj.EtabsModel(backup=False, software=software)
         etabs.unlock_model()
+        doc = FreeCAD.ActiveDocument
         if self.form.slabs_checkbox.isChecked():
-            etabs.area.export_freecad_slabs()
+            etabs.area.export_freecad_slabs(doc)
         if self.form.openings_checkbox.isChecked():
-            etabs.area.export_freecad_openings()
+            etabs.area.export_freecad_openings(doc)
         if self.form.strips_checkbox.isChecked():
-            etabs.area.export_freecad_strips()
+            etabs.area.export_freecad_strips(doc)
+        if self.form.stiff_elements_checkbox.isChecked():
+            etabs.area.export_freecad_stiff_elements(doc)
         etabs.SapModel.View.RefreshView()
 
 
