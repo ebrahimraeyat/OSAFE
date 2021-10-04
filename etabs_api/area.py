@@ -30,13 +30,17 @@ class Area:
                 points = slab.points
                 self.create_area_by_coord(points)
         elif foun.foundation_type == 'Mat':
-            points = []
-            edges = Part.__sortEdges__(foun.plane_without_openings.Edges)
-            for e in edges:
-                v = e.firstVertex()
-                points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+            edges = foun.plane_without_openings.Edges
+            points = self.get_sort_points(edges)
             self.create_area_by_coord(points)
 
+    def get_sort_points(self, edges):
+        points = []
+        edges = Part.__sortEdges__(edges)
+        for e in edges:
+            v = e.firstVertex()
+        points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+        return points
 
     def create_area_by_coord(self, points : 'Base.Vector'):
         n = len(points)
