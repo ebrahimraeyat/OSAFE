@@ -27,15 +27,19 @@ class Area:
         if doc is None:
             doc = FreeCAD.ActiveDocument
         foun = doc.Foundation
+        slab_names = []
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs
             for slab in slabs:
                 points = slab.points
-                self.create_area_by_coord(points)
+                name = self.create_area_by_coord(points)
+                slab_names.append(name)
         elif foun.foundation_type == 'Mat':
             edges = foun.plane_without_openings.Edges
             points = self.get_sort_points(edges)
-            self.create_area_by_coord(points)
+            name = self.create_area_by_coord(points)
+            slab_names.append(name)
+        return slab_names
 
     def get_sort_points(self, edges):
         points = []
@@ -54,9 +58,10 @@ class Area:
         ys = [p.y for p in points]
         zs = [p.z for p in points]
         if prop_name is None:
-            self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
+            ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
         else:
-            self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, PropName=prop_name)
+            ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, PropName=prop_name)
+        return ret[3]
 
     def export_freecad_openings(self, doc : 'App.Document' = None):
         self.etabs.set_current_unit('kN', 'mm')
