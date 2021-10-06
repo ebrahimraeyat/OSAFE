@@ -8,6 +8,7 @@ if __name__ == '__main__':
 try:
     import FreeCAD
     import Part
+    from safe.punch import punch_funcs
 except:
     pass
 
@@ -22,7 +23,12 @@ class Area:
         self.etabs = etabs
         self.SapModel = etabs.SapModel
 
-    def export_freecad_slabs(self, doc : 'App.Document' = None):
+    def export_freecad_slabs(self,
+        doc : 'App.Document' = None,
+        split_mat : bool = True,
+        soil_name : str = 'SOIL2',
+        soil_modulus : float = 2,
+            ):
         self.etabs.set_current_unit('kN', 'mm')
         if doc is None:
             doc = FreeCAD.ActiveDocument
@@ -34,19 +40,55 @@ class Area:
                 points = slab.points
                 name = self.create_area_by_coord(points)
                 slab_names.append(name)
+            self.export_freecad_soil_support(
+                slab_names=slab_names,
+                soil_name=soil_name,
+                soil_modulus=soil_modulus,
+            )
         elif foun.foundation_type == 'Mat':
-            edges = foun.plane_without_openings.Edges
-            points = self.get_sort_points(edges)
-            name = self.create_area_by_coord(points)
-            slab_names.append(name)
+            if split_mat:
+                area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
+                    foun.plane_without_openings,
+                )
+                for points in area_points:
+                    name = self.create_area_by_coord(points)
+                    slab_names.append(name)
+                self.export_freecad_soil_support(
+                    slab_names=[slab_names[-1]],
+                    soil_name=soil_name,
+                    soil_modulus=soil_modulus,
+                )
+                self.export_freecad_soil_support(
+                    slab_names=slab_names[:2],
+                    soil_name=f'{soil_name}_2',
+                    soil_modulus=soil_modulus * 2,
+                )
+                self.export_freecad_soil_support(
+                    slab_names=slab_names[2:4],
+                    soil_name=f'{soil_name}_1.5',
+                    soil_modulus=soil_modulus * 1.5,
+                )
+            else:
+                edges = foun.plane_without_openings.Edges
+                points = self.get_sort_points(edges)
+                name = self.create_area_by_coord(points)
+                slab_names.append(name)
+                self.export_freecad_soil_support(
+                    slab_names=slab_names,
+                    soil_name=soil_name,
+                    soil_modulus=soil_modulus,
+                )
         return slab_names
 
-    def get_sort_points(self, edges):
+    def get_sort_points(self, edges, vector=True):
         points = []
         edges = Part.__sortEdges__(edges)
         for e in edges:
             v = e.firstVertex()
-            points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+            if vector is True:
+                points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+            else:
+                points.append(v)
         return points
 
     def create_area_by_coord(self,
@@ -142,7 +184,22 @@ class Area:
                 ):
                 points = self.get_sort_points(o.rect.Edges)
                 self.create_area_by_coord(points, prop_name='COL_STIFF')
- 
+    
+    def export_freecad_soil_support(self,
+        slab_names : list,
+        soil_modulus : float = 2,
+        soil_name : str = 'SOIL1',
+        ):
+        self.etabs.set_current_unit('kgf', 'cm')
+        self.SapModel.PropAreaSpring.SetAreaSpringProp(
+            soil_name, 0, 0, soil_modulus , 3)
+        for s in slab_names:
+            self.SapModel.AreaObj.SetSpringAssignment(s, soil_name)
+    
+    @staticmethod
+    def get_vertex_from_point(point):
+        return Part.Vertex(point.x, point.y, point.z)
+
 
 if __name__ == '__main__':
     import sys
@@ -163,7 +220,8 @@ if __name__ == '__main__':
     sys.path.insert(0, str(current_path))
     from etabs_obj import EtabsModel
     etabs = EtabsModel(backup=False, software='SAFE')
+    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
     SapModel = etabs.SapModel
-    ret = etabs.area.export_freecad_stiff_elements(document)
+    ret = etabs.area.export_freecad_slabs(document)
     ret = etabs.area.export_freecad_openings(openings)
     print('Wow')

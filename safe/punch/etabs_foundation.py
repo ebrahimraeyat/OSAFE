@@ -5,6 +5,11 @@ import FreeCAD
 import FreeCADGui
 import Part
 
+try:
+	from safe.punch import punch_funcs
+except:
+	import punch_funcs
+
 
 class Foundation:
 	def __init__(self, obj):
@@ -66,6 +71,12 @@ class Foundation:
 				"openings",
 				"Foundation",
 				)
+		# if not hasattr(obj, "split"):
+		# 	obj.addProperty(
+		# 		"App::PropertyBool",
+		# 		"split",
+		# 		"Foundation",
+		# 		).split = True
 		if not hasattr(obj, "foundation_type"):
 			obj.addProperty(
 				"App::PropertyEnumeration",
@@ -94,6 +105,9 @@ class Foundation:
 		if obj.foundation_type == 'Strip':
 			plan = foundation_plane
 		elif obj.foundation_type == 'Mat':
+			# if obj.split:
+			# 	return
+			# else:
 			plan = Part.Face(foundation_plane.OuterWire)
 		obj.plane_without_openings = plan
 		new_shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))

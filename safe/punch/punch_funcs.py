@@ -153,6 +153,7 @@ def location_of_column(
 				faces_normals['y'].append(normal_y)
 	if not (faces_normals['x'] and faces_normals['y']):
 		return None
+
 	no_of_faces = len(faces_normals['x'] + faces_normals['y'])
 	if no_of_faces == 2:
 		signx = faces_normals['x'][0] > 0
@@ -249,3 +250,95 @@ def sort_vertex(coords):
 	import operator
 	center = tuple(map(operator.truediv, reduce(lambda x, y: map(operator.add, x, y), coords), [len(coords)] * 2))
 	return sorted(coords, key=lambda coord: (-135 - math.degrees(math.atan2(*tuple(map(operator.sub, coord, center))[::-1]))) % 360)
+
+def get_sort_points(edges, vector=True):
+	points = []
+	edges = Part.__sortEdges__(edges)
+	for e in edges:
+		v = e.firstVertex()
+		if vector is True:
+			points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+		else:
+			points.append(v)
+	return points
+
+def get_obj_points_with_scales(
+	shape : Part.Shape, 
+	scales : list = [.75, .5],
+	) -> list:
+	vertexes, _ = get_sort_points(shape.Edges)
+	center_of_mass = shape.CenterOfMass
+	lines = []
+	for v in vertexes:
+		line = Part.makeLine(v, center_of_mass)
+		lines.append(line)
+	original_points = [FreeCAD.Vector(vec.x, vec.y, vec.z) for vec in vertexes]
+	scale_points = []
+	scale_points.append(original_points)
+	for scale in scales:
+		points = []
+		for line in lines:
+			point = line.valueAt((1 - scale) * line.Length)
+			points.append(point)
+		scale_points.append(points)
+	return scale_points
+
+def get_scale_area_points_with_scale(
+	shape : Part.Shape, 
+	scales : list = [.75, .5],
+	) -> list:
+	scale_points = get_obj_points_with_scales(shape, scales)
+	area_points = []
+	for points1, points2  in zip(scale_points[:-1], scale_points[1:]):
+		n = len(points1) // 2
+		points11 = points1[:n + 1]
+		points12 = points1[n:]
+		points21 = points2[:n + 1]
+		points22 = points2[n:]
+		points21.reverse()
+		points22.reverse()
+		area_points.extend((
+			points11 + points21,
+			points12 + points22,
+			))
+	area_points.append(scale_points[-1])
+	return area_points
+
+def split_face_with_scales(
+	face : Part.Face,
+	scales : list = [.75, .5],
+	) -> list:
+	from BOPTools.GeneralFuseResult import GeneralFuseResult
+	s1 = face.copy().scale(scales[0])
+	s2 = face.copy().scale(scales[1])
+	center_of_mass = face.CenterOfMass
+	tr1 = center_of_mass.sub(s1.CenterOfMass)
+	s1.Placement.Base = tr1
+	tr2 = center_of_mass.sub(s2.CenterOfMass)
+	s2.Placement.Base = tr2
+	area1 = face.cut(s1)
+	area2 = s1.cut(s2)
+	e1, e2 = sorted(face.Edges, key=lambda x: x.Length, reverse=True)[0:2]
+	v1 = e1.CenterOfMass
+	v2 = e2.CenterOfMass
+	poly = Part.makePolygon([v1, center_of_mass, v2])
+	faces = []
+	for area in (area1, area2):
+		pieces, map_ = area.generalFuse([poly])
+		gr = GeneralFuseResult([area, poly], (pieces,map_))
+		gr.splitAggregates()
+		comp = Part.Compound(gr.pieces)
+		faces.extend(comp.Faces)
+	faces.append(Part.Face(s2))
+	return faces
+
+def get_sub_areas_points_from_face_with_scales(
+	face : Part.Face,
+	scales : list = [.75, .5],
+	) -> list:
+	faces = split_face_with_scales(face, scales)
+	faces_points = []
+	for f in faces:
+		points = get_sort_points(f.Edges)
+		faces_points.append(points)
+	return faces_points

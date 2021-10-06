@@ -22,11 +22,18 @@ class SafeTaskPanel:
         etabs.unlock_model()
         doc = FreeCAD.ActiveDocument
         if self.form.slabs_checkbox.isChecked():
-            etabs.area.export_freecad_slabs(doc)
+            soil_name = self.form.soil_name.text()
+            soil_modulus = self.form.soil_modulus.value()
+            etabs.area.export_freecad_slabs(
+                doc,
+                soil_name=soil_name,
+                soil_modulus=soil_modulus,
+            )
         if self.form.openings_checkbox.isChecked():
             etabs.area.export_freecad_openings(doc)
         if self.form.strips_checkbox.isChecked():
-            etabs.area.export_freecad_strips(doc)
+            if doc.Foundation.foundation_type == 'Strip':
+                etabs.area.export_freecad_strips(doc)
         if self.form.stiff_elements_checkbox.isChecked():
             etabs.area.export_freecad_stiff_elements(doc)
         etabs.SapModel.View.RefreshView()
