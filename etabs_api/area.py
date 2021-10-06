@@ -53,6 +53,7 @@ class Area:
                 for points in area_points:
                     name = self.create_area_by_coord(points)
                     slab_names.append(name)
+                assert len(slab_names) == 5
                 self.export_freecad_soil_support(
                     slab_names=[slab_names[-1]],
                     soil_name=soil_name,

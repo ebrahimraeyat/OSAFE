@@ -92,6 +92,12 @@ class RectangleSlab:
                 "points",
                 "slab",
                 )
+        if not hasattr(obj, "extend"):
+            obj.addProperty(
+            "App::PropertyLength",
+            "extend",
+            "slab",
+            ).extend = 100
         # if not hasattr(obj, "strip"):
         #     obj.addProperty(
         #         "App::PropertyLink",
@@ -145,10 +151,45 @@ class RectangleSlab:
         obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
     def get_new_points(self, obj):
-        x1 = obj.start_point.x
-        y1 = obj.start_point.y
-        x2 = obj.end_point.x
-        y2 = obj.end_point.y
+        xs = obj.start_point.x
+        ys = obj.start_point.y
+        xe = obj.end_point.x
+        ye = obj.end_point.y
+        delta_x = xe - xs
+        delta_y = ye - ys
+        d = obj.start_point.distanceToPoint(obj.end_point)
+        if delta_x == 0:
+            dx = 0
+            dy = obj.extend.Value
+            new_start_point = obj.start_point.add(FreeCAD.Vector(dx, -dy, 0))
+            new_d = new_start_point.distanceToPoint(obj.end_point)
+            if new_d > d:
+                new_end_point = obj.end_point.add(FreeCAD.Vector(dx, dy, 0))
+            else:
+                new_start_point = obj.start_point.add(FreeCAD.Vector(dx, dy, 0))
+                new_end_point = obj.end_point.add(FreeCAD.Vector(dx, -dy, 0))
+        else:
+            m = delta_y / delta_x
+            dx = obj.extend.Value / math.sqrt(1 + m ** 2)
+            dy = m * abs(dx)
+            if m >= 0:
+                if xe > xs:
+                    new_start_point = obj.start_point.add(FreeCAD.Vector(-dx, -dy, 0))
+                    new_end_point = obj.end_point.add(FreeCAD.Vector(dx, dy, 0))
+                else:
+                    new_start_point = obj.start_point.add(FreeCAD.Vector(dx, dy, 0))
+                    new_end_point = obj.end_point.add(FreeCAD.Vector(-dx, -dy, 0))
+            elif m < 0:
+                if xe > xs:
+                    new_start_point = obj.start_point.add(FreeCAD.Vector(-dx, dy, 0))
+                    new_end_point = obj.end_point.add(FreeCAD.Vector(dx, -dy, 0))
+                else:
+                    new_start_point = obj.start_point.add(FreeCAD.Vector(dx, -dy, 0))
+                    new_end_point = obj.end_point.add(FreeCAD.Vector(-dx, dy, 0))
+        x1 = new_start_point.x
+        y1 = new_start_point.y
+        x2 = new_end_point.x
+        y2 = new_end_point.y
         if obj.offset != 0:
             neg = False if obj.offset >= 0 else True
             distance = abs(obj.offset)

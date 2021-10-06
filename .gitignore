@@ -126,3 +126,6 @@ venv.bak/
 # test
 test/etabs_api/test.*
 
+# FreeCAD backup files
+*.FCStd1
+
