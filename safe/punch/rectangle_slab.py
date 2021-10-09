@@ -154,22 +154,7 @@ class RectangleSlab:
     def get_new_points(self, obj):
         p1 = obj.start_point
         p2 = obj.end_point
-        xs = p1.x
-        xe = p2.x
-        delta_x = xe - xs
-        d = p1.distanceToPoint(p2)
-        if delta_x == 0:
-            dx = 0
-            dy = obj.extend.Value
-            new_start_point = p1.add(FreeCAD.Vector(dx, -dy, 0))
-            new_d = new_start_point.distanceToPoint(p2)
-            if new_d > d:
-                new_end_point = p2.add(FreeCAD.Vector(dx, dy, 0))
-            else:
-                new_start_point = p1.add(FreeCAD.Vector(dx, dy, 0))
-                new_end_point = p2.add(FreeCAD.Vector(dx, -dy, 0))
-        else:
-            new_start_point, new_end_point = punch_funcs.extend_two_points(p1, p2, obj.extend.Value)
+        new_start_point, new_end_point = punch_funcs.extend_two_points(p1, p2, obj.extend.Value)
         x1 = new_start_point.x
         y1 = new_start_point.y
         x2 = new_end_point.x

@@ -394,14 +394,14 @@ def extend_two_points(p1, p2, length):
 						(y - p1.y) ** 2)
 		if dist > d:
 			new_end_point = FreeCAD.Vector(x, y, p2.z)
-			x = p1.x - length
+			x = p1.x - dx
 			y = eval(equation)
 			new_start_point = FreeCAD.Vector(x, y, p1.z)
 		else:
-			x = p2.x - length
+			x = p2.x - dx
 			y = eval(equation)
 			new_end_point = FreeCAD.Vector(x, y, p2.z)
-			x = p1.x + length
+			x = p1.x + dx
 			y = eval(equation)
 			new_start_point = FreeCAD.Vector(x, y, p1.z)
 	return new_start_point, new_end_point

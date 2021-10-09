@@ -1,3 +1,4 @@
+import math
 import sys
 from pathlib import Path
 
@@ -79,6 +80,12 @@ def test_extend_two_points():
     new_p1, new_p2 = punch_funcs.extend_two_points(p1, p2, 1)
     assert new_p2 == FreeCAD.Vector(-1, 0, 0)
     assert new_p1 == FreeCAD.Vector(2, 0, 0)
+    
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(1, 1, 0)
+    new_p1, new_p2 = punch_funcs.extend_two_points(p1, p2, math.sqrt(2))
+    assert new_p1 == FreeCAD.Vector(-1, -1, 0)
+    assert new_p2 == FreeCAD.Vector(2, 2, 0)
 
 
 
