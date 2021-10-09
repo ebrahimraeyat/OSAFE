@@ -458,4 +458,19 @@ def get_offset_points(
 		new_end_point = FreeCAD.Vector(x2, y2, p2.z)
 		return new_start_point, new_end_point
 
+def get_common_part_of_slabs(slabs):
+	if len(slabs) < 2:
+		return None
+	shapes = []
+	for s in slabs:
+		p1, p2 = extend_two_points(s.start_point, s.end_point)
+		p1, p2 = get_offset_points(p1, p2, s.offset)
+		points = get_width_points(p1, p2, s.width.Value/2, s.angle)
+		points.append(points[0])
+		shapes.append(Part.Face(Part.makePolygon(points)))
+	comm = shapes[0]
+	for sh in shapes[1:]:
+		comm = comm.common(sh)
+	return comm
+
 	

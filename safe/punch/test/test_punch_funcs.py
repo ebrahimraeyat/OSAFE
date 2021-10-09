@@ -107,5 +107,13 @@ def test_get_offset_points():
     assert FreeCAD.Vector(0, .5, 0) in points
     assert FreeCAD.Vector(1, .5, 0) in points
 
+def test_get_common_part_of_slabs():
+    s0 = document.Slab
+    s3 = document.Slab003
+    s5 = document.Slab005
+    comm = punch_funcs.get_common_part_of_slabs((s0, s3, s5))
+    assert len(comm.Faces) == 1
+    assert len(comm.Edges) == 6
+    
 if __name__ == '__main__':
     pass
