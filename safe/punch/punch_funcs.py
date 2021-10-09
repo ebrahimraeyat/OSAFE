@@ -405,4 +405,22 @@ def extend_two_points(p1, p2, length):
 			y = eval(equation)
 			new_start_point = FreeCAD.Vector(x, y, p1.z)
 	return new_start_point, new_end_point
+
+def get_width_points(xs, ys, xe, ye, width, teta):
+	points = []
+	_sin = math.sin(teta)
+	_cos = math.cos(teta)
+	x = xs - width * _sin
+	y = ys + width * _cos
+	points.append(FreeCAD.Vector(x, y, 0))
+	x = xs + width * _sin
+	y = ys - width * _cos
+	points.append(FreeCAD.Vector(x, y, 0))
+	x = xe + width * _sin
+	y = ye - width * _cos
+	points.append(FreeCAD.Vector(x, y, 0))
+	x = xe - width * _sin
+	y = ye + width * _cos
+	points.append(FreeCAD.Vector(x, y, 0))
+	return points
 	

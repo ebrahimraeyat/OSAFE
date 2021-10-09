@@ -129,23 +129,9 @@ class RectangleSlab:
 
     def create_width(self, obj):
         xs, ys, xe, ye = self.get_new_points(obj)
-        points = []
         w = obj.width.Value / 2
         teta = obj.angle
-        _sin = math.sin(teta)
-        _cos = math.cos(teta)
-        x = xs - w * _sin
-        y = ys + w * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        x = xs + w * _sin
-        y = ys - w * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        x = xe + w * _sin
-        y = ye - w * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        x = xe - w * _sin
-        y = ye + w * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
+        points = punch_funcs.get_width_points(xs, ys, xe, ye, w, teta)
         obj.points = points
         points.append(points[0])
         obj.plane = Part.Face(Part.makePolygon(points))
