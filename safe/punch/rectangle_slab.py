@@ -93,12 +93,12 @@ class RectangleSlab:
                 "points",
                 "slab",
                 )
-        if not hasattr(obj, "extend"):
-            obj.addProperty(
-            "App::PropertyLength",
-            "extend",
-            "slab",
-            ).extend = 3000
+        # if not hasattr(obj, "extend"):
+        #     obj.addProperty(
+        #     "App::PropertyLength",
+        #     "extend",
+        #     "slab",
+        #     ).extend = 3000
         # if not hasattr(obj, "strip"):
         #     obj.addProperty(
         #         "App::PropertyLink",
@@ -152,13 +152,10 @@ class RectangleSlab:
         obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
     def get_new_points(self, obj):
-        p1 = obj.start_point
-        p2 = obj.end_point
-        new_start_point, new_end_point = punch_funcs.extend_two_points(p1, p2, obj.extend.Value)
-        x1 = new_start_point.x
-        y1 = new_start_point.y
-        x2 = new_end_point.x
-        y2 = new_end_point.y
+        x1 = obj.start_point.x
+        y1 = obj.start_point.y
+        x2 = obj.end_point.x
+        y2 = obj.end_point.y
         if obj.offset != 0:
             neg = False if obj.offset >= 0 else True
             distance = abs(obj.offset)
