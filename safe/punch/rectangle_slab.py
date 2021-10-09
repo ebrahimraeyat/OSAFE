@@ -2,7 +2,7 @@ import math
 from pathlib import Path
 import Part
 import FreeCAD
-from etabs_api.frame_obj import FrameObj
+
 from safe.punch import punch_funcs
 from safe.punch.strip import make_strip
 
@@ -128,26 +128,14 @@ class RectangleSlab:
         #     obj.strip.end_width_right = ewr
 
     def create_width(self, obj):
-        xs, ys, xe, ye = self.get_new_points(obj)
+        p1, p2 = punch_funcs.get_offset_points(
+            obj.start_point, obj.end_point, obj.offset)
         w = obj.width.Value / 2
-        teta = obj.angle
-        points = punch_funcs.get_width_points(xs, ys, xe, ye, w, teta)
+        points = punch_funcs.get_width_points(p1, p2, w, obj.angle)
         obj.points = points
         points.append(points[0])
         obj.plane = Part.Face(Part.makePolygon(points))
         obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
-
-    def get_new_points(self, obj):
-        x1 = obj.start_point.x
-        y1 = obj.start_point.y
-        x2 = obj.end_point.x
-        y2 = obj.end_point.y
-        if obj.offset != 0:
-            neg = False if obj.offset >= 0 else True
-            distance = abs(obj.offset)
-            x1, y1, x2, y2 = FrameObj.offset_frame_points(x1, y1, x2, y2, distance, neg)
-        return x1, y1, x2, y2
-
 
 class ViewProviderRectangle:
     def __init__(self, vobj):

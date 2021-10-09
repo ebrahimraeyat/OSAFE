@@ -62,17 +62,6 @@ def test_get_points_connections_from_slabs():
     points_slabs = punch_funcs.get_points_connections_from_slabs(slabs)
     assert len(points_slabs) == 11
 
-def test_get_width_points():
-    xs, ys, xe, ye = 0, 0, 1, 0
-    w = .5
-    angle = 0
-    points = punch_funcs.get_width_points(xs, ys, xe, ye, w, angle)
-    assert len(points) == 4
-    assert FreeCAD.Vector(0, -.5, 0) in points
-    assert FreeCAD.Vector(0, .5, 0) in points
-    assert FreeCAD.Vector(1, -.5, 0) in points
-    assert FreeCAD.Vector(1, .5, 0) in points
-
 def test_extend_two_points():
     # horizontal line
     p1 = FreeCAD.Vector(0, 0, 0)
@@ -98,7 +87,25 @@ def test_extend_two_points():
     assert new_p1 == FreeCAD.Vector(-1, -1, 0)
     assert new_p2 == FreeCAD.Vector(2, 2, 0)
 
+def test_get_width_points():
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(1, 0, 0)
+    w = .5
+    points = punch_funcs.get_width_points(p1, p2, w)
+    assert len(points) == 4
+    assert FreeCAD.Vector(0, -.5, 0) in points
+    assert FreeCAD.Vector(0, .5, 0) in points
+    assert FreeCAD.Vector(1, -.5, 0) in points
+    assert FreeCAD.Vector(1, .5, 0) in points
 
+def test_get_offset_points():
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(1, 0, 0)
+    offset = .5
+    points = punch_funcs.get_offset_points(p1, p2, offset)
+    assert len(points) == 2
+    assert FreeCAD.Vector(0, .5, 0) in points
+    assert FreeCAD.Vector(1, .5, 0) in points
 
 if __name__ == '__main__':
     pass

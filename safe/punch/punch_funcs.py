@@ -4,6 +4,8 @@ import math
 import FreeCAD
 import Part
 
+from etabs_api.frame_obj import FrameObj
+
 
 def remove_obj(name: str) -> None:
 	o = FreeCAD.ActiveDocument.getObject(name)
@@ -367,7 +369,11 @@ def get_line_equation(p1, p2):
 		b = y1 - m * x1
 		return f'{m} * x + {b}'
 
-def extend_two_points(p1, p2, length):
+def extend_two_points(
+	p1 : FreeCAD.Vector,
+	p2 : FreeCAD.Vector,
+	length : float = 2000,
+	) -> tuple:
 	xs = p1.x
 	xe = p2.x
 	ys = p1.y
@@ -406,7 +412,16 @@ def extend_two_points(p1, p2, length):
 			new_start_point = FreeCAD.Vector(x, y, p1.z)
 	return new_start_point, new_end_point
 
-def get_width_points(xs, ys, xe, ye, width, teta):
+def get_width_points(
+	p1 : FreeCAD.Vector,
+	p2 : FreeCAD.Vector,
+	width : float,
+	teta : Union[float, None] = None,
+	) -> list:
+	xs, ys, xe, ye = p1.x, p1.y, p2.x, p2.y
+	if teta is None:
+		v = p2 - p1
+		teta = math.atan2(v.y, v.x)
 	points = []
 	_sin = math.sin(teta)
 	_cos = math.cos(teta)
@@ -423,4 +438,24 @@ def get_width_points(xs, ys, xe, ye, width, teta):
 	y = ye + width * _cos
 	points.append(FreeCAD.Vector(x, y, 0))
 	return points
+
+def get_offset_points(
+	p1 : FreeCAD.Vector,
+	p2 : FreeCAD.Vector,
+	offset : float,
+	) -> tuple:
+	if offset == 0:
+		return p1, p2
+	else:
+		x1 = p1.x
+		y1 = p1.y
+		x2 = p2.x
+		y2 = p2.y
+		neg = False if offset >= 0 else True
+		distance = abs(offset)
+		x1, y1, x2, y2 = FrameObj.offset_frame_points(x1, y1, x2, y2, distance, neg)
+		new_start_point = FreeCAD.Vector(x1, y1, p1.z)
+		new_end_point = FreeCAD.Vector(x2, y2, p2.z)
+		return new_start_point, new_end_point
+
 	
