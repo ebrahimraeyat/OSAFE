@@ -61,6 +61,26 @@ def test_get_points_connections_from_slabs():
     points_slabs = punch_funcs.get_points_connections_from_slabs(slabs)
     assert len(points_slabs) == 11
 
+def test_extend_two_points():
+    # horizontal line
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(1, 0, 0)
+    new_p1, new_p2 = punch_funcs.extend_two_points(p1, p2, 1)
+    assert new_p1 == FreeCAD.Vector(-1, 0, 0)
+    assert new_p2 == FreeCAD.Vector(2, 0, 0)
+    # vertical line
+    p2 = FreeCAD.Vector(0, 1, 0)
+    new_p1, new_p2 = punch_funcs.extend_two_points(p1, p2, 1)
+    assert new_p1 == FreeCAD.Vector(0, -1, 0)
+    assert new_p2 == FreeCAD.Vector(0, 2, 0)
+    # inverse p1 and p2
+    p2 = FreeCAD.Vector(0, 0, 0)
+    p1 = FreeCAD.Vector(1, 0, 0)
+    new_p1, new_p2 = punch_funcs.extend_two_points(p1, p2, 1)
+    assert new_p2 == FreeCAD.Vector(-1, 0, 0)
+    assert new_p1 == FreeCAD.Vector(2, 0, 0)
+
+
 
 if __name__ == '__main__':
     pass

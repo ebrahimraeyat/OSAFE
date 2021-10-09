@@ -3,6 +3,7 @@ from pathlib import Path
 import Part
 import FreeCAD
 from etabs_api.frame_obj import FrameObj
+from safe.punch import punch_funcs
 from safe.punch.strip import make_strip
 
 
@@ -97,7 +98,7 @@ class RectangleSlab:
             "App::PropertyLength",
             "extend",
             "slab",
-            ).extend = 100
+            ).extend = 3000
         # if not hasattr(obj, "strip"):
         #     obj.addProperty(
         #         "App::PropertyLink",
@@ -151,41 +152,24 @@ class RectangleSlab:
         obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
     def get_new_points(self, obj):
-        xs = obj.start_point.x
-        ys = obj.start_point.y
-        xe = obj.end_point.x
-        ye = obj.end_point.y
+        p1 = obj.start_point
+        p2 = obj.end_point
+        xs = p1.x
+        xe = p2.x
         delta_x = xe - xs
-        delta_y = ye - ys
-        d = obj.start_point.distanceToPoint(obj.end_point)
+        d = p1.distanceToPoint(p2)
         if delta_x == 0:
             dx = 0
             dy = obj.extend.Value
-            new_start_point = obj.start_point.add(FreeCAD.Vector(dx, -dy, 0))
-            new_d = new_start_point.distanceToPoint(obj.end_point)
+            new_start_point = p1.add(FreeCAD.Vector(dx, -dy, 0))
+            new_d = new_start_point.distanceToPoint(p2)
             if new_d > d:
-                new_end_point = obj.end_point.add(FreeCAD.Vector(dx, dy, 0))
+                new_end_point = p2.add(FreeCAD.Vector(dx, dy, 0))
             else:
-                new_start_point = obj.start_point.add(FreeCAD.Vector(dx, dy, 0))
-                new_end_point = obj.end_point.add(FreeCAD.Vector(dx, -dy, 0))
+                new_start_point = p1.add(FreeCAD.Vector(dx, dy, 0))
+                new_end_point = p2.add(FreeCAD.Vector(dx, -dy, 0))
         else:
-            m = delta_y / delta_x
-            dx = obj.extend.Value / math.sqrt(1 + m ** 2)
-            dy = m * abs(dx)
-            if m >= 0:
-                if xe > xs:
-                    new_start_point = obj.start_point.add(FreeCAD.Vector(-dx, -dy, 0))
-                    new_end_point = obj.end_point.add(FreeCAD.Vector(dx, dy, 0))
-                else:
-                    new_start_point = obj.start_point.add(FreeCAD.Vector(dx, dy, 0))
-                    new_end_point = obj.end_point.add(FreeCAD.Vector(-dx, -dy, 0))
-            elif m < 0:
-                if xe > xs:
-                    new_start_point = obj.start_point.add(FreeCAD.Vector(-dx, dy, 0))
-                    new_end_point = obj.end_point.add(FreeCAD.Vector(dx, -dy, 0))
-                else:
-                    new_start_point = obj.start_point.add(FreeCAD.Vector(dx, -dy, 0))
-                    new_end_point = obj.end_point.add(FreeCAD.Vector(-dx, dy, 0))
+            new_start_point, new_end_point = punch_funcs.extend_two_points(p1, p2, obj.extend.Value)
         x1 = new_start_point.x
         y1 = new_start_point.y
         x2 = new_end_point.x

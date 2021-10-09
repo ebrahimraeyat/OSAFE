@@ -356,4 +356,53 @@ def get_points_connections_from_slabs(slabs):
 			else:
 				d[p].append(s)
 	return d
-			
+
+def get_line_equation(p1, p2):
+	x1, y1 = p1.x, p1.y
+	x2, y2 = p2.x, p2.y
+	if x1 == x2:
+		return ''
+	else:
+		m = (y2 - y1) / (x2 - x1)
+		b = y1 - m * x1
+		return f'{m} * x + {b}'
+
+def extend_two_points(p1, p2, length):
+	xs = p1.x
+	xe = p2.x
+	ys = p1.y
+	ye = p2.y
+	delta_x = xe - xs
+	d = p1.distanceToPoint(p2)
+	if delta_x == 0:
+		dx = 0
+		dy = length
+		new_start_point = p1.add(FreeCAD.Vector(dx, -dy, 0))
+		new_d = new_start_point.distanceToPoint(p2)
+		if new_d > d:
+			new_end_point = p2.add(FreeCAD.Vector(dx, dy, 0))
+		else:
+			new_start_point = p1.add(FreeCAD.Vector(dx, dy, 0))
+			new_end_point = p2.add(FreeCAD.Vector(dx, -dy, 0))
+	else:
+		equation = get_line_equation(p1, p2)
+		m = (ye - ys) / (xe - xs)
+		dx = length / math.sqrt(1 + m ** 2)
+		x = p2.x + dx
+		y = eval(equation)
+		dist = math.sqrt((x - p1.x) ** 2 + 
+						(y - p1.y) ** 2)
+		if dist > d:
+			new_end_point = FreeCAD.Vector(x, y, p2.z)
+			x = p1.x - length
+			y = eval(equation)
+			new_start_point = FreeCAD.Vector(x, y, p1.z)
+		else:
+			x = p2.x - length
+			y = eval(equation)
+			new_end_point = FreeCAD.Vector(x, y, p2.z)
+			x = p1.x + length
+			y = eval(equation)
+			new_start_point = FreeCAD.Vector(x, y, p1.z)
+	return new_start_point, new_end_point
+	
