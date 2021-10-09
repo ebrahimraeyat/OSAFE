@@ -56,6 +56,11 @@ def test_get_sub_areas_points_from_face_with_scales():
     for ps in points:
         assert len(ps) == 22
 
+def test_get_points_connections_from_slabs():
+    slabs = document_mat.Foundation.tape_slabs
+    points_slabs = punch_funcs.get_points_connections_from_slabs(slabs)
+    assert len(points_slabs) == 11
+
 
 if __name__ == '__main__':
     pass

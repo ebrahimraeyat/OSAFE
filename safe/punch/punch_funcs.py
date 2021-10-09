@@ -342,3 +342,18 @@ def get_sub_areas_points_from_face_with_scales(
 		points = get_sort_points(f.Edges)
 		faces_points.append(points)
 	return faces_points
+
+def get_points_connections_from_slabs(slabs):
+	d = {}
+	for s in slabs:
+		v1 = s.start_point
+		v2 = s.end_point
+		for v in (v1, v2):
+			p = (v.x, v.y, v.z)
+			current_slabs = d.get(p, None)
+			if current_slabs is None:
+				d[p] = [s]
+			else:
+				d[p].append(s)
+	return d
+			
