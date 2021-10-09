@@ -87,8 +87,8 @@ class EtabsPunch(object):
         punches = []
         for _, row in basepoints_coord_and_dims.iterrows():
             name = row['UniqueName']
-            bx = float(row['t2'])
-            by = float(row['t3'])
+            bx = float(row['t3'])
+            by = float(row['t2'])
             angle = float(row['AxisAngle'])
             x = row['x']
             y = row['y']
