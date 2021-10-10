@@ -95,20 +95,7 @@ class Foundation:
 				]):
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
-		new_shape = tape_slabs[0].solid
-		new_shape = new_shape.fuse([i.solid for i in tape_slabs[1:]])
-		new_shape = new_shape.removeSplitter()
-		for f in new_shape.Faces:
-			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
-				foundation_plane = f
-				break
-		if obj.foundation_type == 'Strip':
-			plan = foundation_plane
-		elif obj.foundation_type == 'Mat':
-			# if obj.split:
-			# 	return
-			# else:
-			plan = Part.Face(foundation_plane.OuterWire)
+		plan = punch_funcs.get_foundation_plane_without_openings(obj)
 		obj.plane_without_openings = plan
 		new_shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 		if len(obj.openings) > 0:
