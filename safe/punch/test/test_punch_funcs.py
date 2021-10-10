@@ -114,6 +114,12 @@ def test_get_common_part_of_slabs():
     comm = punch_funcs.get_common_part_of_slabs((s0, s3, s5))
     assert len(comm.Faces) == 1
     assert len(comm.Edges) == 6
-    
+
+def test_get_common_parts_of_foundation_slabs():
+    points_commons = punch_funcs.get_common_parts_of_foundation_slabs(document.Foundation)
+    assert len(points_commons) == 11
+
+
+
 if __name__ == '__main__':
     pass

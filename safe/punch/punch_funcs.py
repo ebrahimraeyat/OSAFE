@@ -473,4 +473,15 @@ def get_common_part_of_slabs(slabs):
 		comm = comm.common(sh)
 	return comm
 
+def get_common_parts_of_foundation_slabs(foundation):
+	points_slabs = get_points_connections_from_slabs(foundation.tape_slabs)
+	points_common_part = {}
+	for p, slabs in points_slabs.items():
+		comm = get_common_part_of_slabs(slabs)
+		if comm is None:
+			continue
+		points_common_part[p] = comm
+	return points_common_part
+
+
 	
