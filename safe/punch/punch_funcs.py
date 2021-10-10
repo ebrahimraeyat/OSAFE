@@ -501,6 +501,21 @@ def get_foundation_plane_without_openings(
 	elif foundation.foundation_type == 'Mat':
 		plan = Part.Face(foundation_plane.OuterWire)
 	return plan
+
+def get_foundation_plan_with_openings(
+	foundation,
+	) -> Part.Face:
+	plan_with_openings = get_foundation_plane_without_openings(foundation)
+	if len(foundation.openings) > 0:
+		new_shape = plan_with_openings.extrude(FreeCAD.Vector(0, 0, -1))
+		new_shape = new_shape.cut([o.Shape for o in foundation.openings])
+		for f in new_shape.Faces:
+			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+				plan_with_openings = f
+				break
+	return plan_with_openings
+
+
 	
 
 

@@ -124,6 +124,11 @@ def test_get_foundation_plane_without_openings():
     assert len(plan.Faces) == 1
     assert len(plan.Edges) == 30
 
+def test_get_foundation_plan_with_openings():
+    plan = punch_funcs.get_foundation_plan_with_openings(document.Foundation)
+    assert len(plan.Faces) == 1
+    assert len(plan.Edges) == 34
+
 
 
 
