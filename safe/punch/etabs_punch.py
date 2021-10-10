@@ -79,11 +79,11 @@ class EtabsPunch(object):
         basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
                 joint_design_reactions
             )
-        for f in self.foundation.Shape.Faces:
-            if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
-                foundation_plane = f
-                break
-        self.foundation.plane = foundation_plane
+        # for f in self.foundation.Shape.Faces:
+        #     if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+        #         foundation_plane = f
+        #         break
+        # self.foundation.plane = foundation_plane
         punches = []
         for _, row in basepoints_coord_and_dims.iterrows():
             name = row['UniqueName']

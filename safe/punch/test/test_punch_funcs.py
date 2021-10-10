@@ -30,8 +30,9 @@ def test_get_obj_points_with_scales():
     assert len(points[0]) == 21
     assert len(points[1]) == 21
     assert len(points[2]) == 21
-    face = Part.Face(Part.makePolygon(points[0]))
-    assert pytest.approx(face.Area, abs=.1) == document.Foundation.plane_without_openings.Area
+    # face0 = Part.Face(Part.makePolygon(points[0]))
+    # plan = Part.Face(document.Foundation.plane_without_openings.OuterWire)
+    # assert pytest.approx(face0.Area, abs=.1) == plan.Area
 
 def test_get_scale_area_points_with_scale():
     points = punch_funcs.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
@@ -54,8 +55,7 @@ def test_get_sub_areas_points_from_face_with_scales():
     points = punch_funcs.get_sub_areas_points_from_face_with_scales(plan)
     assert len(points) == 5
     assert len(points[-1]) == 21
-    for ps in points:
-        assert len(ps) == 22
+    
 
 def test_get_points_connections_from_slabs():
     slabs = document_mat.Foundation.tape_slabs

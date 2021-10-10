@@ -95,16 +95,8 @@ class Foundation:
 				]):
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
-		plan = punch_funcs.get_foundation_plane_without_openings(obj)
-		obj.plane_without_openings = plan
-		new_shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
-		if len(obj.openings) > 0:
-			new_shape = new_shape.cut([o.Shape for o in obj.openings])
-		obj.Shape = new_shape
-		for f in new_shape.Faces:
-			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
-				obj.plane = f
-				break
+		obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
+		obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 		obj.d = obj.height - obj.cover
 
 	def onDocumentRestored(self, obj):

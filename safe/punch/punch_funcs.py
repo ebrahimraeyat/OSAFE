@@ -268,7 +268,7 @@ def get_obj_points_with_scales(
 	shape : Part.Shape, 
 	scales : list = [.75, .5],
 	) -> list:
-	vertexes, _ = get_sort_points(shape.Edges)
+	vertexes = get_sort_points(shape.Edges)
 	center_of_mass = shape.CenterOfMass
 	lines = []
 	for v in vertexes:
