@@ -149,6 +149,11 @@ def test_get_foundation_plan_with_holes():
     for hole in holes:
         assert isinstance(hole, Part.Face)
 
+def test_get_points_of_foundation_plan_and_holes():
+    points = punch_funcs.get_points_of_foundation_plan_and_holes(document.Foundation)
+    assert len(points) == 7
+    assert len(points[0]) == 7
+
 
 
 

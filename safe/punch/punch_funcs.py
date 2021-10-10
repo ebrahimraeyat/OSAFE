@@ -528,6 +528,19 @@ def get_foundation_plan_with_holes(
 		holes = [o.plane for o in foundation.openings]
 	return plan_with_openings, plan_without_openings, holes
 
+def get_points_of_foundation_plan_and_holes(
+	foundation,
+	) -> list:
+	plan_with_openings, plan_without_openings, holes = get_foundation_plan_with_holes(foundation)
+	points = []
+	if foundation.foundation_type == 'Strip':
+		edges_list = [plan.Edges for plan in [plan_with_openings] + holes]
+	elif foundation.foundation_type == 'Mat':
+		edges_list = [plan.Edges for plan in [plan_without_openings] + holes]
+	for edges in edges_list:
+		points.append(get_sort_points(edges))
+	return points
+
 
 	
 
