@@ -125,20 +125,26 @@ def test_get_foundation_plane_without_openings():
     assert len(plan.Edges) == 30
 
 def test_get_foundation_plan_with_openings():
-    plan = punch_funcs.get_foundation_plan_with_openings(document.Foundation)
-    assert len(plan.Faces) == 1
-    assert len(plan.Edges) == 34
+    plan_with_openings, plan_without_openings = punch_funcs.get_foundation_plan_with_openings(document.Foundation)
+    assert len(plan_with_openings.Faces) == 1
+    assert len(plan_with_openings.Edges) == 34
+    assert len(plan_without_openings.Faces) == 1
+    assert len(plan_without_openings.Edges) == 30
 
 def test_get_foundation_plan_with_holes():
-    plan, holes = punch_funcs.get_foundation_plan_with_holes(document.Foundation)
-    assert len(plan.Faces) == 1
-    assert len(plan.Edges) == 34
+    plan_with_openings, plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(document.Foundation)
+    assert len(plan_with_openings.Faces) == 1
+    assert len(plan_with_openings.Edges) == 34
+    assert len(plan_without_openings.Faces) == 1
+    assert len(plan_without_openings.Edges) == 30
     assert len(holes) == 6
     for hole in holes:
         assert isinstance(hole, Part.Face)
-    plan, holes = punch_funcs.get_foundation_plan_with_holes(document_mat.Foundation)
-    assert len(plan.Faces) == 1
-    assert len(plan.Edges) == 7
+    plan_with_openings, plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(document_mat.Foundation)
+    assert len(plan_with_openings.Faces) == 1
+    assert len(plan_with_openings.Edges) == 11
+    assert len(plan_without_openings.Faces) == 1
+    assert len(plan_without_openings.Edges) == 7
     assert len(holes) == 1
     for hole in holes:
         assert isinstance(hole, Part.Face)
