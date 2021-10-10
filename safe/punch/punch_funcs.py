@@ -483,5 +483,25 @@ def get_common_parts_of_foundation_slabs(foundation):
 		points_common_part[p] = comm
 	return points_common_part
 
+def get_foundation_plane_without_openings(
+	foundation,
+	) -> Part.Face:
+	slabs = foundation.tape_slabs
+	points_common_part = get_common_parts_of_foundation_slabs(foundation)
+	common_parts = list(points_common_part.values())
+	solids = [f.extrude(FreeCAD.Vector(0, 0, -1)) for f in [s.plane for s in slabs] + common_parts]
+	shape = solids[0].fuse(solids[1:])
+	shape = shape.removeSplitter()
+	for f in shape.Faces:
+		if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+			foundation_plane = f
+			break
+	if foundation.foundation_type == 'Strip':
+		plan = foundation_plane
+	elif foundation.foundation_type == 'Mat':
+		plan = Part.Face(foundation_plane.OuterWire)
+	return plan
+	
+
 
 	

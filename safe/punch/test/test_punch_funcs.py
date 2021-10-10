@@ -119,6 +119,12 @@ def test_get_common_parts_of_foundation_slabs():
     points_commons = punch_funcs.get_common_parts_of_foundation_slabs(document.Foundation)
     assert len(points_commons) == 11
 
+def test_get_foundation_plane_without_openings():
+    plan = punch_funcs.get_foundation_plane_without_openings(document.Foundation)
+    assert len(plan.Faces) == 1
+    assert len(plan.Edges) == 30
+
+
 
 
 if __name__ == '__main__':
