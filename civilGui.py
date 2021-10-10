@@ -237,6 +237,7 @@ class CivilOpeningEtabs:
         from safe.punch import opening
         from etabs_api import etabs_obj
         etabs = etabs_obj.EtabsModel(backup=False)
+        etabs.set_current_unit('kN', 'mm')
         points = etabs.select_obj.get_selected_obj_type(1)
         if len(points) > 2:
             points_xyz = list(etabs.points.get_points_coords(points).values())
