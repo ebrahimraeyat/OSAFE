@@ -515,6 +515,20 @@ def get_foundation_plan_with_openings(
 				break
 	return plan_with_openings
 
+def get_foundation_plan_with_holes(
+	foundation,
+	) -> Part.Face:
+	if foundation.foundation_type == 'Strip':
+		plan_with_openings = get_foundation_plan_with_openings(foundation)
+		mat = Part.Face(plan_with_openings.OuterWire)
+		cut = mat.cut([plan_with_openings])
+		holes = cut.SubShapes
+		return plan_with_openings, holes
+	elif foundation.foundation_type == 'Mat':
+		plan_without_openings = get_foundation_plane_without_openings(foundation)
+		holes = [o.plane for o in foundation.openings]
+		return plan_without_openings, holes
+
 
 	
 

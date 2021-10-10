@@ -129,6 +129,20 @@ def test_get_foundation_plan_with_openings():
     assert len(plan.Faces) == 1
     assert len(plan.Edges) == 34
 
+def test_get_foundation_plan_with_holes():
+    plan, holes = punch_funcs.get_foundation_plan_with_holes(document.Foundation)
+    assert len(plan.Faces) == 1
+    assert len(plan.Edges) == 34
+    assert len(holes) == 6
+    for hole in holes:
+        assert isinstance(hole, Part.Face)
+    plan, holes = punch_funcs.get_foundation_plan_with_holes(document_mat.Foundation)
+    assert len(plan.Faces) == 1
+    assert len(plan.Edges) == 7
+    assert len(holes) == 1
+    for hole in holes:
+        assert isinstance(hole, Part.Face)
+
 
 
 
