@@ -88,11 +88,11 @@ class Foundation:
 		doc = obj.Document
 		tape_slabs = []
 		for o in doc.Objects:
-			if all(
-				[hasattr(o, "Proxy"),
-				hasattr(o.Proxy, "Type"),
+			if (
+				hasattr(o, "Proxy") and
+				hasattr(o.Proxy, "Type") and
 				o.Proxy.Type in ("tape_slab", "trapezoidal_slab"),
-				]):
+				):
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
 		obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
