@@ -26,22 +26,25 @@ class Area:
     def export_freecad_slabs(self,
         doc : 'App.Document' = None,
         split_mat : bool = True,
-        soil_name : str = 'SOIL2',
+        soil_name : str = 'SOIL',
         soil_modulus : float = 2,
             ):
-        self.etabs.set_current_unit('kN', 'mm')
         if doc is None:
             doc = FreeCAD.ActiveDocument
         foun = doc.Foundation
         slab_names = []
         if foun.foundation_type == 'Strip':
+            # write soil table
+            names_props = [(soil_name, f'{soil_modulus}')]
+            self.etabs.database.create_area_spring_table(names_props)
+            self.etabs.set_current_unit('kN', 'mm')
             points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
             name = self.create_area_by_coord(points[0])
             slab_names.append(name)
             self.export_freecad_soil_support(
                 slab_names=slab_names,
                 soil_name=soil_name,
-                soil_modulus=soil_modulus,
+                soil_modulus=None,
             )
             self.etabs.set_current_unit('kN', 'mm')
             for pts in points[1:]:
@@ -54,6 +57,13 @@ class Area:
                 self.SapModel.AreaObj.SetOpening(name, True)
         elif foun.foundation_type == 'Mat':
             if split_mat:
+                names_props = [
+                    (soil_name, f'{soil_modulus}'),
+                    (f'{soil_name}_1.5', f'{soil_modulus * 1.5}'),
+                    (f'{soil_name}_2', f'{soil_modulus * 2}'),
+                ]
+                self.etabs.database.create_area_spring_table(names_props)
+                self.etabs.set_current_unit('kN', 'mm')
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
                     foun.plane_without_openings,
                 )
@@ -63,19 +73,22 @@ class Area:
                 self.export_freecad_soil_support(
                     slab_names=[slab_names[-1]],
                     soil_name=soil_name,
-                    soil_modulus=soil_modulus,
+                    soil_modulus=None,
                 )
                 self.export_freecad_soil_support(
                     slab_names=slab_names[:2],
                     soil_name=f'{soil_name}_2',
-                    soil_modulus=soil_modulus * 2,
+                    soil_modulus=None,
                 )
                 self.export_freecad_soil_support(
                     slab_names=slab_names[2:4],
                     soil_name=f'{soil_name}_1.5',
-                    soil_modulus=soil_modulus * 1.5,
+                    soil_modulus=None,
                 )
             else:
+                names_props = [(soil_name, f'{soil_modulus}')]
+                self.etabs.database.create_area_spring_table(names_props)
+                self.etabs.set_current_unit('kN', 'mm')
                 edges = foun.plane_without_openings.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points)
@@ -83,7 +96,7 @@ class Area:
                 self.export_freecad_soil_support(
                     slab_names=slab_names,
                     soil_name=soil_name,
-                    soil_modulus=soil_modulus,
+                    soil_modulus=None,
                 )
         return slab_names
 
@@ -201,8 +214,9 @@ class Area:
         soil_name : str = 'SOIL1',
         ):
         self.etabs.set_current_unit('kgf', 'cm')
-        self.SapModel.PropAreaSpring.SetAreaSpringProp(
-            soil_name, 0, 0, soil_modulus , 3)
+        if soil_modulus is not None:
+            self.SapModel.PropAreaSpring.SetAreaSpringProp(
+                soil_name, 0, 0, soil_modulus , 3)
         for s in slab_names:
             self.SapModel.AreaObj.SetSpringAssignment(s, soil_name)
     
