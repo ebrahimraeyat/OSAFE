@@ -35,16 +35,23 @@ class Area:
         foun = doc.Foundation
         slab_names = []
         if foun.foundation_type == 'Strip':
-            slabs = foun.tape_slabs
-            for slab in slabs:
-                points = slab.points
-                name = self.create_area_by_coord(points)
-                slab_names.append(name)
+            points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
+            name = self.create_area_by_coord(points[0])
+            slab_names.append(name)
             self.export_freecad_soil_support(
                 slab_names=slab_names,
                 soil_name=soil_name,
                 soil_modulus=soil_modulus,
             )
+            self.etabs.set_current_unit('kN', 'mm')
+            for pts in points[1:]:
+                n = len(pts)
+                xs = [p.x for p in pts]
+                ys = [p.y for p in pts]
+                zs = [p.z for p in pts]
+                ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
+                name = ret[3]
+                self.SapModel.AreaObj.SetOpening(name, True)
         elif foun.foundation_type == 'Mat':
             if split_mat:
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
@@ -52,7 +59,6 @@ class Area:
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points)
-                    # assert type(name) == str
                     slab_names.append(name)
                 self.export_freecad_soil_support(
                     slab_names=[slab_names[-1]],
@@ -110,7 +116,10 @@ class Area:
         self.etabs.set_current_unit('kN', 'mm')
         if doc is None:
             doc = FreeCAD.ActiveDocument
-        openings = doc.Foundation.openings
+        foun = doc.Foundation
+        if foun.foundation_type == 'Strip':
+            return
+        openings = foun.openings
         for opening in openings:
             points = opening.points
             n = len(points)
