@@ -427,16 +427,16 @@ class DatabaseTables:
             loadcases : list = None,
             section_cuts: list = None,
             ):
-            self.etabs.run_analysis()
-            table = 'Section Cut Forces - Analysis'
-            columns = ['SectionCut', 'OutputCase', 'F1', 'F2']
-            self.etabs.load_cases.select_load_cases(loadcases)
-            df = self.read(table, to_dataframe=True, cols=columns)
-            df = df[
-                    (df['OutputCase'].isin(loadcases)) &
-                    (df['SectionCut'].isin(section_cuts))
-                    ]
-            return df
+        self.etabs.run_analysis()
+        table = 'Section Cut Forces - Analysis'
+        columns = ['SectionCut', 'OutputCase', 'F1', 'F2']
+        self.etabs.load_cases.select_load_cases(loadcases)
+        df = self.read(table, to_dataframe=True, cols=columns)
+        df = df[
+                (df['OutputCase'].isin(loadcases)) &
+                (df['SectionCut'].isin(section_cuts))
+                ]
+        return df
 
     def get_joint_design_reactions(self):
         self.select_design_load_combinations()
@@ -584,6 +584,20 @@ class DatabaseTables:
             cols.insert(1, 'Story')
         df = self.read(table_key, to_dataframe=True, cols=cols)
         return df
+
+    def create_area_spring_table(self,
+            names_props : list,
+            ) -> None:
+        table_key = 'Spring Property Definitions - Area Springs'
+        fields = ('Name', 'SubModulus', 'NonlinOpt')
+        data = []
+        for name, submodulus in names_props:
+            data.append(
+            (name, submodulus, 'Compression Only')
+            )
+        data = self.unique_data(data)
+        self.etabs.set_current_unit('kgf', 'cm')
+        self.apply_data(table_key, data, fields)
 
     
 

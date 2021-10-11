@@ -164,3 +164,9 @@ def test_get_strip_connectivity(shayesteh_safe):
     df = shayesteh_safe.database.get_strip_connectivity()
     assert len(df) == shayesteh_safe.SapModel.DesignConcreteSlab.DesignStrip.GetNameList()[0]
 
+@pytest.mark.applymethod
+def test_create_area_spring_table(shayesteh_safe):
+    names_props = [('SOIL', '2'), ('SOIL_1.5', '3'), ('SOIL_2', '4')]
+    df = shayesteh_safe.database.create_area_spring_table(names_props)
+    
+
