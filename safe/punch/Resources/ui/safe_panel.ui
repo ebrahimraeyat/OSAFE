@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>249</width>
-    <height>265</height>
+    <height>312</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,17 +60,17 @@
       <string>Soil Properties</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="soil_name">
+        <property name="text">
+         <string>SOIL</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="soil_name">
-        <property name="text">
-         <string>SOIL2</string>
         </property>
        </widget>
       </item>
@@ -103,6 +103,19 @@
         </property>
         <property name="value">
          <double>2.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="split">
+        <property name="toolTip">
+         <string>Split mat foundation to 3 Area</string>
+        </property>
+        <property name="text">
+         <string>Split Mat</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

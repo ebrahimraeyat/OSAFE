@@ -18,6 +18,7 @@ class SafeTaskPanel:
 
     def export_to_safe(self):
         software = self.form.software.currentText()
+        split = self.form.split.isChecked()
         etabs = etabs_obj.EtabsModel(backup=False, software=software)
         etabs.unlock_model()
         doc = FreeCAD.ActiveDocument
@@ -26,6 +27,7 @@ class SafeTaskPanel:
             soil_modulus = self.form.soil_modulus.value()
             etabs.area.export_freecad_slabs(
                 doc,
+                split_mat = split,
                 soil_name=soil_name,
                 soil_modulus=soil_modulus,
             )
