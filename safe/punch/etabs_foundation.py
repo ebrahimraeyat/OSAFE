@@ -89,6 +89,12 @@ class Foundation:
 				"top_face",
 				"Foundation",
 				)
+		if not hasattr(obj, "loadcases"):
+			obj.addProperty(
+				"App::PropertyStringList",
+				"loadcases",
+				"Loads",
+				)
 
 	def execute(self, obj):
 		doc = obj.Document
@@ -150,6 +156,7 @@ def make_foundation(
 	fc: int = 25,
 	height : int = 800,
 	foundation_type : str = 'Strip',
+	load_cases : list = [],
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
 	# obj = FreeCAD.ActiveDocument.addObject("Part::MultiFuse", "Fusion")
@@ -161,6 +168,7 @@ def make_foundation(
 	obj.height = height
 	obj.d = height - cover
 	obj.foundation_type = foundation_type
+	obj.loadcases = load_cases
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 

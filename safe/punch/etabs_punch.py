@@ -72,7 +72,9 @@ class EtabsPunch(object):
     def create_foundation(self,
         ):
         self.create_slabs_plane()
-        self.foundation = etabs_foundation.make_foundation(self.cover, self.fc, self.height, self.foundation_type)
+        Load_cases = self.etabs.load_cases.get_loadcase_withtype(1)
+        self.foundation = etabs_foundation.make_foundation(
+            self.cover, self.fc, self.height, self.foundation_type, Load_cases)
 
     def create_punches(self):
         joint_design_reactions = self.etabs.database.get_joint_design_reactions()
@@ -149,17 +151,3 @@ class EtabsPunch(object):
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()
-
-
-def open(filename):
-    import os
-    docname = os.path.splitext(os.path.basename(filename))[0]
-    doc = FreeCAD.newDocument(docname)
-    doc.Label = docname
-    doc = insert(filename, doc.Name)
-    return doc
-
-
-def insert(filename, docname):
-    geom = Geom(filename)
-    geom.plot()
