@@ -83,6 +83,12 @@ class Foundation:
 				"foundation_type",
 				"Foundation",
 				).foundation_type = ['Strip', 'Mat']
+		if not hasattr(obj, "top_face"):
+			obj.addProperty(
+				"App::PropertyString",
+				"top_face",
+				"Foundation",
+				)
 
 	def execute(self, obj):
 		doc = obj.Document
@@ -97,12 +103,21 @@ class Foundation:
 		obj.tape_slabs = tape_slabs
 		obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
 		obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+		for i, face in enumerate(obj.Shape.Faces, start=1):
+			if face.BoundBox.ZLength == 0 and face.BoundBox.ZMax == 0:
+				obj.top_face = f'Face{i}'
+		for o in doc.Objects:
+			if (
+				hasattr(o, 'TypeId') and
+				o.TypeId == 'Fem::ConstraintForce'
+				):
+				o.References = [obj, obj.top_face]
 		obj.d = obj.height - obj.cover
 
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
 		self.set_properties(obj)
-        
+		
 class ViewProviderFoundation:
 
 	def __init__(self, vobj):
