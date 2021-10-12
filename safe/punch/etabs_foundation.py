@@ -91,7 +91,7 @@ class Foundation:
 			if (
 				hasattr(o, "Proxy") and
 				hasattr(o.Proxy, "Type") and
-				o.Proxy.Type in ("tape_slab", "trapezoidal_slab"),
+				o.Proxy.Type in ("tape_slab", "trapezoidal_slab")
 				):
 				tape_slabs.append(o)
 		obj.tape_slabs = tape_slabs
