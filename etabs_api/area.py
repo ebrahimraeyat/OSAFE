@@ -219,6 +219,18 @@ class Area:
                 soil_name, 0, 0, soil_modulus , 3)
         for s in slab_names:
             self.SapModel.AreaObj.SetSpringAssignment(s, soil_name)
+
+    def set_uniform_gravity_load(self,
+        area_name : str,
+        load_pat : str,
+        value : float,
+        ) -> None:
+        self.SapModel.AreaObj.SetLoadUniform(
+            area_name,
+            load_pat,
+            -value,
+            6,  # Dir
+        )
     
     @staticmethod
     def get_vertex_from_point(point):

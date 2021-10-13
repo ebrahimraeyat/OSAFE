@@ -60,5 +60,14 @@ def test_export_freecad_strips(shayesteh_safe):
 def test_export_freecad_stiff_elements(shayesteh_safe):
     shayesteh_safe.area.export_freecad_stiff_elements(document)
 
+def test_set_uniform_gravity_load(shayesteh_safe):
+    shayesteh_safe.area.set_uniform_gravity_load(
+        '1', 'DEAD', 350
+    )
+    ret = shayesteh_safe.SapModel.AreaObj.GetLoadUniform('1')
+    assert ret[2][0] == 'DEAD'
+    assert ret[4][0] == 6
+    assert ret[5][0] == -350
+
 if __name__ == '__main__':
     test_export_freecad_stiff_elements(shayesteh_safe)
