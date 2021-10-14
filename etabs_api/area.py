@@ -221,16 +221,18 @@ class Area:
             self.SapModel.AreaObj.SetSpringAssignment(s, soil_name)
 
     def set_uniform_gravity_load(self,
-        area_name : str,
+        area_names : list,
         load_pat : str,
         value : float,
         ) -> None:
-        self.SapModel.AreaObj.SetLoadUniform(
-            area_name,
-            load_pat,
-            -value,
-            6,  # Dir
-        )
+        self.etabs.set_current_unit('kgf', 'm')
+        for area_name in area_names:
+            self.SapModel.AreaObj.SetLoadUniform(
+                area_name,
+                load_pat,
+                -value,
+                6,  # Dir
+            )
     
     @staticmethod
     def get_vertex_from_point(point):

@@ -22,15 +22,24 @@ class SafeTaskPanel:
         etabs = etabs_obj.EtabsModel(backup=False, software=software)
         etabs.unlock_model()
         doc = FreeCAD.ActiveDocument
+        slab_names = []
         if self.form.slabs_checkbox.isChecked():
             soil_name = self.form.soil_name.text()
             soil_modulus = self.form.soil_modulus.value()
-            etabs.area.export_freecad_slabs(
+            slab_names = etabs.area.export_freecad_slabs(
                 doc,
                 split_mat = split,
                 soil_name=soil_name,
                 soil_modulus=soil_modulus,
             )
+        if self.form.loads_checkbox.isChecked():
+            loads = doc.findObjects(Type='Fem::ConstraintForce')
+            for load in loads:
+                etabs.area.set_uniform_gravity_load(
+                    slab_names,
+                    load.loadcase,
+                    load.Force,
+                    )
         if self.form.openings_checkbox.isChecked():
             etabs.area.export_freecad_openings(doc)
         if self.form.strips_checkbox.isChecked():
