@@ -28,10 +28,21 @@ class Area:
         split_mat : bool = True,
         soil_name : str = 'SOIL',
         soil_modulus : float = 2,
+        slab_sec_name : Union[str, None] = None,
             ):
         if doc is None:
             doc = FreeCAD.ActiveDocument
         foun = doc.Foundation
+        if slab_sec_name is None:
+            foun_height = int(foun.height.Value)
+            slab_sec_name = f'SLAB{foun_height}'
+        # creating concrete material
+        fc = int(foun.fc.getValueAs('N/(mm^2)'))
+        self.etabs.set_current_unit('N', 'mm')
+        self.SapModel.PropMaterial.SetMaterial(f'C{fc}', 2)
+        self.SapModel.PropMaterial.SetOConcrete(f'C{fc}', fc, False, 0, 1, 1, .002, .005)
+        self.SapModel.PropArea.SetSlab(slab_sec_name, 5, 2, f'C{fc}', foun_height)
+        
         slab_names = []
         if foun.foundation_type == 'Strip':
             # write soil table
@@ -39,7 +50,7 @@ class Area:
             self.etabs.database.create_area_spring_table(names_props)
             self.etabs.set_current_unit('kN', 'mm')
             points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
-            name = self.create_area_by_coord(points[0])
+            name = self.create_area_by_coord(points[0], slab_sec_name)
             slab_names.append(name)
             self.export_freecad_soil_support(
                 slab_names=slab_names,
@@ -52,7 +63,7 @@ class Area:
                 xs = [p.x for p in pts]
                 ys = [p.y for p in pts]
                 zs = [p.z for p in pts]
-                ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
+                ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, '', slab_sec_name)
                 name = ret[3]
                 self.SapModel.AreaObj.SetOpening(name, True)
         elif foun.foundation_type == 'Mat':
@@ -68,7 +79,7 @@ class Area:
                     foun.plane_without_openings,
                 )
                 for points in area_points:
-                    name = self.create_area_by_coord(points)
+                    name = self.create_area_by_coord(points, slab_sec_name)
                     slab_names.append(name)
                 self.export_freecad_soil_support(
                     slab_names=[slab_names[-1]],
@@ -91,7 +102,7 @@ class Area:
                 self.etabs.set_current_unit('kN', 'mm')
                 edges = foun.plane_without_openings.Edges
                 points = self.get_sort_points(edges)
-                name = self.create_area_by_coord(points)
+                name = self.create_area_by_coord(points, slab_sec_name)
                 slab_names.append(name)
                 self.export_freecad_soil_support(
                     slab_names=slab_names,
@@ -122,7 +133,7 @@ class Area:
         if prop_name is None:
             ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
         else:
-            ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, PropName=prop_name)
+            ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, '', prop_name)
         return ret[3]
 
     def export_freecad_openings(self, doc : 'App.Document' = None):
