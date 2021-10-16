@@ -33,14 +33,16 @@ class SafeTaskPanel:
                 soil_modulus=soil_modulus,
             )
         if self.form.loads_checkbox.isChecked():
-            loads = doc.findObjects(Type='Fem::ConstraintForce')
-            for load in loads:
-                etabs.area.set_uniform_gravity_load(
-                    slab_names,
-                    load.loadcase,
-                    load.Force,
-                    )
-        
+            try:
+                loads = doc.findObjects(Type='Fem::ConstraintForce')
+                for load in loads:
+                    etabs.area.set_uniform_gravity_load(
+                        slab_names,
+                        load.loadcase,
+                        load.Force,
+                        )
+            except TypeError:
+                print('Can not find any loads in model')
         if self.form.wall_loads.isChecked():
             etabs.area.export_freecad_wall_loads(doc)
         if self.form.openings_checkbox.isChecked():
