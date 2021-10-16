@@ -242,6 +242,32 @@ class CivilForce:
         return not FreeCAD.ActiveDocument is None
 
 
+class CivilWall:
+
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "civil_wall",
+            "Create wall")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "civil_wall",
+            "Create wall on foundation")
+        path = str(
+                   Path(civilwelcome.__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "wall.svg"
+                   )
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
+    
+    def Activated(self):
+        from safe.punch.py_widget import wall_panel
+        panel = wall_panel.WallTaskPanel()
+        Gui.Control.showDialog(panel)
+        return panel
+
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
+
+
 class CivilOpeningEtabs:
 
     def GetResources(self):
@@ -387,6 +413,7 @@ class SerialForm:
 Gui.addCommand('Civil_etabs', CivilEtabs())
 Gui.addCommand('Civil_opening_etabs', CivilOpeningEtabs())
 Gui.addCommand('Civil_force', CivilForce())
+Gui.addCommand('Civil_wall', CivilWall())
 Gui.addCommand('Civil_safe', CivilSafe())
 Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
@@ -402,6 +429,7 @@ command_list = [
             "Civil_etabs",
             "Civil_opening_etabs",
             "Civil_force",
+            "Civil_wall",
             "Civil_safe",
             "Copy",
             "Civil_pdf",
