@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>268</width>
-    <height>343</height>
+    <height>370</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,6 +58,16 @@
     <widget class="QCheckBox" name="loads_checkbox">
      <property name="text">
       <string>Loads</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="wall_loads">
+     <property name="text">
+      <string>Wall Loads</string>
      </property>
      <property name="checked">
       <bool>true</bool>

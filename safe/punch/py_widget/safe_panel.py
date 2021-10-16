@@ -40,6 +40,9 @@ class SafeTaskPanel:
                     load.loadcase,
                     load.Force,
                     )
+        
+        if self.form.wall_loads.isChecked():
+            etabs.area.export_freecad_wall_loads(doc)
         if self.form.openings_checkbox.isChecked():
             etabs.area.export_freecad_openings(doc)
         if self.form.strips_checkbox.isChecked():

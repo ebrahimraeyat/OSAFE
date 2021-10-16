@@ -69,5 +69,9 @@ def test_set_uniform_gravity_load(shayesteh_safe):
     assert ret[4][0] == 6
     assert ret[5][0] == -350
 
+def test_export_freecad_wall_loads(shayesteh_safe):
+    shayesteh_safe.area.export_freecad_wall_loads(document)
+    
+
 if __name__ == '__main__':
     test_export_freecad_stiff_elements(shayesteh_safe)

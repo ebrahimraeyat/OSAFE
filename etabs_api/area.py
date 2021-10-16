@@ -219,6 +219,30 @@ class Area:
                 points = self.get_sort_points(o.rect.Edges)
                 self.create_area_by_coord(points, prop_name='COL_STIFF')
     
+    def export_freecad_wall_loads(self, doc : 'App.Document' = None):
+        if doc is None:
+            doc = FreeCAD.ActiveDocument
+        for o in doc.Objects:
+            if (hasattr(o, "Proxy") and 
+                hasattr(o.Proxy, "Type") and 
+                o.Proxy.Type == "Wall"
+                ):
+                mass_per_area = o.weight
+                height = o.Height.Value / 1000
+                p1 = o.Base.start_point
+                p2 = o.Base.end_point
+                self.etabs.set_current_unit('kgf', 'mm')
+                frame = self.SapModel.FrameObj.AddByCoord(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z,'', 'None')
+                name = frame[0]
+                loadpat = self.etabs.load_patterns.get_special_load_pattern_names(1)[0]
+                self.etabs.set_current_unit('kgf', 'm')
+                self.etabs.frame_obj.assign_gravity_load_from_wall(
+                    name = name,
+                    loadpat = loadpat,
+                    mass_per_area = mass_per_area,
+                    height = height,
+                )
+
     def export_freecad_soil_support(self,
         slab_names : list,
         soil_modulus : float = 2,
