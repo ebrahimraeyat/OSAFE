@@ -211,7 +211,7 @@ class CivilSafe:
         allow, check = allowed_to_continue(
             'safe_export.bin',
             'https://gist.githubusercontent.com/ebrahimraeyat/0f14001cbbd16a23bfc8d2844d97947b/raw/',
-            'foundation',
+            'punch',
             )
         if not allow:
             return
