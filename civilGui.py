@@ -208,9 +208,17 @@ class CivilSafe:
                 'ToolTip': ToolTip}
     
     def Activated(self):
+        allow, check = allowed_to_continue(
+            'safe_export.bin',
+            'https://gist.githubusercontent.com/ebrahimraeyat/0f14001cbbd16a23bfc8d2844d97947b/raw/',
+            'foundation',
+            )
+        if not allow:
+            return
         from safe.punch.py_widget import safe_panel
         panel = safe_panel.SafeTaskPanel()
         Gui.Control.showDialog(panel)
+        show_warning_about_number_of_use(check)
         return panel
 
     def IsActive(self):
