@@ -65,7 +65,7 @@ class DatabaseTables:
     def apply_data(self,
             table_key : str,
             data : Union[list, pd.core.frame.DataFrame],
-            fields : Union[list, bool] = None,
+            fields : Union[list, tuple, bool] = None,
             ) -> None:
         if type(data) == pd.core.frame.DataFrame:
             fields = list(data.columns)
@@ -598,6 +598,31 @@ class DatabaseTables:
         data = self.unique_data(data)
         self.etabs.set_current_unit('kgf', 'cm')
         self.apply_data(table_key, data, fields)
+
+    def create_punching_shear_general_table(self,
+            punches : list,
+            ) -> None:
+        table_key = 'Concrete Slab Design Overwrites - Punching Shear - General'
+        fields = ('UniqueName', 'CheckPunchingShear', 'LocationType', 'Perimeter',
+                'UserXDim', 'UserYDim', 'UserAngle', 'EffDepthType', 'EffDepth',
+                )
+        data = []
+        for punch in punches:
+            data.append(
+            (punch.id,
+            'Program Determined',
+            punch.Location,
+            'Specified Perimeter',
+            f'{punch.bx}',
+            f'{punch.by}',
+            f'{punch.angle.Value}',
+            'Specified',
+            f'{punch.d}',
+            ))
+        data = self.unique_data(data)
+        self.etabs.set_current_unit('kgf', 'mm')
+        self.apply_data(table_key, data, fields)
+
 
     
 

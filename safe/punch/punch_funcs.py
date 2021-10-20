@@ -162,14 +162,14 @@ def location_of_column(
 		signy = faces_normals['y'][0] > 0
 		if not signy:
 			if not signx:
-				return 'Corner3'
+				return 'Corner 3'
 			elif signx:
-				return 'Corner4'
+				return 'Corner 4'
 		elif signy:
 			if signx:
-				return 'Corner1'
+				return 'Corner 1'
 			elif not signx:
-				return 'Corner2'
+				return 'Corner 2'
 		else:
 			return 'Corner'
 	elif no_of_faces == 3:
@@ -177,22 +177,22 @@ def location_of_column(
 		sumy = sum(faces_normals['y'])
 		if sumx == 0:
 			if sumy == -1:
-				return 'Edge3'
+				return 'Edge 3'
 			elif sumy == 1:
-				return 'Edge1'
+				return 'Edge 1'
 		elif sumy == 0:
 			if sumx == 1:
-				return 'Edge4'
+				return 'Edge 4'
 			elif sumx == -1:
-				return 'Edge2'
+				return 'Edge 2'
 		else:
 			return 'Edge'
 	else:
-		return 'Interier'
+		return 'Interior'
 
 
 def allowable_stress(bx, by, location, fc, b0, d, ACI2019=False, phi_c=.75):
-	alpha_ss = {'interier': 40, 'edge': 30, 'corner': 20}
+	alpha_ss = {'Interior': 40, 'edge': 30, 'corner': 20}
 	b0d = b0 * d
 	beta = bx / by
 	if beta < 1:
@@ -226,15 +226,15 @@ def get_user_location_faces(
                             ) -> List[Part.Face]:
 
 	location_normals = {
-			'Corner3': [(0, -1, 0), (-1, 0, 0)],
-			'Corner4': [(0, -1, 0), (1, 0, 0)],
-			'Corner1': [(0, 1, 0), (1, 0, 0)],
-			'Corner2': [(0, 1, 0), (-1, 0, 0)],
-			'Edge3': [(0, -1, 0), (-1, 0, 0), (1, 0, 0)],
-			'Edge4': [(0, -1, 0), (1, 0, 0), (0, 1, 0)],
-			'Edge1': [(0, 1, 0), (1, 0, 0), (-1, 0, 0)],
-			'Edge2': [(0, 1, 0), (-1, 0, 0), (0, -1, 0)],
-			'Interier': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
+			'Corner 3': [(0, -1, 0), (-1, 0, 0)],
+			'Corner 4': [(0, -1, 0), (1, 0, 0)],
+			'Corner 1': [(0, 1, 0), (1, 0, 0)],
+			'Corner 2': [(0, 1, 0), (-1, 0, 0)],
+			'Edge 3': [(0, -1, 0), (-1, 0, 0), (1, 0, 0)],
+			'Edge 4': [(0, -1, 0), (1, 0, 0), (0, 1, 0)],
+			'Edge 1': [(0, 1, 0), (1, 0, 0), (-1, 0, 0)],
+			'Edge 2': [(0, 1, 0), (-1, 0, 0), (0, -1, 0)],
+			'Interior': [(0, 1, 0), (-1, 0, 0), (0, -1, 0), (1, 0, 0)]
 			}
 
 	normals = location_normals[location]

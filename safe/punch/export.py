@@ -55,9 +55,9 @@ def createPdf(doc, pdfName):
             c = o.text.Placement.Base
             ha = 'right'
             va = 'center'
-            if o.Location in ('Corner2', 'Edge2', 'Corner3', 'Interier'):
+            if o.Location in ('Corner 2', 'Edge 2', 'Corner 3', 'Interior'):
                 ha = 'left'
-            if o.Location in ('Corner3', 'Edge3', 'Corner4', 'Interier'):
+            if o.Location in ('Corner 3', 'Edge 3', 'Corner 4', 'Interior'):
                 va = 'bottom'
             ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=o.angle.Value, annotation_clip=False)
 
@@ -231,9 +231,9 @@ def get_alignment(
                   p: "FeaturePython",
                   ) -> int:
     v = "MIDDLE"
-    if p.Location == "Edge1":
+    if p.Location == "Edge 1":
         v = "TOP"
-    if p.Location == "Edge3":
+    if p.Location == "Edge 3":
         v = "BOTTOM"
     h = p.text.ViewObject.Justification.upper()
     alignment = f"{v}_{h}"

@@ -17,7 +17,7 @@ class Punch:
 		obj.Proxy = self
 		self.Type = "Punch"
 		self.set_properties(obj)
-		obj.Location = ['Corner1', 'Corner2', 'Corner3', 'Corner4', 'Edge1', 'Edge2', 'Edge3', 'Edge4', 'Interier']
+		obj.Location = ['Corner 1', 'Corner 2', 'Corner 3', 'Corner 4', 'Edge 1', 'Edge 2', 'Edge 3', 'Edge 4', 'Interior']
 
 	def set_properties(self, obj):
 		if not hasattr(obj, "text"):
@@ -208,7 +208,7 @@ class Punch:
 		return
 
 	def alphas(self, location):
-		if 'Interier' in location:
+		if 'Interior' in location:
 			return 40
 		elif 'Edge' in location:
 			return 30
@@ -367,38 +367,38 @@ class ViewProviderPunch:
 
 	def set_text_placement(self, obj):
 		xs = {
-				'Corner1': 'bb.XMin',
-				'Corner2': 'bb.XMax',
-				'Corner3': 'bb.XMax',
-				'Corner4': 'bb.XMin',
-				'Edge1': 'bb.Center.x',
-				'Edge2': 'bb.XMax',
-				'Edge3': 'bb.Center.x',
-				'Edge4': 'bb.XMin',
-				'Interier': 'bb.Center.x',
+				'Corner 1': 'bb.XMin',
+				'Corner 2': 'bb.XMax',
+				'Corner 3': 'bb.XMax',
+				'Corner 4': 'bb.XMin',
+				'Edge 1': 'bb.Center.x',
+				'Edge 2': 'bb.XMax',
+				'Edge 3': 'bb.Center.x',
+				'Edge 4': 'bb.XMin',
+				'Interior': 'bb.Center.x',
 			  }
 		ys = {
-				'Corner1': 'bb.Center.y',
-				'Corner2': 'bb.Center.y',
-				'Corner3': 'bb.Center.y',
-				'Corner4': 'bb.Center.y',
-				'Edge1': 'bb.YMin',
-				'Edge2': 'bb.Center.y',
-				'Edge3': 'bb.YMax',
-				'Edge4': 'bb.Center.y',
-				'Interier': 'bb.YMax',
+				'Corner 1': 'bb.Center.y',
+				'Corner 2': 'bb.Center.y',
+				'Corner 3': 'bb.Center.y',
+				'Corner 4': 'bb.Center.y',
+				'Edge 1': 'bb.YMin',
+				'Edge 2': 'bb.Center.y',
+				'Edge 3': 'bb.YMax',
+				'Edge 4': 'bb.Center.y',
+				'Interior': 'bb.YMax',
 			  }
 
 		justifications = {
-				'Corner1': 'Right',
-				'Corner2': 'Left',
-				'Corner3': 'Left',
-				'Corner4': 'Right',
-				'Edge1': 'Center',
-				'Edge2': 'Left',
-				'Edge3': 'Center',
-				'Edge4': 'Right',
-				'Interier': 'Center',
+				'Corner 1': 'Right',
+				'Corner 2': 'Left',
+				'Corner 3': 'Left',
+				'Corner 4': 'Right',
+				'Edge 1': 'Center',
+				'Edge 2': 'Left',
+				'Edge 3': 'Center',
+				'Edge 4': 'Right',
+				'Interior': 'Center',
 			  }
 		bb = obj.Shape.BoundBox
 		location = obj.Location
@@ -409,7 +409,7 @@ class ViewProviderPunch:
 		obj.text.Placement.Rotation = rot
 		if hasattr(obj.text.ViewObject, "Justification"):
 			obj.text.ViewObject.Justification = justifications[location]
-		if location in ("Edge3", "Interier"):
+		if location in ("Edge 3", "Interior"):
 			if hasattr(obj.text.ViewObject, "LineSpacing"):
 				obj.text.ViewObject.LineSpacing = -1.00
 
@@ -467,7 +467,7 @@ def make_punch(
 	by: Union[float, int],
 	center: FreeCAD.Vector,
 	combos_load: dict,
-	location: str = 'Corner1',
+	location: str = 'Corner 1',
 	angle : float = 0,
 	):
 

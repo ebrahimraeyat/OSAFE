@@ -31,47 +31,47 @@
        <widget class="QComboBox" name="location">
         <item>
          <property name="text">
-          <string>Corner1</string>
+          <string>Corner 1</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Corner2</string>
+          <string>Corner 2</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Corner3</string>
+          <string>Corner 3</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Corner4</string>
+          <string>Corner 4</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Edge1</string>
+          <string>Edge 1</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Edge2</string>
+          <string>Edge 2</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Edge3</string>
+          <string>Edge 3</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Edge4</string>
+          <string>Edge 4</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Interier</string>
+          <string>Interior</string>
          </property>
         </item>
        </widget>
