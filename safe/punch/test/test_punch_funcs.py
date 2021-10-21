@@ -171,6 +171,13 @@ def test_punch_null_edges():
     assert len(null_edges) == 6
     assert len(common_edges) == 6
 
+def test_punch_null_points():
+    punch = document.Punch002
+    null_edges, null_points = punch_funcs.punch_null_points(punch)
+    assert null_edges == [0, 1, 1, 0, 0, 1]
+    assert len(null_edges) == 6
+    assert len(null_points) == 6
+
 
 
 

@@ -80,6 +80,14 @@ def punch_null_edges(
 			null_edges.append(1)
 	return null_edges, common_edges
 
+def punch_null_points(
+	punch,
+	) -> tuple:
+	null_edges, common_edges = punch_null_edges(punch)
+	null_points = get_sort_points(common_edges)
+	return null_edges, null_points
+
+
 def punch_faces(
 	edges: List[Part.Edge],
 	d: Union[float, int],
