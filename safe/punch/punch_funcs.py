@@ -45,7 +45,6 @@ def punch_area_edges(
 	sh1: Part.Shape,
 	sh2: Part.Shape,
 	):
-
 	cut = sh1.cut(sh2)
 	edges = []
 	for e in cut.Edges:
@@ -54,6 +53,28 @@ def punch_area_edges(
 		if sh2.isInside(p1, .1, True) and sh2.isInside(p2, .1, True):
 			edges.append(e)
 	return edges
+
+def punch_null_edges(
+	sh1: Part.Shape,	# foundation shape
+	sh2: Part.Shape,	# offset shape
+	edges : list,
+	) -> tuple:
+	common = sh1.common(sh2)
+	common_edges = Part.__sortEdges__(common.Edges)
+	null_edges = []
+	for e in common_edges:
+		p1 = e.firstVertex().Point
+		p2 = e.lastVertex().Point
+		for e2 in edges:
+			p3 = e2.firstVertex().Point
+			p4 = e2.lastVertex().Point
+			if (p1.isEqual(p3, .1) and p2.isEqual(p4, .1)) or \
+				(p1.isEqual(p4, .1) and p2.isEqual(p3, .1)):
+				null_edges.append(0)
+				break
+		else:
+			null_edges.append(1)
+	return null_edges, common_edges
 
 def punch_faces(
 	edges: List[Part.Edge],

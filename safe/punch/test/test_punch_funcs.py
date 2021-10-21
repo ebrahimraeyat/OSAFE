@@ -9,7 +9,7 @@ sys.path.append(FREECADPATH)
 import FreeCAD
 import Part
 
-filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / '2.FCStd'
+filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
@@ -154,8 +154,31 @@ def test_get_points_of_foundation_plan_and_holes():
     assert len(points) == 7
     assert len(points[0]) == 7
 
+def test_punch_area_edges():
+    obj = document.Punch002
+    d = obj.foundation.d.Value
+    x = obj.bx + d
+    y = obj.by + d
+    offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
+    foun_plan = obj.foundation.plane.copy()
+    edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
+    assert len(edges) == 3
+
+def test_punch_null_edges():
+    obj = document.Punch002
+    d = obj.foundation.d.Value
+    x = obj.bx + d
+    y = obj.by + d
+    offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
+    foun_plan = obj.foundation.plane.copy()
+    edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
+    null_edges, common_edges = punch_funcs.punch_null_edges(foun_plan, offset_shape, edges)
+    assert null_edges == [0, 1, 1, 0, 0, 1]
+    assert len(null_edges) == 6
+    assert len(common_edges) == 6
+
 
 
 
 if __name__ == '__main__':
-    pass
+    test_punch_null_edges()
