@@ -55,11 +55,15 @@ def punch_area_edges(
 	return edges
 
 def punch_null_edges(
-	sh1: Part.Shape,	# foundation shape
-	sh2: Part.Shape,	# offset shape
-	edges : list,
+	punch,
 	) -> tuple:
-	common = sh1.common(sh2)
+	d = punch.foundation.d.Value
+	x = punch.bx + d
+	y = punch.by + d
+	offset_shape = rectangle_face(punch.center_of_load, x, y)
+	foun_plan = punch.foundation.plane.copy()
+	edges = punch_area_edges(foun_plan, offset_shape)
+	common = foun_plan.common(offset_shape)
 	common_edges = Part.__sortEdges__(common.Edges)
 	null_edges = []
 	for e in common_edges:

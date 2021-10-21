@@ -165,14 +165,8 @@ def test_punch_area_edges():
     assert len(edges) == 3
 
 def test_punch_null_edges():
-    obj = document.Punch002
-    d = obj.foundation.d.Value
-    x = obj.bx + d
-    y = obj.by + d
-    offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
-    foun_plan = obj.foundation.plane.copy()
-    edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
-    null_edges, common_edges = punch_funcs.punch_null_edges(foun_plan, offset_shape, edges)
+    punch = document.Punch002
+    null_edges, common_edges = punch_funcs.punch_null_edges(punch)
     assert null_edges == [0, 1, 1, 0, 0, 1]
     assert len(null_edges) == 6
     assert len(common_edges) == 6
