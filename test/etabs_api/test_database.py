@@ -188,6 +188,16 @@ def test_create_punching_shear_general_table(shayesteh_safe):
             punches.append(o)
     shayesteh_safe.database.create_punching_shear_general_table(punches)
 
+@pytest.mark.applymethod
+def test_create_punching_shear_perimeter_table(shayesteh_safe):
+    punches = []
+    for o in document.Objects:
+        if hasattr(o, "Proxy") and \
+            hasattr(o.Proxy, "Type") and \
+            o.Proxy.Type == "Punch":
+            punches.append(o)
+    shayesteh_safe.database.create_punching_shear_perimeter_table(punches)
+
 
     
 

@@ -60,9 +60,15 @@ def punch_null_edges(
 	d = punch.foundation.d.Value
 	x = punch.bx + d
 	y = punch.by + d
+	edges = punch.edges.Edges
 	offset_shape = rectangle_face(punch.center_of_load, x, y)
 	foun_plan = punch.foundation.plane.copy()
-	edges = punch_area_edges(foun_plan, offset_shape)
+	if punch.angle != 0:
+			offset_shape.rotate(
+				punch.center_of_load,
+				FreeCAD.Vector(0, 0, 1),
+				punch.angle.Value,
+				)
 	common = foun_plan.common(offset_shape)
 	common_edges = Part.__sortEdges__(common.Edges)
 	null_edges = []
@@ -74,18 +80,21 @@ def punch_null_edges(
 			p4 = e2.lastVertex().Point
 			if (p1.isEqual(p3, .1) and p2.isEqual(p4, .1)) or \
 				(p1.isEqual(p4, .1) and p2.isEqual(p3, .1)):
-				null_edges.append(0)
+				null_edges.append('No')
 				break
 		else:
-			null_edges.append(1)
+			null_edges.append('Yes')
 	return null_edges, common_edges
 
 def punch_null_points(
 	punch,
 	) -> tuple:
 	null_edges, common_edges = punch_null_edges(punch)
-	null_points = get_sort_points(common_edges)
-	return null_edges, null_points
+	null_points_in_general = get_sort_points(common_edges)
+	null_points_in_local = []
+	for point in null_points_in_general:
+		null_points_in_local.append(point.sub(punch.center_of_punch))
+	return null_edges, null_points_in_local
 
 
 def punch_faces(

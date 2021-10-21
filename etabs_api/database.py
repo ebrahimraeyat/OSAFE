@@ -604,7 +604,7 @@ class DatabaseTables:
             ) -> None:
         table_key = 'Concrete Slab Design Overwrites - Punching Shear - General'
         fields = ('UniqueName', 'CheckPunchingShear', 'LocationType', 'Perimeter',
-                'UserXDim', 'UserYDim', 'UserAngle', 'EffDepthType', 'EffDepth',
+                'EffDepthType', 'EffDepth', 'OpeningDef'
                 )
         data = []
         for punch in punches:
@@ -613,16 +613,43 @@ class DatabaseTables:
             'Program Determined',
             punch.Location,
             'Specified Perimeter',
-            f'{punch.bx}',
-            f'{punch.by}',
-            f'{punch.angle.Value}',
+            # f'{punch.bx}',
+            # f'{punch.by}',
+            # f'{punch.angle.Value}',
             'Specified',
             f'{punch.d}',
+            'Specified',
             ))
         data = self.unique_data(data)
         self.etabs.set_current_unit('kgf', 'mm')
         self.apply_data(table_key, data, fields)
 
+    def create_punching_shear_perimeter_table(self,
+            punches : list,
+            ) -> None:
+        try:
+            from safe.punch import punch_funcs
+        except:
+            import punch_funcs
+        table_key = 'Concrete Slab Design Overwrites - Punching Shear - Perimeter'
+        fields = ('UniqueName', 'PointNum', 'XCoord', 'YCoord', 'Radius', 'IsNull')
+        data = []
+        for punch in punches:
+            name = punch.id
+            nulls, null_points = punch_funcs.punch_null_points(punch)
+            for i, (point, is_null) in enumerate(zip(null_points, nulls), start=1):
+                x, y = point.x, point.y
+                data.append(
+                    (name,
+                    str(i),
+                    f'{x}',
+                    f'{y}',
+                    '0',
+                    is_null,
+                ))
+        data = self.unique_data(data)
+        self.etabs.set_current_unit('kgf', 'mm')
+        self.apply_data(table_key, data, fields)
 
     
 
