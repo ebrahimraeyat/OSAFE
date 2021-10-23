@@ -34,6 +34,11 @@ class SafeReader():
         self.tables_contents = tables_contents
         return tables_contents
 
+    def add_content_to_table(self, table_key, content):
+        curr_content = self.tables_contents.get(table_key, '')
+        self.tables_contents[table_key] = curr_content + content
+        return None
+
     def write(self, filename):
         if self.tables_contents is None:
             self.get_tables_contents()
