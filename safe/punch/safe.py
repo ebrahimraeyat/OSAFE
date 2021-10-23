@@ -1,5 +1,6 @@
 from collections import namedtuple
 import pandas as pd
+pd.options.mode.chained_assignment = None
 import numpy as np
 
 
@@ -181,11 +182,13 @@ class Safe:
 
     def read_load_combinations(self):
         df_comb = self.excel['Load Combinations']
+        df_comb['Combo'] = df_comb['Combo'].astype(str)
         combos_sr = df_comb['Combo'].unique()
         combos_sr_yes = df_comb[df_comb['DSStrength'] == 'Yes']['Combo'].unique()
         df, load_cases_sr = self.read_load_cases()
         index = 0
         combo_df = pd.DataFrame(columns=['Combo', 'Load', 'SF'])
+        combo_df['Combo'] = combo_df['Combo'].astype(str)
         combo_load_dict = {}
         for _, row in df_comb.iterrows():
             if row['Combo'] in combos_sr_yes:
@@ -209,6 +212,7 @@ class Safe:
                                 index += 1
                 elif load in load_cases_sr:
                     case = df[df['LoadCase'] == load]
+                    case['LoadPat'] = case['LoadPat'].astype(str)
                     for _, row4 in case.iterrows():
                         text = combination + row4['LoadPat']
                         i = combo_load_dict.get(text, None)
