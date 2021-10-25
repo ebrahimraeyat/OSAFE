@@ -87,8 +87,6 @@ class FreecadReadwriteModel():
         self.doc = doc
         self.last_point_number = 1000
         self.last_area_number = 1000
-        # self.points_content = ''
-        # self.area_content = ''
 
     def export_freecad_slabs(self,
         split_mat : bool = True,
@@ -108,57 +106,58 @@ class FreecadReadwriteModel():
         openings_names = []
         if foun.foundation_type == 'Strip':
             # write soil table
-            # names_props = [(soil_name, f'{soil_modulus}')]
-            # self.etabs.database.create_area_spring_table(names_props)
+            names_props = [(soil_name, f'{soil_modulus}')]
+            soil_content = create_soil_table(names_props)
+            table_key = "SOIL PROPERTIES"
+            self.safe.add_content_to_table(table_key, soil_content)
             # self.etabs.set_current_unit('kN', 'mm')
             points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
             name = self.create_area_by_coord(points[0],) # slab_sec_name)
             slab_names.append(name)
-            # self.export_freecad_soil_support(
-            #     slab_names=slab_names,
-            #     soil_name=soil_name,
-            #     soil_modulus=None,
-            # )
+            soil_assignment_content =  self.export_freecad_soil_support(
+                slab_names=slab_names,
+                soil_name=soil_name,
+                soil_modulus=None,
+            )
+            table_key = "SOIL PROPERTY ASSIGNMENTS"
+            self.safe.add_content_to_table(table_key, soil_assignment_content)
+            
             for pts in points[1:]:
                 name = self.create_area_by_coord(pts, is_opening=True) # slab_sec_name)
                 openings_names.append(name)
-                # n = len(pts)
-                # xs = [p.x for p in pts]
-                # ys = [p.y for p in pts]
-                # zs = [p.z for p in pts]
-                # ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs, '', slab_sec_name)
-                # name = ret[3]
-                # self.SapModel.AreaObj.SetOpening(name, True)
         elif foun.foundation_type == 'Mat':
             if split_mat:
-                # names_props = [
-                #     (soil_name, f'{soil_modulus}'),
-                #     (f'{soil_name}_1.5', f'{soil_modulus * 1.5}'),
-                #     (f'{soil_name}_2', f'{soil_modulus * 2}'),
-                # ]
-                # self.etabs.database.create_area_spring_table(names_props)
-                # self.etabs.set_current_unit('kN', 'mm')
+                names_props = [
+                    (soil_name, f'{soil_modulus}'),
+                    (f'{soil_name}_1.5', f'{soil_modulus * 1.5}'),
+                    (f'{soil_name}_2', f'{soil_modulus * 2}'),
+                ]
+                soil_content = create_soil_table(names_props)
+                table_key = "SOIL PROPERTIES"
+                self.safe.add_content_to_table(table_key, soil_content)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
                     foun.plane_without_openings,
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points,) # slab_sec_name)
                     slab_names.append(name)
-                # self.export_freecad_soil_support(
-                #     slab_names=[slab_names[-1]],
-                #     soil_name=soil_name,
-                #     soil_modulus=None,
-                # )
-                # self.export_freecad_soil_support(
-                #     slab_names=slab_names[:2],
-                #     soil_name=f'{soil_name}_2',
-                #     soil_modulus=None,
-                # )
-                # self.export_freecad_soil_support(
-                #     slab_names=slab_names[2:4],
-                #     soil_name=f'{soil_name}_1.5',
-                #     soil_modulus=None,
-                # )
+                soil_assignment_content = self.export_freecad_soil_support(
+                    slab_names=[slab_names[-1]],
+                    soil_name=soil_name,
+                    soil_modulus=None,
+                )
+                soil_assignment_content += self.export_freecad_soil_support(
+                    slab_names=slab_names[:2],
+                    soil_name=f'{soil_name}_2',
+                    soil_modulus=None,
+                )
+                soil_assignment_content += self.export_freecad_soil_support(
+                    slab_names=slab_names[2:4],
+                    soil_name=f'{soil_name}_1.5',
+                    soil_modulus=None,
+                )
+                table_key = "SOIL PROPERTY ASSIGNMENTS"
+                self.safe.add_content_to_table(table_key, soil_assignment_content)
             else:
                 # names_props = [(soil_name, f'{soil_modulus}')]
                 # self.etabs.database.create_area_spring_table(names_props)
@@ -339,15 +338,17 @@ class FreecadReadwriteModel():
 
     def export_freecad_soil_support(self,
         slab_names : list,
-        soil_modulus : float = 2,
-        soil_name : str = 'SOIL1',
+        soil_name : str = 'SOIL',
+        soil_modulus : Union[float, bool] = None,
         ):
-        self.etabs.set_current_unit('kgf', 'cm')
-        if soil_modulus is not None:
-            self.SapModel.PropAreaSpring.SetAreaSpringProp(
-                soil_name, 0, 0, soil_modulus , 3)
-        for s in slab_names:
-            self.SapModel.AreaObj.SetSpringAssignment(s, soil_name)
+        # self.etabs.set_current_unit('kgf', 'cm')
+        # if soil_modulus is not None:
+        #     self.SapModel.PropAreaSpring.SetAreaSpringProp(
+        #         soil_name, 0, 0, soil_modulus , 3)
+        soil_assignment_content = ''
+        for slab_name in slab_names:
+            soil_assignment_content += f"Area={slab_name}   SoilProp={soil_name}\n"
+        return soil_assignment_content
 
     def set_uniform_gravity_load(self,
         area_names : list,
@@ -367,6 +368,11 @@ class FreecadReadwriteModel():
     def get_vertex_from_point(point):
         return Part.Vertex(point.x, point.y, point.z)
 
+def create_soil_table(soil_prop):
+    soil_content = ''
+    for name, ks in soil_prop:
+        soil_content += f'Soil={name}   Subgrade={ks}   NonlinOpt="Compression Only"\n'
+    return soil_content
 
 if __name__ == '__main__':
     import sys
