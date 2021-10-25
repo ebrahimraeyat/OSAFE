@@ -19,7 +19,7 @@ __all__ = ['Safe', 'FreecadReadwriteModel']
 class Safe():
 
     def __init__(self,
-            input_f2k_path : Path,
+            input_f2k_path : Path = None,
             output_f2k_path : Path = None,
         ) -> None:
         self.input_f2k_path = input_f2k_path
@@ -37,7 +37,7 @@ class Safe():
         self.__file_object.close()
 
     def get_tables_contents(self):
-        with Safe(self.input_f2k_path) as reader:
+        with open(self.input_f2k_path, 'r') as reader:
             lines = reader.readlines()
             tables_contents = dict()
             n = len("TABLE:  ")
@@ -59,6 +59,23 @@ class Safe():
         self.tables_contents[table_key] = curr_content + content
         return None
 
+    def force_length_unit(self,
+        content : Union[str, bool] = None,
+        ):
+        if content is None:
+            if self.tables_contents is None:
+                self.get_tables_contents()
+            table_key = "PROGRAM CONTROL"
+            content = self.tables_contents.get(table_key, None)
+            if content is None:
+                return
+        label = 'CurrUnits="'
+        init_curr_unit = content.find(label)
+        init_unit_index = init_curr_unit + len(label)
+        end_unit_index = content[init_unit_index:].find('"') + init_unit_index
+        force, length, _ = content[init_unit_index: end_unit_index].split(', ')
+        return force, length
+
     def write(self):
         if self.tables_contents is None:
             self.get_tables_contents()
@@ -71,6 +88,8 @@ class Safe():
 
 
 class FreecadReadwriteModel():
+    force_units = dict(N=9.81, kN=9810, Kgf=1, tonf=1000)
+    length_units = dict(mm=1, cm=.1, m=.001)
 
     def __init__(
                 self,
@@ -82,6 +101,7 @@ class FreecadReadwriteModel():
             output_f2k_path = input_f2k_path
         self.safe = Safe(input_f2k_path, output_f2k_path)
         self.safe.get_tables_contents()
+        self.force_unit, self.length_unit = self.safe.force_length_unit()
         if doc is None:
             doc = FreeCAD.ActiveDocument
         self.doc = doc
@@ -106,8 +126,8 @@ class FreecadReadwriteModel():
         openings_names = []
         if foun.foundation_type == 'Strip':
             # write soil table
-            names_props = [(soil_name, f'{soil_modulus}')]
-            soil_content = create_soil_table(names_props)
+            names_props = [(soil_name, soil_modulus)]
+            soil_content = self.create_soil_table(names_props)
             table_key = "SOIL PROPERTIES"
             self.safe.add_content_to_table(table_key, soil_content)
             # self.etabs.set_current_unit('kN', 'mm')
@@ -125,14 +145,15 @@ class FreecadReadwriteModel():
             for pts in points[1:]:
                 name = self.create_area_by_coord(pts, is_opening=True) # slab_sec_name)
                 openings_names.append(name)
+        
         elif foun.foundation_type == 'Mat':
             if split_mat:
                 names_props = [
-                    (soil_name, f'{soil_modulus}'),
-                    (f'{soil_name}_1.5', f'{soil_modulus * 1.5}'),
-                    (f'{soil_name}_2', f'{soil_modulus * 2}'),
+                    (soil_name, soil_modulus),
+                    (f'{soil_name}_1.5', soil_modulus * 1.5),
+                    (f'{soil_name}_2', soil_modulus * 2),
                 ]
-                soil_content = create_soil_table(names_props)
+                soil_content = self.create_soil_table(names_props)
                 table_key = "SOIL PROPERTIES"
                 self.safe.add_content_to_table(table_key, soil_content)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
@@ -194,9 +215,13 @@ class FreecadReadwriteModel():
         points_content = ''
         area_name = self.last_area_number
         areas_content = f"\tArea={area_name}   NumPoints={n}"
+        length_scale = self.length_units.get(self.length_unit)
         for i, point in enumerate(points, start=1):
+            x = point.x * length_scale
+            y = point.y * length_scale
+            z = point.z * length_scale
             if i % 4 == 0:
-                points_content += f"Point={self.last_point_number}   GlobalX={point.x}   GlobalY={point.y}   GlobalZ={point.z}   SpecialPt=No\n"
+                points_content += f"Point={self.last_point_number}   GlobalX={x}   GlobalY={y}   GlobalZ={z}   SpecialPt=No\n"
                 nodes.append(self.last_point_number)
                 self.last_point_number += 1
                 if i == 4:
@@ -205,7 +230,7 @@ class FreecadReadwriteModel():
                     areas_content += f"\tArea={area_name}   Point1={nodes[0]}   Point2={nodes[1]}   Point3={nodes[2]}   Point4={nodes[3]}\n"
                 nodes = []
             else:
-                points_content += f"Point={self.last_point_number}   GlobalX={point.x}   GlobalY={point.y}   GlobalZ={point.z}   SpecialPt=No\n"
+                points_content += f"Point={self.last_point_number}   GlobalX={x}   GlobalY={y}   GlobalZ={z}   SpecialPt=No\n"
                 nodes.append(self.last_point_number)
                 self.last_point_number += 1
         for i, node in enumerate(nodes, start=1):
@@ -368,11 +393,14 @@ class FreecadReadwriteModel():
     def get_vertex_from_point(point):
         return Part.Vertex(point.x, point.y, point.z)
 
-def create_soil_table(soil_prop):
-    soil_content = ''
-    for name, ks in soil_prop:
-        soil_content += f'Soil={name}   Subgrade={ks}   NonlinOpt="Compression Only"\n'
-    return soil_content
+    def create_soil_table(self, soil_prop):
+        soil_content = ''
+        force_scale = self.force_units.get(self.force_unit)
+        length_scale = self.length_units.get(self.length_unit) * 10
+        for name, ks in soil_prop:
+            ks *= force_scale / (length_scale) ** 3
+            soil_content += f'Soil={name}   Subgrade={ks}   NonlinOpt="Compression Only"\n'
+        return soil_content
 
 if __name__ == '__main__':
     import sys
