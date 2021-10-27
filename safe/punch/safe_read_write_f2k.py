@@ -150,19 +150,7 @@ class FreecadReadwriteModel():
             foun_height = int(foun.height.getValueAs(f'{self.length_unit}'))
             slab_sec_name = f'SLAB{foun_height}'
         # creating concrete material
-        table_key = "MATERIAL PROPERTIES 01 - GENERAL"
-        name = int(foun.fc.getValueAs('N/(mm^2)'))
-        mat_name = f'C{name}'
-        material_content = f'Material={mat_name}   Type=Concrete\n'
-        self.safe.add_content_to_table(table_key, material_content)
-        table_key = "MATERIAL PROPERTIES 03 - CONCRETE"
-        A = 9.9E-06
-        w = 2400
-        unit_weight = w * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
-        fc = foun.fc.getValueAs('MPa') * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
-        Ec = .043 * w ** 1.5 * math.sqrt(foun.fc.getValueAs('MPa'))
-        mat_prop_content = f'Material={mat_name}   E={Ec}   U=0.2   A={A}   UnitWt={unit_weight}   Fc={fc}   LtWtConc=No   UserModRup=No\n'
-        self.safe.add_content_to_table(table_key, mat_prop_content)
+        mat_name = self.create_concrete_material(foun)
         # define slab
         table_key = "SLAB PROPERTIES 01 - GENERAL"
 #    Slab=COL   Type=Stiff   ThickPlate=Yes   Color=Cyan   Notes="Added 1/31/2017 11:08:53 PM"   GUID=16338132-0503-48a9-b221-6a7c72b6c716
@@ -439,6 +427,29 @@ class FreecadReadwriteModel():
             ks *= self.safe.force_units['Kgf'] / self.safe.length_units['cm'] ** 3
             soil_content += f'Soil={name}   Subgrade={ks}   NonlinOpt="Compression Only"\n'
         return soil_content
+
+    def create_concrete_material(self,
+            mat_name = '',
+            fc_mpa = 0,
+            weight = 2400,
+            foun = None):
+        if foun is not None:
+            fc_mpa = foun.fc.getValueAs("MPa")
+            mat_name = f'C{fc_mpa}'
+        fc = fc_mpa * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
+        table_key = "MATERIAL PROPERTIES 01 - GENERAL"
+        material_content = f'Material={mat_name}   Type=Concrete\n'
+        self.safe.add_content_to_table(table_key, material_content)
+        table_key = "MATERIAL PROPERTIES 03 - CONCRETE"
+        A = 9.9E-06
+        unit_weight = weight * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
+        Ec = .043 * weight ** 1.5 * math.sqrt(fc_mpa)
+        mat_prop_content = f'Material={mat_name}   E={Ec}   U=0.2   A={A}   UnitWt={unit_weight}   Fc={fc}   LtWtConc=No   UserModRup=No\n'
+        self.safe.add_content_to_table(table_key, mat_prop_content)
+        return mat_name
+
+
+
 
 if __name__ == '__main__':
     import sys
