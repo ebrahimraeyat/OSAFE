@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Union
+import math
 
 
 if __name__ == '__main__':
@@ -17,7 +18,6 @@ __all__ = ['Safe', 'FreecadReadwriteModel']
 
 
 class Safe():
-
     def __init__(self,
             input_f2k_path : Path = None,
             output_f2k_path : Path = None,
@@ -74,6 +74,9 @@ class Safe():
         init_unit_index = init_curr_unit + len(label)
         end_unit_index = content[init_unit_index:].find('"') + init_unit_index
         force, length, _ = content[init_unit_index: end_unit_index].split(', ')
+        self.force_unit, self.length_unit = force, length
+        self.force_units = self.get_force_units(self.force_unit)
+        self.length_units = self.get_length_units(self.length_unit)
         return force, length
 
     def write(self):
@@ -86,10 +89,35 @@ class Safe():
             writer.write("\nEND TABLE DATA")
         return None
 
+    def get_force_units(self, force_unit : str):
+        '''
+        force_unit can be 'N', 'kN', 'Kgf', 'tonf'
+        '''
+        if force_unit == 'N':
+            return dict(N=1, kN=1000, Kgf=9.81, tonf=9810)
+        elif force_unit == 'kN':
+            return dict(N=.001, kN=1, Kgf=.00981, tonf=9.81)
+        elif force_unit == 'Kgf':
+            return dict(N=1/9.81, kN=1000/9.81, Kgf=1, tonf=1000)
+        elif force_unit == 'tonf':
+            return dict(N=.000981, kN=.981, Kgf=.001, tonf=1)
+        else:
+            raise KeyError
+
+    def get_length_units(self, length_unit : str):
+        '''
+        length_unit can be 'mm', 'cm', 'm'
+        '''
+        if length_unit == 'mm':
+            return dict(mm=1, cm=10, m=1000)
+        elif length_unit == 'cm':
+            return dict(mm=.1, cm=1, m=100)
+        elif length_unit == 'm':
+            return dict(mm=.001, cm=.01, m=1)
+        else:
+            raise KeyError
 
 class FreecadReadwriteModel():
-    force_units = dict(N=9.81, kN=9810, Kgf=1, tonf=1000)
-    length_units = dict(mm=1, cm=.1, m=.001)
 
     def __init__(
                 self,
@@ -101,7 +129,9 @@ class FreecadReadwriteModel():
             output_f2k_path = input_f2k_path
         self.safe = Safe(input_f2k_path, output_f2k_path)
         self.safe.get_tables_contents()
-        self.force_unit, self.length_unit = self.safe.force_length_unit()
+        self.safe.force_length_unit()
+        self.force_unit = self.safe.force_unit
+        self.length_unit = self.safe.length_unit
         if doc is None:
             doc = FreeCAD.ActiveDocument
         self.doc = doc
@@ -117,34 +147,45 @@ class FreecadReadwriteModel():
         
         foun = self.doc.Foundation
         if slab_sec_name is None:
-            foun_height = int(foun.height.Value)
+            foun_height = int(foun.height.getValueAs(f'{self.length_unit}'))
             slab_sec_name = f'SLAB{foun_height}'
         # creating concrete material
-        # fc = int(foun.fc.getValueAs('N/(mm^2)'))
-        
+        table_key = "MATERIAL PROPERTIES 01 - GENERAL"
+        name = int(foun.fc.getValueAs('N/(mm^2)'))
+        mat_name = f'C{name}'
+        material_content = f'Material={mat_name}   Type=Concrete\n'
+        self.safe.add_content_to_table(table_key, material_content)
+        table_key = "MATERIAL PROPERTIES 03 - CONCRETE"
+        A = 9.9E-06
+        w = 2400
+        unit_weight = w * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
+        fc = foun.fc.getValueAs('MPa') * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
+        Ec = .043 * w ** 1.5 * math.sqrt(foun.fc.getValueAs('MPa'))
+        mat_prop_content = f'Material={mat_name}   E={Ec}   U=0.2   A={A}   UnitWt={unit_weight}   Fc={fc}   LtWtConc=No   UserModRup=No\n'
+        self.safe.add_content_to_table(table_key, mat_prop_content)
+        # define slab
+        table_key = "SLAB PROPERTIES 01 - GENERAL"
+#    Slab=COL   Type=Stiff   ThickPlate=Yes   Color=Cyan   Notes="Added 1/31/2017 11:08:53 PM"   GUID=16338132-0503-48a9-b221-6a7c72b6c716
+        slab_general_content = f'Slab={slab_sec_name}   Type=Mat   ThickPlate=Yes\n'
+        self.safe.add_content_to_table(table_key, slab_general_content)
+        table_key = "SLAB PROPERTIES 02 - SOLID SLABS"
+        slab_prop_content = f'Slab={slab_sec_name}   Type=Mat   MatProp={mat_name}   Thickness={foun_height}   Ortho=No\n'
+        self.safe.add_content_to_table(table_key, slab_prop_content)
         slab_names = []
-        openings_names = []
         if foun.foundation_type == 'Strip':
-            # write soil table
+            # soil content
             names_props = [(soil_name, soil_modulus)]
             soil_content = self.create_soil_table(names_props)
-            table_key = "SOIL PROPERTIES"
-            self.safe.add_content_to_table(table_key, soil_content)
-            # self.etabs.set_current_unit('kN', 'mm')
             points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
-            name = self.create_area_by_coord(points[0],) # slab_sec_name)
+            name = self.create_area_by_coord(points[0], slab_sec_name)
             slab_names.append(name)
             soil_assignment_content =  self.export_freecad_soil_support(
                 slab_names=slab_names,
                 soil_name=soil_name,
                 soil_modulus=None,
             )
-            table_key = "SOIL PROPERTY ASSIGNMENTS"
-            self.safe.add_content_to_table(table_key, soil_assignment_content)
-            
             for pts in points[1:]:
-                name = self.create_area_by_coord(pts, is_opening=True) # slab_sec_name)
-                openings_names.append(name)
+                self.create_area_by_coord(pts, is_opening=True)
         
         elif foun.foundation_type == 'Mat':
             if split_mat:
@@ -154,13 +195,11 @@ class FreecadReadwriteModel():
                     (f'{soil_name}_2', soil_modulus * 2),
                 ]
                 soil_content = self.create_soil_table(names_props)
-                table_key = "SOIL PROPERTIES"
-                self.safe.add_content_to_table(table_key, soil_content)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
                     foun.plane_without_openings,
                 )
                 for points in area_points:
-                    name = self.create_area_by_coord(points,) # slab_sec_name)
+                    name = self.create_area_by_coord(points, slab_sec_name)
                     slab_names.append(name)
                 soil_assignment_content = self.export_freecad_soil_support(
                     slab_names=[slab_names[-1]],
@@ -177,22 +216,24 @@ class FreecadReadwriteModel():
                     soil_name=f'{soil_name}_1.5',
                     soil_modulus=None,
                 )
-                table_key = "SOIL PROPERTY ASSIGNMENTS"
-                self.safe.add_content_to_table(table_key, soil_assignment_content)
+                
             else:
-                # names_props = [(soil_name, f'{soil_modulus}')]
-                # self.etabs.database.create_area_spring_table(names_props)
-                # self.etabs.set_current_unit('kN', 'mm')
+                names_props = [(soil_name, f'{soil_modulus}')]
+                soil_content = self.create_soil_table(names_props)
                 edges = foun.plane_without_openings.Edges
                 points = self.get_sort_points(edges)
-                name = self.create_area_by_coord(points,) # slab_sec_name)
+                name = self.create_area_by_coord(points, slab_sec_name)
                 slab_names.append(name)
-                # self.export_freecad_soil_support(
-                #     slab_names=slab_names,
-                #     soil_name=soil_name,
-                #     soil_modulus=None,
-                # )
-        return slab_names, openings_names
+                soil_assignment_content = self.export_freecad_soil_support(
+                    slab_names=slab_names,
+                    soil_name=soil_name,
+                    soil_modulus=None,
+                )
+        table_key = "SOIL PROPERTIES"
+        self.safe.add_content_to_table(table_key, soil_content)
+        table_key = "SOIL PROPERTY ASSIGNMENTS"
+        self.safe.add_content_to_table(table_key, soil_assignment_content)
+        return slab_names
 
     def get_sort_points(self, edges, vector=True):
         points = []
@@ -207,7 +248,7 @@ class FreecadReadwriteModel():
 
     def create_area_by_coord(self,
             points : 'Base.Vector',
-            # prop_name : Union[str, bool] = None,
+            prop_name : Union[str, bool] = None,
             is_opening : bool = False,
             ):
         n = len(points)
@@ -215,7 +256,7 @@ class FreecadReadwriteModel():
         points_content = ''
         area_name = self.last_area_number
         areas_content = f"\tArea={area_name}   NumPoints={n}"
-        length_scale = self.length_units.get(self.length_unit)
+        length_scale = self.safe.length_units.get(self.length_unit)
         for i, point in enumerate(points, start=1):
             x = point.x * length_scale
             y = point.y * length_scale
@@ -244,10 +285,9 @@ class FreecadReadwriteModel():
         table_key = "OBJECT GEOMETRY - AREAS 01 - GENERAL"
         self.safe.add_content_to_table(table_key, areas_content)
         if is_opening:
-            slab_assignment_content = f"Area={area_name}   SlabProp=None   OpeningType=Unloaded\n"
+            slab_assignment_content = f"\tArea={area_name}   SlabProp=None   OpeningType=Unloaded\n"
         else:
-            # slab_assignment_content = f"Area={area_name}   SlabProp={prop_name}   OpeningType=None"
-            slab_assignment_content = f"Area={area_name}   SlabProp=None   OpeningType=None\n"
+            slab_assignment_content = f"\tArea={area_name}   SlabProp={prop_name}   OpeningType=None\n"
         table_key = "SLAB PROPERTY ASSIGNMENTS"
         self.safe.add_content_to_table(table_key, slab_assignment_content)
 
@@ -395,10 +435,8 @@ class FreecadReadwriteModel():
 
     def create_soil_table(self, soil_prop):
         soil_content = ''
-        force_scale = self.force_units.get(self.force_unit)
-        length_scale = self.length_units.get(self.length_unit) * 10
         for name, ks in soil_prop:
-            ks *= force_scale / (length_scale) ** 3
+            ks *= self.safe.force_units['Kgf'] / self.safe.length_units['cm'] ** 3
             soil_content += f'Soil={name}   Subgrade={ks}   NonlinOpt="Compression Only"\n'
         return soil_content
 
