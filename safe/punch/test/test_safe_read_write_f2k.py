@@ -37,6 +37,15 @@ def test_export_freecad_slabs_mat():
     rw.safe.write()
     assert len(slabs) == 5
 
+def test_export_freecad_openings():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\output_mat.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document_mat)
+    slabs = rw.export_freecad_openings()
+    rw.safe.write()
+    assert len(slabs) == 1
+
 def test_force_length_unit():
     safe = Safe()
     content = 'ProgramName="SAFE 2016"   Version=16.0.2   ProgLevel="Post Tensioning"   LicenseNum=*1ZAU45DLGK2A3EX   CurrUnits="Kgf, m, C"   MergeTol=0.0025   ModelDatum=0   StHtAbove=0   StHtBelow=3000   ConcCode="ACI 318-14"'

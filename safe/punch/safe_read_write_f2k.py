@@ -153,7 +153,7 @@ class FreecadReadwriteModel():
         mat_name = self.create_concrete_material(foun=foun)
         # define slab
         table_key = "SLAB PROPERTIES 01 - GENERAL"
-#    Slab=COL   Type=Stiff   ThickPlate=Yes   Color=Cyan   Notes="Added 1/31/2017 11:08:53 PM"   GUID=16338132-0503-48a9-b221-6a7c72b6c716
+        #    Slab=COL   Type=Stiff   ThickPlate=Yes   Color=Cyan   Notes="Added 1/31/2017 11:08:53 PM"   GUID=16338132-0503-48a9-b221-6a7c72b6c716
         slab_general_content = f'Slab={slab_sec_name}   Type=Mat   ThickPlate=Yes\n'
         self.safe.add_content_to_table(table_key, slab_general_content)
         table_key = "SLAB PROPERTIES 02 - SOLID SLABS"
@@ -282,23 +282,16 @@ class FreecadReadwriteModel():
         return area_name
 
     def export_freecad_openings(self, doc : 'App.Document' = None):
-        # self.etabs.set_current_unit('kN', 'mm')
-        # if doc is None:
-        #     doc = FreeCAD.ActiveDocument
-        foun = doc.Foundation
+        foun = self.doc.Foundation
         if foun.foundation_type == 'Strip':
             return
         openings = foun.openings
+        names = []
         for opening in openings:
             points = opening.points
-            self.create_area_by_coord(points, is_opening=True)
-            # n = len(points)
-            # xs = [p.x for p in points]
-            # ys = [p.y for p in points]
-            # zs = [p.z for p in points]
-            # ret = self.SapModel.AreaObj.AddByCoord(n, xs, ys, zs)
-            # name = ret[3]
-            # self.SapModel.AreaObj.SetOpening(name, True)
+            name = self.create_area_by_coord(points, is_opening=True)
+            names.append(name)
+        return names
 
     def export_freecad_strips(self, doc : 'App.Document' = None):
         self.etabs.set_current_unit('kN', 'mm')
