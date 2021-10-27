@@ -150,7 +150,7 @@ class FreecadReadwriteModel():
             foun_height = int(foun.height.getValueAs(f'{self.length_unit}'))
             slab_sec_name = f'SLAB{foun_height}'
         # creating concrete material
-        mat_name = self.create_concrete_material(foun)
+        mat_name = self.create_concrete_material(foun=foun)
         # define slab
         table_key = "SLAB PROPERTIES 01 - GENERAL"
 #    Slab=COL   Type=Stiff   ThickPlate=Yes   Color=Cyan   Notes="Added 1/31/2017 11:08:53 PM"   GUID=16338132-0503-48a9-b221-6a7c72b6c716
@@ -432,9 +432,10 @@ class FreecadReadwriteModel():
             mat_name = '',
             fc_mpa = 0,
             weight = 2400,
-            foun = None):
+            foun = None,
+            ):
         if foun is not None:
-            fc_mpa = foun.fc.getValueAs("MPa")
+            fc_mpa = int(foun.fc.getValueAs("MPa"))
             mat_name = f'C{fc_mpa}'
         fc = fc_mpa * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
         table_key = "MATERIAL PROPERTIES 01 - GENERAL"
