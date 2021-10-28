@@ -54,6 +54,30 @@ def test_export_freecad_strips():
     rw.export_freecad_strips()
     rw.safe.write()
 
+def test_add_preferences():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\pref.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw.add_preferences()
+    rw.safe.write()
+
+def test_export_freecad_stiff_elements():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\stiff.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw.export_freecad_stiff_elements()
+    rw.safe.write()
+
+def test_export_punch_props():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\punch.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw.export_punch_props()
+    rw.safe.write()
+
 def test_get_points_coordinates():
     safe = Safe()
     content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
@@ -107,4 +131,4 @@ def test_force_length_unit():
 
 
 if __name__ == '__main__':
-    test_get_points_coordinates()
+    test_export_freecad_strips()

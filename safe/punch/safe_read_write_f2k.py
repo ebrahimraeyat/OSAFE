@@ -36,7 +36,6 @@ class Safe():
     def __exit__(self, type, val, tb):
         self.__file_object.close()
 
-
     def get_tables_contents(self):
         with open(self.input_f2k_path, 'r') as reader:
             lines = reader.readlines()
@@ -185,13 +184,7 @@ class FreecadReadwriteModel():
         # creating concrete material
         mat_name = self.create_concrete_material(foun=foun)
         # define slab
-        table_key = "SLAB PROPERTIES 01 - GENERAL"
-        #    Slab=COL   Type=Stiff   ThickPlate=Yes   Color=Cyan   Notes="Added 1/31/2017 11:08:53 PM"   GUID=16338132-0503-48a9-b221-6a7c72b6c716
-        slab_general_content = f'Slab={slab_sec_name}   Type=Mat   ThickPlate=Yes\n'
-        self.safe.add_content_to_table(table_key, slab_general_content)
-        table_key = "SLAB PROPERTIES 02 - SOLID SLABS"
-        slab_prop_content = f'Slab={slab_sec_name}   Type=Mat   MatProp={mat_name}   Thickness={foun_height}   Ortho=No\n'
-        self.safe.add_content_to_table(table_key, slab_prop_content)
+        self.create_solid_slab(slab_sec_name, 'Mat', mat_name, foun_height)
         slab_names = []
         if foun.foundation_type == 'Strip':
             # soil content
@@ -326,24 +319,27 @@ class FreecadReadwriteModel():
             names.append(name)
         return names
 
-    def export_freecad_strips(self, doc : 'App.Document' = None):
+    def export_freecad_strips(self):
         foun = self.doc.Foundation
         point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
         points_content = ''
         curr_point_content = self.safe.tables_contents.get(point_coords_table_key, '')
         strip_table_key = "OBJECT GEOMETRY - DESIGN STRIPS"
-        strip_content = self.safe.tables_contents.get(strip_table_key, '')
+        strip_content = ''
+        strip_assign_table_key = "SLAB DESIGN OVERWRITES 01 - STRIP BASED"
+        strip_assign_content = ''
+        self.create_rebar_material('AIII', 4000)
+        scale_factor = self.safe.length_units['mm']
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs
             i = j = 0
             for slab in slabs:
                 p1 = slab.start_point
                 p2 = slab.end_point
-                scale_factor = self.safe.length_units['mm']
                 coord1 = [i * scale_factor for i in (p1.x, p1.y, p1.z)]
                 coord2 = [i * scale_factor for i in (p2.x, p2.y, p2.z)]
-                p1_name = self.safe.is_point_exist(coord1, curr_point_content)
-                p2_name = self.safe.is_point_exist(coord2, curr_point_content)
+                p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)
+                p2_name = self.safe.is_point_exist(coord2, curr_point_content + points_content)
                 if p1_name is None:
                     points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
                     p1_name = self.last_point_number
@@ -352,8 +348,8 @@ class FreecadReadwriteModel():
                     points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
                     p2_name = self.last_point_number
                     self.last_point_number += 1
-                swl = ewl = slab.width.Value / 2 + slab.offset
-                swr = ewr = slab.width.Value / 2 - slab.offset
+                swl = ewl = (slab.width.Value / 2 + slab.offset) * scale_factor
+                swr = ewr = (slab.width.Value / 2 - slab.offset) * scale_factor
                 dx = abs(p1.x - p2.x)
                 dy = abs(p1.y - p2.y)
                 if dx > dy:
@@ -366,19 +362,17 @@ class FreecadReadwriteModel():
                     name = f'CS{layer}{j}'
                 strip_content += f'\tStrip={name}   Point={p1_name}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
                 strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr}\n'
+                strip_assign_content += f'\tStrip={name}   Layer={layer}   DesignType=Column   RLLF=1   Design=Yes   IgnorePT=No   RebarMat=AIII   CoverType=Preferences\n'
         self.safe.add_content_to_table(point_coords_table_key, points_content)
         self.safe.add_content_to_table(strip_table_key, strip_content)
+        self.safe.add_content_to_table(strip_assign_table_key, strip_assign_content)
 
-    def export_freecad_stiff_elements(self, doc : 'App.Document' = None):
-        self.etabs.set_current_unit('kN', 'mm')
-        self.SapModel.PropMaterial.SetMaterial('CONCRETE_ZERO', 2)
-        self.SapModel.PropMaterial.SetWeightAndMass('CONCRETE_ZERO', 1, 0)
-        self.SapModel.PropMaterial.SetWeightAndMass('CONCRETE_ZERO', 2, 0)
-        self.SapModel.PropArea.SetSlab('COL_STIFF', 2, 2, 'CONCRETE_ZERO', 1500)
-
-        if doc is None:
-            doc = FreeCAD.ActiveDocument
-        for o in doc.Objects:
+    def export_freecad_stiff_elements(self):
+        fc_mpa = self.doc.Foundation.fc.getValueAs('MPa')
+        self.create_concrete_material('CONCRETE_ZERO', fc_mpa, 0)
+        thickness = 1500 * self.safe.length_units['mm']
+        self.create_solid_slab('COL_STIFF', 'Stiff', 'CONCRETE_ZERO', thickness)
+        for o in self.doc.Objects:
             if (hasattr(o, "Proxy") and 
                 hasattr(o.Proxy, "Type") and 
                 o.Proxy.Type == "Punch"
@@ -424,6 +418,34 @@ class FreecadReadwriteModel():
             soil_assignment_content += f"Area={slab_name}   SoilProp={soil_name}\n"
         return soil_assignment_content
 
+    def export_punch_props(self,
+            punches : Union[list, bool] = None,
+            ):
+        if punches is None:
+            punches = []
+            for o in self.doc.Objects:
+                if hasattr(o, "Proxy") and \
+                    hasattr(o.Proxy, "Type") and \
+                    o.Proxy.Type == "Punch":
+                    punches.append(o)
+        punch_general_content = ''
+        punch_perimeter_content = ''
+        scale = self.safe.length_units['mm']
+        for punch in punches:
+            id_ = punch.id
+            loc = punch.Location
+            depth = punch.d * scale
+            punch_general_content += f'\tPoint={id_}   Check="Program Determined"   LocType={loc}   Perimeter="User Perimeter"   EffDepth=User   UserDepth={depth}   Openings=User   ReinfType=None\n'
+            nulls, null_points = punch_funcs.punch_null_points(punch)
+            for i, (point, is_null) in enumerate(zip(null_points, nulls), start=1):
+                x, y = point.x * scale, point.y * scale
+                punch_perimeter_content += f'\tPoint={id_}   PointNum={i}   X={x}   Y={y}   Radius=0   IsNull={is_null}\n'
+
+        punch_general_table_key = "PUNCHING SHEAR DESIGN OVERWRITES 01 - GENERAL"
+        punch_perimeter_table_key = "PUNCHING SHEAR DESIGN OVERWRITES 02 - USER PERIMETER"
+        self.safe.add_content_to_table(punch_general_table_key, punch_general_content)
+        self.safe.add_content_to_table(punch_perimeter_table_key, punch_perimeter_content)
+
     def set_uniform_gravity_load(self,
         area_names : list,
         load_pat : str,
@@ -449,6 +471,17 @@ class FreecadReadwriteModel():
             soil_content += f'Soil={name}   Subgrade={ks}   NonlinOpt="Compression Only"\n'
         return soil_content
 
+    def add_material(self,
+            name : str,
+            type_ : str,
+            ):
+        '''
+        type can be 'Concrete', 'Rebar', ...
+        '''
+        table_key = "MATERIAL PROPERTIES 01 - GENERAL"
+        material_content = f'\tMaterial={name}   Type={type_}\n'
+        self.safe.add_content_to_table(table_key, material_content)
+        
     def create_concrete_material(self,
             mat_name = '',
             fc_mpa = 0,
@@ -459,9 +492,7 @@ class FreecadReadwriteModel():
             fc_mpa = int(foun.fc.getValueAs("MPa"))
             mat_name = f'C{fc_mpa}'
         fc = fc_mpa * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
-        table_key = "MATERIAL PROPERTIES 01 - GENERAL"
-        material_content = f'Material={mat_name}   Type=Concrete\n'
-        self.safe.add_content_to_table(table_key, material_content)
+        self.add_material(mat_name, 'Concrete')
         table_key = "MATERIAL PROPERTIES 03 - CONCRETE"
         A = 9.9E-06
         unit_weight = weight * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
@@ -469,9 +500,43 @@ class FreecadReadwriteModel():
         mat_prop_content = f'Material={mat_name}   E={Ec}   U=0.2   A={A}   UnitWt={unit_weight}   Fc={fc}   LtWtConc=No   UserModRup=No\n'
         self.safe.add_content_to_table(table_key, mat_prop_content)
         return mat_name
+    
+    def create_rebar_material(self,
+            mat_name = 'AIII',
+            fy_mpa : int = 4000,
+            ):
+        self.add_material(mat_name, 'Rebar')
+        table_key = "MATERIAL PROPERTIES 04 - REBAR"
+        weight = 7850
+        unit_weight = weight * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
+        E = 2e5 * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
+        fy = fy_mpa * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
+        fu = 1.25 * fy
+        mat_prop_content = f'Material={mat_name}   E={E}   UnitWt={unit_weight}   Fy={fy}   Fu={fu}\n'
+        self.safe.add_content_to_table(table_key, mat_prop_content)
+        return mat_name
 
+    def create_solid_slab(self,
+            name : str,
+            type_ : str, # 'Mat', 'Stiff', 'Slab'
+            material,
+            thickness,
+            is_thick='Yes',
+            ):
+        table_key = "SLAB PROPERTIES 01 - GENERAL"
+        slab_general_content = f'Slab={name}   Type={type_}   ThickPlate={is_thick}\n'
+        self.safe.add_content_to_table(table_key, slab_general_content)
+        table_key = "SLAB PROPERTIES 02 - SOLID SLABS"
+        slab_prop_content = f'Slab={name}   Type={type_}   MatProp={material}   Thickness={thickness}   Ortho=No\n'
+        self.safe.add_content_to_table(table_key, slab_prop_content)
 
-
+    def add_preferences(self):
+        table_key = "DESIGN PREFERENCES 02 - REBAR COVER - SLABS"
+        foun = self.doc.Foundation
+        cover_mm = foun.cover.getValueAs('mm')
+        cover = cover_mm * self.safe.length_units['mm']
+        content = f'\tCoverTop={cover}   CoverBot={cover}   BarSize=20\n'
+        self.safe.tables_contents[table_key] = content
 
 if __name__ == '__main__':
     import sys
