@@ -54,6 +54,38 @@ class Safe():
         self.tables_contents = tables_contents
         return tables_contents
 
+    def get_points_coordinates(self,
+            content : str = None,
+            ) -> dict:
+        if content is None:
+            content = self.tables_contents["OBJECT GEOMETRY - POINT COORDINATES"]
+        lines = content.split('\n')
+        points_coordinates = dict()
+        for line in lines:
+            if not line:
+                continue
+            line = line.lstrip(' ')
+            fields_values = line.split()
+            coordinates = []
+            for i, field_value in enumerate(fields_values[:-1]):
+                if i == 0:
+                    point_name = int(field_value.split('=')[1])
+                else:
+                    value = float(field_value.split('=')[1])
+                    coordinates.append(value)
+            points_coordinates[point_name] = coordinates
+        return points_coordinates
+
+    def is_point_exist(self,
+            coordinate : list,
+            content : Union[str, bool] = None,
+            ):
+        points_coordinates = self.get_points_coordinates(content)
+        for id, coord in points_coordinates.items():
+            if coord == coordinate:
+                return id
+        return None
+                    
     def add_content_to_table(self, table_key, content):
         curr_content = self.tables_contents.get(table_key, '')
         self.tables_contents[table_key] = curr_content + content
@@ -294,10 +326,7 @@ class FreecadReadwriteModel():
         return names
 
     def export_freecad_strips(self, doc : 'App.Document' = None):
-        self.etabs.set_current_unit('kN', 'mm')
-        if doc is None:
-            doc = FreeCAD.ActiveDocument
-        foun = doc.Foundation
+        foun = self.doc.Foundation
         data = []
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs

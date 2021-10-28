@@ -46,6 +46,29 @@ def test_export_freecad_openings():
     rw.safe.write()
     assert len(slabs) == 1
 
+def test_get_points_coordinates():
+    safe = Safe()
+    content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=117   GlobalX=7040   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n   
+                Point=119   GlobalX=14690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n'''
+
+    points_coordinates = safe.get_points_coordinates(content)
+    assert set(points_coordinates.keys()) == set([115, 117, 119, 121])
+    assert points_coordinates[115] == [2820, 0, 0]
+
+def test_is_point_exist():
+    safe = Safe()
+    content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=117   GlobalX=7040   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n   
+                Point=119   GlobalX=14690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n'''
+
+    id = safe.is_point_exist([2820, 0, 0], content)
+    assert id == 115
+    id = safe.is_point_exist([2820, 20, 0], content)
+    assert not id
+
 def test_force_length_unit():
     safe = Safe()
     content = 'ProgramName="SAFE 2016"   Version=16.0.2   ProgLevel="Post Tensioning"   LicenseNum=*1ZAU45DLGK2A3EX   CurrUnits="Kgf, m, C"   MergeTol=0.0025   ModelDatum=0   StHtAbove=0   StHtBelow=3000   ConcCode="ACI 318-14"'
@@ -76,4 +99,4 @@ def test_force_length_unit():
 
 
 if __name__ == '__main__':
-    test_force_length_unit()
+    test_get_points_coordinates()
