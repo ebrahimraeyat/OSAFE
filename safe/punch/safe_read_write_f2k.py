@@ -36,6 +36,7 @@ class Safe():
     def __exit__(self, type, val, tb):
         self.__file_object.close()
 
+
     def get_tables_contents(self):
         with open(self.input_f2k_path, 'r') as reader:
             lines = reader.readlines()
@@ -327,17 +328,30 @@ class FreecadReadwriteModel():
 
     def export_freecad_strips(self, doc : 'App.Document' = None):
         foun = self.doc.Foundation
-        data = []
+        point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
+        points_content = ''
+        curr_point_content = self.safe.tables_contents.get(point_coords_table_key, '')
+        strip_table_key = "OBJECT GEOMETRY - DESIGN STRIPS"
+        strip_content = self.safe.tables_contents.get(strip_table_key, '')
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs
             i = j = 0
             for slab in slabs:
                 p1 = slab.start_point
                 p2 = slab.end_point
-                p = self.SapModel.PointObj.AddCartesian(p1.x, p1.y, p1.z)
-                p1_name = p[0]
-                p = self.SapModel.PointObj.AddCartesian(p2.x, p2.y, p2.z)
-                p2_name = p[0]
+                scale_factor = self.safe.length_units['mm']
+                coord1 = [i * scale_factor for i in (p1.x, p1.y, p1.z)]
+                coord2 = [i * scale_factor for i in (p2.x, p2.y, p2.z)]
+                p1_name = self.safe.is_point_exist(coord1, curr_point_content)
+                p2_name = self.safe.is_point_exist(coord2, curr_point_content)
+                if p1_name is None:
+                    points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
+                    p1_name = self.last_point_number
+                    self.last_point_number += 1
+                if p2_name is None:
+                    points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
+                    p2_name = self.last_point_number
+                    self.last_point_number += 1
                 swl = ewl = slab.width.Value / 2 + slab.offset
                 swr = ewr = slab.width.Value / 2 - slab.offset
                 dx = abs(p1.x - p2.x)
@@ -350,25 +364,10 @@ class FreecadReadwriteModel():
                     layer = 'B'
                     j += 1
                     name = f'CS{layer}{j}'
-                data.extend((
-                    name,
-                    '1',
-                    f'{p1_name}',
-                    f'{p2_name}',
-                    f'{swl}',
-                    f'{swr}',
-                    f'{ewl}',
-                    f'{ewr}',
-                    'NO',
-                    f'{layer}',
-                    ))
-        table_key = 'Strip Object Connectivity'
-        fields = ['Name', 'NumSegs', 'StartPoint', 'EndPoint', 'WStartLeft',
-            'WStartRight', 'WEndLeft', 'WEndRight', 'AutoWiden', 'Layer']
-        if self.etabs.software == 'ETABS':
-            fields.insert(1, 'Story')
-        assert len(fields) == len(data) / len(slabs)
-        self.etabs.database.apply_data(table_key, data, fields)
+                strip_content += f'\tStrip={name}   Point={p1_name}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
+                strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr}\n'
+        self.safe.add_content_to_table(point_coords_table_key, points_content)
+        self.safe.add_content_to_table(strip_table_key, strip_content)
 
     def export_freecad_stiff_elements(self, doc : 'App.Document' = None):
         self.etabs.set_current_unit('kN', 'mm')

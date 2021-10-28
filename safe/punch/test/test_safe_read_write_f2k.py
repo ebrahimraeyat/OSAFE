@@ -46,6 +46,14 @@ def test_export_freecad_openings():
     rw.safe.write()
     assert len(slabs) == 1
 
+def test_export_freecad_strips():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\strip.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw.export_freecad_strips()
+    rw.safe.write()
+
 def test_get_points_coordinates():
     safe = Safe()
     content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
