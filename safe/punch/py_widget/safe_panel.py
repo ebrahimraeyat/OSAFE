@@ -95,19 +95,19 @@ class SafeTaskPanel:
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
-            # if is_area_loads:
-            #     try:
-            #         loads = doc.findObjects(Type='Fem::ConstraintForce')
-            #         for load in loads:
-            #             rw.add_uniform_gravity_load(
-            #                 slab_names,
-            #                 load.loadcase,
-            #                 load.Force,
-            #                 )
-            #     except TypeError:
-            #         print('Can not find any loads in model')
-            # if self.form.wall_loads.isChecked():
-            #     rw.export_freecad_wall_loads(doc)
+                if is_area_loads:
+                    try:
+                        loads = doc.findObjects(Type='Fem::ConstraintForce')
+                        for load in loads:
+                            rw.add_uniform_gravity_load(
+                                slab_names,
+                                load.loadcase,
+                                load.Force,
+                                )
+                    except TypeError:
+                        print('Can not find any loads in model')
+            if self.form.wall_loads.isChecked():
+                rw.export_freecad_wall_loads()
             if is_openings:
                 rw.export_freecad_openings(doc)
             if is_strips:

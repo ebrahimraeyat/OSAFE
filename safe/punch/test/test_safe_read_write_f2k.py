@@ -27,6 +27,31 @@ def test_export_freecad_slabs():
     rw.safe.write()
     assert len(slabs) == 1
 
+def test_export_freecad_wall_loads():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\\wall_loads.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw.export_freecad_wall_loads()
+    rw.safe.write()
+
+def test_add_uniform_gravity_load():
+    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path.touch()
+    output_f2k_path = Path('~\\uniform.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document)
+    slabs = rw.export_freecad_slabs()
+    rw.add_uniform_gravity_load(slabs, 'DEAD', 200)
+    rw.safe.write()
+    assert len(slabs) == 1
+    # Mat 
+    output_f2k_path = Path('~\\uniform_mat.f2k').expanduser()
+    rw = FRW(input_f2k_path, output_f2k_path, document_mat)
+    slabs = rw.export_freecad_slabs()
+    rw.add_uniform_gravity_load(slabs, 'DEAD', 200)
+    rw.safe.write()
+    assert len(slabs) == 5
+
 
 def test_export_freecad_slabs_mat():
     input_f2k_path = Path('~\input.f2k').expanduser()

@@ -123,16 +123,16 @@ class Safe():
 
     def get_force_units(self, force_unit : str):
         '''
-        force_unit can be 'N', 'kN', 'Kgf', 'tonf'
+        force_unit can be 'N', 'KN', 'Kgf', 'tonf'
         '''
         if force_unit == 'N':
-            return dict(N=1, kN=1000, Kgf=9.81, tonf=9810)
-        elif force_unit == 'kN':
-            return dict(N=.001, kN=1, Kgf=.00981, tonf=9.81)
+            return dict(N=1, KN=1000, Kgf=9.81, tonf=9810)
+        elif force_unit == 'KN':
+            return dict(N=.001, KN=1, Kgf=.00981, tonf=9.81)
         elif force_unit == 'Kgf':
-            return dict(N=1/9.81, kN=1000/9.81, Kgf=1, tonf=1000)
+            return dict(N=1/9.81, KN=1000/9.81, Kgf=1, tonf=1000)
         elif force_unit == 'tonf':
-            return dict(N=.000981, kN=.981, Kgf=.001, tonf=1)
+            return dict(N=.000981, KN=.981, Kgf=.001, tonf=1)
         else:
             raise KeyError
 
@@ -169,6 +169,7 @@ class FreecadReadwriteModel():
         self.doc = doc
         self.last_point_number = 1000
         self.last_area_number = 1000
+        self.last_line_number = 1000
 
     def export_freecad_slabs(self,
         split_mat : bool = True,
@@ -232,7 +233,7 @@ class FreecadReadwriteModel():
                 )
                 
             else:
-                names_props = [(soil_name, f'{soil_modulus}')]
+                names_props = [(soil_name, soil_modulus)]
                 soil_content = self.create_soil_table(names_props)
                 edges = foun.plane_without_openings.Edges
                 points = self.get_sort_points(edges)
@@ -380,29 +381,47 @@ class FreecadReadwriteModel():
                 points = self.get_sort_points(o.rect.Edges)
                 self.create_area_by_coord(points, prop_name='COL_STIFF')
     
-    def export_freecad_wall_loads(self, doc : 'App.Document' = None):
-        if doc is None:
-            doc = FreeCAD.ActiveDocument
-        for o in doc.Objects:
-            if (hasattr(o, "Proxy") and 
-                hasattr(o.Proxy, "Type") and 
+    def export_freecad_wall_loads(self, loadpat='DEAD'):
+        point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
+        points_content = ''
+        curr_point_content = self.safe.tables_contents.get(point_coords_table_key, '')
+        scale_factor = self.safe.length_units['mm']
+        line_content = ''
+        line_load_content = ''
+        points_content = ''
+        for o in self.doc.Objects:
+            if (hasattr(o, "Proxy") and
+                hasattr(o.Proxy, "Type") and
                 o.Proxy.Type == "Wall"
                 ):
                 mass_per_area = o.weight
-                height = o.Height.Value / 1000
+                height = o.Height.getValueAs('m')
+                value = mass_per_area * height * self.safe.force_units['Kgf'] / self.safe.length_units['m']
                 p1 = o.Base.start_point
                 p2 = o.Base.end_point
-                self.etabs.set_current_unit('kgf', 'mm')
-                frame = self.SapModel.FrameObj.AddByCoord(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z,'', 'None')
-                name = frame[0]
-                loadpat = self.etabs.load_patterns.get_special_load_pattern_names(1)[0]
-                self.etabs.set_current_unit('kgf', 'm')
-                self.etabs.frame_obj.assign_gravity_load_from_wall(
-                    name = name,
-                    loadpat = loadpat,
-                    mass_per_area = mass_per_area,
-                    height = height,
-                )
+                coord1 = [i * scale_factor for i in (p1.x, p1.y, p1.z)]
+                coord2 = [i * scale_factor for i in (p2.x, p2.y, p2.z)]
+                p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)
+                p2_name = self.safe.is_point_exist(coord2, curr_point_content + points_content)
+                if p1_name is None:
+                    points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
+                    p1_name = self.last_point_number
+                    self.last_point_number += 1
+                if p2_name is None:
+                    points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
+                    p2_name = self.last_point_number
+                    self.last_point_number += 1
+                line_content += f'Line={self.last_line_number}   PointI={p1_name}   PointJ={p2_name}   LineType=Beam\n'
+                name = self.last_line_number
+                self.last_line_number += 1
+                line_load_content += f'Line={name}   LoadPat={loadpat}   Type=Force   Dir=Gravity   DistType=RelDist   RelDistA=0   RelDistB=1   FOverLA={value}   FOverLB={value}\n'
+                
+        if points_content:
+            self.safe.add_content_to_table(point_coords_table_key, points_content)
+        table_key = "OBJECT GEOMETRY - LINES 01 - GENERAL"
+        self.safe.add_content_to_table(table_key, line_content)
+        table_key = "LOAD ASSIGNMENTS - LINE OBJECTS - DISTRIBUTED LOADS"
+        self.safe.add_content_to_table(table_key, line_load_content)
 
     def export_freecad_soil_support(self,
         slab_names : list,
@@ -446,20 +465,18 @@ class FreecadReadwriteModel():
         self.safe.add_content_to_table(punch_general_table_key, punch_general_content)
         self.safe.add_content_to_table(punch_perimeter_table_key, punch_perimeter_content)
 
-    def set_uniform_gravity_load(self,
+    def add_uniform_gravity_load(self,
         area_names : list,
         load_pat : str,
         value : float,
         ) -> None:
-        self.etabs.set_current_unit('kgf', 'm')
+        table_key = "LOAD ASSIGNMENTS - SURFACE LOADS"
+        content = ''
+        value *= self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 2
         for area_name in area_names:
-            self.SapModel.AreaObj.SetLoadUniform(
-                area_name,
-                load_pat,
-                -value,
-                6,  # Dir
-            )
-    
+            content += f'Area={area_name}   LoadPat={load_pat}   Dir=Gravity   UnifLoad={value}   A=0   B=0   C=0\n'
+        self.safe.add_content_to_table(table_key, content)
+
     @staticmethod
     def get_vertex_from_point(point):
         return Part.Vertex(point.x, point.y, point.z)
