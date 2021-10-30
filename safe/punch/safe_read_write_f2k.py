@@ -179,7 +179,7 @@ class FreecadReadwriteModel():
         
         foun = self.doc.Foundation
         if slab_sec_name is None:
-            foun_height = int(foun.height.getValueAs(f'{self.length_unit}'))
+            foun_height = foun.height.getValueAs(f'{self.length_unit}')
             slab_sec_name = f'SLAB{foun_height}'
         # creating concrete material
         mat_name = self.create_concrete_material(foun=foun)
@@ -270,7 +270,7 @@ class FreecadReadwriteModel():
         points_content = ''
         area_name = self.last_area_number
         areas_content = f"\tArea={area_name}   NumPoints={n}"
-        length_scale = self.safe.length_units.get(self.length_unit)
+        length_scale = self.safe.length_units.get('mm')
         for i, point in enumerate(points, start=1):
             x = point.x * length_scale
             y = point.y * length_scale
@@ -328,7 +328,7 @@ class FreecadReadwriteModel():
         strip_content = ''
         strip_assign_table_key = "SLAB DESIGN OVERWRITES 01 - STRIP BASED"
         strip_assign_content = ''
-        self.create_rebar_material('AIII', 4000)
+        self.create_rebar_material('AIII', 400)
         scale_factor = self.safe.length_units['mm']
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs
@@ -435,7 +435,7 @@ class FreecadReadwriteModel():
             id_ = punch.id
             loc = punch.Location
             depth = punch.d * scale
-            punch_general_content += f'\tPoint={id_}   Check="Program Determined"   LocType={loc}   Perimeter="User Perimeter"   EffDepth=User   UserDepth={depth}   Openings=User   ReinfType=None\n'
+            punch_general_content += f'\tPoint={id_}   Check="Program Determined"   LocType="{loc}"   Perimeter="User Perimeter"   EffDepth=User   UserDepth={depth}   Openings=User   ReinfType=None\n'
             nulls, null_points = punch_funcs.punch_null_points(punch)
             for i, (point, is_null) in enumerate(zip(null_points, nulls), start=1):
                 x, y = point.x * scale, point.y * scale
@@ -496,14 +496,17 @@ class FreecadReadwriteModel():
         table_key = "MATERIAL PROPERTIES 03 - CONCRETE"
         A = 9.9E-06
         unit_weight = weight * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
-        Ec = .043 * weight ** 1.5 * math.sqrt(fc_mpa)
+        if weight == 0:
+            Ec = .043 * 2400 ** 1.5 * math.sqrt(fc_mpa)
+        else:
+            Ec = .043 * weight ** 1.5 * math.sqrt(fc_mpa)
         mat_prop_content = f'Material={mat_name}   E={Ec}   U=0.2   A={A}   UnitWt={unit_weight}   Fc={fc}   LtWtConc=No   UserModRup=No\n'
         self.safe.add_content_to_table(table_key, mat_prop_content)
         return mat_name
     
     def create_rebar_material(self,
             mat_name = 'AIII',
-            fy_mpa : int = 4000,
+            fy_mpa : int = 400,
             ):
         self.add_material(mat_name, 'Rebar')
         table_key = "MATERIAL PROPERTIES 04 - REBAR"

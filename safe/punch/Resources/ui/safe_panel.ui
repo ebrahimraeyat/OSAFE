@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>268</width>
-    <height>370</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Export Foundation Geometry</string>
+   <string>Export to SAFE</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -57,7 +57,7 @@
    <item>
     <widget class="QCheckBox" name="loads_checkbox">
      <property name="text">
-      <string>Loads</string>
+      <string>Area Loads</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -68,6 +68,16 @@
     <widget class="QCheckBox" name="wall_loads">
      <property name="text">
       <string>Wall Loads</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="punches">
+     <property name="text">
+      <string>Punches</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -143,9 +153,9 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Software</string>
        </property>
@@ -155,9 +165,42 @@
       <widget class="QComboBox" name="software">
        <item>
         <property name="text">
-         <string>SAFE</string>
+         <string>SAFE 16</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>SAFE 20</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="f2k_line_edit">
+       <property name="inputMask">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string>SAFE 16 F2k File</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="browse_button">
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string/>
+       </property>
       </widget>
      </item>
     </layout>
