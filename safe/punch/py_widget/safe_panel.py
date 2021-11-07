@@ -7,7 +7,7 @@ punch_path = Path(__file__).parent.parent
 
 
 
-class SafeTaskPanel:
+class Safe12TaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
