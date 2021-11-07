@@ -132,4 +132,6 @@ test/etabs_api/test.*
 # protect from users
 civilGui.py
 !civilGui.pyc
+check_legal.py
+!check_legal.pyc
 
