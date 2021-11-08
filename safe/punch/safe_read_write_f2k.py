@@ -381,7 +381,7 @@ class FreecadReadwriteModel():
                 points = self.get_sort_points(o.rect.Edges)
                 self.create_area_by_coord(points, prop_name='COL_STIFF')
     
-    def export_freecad_wall_loads(self, loadpat='DEAD'):
+    def export_freecad_wall_loads(self):
         point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
         points_content = ''
         curr_point_content = self.safe.tables_contents.get(point_coords_table_key, '')
@@ -396,6 +396,7 @@ class FreecadReadwriteModel():
                 ):
                 mass_per_area = o.weight
                 height = o.Height.getValueAs('m')
+                loadpat = o.loadpat
                 value = mass_per_area * height * self.safe.force_units['Kgf'] / self.safe.length_units['m']
                 p1 = o.Base.start_point
                 p2 = o.Base.end_point

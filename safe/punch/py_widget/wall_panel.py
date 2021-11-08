@@ -11,6 +11,8 @@ class WallTaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'wall_panel.ui'))
+        foun = FreeCAD.ActiveDocument.Foundation
+        self.form.loadpat.addItems(foun.loadcases)
         self.create_connections()
 
     def create_connections(self):
@@ -27,6 +29,7 @@ class WallTaskPanel:
         weight = self.form.weight.value()
         height = self.form.height_box.value()
         create_blocks = self.form.create_blocks.isChecked()
+        loadpat = self.form.loadpat.currentText()
         mat = FreeCAD.ActiveDocument.findObjects(Type='App::MaterialObjectPython')
         if not mat:
             import Arch
@@ -37,6 +40,8 @@ class WallTaskPanel:
         for s in slabs:
             wall = ArchWall.makeWall(baseobj=s,height=height * 1000)
             wall.addProperty('App::PropertyInteger', 'weight', 'Wall')
+            wall.addProperty('App::PropertyString', 'loadpat', 'Wall')
+            wall.loadpat = loadpat
             wall.weight = weight
             wall.Base.ViewObject.Visibility = True
             wall.Material = mat
@@ -45,6 +50,7 @@ class WallTaskPanel:
                 wall.BlockHeight = 400
                 wall.BlockLength = 800
                 wall.OffsetSecond = 400
+                wall.Joint = 40
                 wall.ViewObject.DisplayMode = 'Flat Lines'
                 wall.ViewObject.LineWidth = 1
             else:
