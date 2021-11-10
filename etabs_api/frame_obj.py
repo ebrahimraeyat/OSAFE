@@ -301,6 +301,49 @@ class FrameObj:
         df = df[['Story', 'Beam', 'UniqueName', 'section', 'phi_Tcr', 'T', 'j', 'init_j']]
         return df
 
+    def angle_between_two_lines(self,
+        line1 : Union[str, Iterable],
+        line2 : Union[str, Iterable],
+        ):
+        if type(line1) != type(line2):
+            return
+        if type(line1) == str: # frame name in etabs model
+            l1_x1, l1_y1, l1_x2, l1_y2 = self.get_xy_of_frame_points(line1)
+            l2_x1, l2_y1, l2_x2, l2_y2 = self.get_xy_of_frame_points(line2)
+        elif type(line1) == Iterable:
+            l1_x1, l1_y1, l1_x2, l1_y2 = line1
+            l2_x1, l2_y1, l2_x2, l2_y2 = line2
+        def dot(vector_a, vector_b):
+            return vector_a[0]*vector_b[0]+vector_a[1]*vector_b[1]
+        vector_a = [(l1_x1-l1_x2), (l1_y1-l1_y2)]
+        vector_b = [(l2_x1-l2_x2), (l2_y1-l2_y2)]
+        dot_prod = dot(vector_a, vector_b)
+        magnitudes_a = dot(vector_a, vector_a)**0.5
+        magnitudes_b = dot(vector_b, vector_b)**0.5
+        angle = math.acos(dot_prod / magnitudes_b / magnitudes_a)
+        ang_deg = math.degrees(angle)%360
+        if ang_deg-180>=0:
+            return 360 - ang_deg
+        else: 
+            return ang_deg
+
+    def get_frame_angle(self,
+        line : Union[str, Iterable],
+        ):
+        if type(line) == str: # frame name in etabs model
+            x1, y1, x2, y2 = self.get_xy_of_frame_points(line)
+        elif type(line) == Iterable:
+            x1, y1, x2, y2 = line
+        if x2 == x1:
+            return 90
+        return math.degrees(math.atan((y2 - y1) / (x2 - x1)))
+        
+    def get_xy_of_frame_points(self, name : str):
+        p1_name, p2_name, _ = self.SapModel.FrameObj.GetPoints(name)
+        x1, y1 = self.SapModel.PointObj.GetCoordCartesian(p1_name)[:2]
+        x2, y2 = self.SapModel.PointObj.GetCoordCartesian(p2_name)[:2]
+        return x1, y1, x2, y2
+
     def offset_frame(self, 
                 distance : float,
                 neg : bool =False,
