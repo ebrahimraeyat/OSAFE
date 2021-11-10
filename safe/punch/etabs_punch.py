@@ -91,6 +91,8 @@ class EtabsPunch(object):
             name = row['UniqueName']
             bx = float(row['t3'])
             by = float(row['t2'])
+            if (not bx > 0) or (not by > 0):
+                continue
             angle = float(row['AxisAngle'])
             x = row['x']
             y = row['y']
