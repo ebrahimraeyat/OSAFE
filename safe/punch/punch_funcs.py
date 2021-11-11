@@ -583,6 +583,55 @@ def get_points_of_foundation_plan_and_holes(
 		points.append(get_sort_points(edges))
 	return points
 
+def get_xy_strips(slabs : list):
+	'''
+	This function get a list of slabs and search for slabs that create contiues strip or slab in x or y direction
+	'''
+	import pandas as pd
+	cols = ['name', 'is_first', 'is_end', 'x', 'y', 'z']
+	df = pd.DataFrame()
+	for s in slabs:
+		se = pd.Series([s.Name, True, False, s.start_point.x, s.start_point.y, s.start_point.z], index=cols)
+		df = df.append(se, ignore_index=True)
+		se = pd.Series([s.Name, False, True, s.end_point.x, s.end_point.y, s.end_point.z], index=cols)
+		df = df.append(se, ignore_index=True)
+	group = df.groupby(['x','y', 'z'])
+	x_slabs = []
+	y_slabs = []
+	x_dir = True
+	y_dir = False
+	end = False
+	used_slabs = []
+	for (x, y, z), frame in group:
+		strips = []
+		# while not end:
+		names = frame['name'].to_list()
+		name = get_closest_angle_to(names, angle=0)
+		if name is None:
+			name = get_closest_angle_to(names, angle=90)
+			if name is None:
+				break
+			else:
+				y_dir = True
+		else:
+			x_dir = True
+		while not end:
+			filt = (df['slab'] == name) & (df['x'] == x)
+			slab_row = df.loc[filt]
+			is_first = slab_row
+		
+		
+		if get_direction(name) == 'X':
+			x_dir = True
+				
+			strips.append(name)
+				
+			
+	
+
+
+
+
 
 	
 

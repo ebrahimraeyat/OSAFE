@@ -3,7 +3,6 @@ import comtypes.client
 from pathlib import Path
 import sys
 
-
 FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 import FreeCAD
@@ -11,11 +10,10 @@ import FreeCAD
 filename = Path(__file__).absolute().parent.parent / 'etabs_api' / 'test_files' / 'freecad' / 'strip.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'etabs_api' / 'test_files' / 'freecad' / 'mat.FCStd'
 document= FreeCAD.openDocument(str(filename))
+etabs_api_path = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(etabs_api_path))
 
-civil_path = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(civil_path))
-
-from etabs_api import etabs_obj
+import etabs_obj
 
 @pytest.fixture
 def shayesteh(edb="shayesteh.EDB"):
@@ -27,13 +25,15 @@ def shayesteh(edb="shayesteh.EDB"):
                 return etabs
             else:
                 raise NameError
-    except:
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
         helper = comtypes.client.CreateObject('ETABSv1.Helper') 
         helper = helper.QueryInterface(comtypes.gen.ETABSv1.cHelper)
         ETABSObject = helper.CreateObjectProgID("CSI.ETABS.API.ETABSObject")
         ETABSObject.ApplicationStart()
         SapModel = ETABSObject.SapModel
-        SapModel.InitializeNewModel()
+        # SapModel.InitializeNewModel()
         SapModel.File.OpenFile(str(Path(__file__).parent / edb))
         asli_file_path = Path(SapModel.GetModelFilename())
         dir_path = asli_file_path.parent.absolute()
@@ -52,7 +52,9 @@ def shayesteh_safe(edb="shayesteh.FDB"):
                 return etabs
             else:
                 raise NameError
-    except:
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
         helper = comtypes.client.CreateObject('SAFEv1.Helper') 
         helper = helper.QueryInterface(comtypes.gen.SAFEv1.cHelper)
         SAFEObject = helper.CreateObjectProgID("CSI.SAFE.API.ETABSObject")
@@ -60,6 +62,33 @@ def shayesteh_safe(edb="shayesteh.FDB"):
         SapModel = SAFEObject.SapModel
         SapModel.InitializeNewModel()
         SapModel.File.OpenFile(str(Path(__file__).parent / edb))
+        asli_file_path = Path(SapModel.GetModelFilename())
+        dir_path = asli_file_path.parent.absolute()
+        test_file_path = dir_path / "test.EDB"
+        SapModel.File.Save(str(test_file_path))
+        etabs = etabs_obj.EtabsModel(backup=False)
+        return etabs
+
+@pytest.fixture
+def khiabany(edb="khiabany.EDB"):
+    try:
+        etabs = etabs_obj.EtabsModel(backup=False)
+        if etabs.success:
+            filepath = Path(etabs.SapModel.GetModelFilename())
+            if 'test.' in filepath.name:
+                return etabs
+            else:
+                raise NameError
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
+        helper = comtypes.client.CreateObject('ETABSv1.Helper') 
+        helper = helper.QueryInterface(comtypes.gen.ETABSv1.cHelper)
+        ETABSObject = helper.CreateObjectProgID("CSI.ETABS.API.ETABSObject")
+        ETABSObject.ApplicationStart()
+        SapModel = ETABSObject.SapModel
+        SapModel.InitializeNewModel()
+        SapModel.File.OpenFile(str(Path(__file__).parent / 'files' / edb))
         asli_file_path = Path(SapModel.GetModelFilename())
         dir_path = asli_file_path.parent.absolute()
         test_file_path = dir_path / "test.EDB"
@@ -159,6 +188,51 @@ def test_get_section_cuts_angle(shayesteh):
     assert len(d) == 13
 
 @pytest.mark.getmethod
+def test_expand_seismic_load_patterns(khiabany):
+    df, loads = khiabany.database.expand_seismic_load_patterns()
+    assert len(loads) == 4
+    assert len(df) == 12
+    assert set(df.Name) == {'EY', 'EX', 'EY_DRIFT', 'ENY_DRIFT', 'EPY_DRIFT', 'EPX', 'ENY', 'ENX', 'ENX_DRIFT', 'EPX_DRIFT', 'EX_DRIFT', 'EPY'}
+    assert set(loads.keys()) == {'EYDRIFT', 'EXALL', 'EYALL', 'EXDRIFT'}
+
+@pytest.mark.getmethod
+def test_expand_table(khiabany):
+    d1 = {
+        'EXALL' : ['EX', 'EPX', 'ENX'],
+        'EYALL' : ['EY', 'EPY', 'ENY'],
+        'EXDRIFT' : ['EPXDRIFT'],
+        }
+    d2 = {'Name': ['EXALL', 'EX', 'Dead', 'EYALL', 'EXDRIFT'],
+            'SF' : [1, 2, 3, 4, 5],
+            }
+    import pandas as pd
+    df = pd.DataFrame(d2)
+    df = khiabany.database.expand_table(df, d1,'Name')
+    assert len(df) == 9
+
+@pytest.mark.getmethod
+def test_expand_design_combos(khiabany):
+    d1 = {
+        'EXALL' : ['EX', 'EPX', 'ENX'],
+        'EYALL' : ['EY', 'EPY', 'ENY'],
+        'EXDRIFT' : ['EPXDRIFT'],
+        }
+    dfs = khiabany.database.expand_design_combos(d1)
+    assert len(dfs) == 1
+    assert list(dfs.keys())[0] == 'Concrete Frame Design Load Combination Data'
+
+@pytest.mark.getmethod
+def test_apply_expand_design_combos(khiabany):
+    import pandas as pd
+    table_key = 'Concrete Frame Design Load Combination Data'
+    d = {'Strength' : 'UDCon-DYN1'}
+    d1 = {table_key: pd.DataFrame(d, index=range(len(d)))}
+    khiabany.database.apply_expand_design_combos(d1)
+    d = khiabany.database.get_design_load_combinations()
+    assert d is not None
+    assert list(d.keys())[0] == table_key
+    
+@pytest.mark.getmethod
 def test_get_basepoints_coord_and_dims(shayesteh):
     d = shayesteh.database.get_basepoints_coord_and_dims()
     assert len(d) == 11
@@ -199,5 +273,6 @@ def test_create_punching_shear_perimeter_table(shayesteh_safe):
     shayesteh_safe.database.create_punching_shear_perimeter_table(punches)
 
 
-    
 
+if __name__ == '__main__':
+    sh = shayesteh()

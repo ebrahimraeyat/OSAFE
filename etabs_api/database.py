@@ -855,7 +855,6 @@ class DatabaseTables:
         self.select_design_load_combinations()
         table_key = 'Joint Design Reactions'
         df = self.read(table_key, to_dataframe=True)
-        df = df.dropna(axis=0, subset=['UniqueName'])
         if 'StepType' in df.columns:
             cols = ['UniqueName', 'OutputCase', 'StepType', 'FZ', 'MX', 'MY']
             df = df[cols]

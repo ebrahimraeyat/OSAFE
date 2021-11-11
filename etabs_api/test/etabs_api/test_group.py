@@ -17,7 +17,9 @@ def shayesteh(edb="shayesteh.EDB"):
                 return etabs
             else:
                 raise NameError
-    except:
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
         helper = comtypes.client.CreateObject('ETABSv1.Helper') 
         helper = helper.QueryInterface(comtypes.gen.ETABSv1.cHelper)
         ETABSObject = helper.CreateObjectProgID("CSI.ETABS.API.ETABSObject")
@@ -33,13 +35,16 @@ def shayesteh(edb="shayesteh.EDB"):
         return etabs
 
 @pytest.mark.getmethod
-def test_all_material(shayesteh):
-    names = shayesteh.material.all_material()
-    assert len(names) == 8
+def test_names(shayesteh):
+    names = shayesteh.group.names()
+    assert len(names) == 1
+    assert names == ('All',)
 
-@pytest.mark.getmethod
-def test_get_material_of_type(shayesteh):
-    names = shayesteh.material.get_material_of_type(2)
-    assert set(names) == {'CONC', 'FLOOR'}
-    names = shayesteh.material.get_material_of_type(1)
-    assert set(names) == {'STEEL'}
+@pytest.mark.setmethod
+def test_add(shayesteh):
+    ret = shayesteh.group.add('sec')
+    assert ret
+    names = shayesteh.group.names()
+    assert 'sec' in names
+    ret = shayesteh.group.add('sec')
+    assert not ret

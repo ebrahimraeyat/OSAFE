@@ -17,7 +17,9 @@ def shayesteh(edb="shayesteh.EDB"):
                 return etabs
             else:
                 raise NameError
-    except:
+        else:
+            raise FileNotFoundError
+    except FileNotFoundError:
         helper = comtypes.client.CreateObject('ETABSv1.Helper') 
         helper = helper.QueryInterface(comtypes.gen.ETABSv1.cHelper)
         ETABSObject = helper.CreateObjectProgID("CSI.ETABS.API.ETABSObject")
@@ -33,16 +35,7 @@ def shayesteh(edb="shayesteh.EDB"):
         return etabs
 
 @pytest.mark.getmethod
-def test_names(shayesteh):
-    names = shayesteh.group.names()
-    assert len(names) == 1
-    assert names == ('All',)
-
-@pytest.mark.setmethod
-def test_add(shayesteh):
-    ret = shayesteh.group.add('sec')
-    assert ret
-    names = shayesteh.group.names()
-    assert 'sec' in names
-    ret = shayesteh.group.add('sec')
-    assert not ret
+def test_get_points_coords(shayesteh):
+    points_coords = shayesteh.points.get_points_coords(['146', '147', '148'])
+    assert list(points_coords.keys()) == ['146', '147', '148']
+    assert pytest.approx(points_coords['146'], abs=1) == (12751.4, 3365.6, 5220)
