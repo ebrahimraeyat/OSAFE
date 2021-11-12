@@ -583,50 +583,159 @@ def get_points_of_foundation_plan_and_holes(
 		points.append(get_sort_points(edges))
 	return points
 
-def get_xy_strips(slabs : list):
+def get_xy_contiues_edges(edges : list):
 	'''
-	This function get a list of slabs and search for slabs that create contiues strip or slab in x or y direction
+	This function get a list of egdes and search for groups of egdes that create contiues edges in x or y direction
 	'''
 	import pandas as pd
-	cols = ['name', 'is_first', 'is_end', 'x', 'y', 'z']
+	cols = ['edge', 'is_first', 'is_end', 'x', 'y', 'z']
 	df = pd.DataFrame()
-	for s in slabs:
-		se = pd.Series([s.Name, True, False, s.start_point.x, s.start_point.y, s.start_point.z], index=cols)
+	for e in edges:
+		v1, v2 = e.firstVertex(), e.lastVertex()
+		se = pd.Series([e, True, False, v1.X, v1.Y, v1.Z], index=cols)
 		df = df.append(se, ignore_index=True)
-		se = pd.Series([s.Name, False, True, s.end_point.x, s.end_point.y, s.end_point.z], index=cols)
+		se = pd.Series([e, False, True, v2.X, v2.Y, v2.Z], index=cols)
 		df = df.append(se, ignore_index=True)
 	group = df.groupby(['x','y', 'z'])
-	x_slabs = []
-	y_slabs = []
-	x_dir = True
-	y_dir = False
+	max_number_edges_connect_to_point = group['edge'].count().max()
+	additional_cols = [n for n in range(1, max_number_edges_connect_to_point + 1)]
+	df1 = pd.DataFrame(columns=['point', 'edge'] + additional_cols)
+	for state, frame in group:
+		edges_from_point = list(frame['edge'])
+		for edge in edges_from_point:
+			edges_without_curr_edge = set(edges_from_point).difference([edge])
+			preferable_edges = get_in_direction_priority(edge, edges_without_curr_edge)
+			none_exist_edge_len = max_number_edges_connect_to_point -  len(preferable_edges)
+			preferable_edges += none_exist_edge_len * [None]
+			se = pd.Series([state, edge] +  preferable_edges, index=df1.columns)
+			df1 = df1.append(se, ignore_index=True)
+	map_dict_edges_to_num = dict()
+	for i, e in enumerate(edges, start=1):
+		map_dict_edges_to_num[e] = i
+	edges_cols = ['edge'] + additional_cols
+	for col in (edges_cols):
+		df1[col] = df1[col].map(map_dict_edges_to_num)
+	df1 = df1.fillna(0)
+	for col in (edges_cols):
+		df1[col] = df1[col].astype(int)
+	all_edges = []
 	end = False
-	used_slabs = []
-	for (x, y, z), frame in group:
-		strips = []
-		# while not end:
-		names = frame['name'].to_list()
-		name = get_closest_angle_to(names, angle=0)
-		if name is None:
-			name = get_closest_angle_to(names, angle=90)
-			if name is None:
+	used_edges = []
+	continues_edges = []
+	for i, row in df1.iterrows():
+		if end:
+			all_edges.append(continues_edges)
+			end = False
+			df1['edge'] = df1['edge'].replace([previous_edge], 0)
+			if df1[edges_cols].sum().sum() == 0:
 				break
-			else:
-				y_dir = True
-		else:
-			x_dir = True
+			continues_edges = []
 		while not end:
-			filt = (df['slab'] == name) & (df['x'] == x)
-			slab_row = df.loc[filt]
-			is_first = slab_row
-		
-		
-		if get_direction(name) == 'X':
-			x_dir = True
+			if len(continues_edges) == 0:
+				filt = (df1['edge'] == 0) | (df1[edges_cols].sum(axis=1) == 0)
+				temp_df = df1[~filt]
+				if len(temp_df) == 0:
+					end = True
+					break
+				j, temp_row = next(temp_df.iterrows())
+				edge_num = temp_row['edge']
+				point = row['point']
+				if not edge_num in used_edges:
+					continues_edges.append(edge_num)
+					used_edges.append(edge_num)
+				for col in edges_cols:
+					df1.at[j, col] = 0
+				df1[additional_cols] = df1[additional_cols].replace([edge_num], 0)
 				
-			strips.append(name)
+			else:
+				previous_edge = continues_edges[-1]
+				filt = (df1['edge'] == previous_edge) & (df1['point'] != point)
+				if not True in filt.values:
+					end = True
+					break
+				temp_df = df1.loc[filt]
+				row_num = temp_df.index.to_list()[0]
+				end = True
+				for col in additional_cols:
+					edge_num = temp_df.at[row_num, col]
+					if edge_num != 0 and not edge_num in used_edges:
+						continues_edges.append(edge_num)
+						used_edges.append(edge_num)
+						end = False
+						point = df1.at[row_num, 'point']
+						df1[additional_cols] = df1[additional_cols].replace([edge_num], 0)
+						df1['edge'] = df1['edge'].replace([previous_edge], 0)
+						break
 				
-			
+
+	return all_edges
+
+
+def get_in_direction_priority(edge, edges,
+		angle: int = 45):
+	'''
+	Getting an edge and calculate angle between edge and each member of edges and then
+	sort them from large to small. angle is acceptable angle that ilustrate edge is in direction
+	of other edges
+	'''
+	acceptable_anlge = 180 - angle
+	if len(edges) == 0:
+		return []
+	edges_angles = []
+	for e in edges:
+		angle = angle_between_two_edges(edge, e)
+		if angle == 0:
+			angle = 180
+		if angle < acceptable_anlge:
+			continue
+		edges_angles.append((e, angle))
+	edges_angles.sort(key=lambda x: x[1], reverse=True)
+	return [a[0] for a in edges_angles]
+
+def dot(vector_a, vector_b):
+	return vector_a[0]*vector_b[0]+vector_a[1]*vector_b[1]
+
+def angle_between_two_edges(
+	edge1 : Part.Edge,
+	edge2 : Part.Edge,
+	):
+	# v1 = edge1.tangentAt(0)
+	# dx1, dy1 = v1.x, v1.y
+	# v2 = edge2.tangentAt(0)
+	# dx2, dy2 = v2.x, v2.y
+	# if abs(dx1) == abs(dx2): # if two edges are in the same direction, also if dx = 0
+	# 	return 180
+	p1, p2 = [v.Point for v in edge1.Vertexes]
+	p3, p4 = [v.Point for v in edge2.Vertexes]
+	p1, p2, p3, p4 = find_common_point(p1, p2, p3, p4)
+
+	x1, x2, y1, y2 = p1.x, p2.x, p1.y, p2.y
+	x3, x4, y3, y4 = p3.x, p4.x, p3.y, p4.y
+	vector_a = [(x1 - x2), (y1 - y2)]
+	vector_b = [(x3 - x4), (y3 - y4)]
+	dot_prod = dot(vector_a, vector_b)
+	magnitudes_a = dot(vector_a, vector_a) ** 0.5
+	magnitudes_b = dot(vector_b, vector_b) ** 0.5
+	angle = math.acos(dot_prod / magnitudes_b / magnitudes_a)
+	ang_deg = math.degrees(angle)%360
+	if ang_deg-180>=0:
+		return 360 - ang_deg
+	else: 
+		return ang_deg
+
+def find_common_point(p1, p2, p3, p4):
+	if p1.isEqual(p3, .001):
+		return p1, p2, p1, p4
+	elif p1.isEqual(p4, .001):
+		return p1, p2, p1, p3
+	elif p2.isEqual(p3, .001):
+		return p2, p1, p2, p4
+	elif p2.isEqual(p4, .001):
+		return p2, p1, p2, p3
+
+
+	
+
 	
 
 
