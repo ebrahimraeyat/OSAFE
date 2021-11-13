@@ -583,10 +583,14 @@ def get_points_of_foundation_plan_and_holes(
 		points.append(get_sort_points(edges))
 	return points
 
-def get_xy_contiues_edges(edges : list):
+def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.DataFram':
 	'''
-	This function get a list of egdes and search for groups of egdes that create contiues edges in x or y direction
+	This function give a list of edges, find the common points of those edges.
+	then for each point and each edge of all edges that connected to this point,
+	it search for similarity direction with this edge. the df columns output is
+	like "point edge 1 2 3 4" 
 	'''
+
 	import pandas as pd
 	cols = ['edge', 'is_first', 'is_end', 'x', 'y', 'z']
 	df = pd.DataFrame()
@@ -598,14 +602,14 @@ def get_xy_contiues_edges(edges : list):
 		df = df.append(se, ignore_index=True)
 	group = df.groupby(['x','y', 'z'])
 	max_number_edges_connect_to_point = group['edge'].count().max()
-	additional_cols = [n for n in range(1, max_number_edges_connect_to_point + 1)]
+	additional_cols = [n for n in range(1, max_number_edges_connect_to_point)]
 	df1 = pd.DataFrame(columns=['point', 'edge'] + additional_cols)
 	for state, frame in group:
 		edges_from_point = list(frame['edge'])
 		for edge in edges_from_point:
 			edges_without_curr_edge = set(edges_from_point).difference([edge])
 			preferable_edges = get_in_direction_priority(edge, edges_without_curr_edge)
-			none_exist_edge_len = max_number_edges_connect_to_point -  len(preferable_edges)
+			none_exist_edge_len = max_number_edges_connect_to_point -  len(preferable_edges) - 1
 			preferable_edges += none_exist_edge_len * [None]
 			se = pd.Series([state, edge] +  preferable_edges, index=df1.columns)
 			df1 = df1.append(se, ignore_index=True)
@@ -618,22 +622,31 @@ def get_xy_contiues_edges(edges : list):
 	df1 = df1.fillna(0)
 	for col in (edges_cols):
 		df1[col] = df1[col].astype(int)
+	return df1
+
+def get_contiues_edges(edges : list):
+	'''
+	This function get a list of egdes and search for groups of egdes that create contiues edges in x or y direction
+	'''
+	df = get_similar_edge_direction_in_common_points_from_edges(edges)
 	all_edges = []
 	end = False
 	used_edges = []
 	continues_edges = []
-	for i, row in df1.iterrows():
+	edges_cols = list(df.columns)[1:]
+	additional_cols = edges_cols[1:]
+	for i, row in df.iterrows():
 		if end:
 			all_edges.append(continues_edges)
 			end = False
-			df1['edge'] = df1['edge'].replace([previous_edge], 0)
-			if df1[edges_cols].sum().sum() == 0:
+			df['edge'] = df['edge'].replace([previous_edge], 0)
+			if df[edges_cols].sum().sum() == 0:
 				break
 			continues_edges = []
 		while not end:
 			if len(continues_edges) == 0:
-				filt = (df1['edge'] == 0) | (df1[edges_cols].sum(axis=1) == 0)
-				temp_df = df1[~filt]
+				filt = (df['edge'] == 0) | (df[edges_cols].sum(axis=1) == 0)
+				temp_df = df[~filt]
 				if len(temp_df) == 0:
 					end = True
 					break
@@ -644,16 +657,16 @@ def get_xy_contiues_edges(edges : list):
 					continues_edges.append(edge_num)
 					used_edges.append(edge_num)
 				for col in edges_cols:
-					df1.at[j, col] = 0
-				df1[additional_cols] = df1[additional_cols].replace([edge_num], 0)
+					df.at[j, col] = 0
+				df[additional_cols] = df[additional_cols].replace([edge_num], 0)
 				
 			else:
 				previous_edge = continues_edges[-1]
-				filt = (df1['edge'] == previous_edge) & (df1['point'] != point)
+				filt = (df['edge'] == previous_edge) & (df['point'] != point)
 				if not True in filt.values:
 					end = True
 					break
-				temp_df = df1.loc[filt]
+				temp_df = df.loc[filt]
 				row_num = temp_df.index.to_list()[0]
 				end = True
 				for col in additional_cols:
@@ -662,12 +675,10 @@ def get_xy_contiues_edges(edges : list):
 						continues_edges.append(edge_num)
 						used_edges.append(edge_num)
 						end = False
-						point = df1.at[row_num, 'point']
-						df1[additional_cols] = df1[additional_cols].replace([edge_num], 0)
-						df1['edge'] = df1['edge'].replace([previous_edge], 0)
+						point = df.at[row_num, 'point']
+						df[additional_cols] = df[additional_cols].replace([edge_num], 0)
+						df['edge'] = df['edge'].replace([previous_edge], 0)
 						break
-				
-
 	return all_edges
 
 
