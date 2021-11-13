@@ -27,7 +27,8 @@ def update():
 	g = git.cmd.Git(civil_path)
 	msg = ''
 	try:
-		msg = g.pull(env={'GIT_SSL_NO_VERIFY': '1'})
+		g.execute('git submodule update --init --recursive')
+		msg = g.execute('git pull --recurse-submodules origin master')
 	except:
 		QMessageBox.information(None, "update", "update takes some minutes, please be patient.")
 		import shutil
@@ -37,9 +38,8 @@ def update():
 		punch_temp_dir = Path.joinpath(Path(default_tmp_dir), 'Civil' + name)
 		os.mkdir(punch_temp_dir)
 		os.chdir(punch_temp_dir)
-		git.Git('.').clone("https://github.com/ebrahimraeyat/Civil.git", env={'GIT_SSL_NO_VERIFY': '1'})
+		git.Git('.').clone("https://github.com/ebrahimraeyat/Civil.git","--recurse-submodules", env={'GIT_SSL_NO_VERIFY': '1'})
 		src_folder = Path.joinpath(punch_temp_dir, 'Civil')
-		
 		if Path.exists(civil_path):
 			shutil.rmtree(civil_path)
 		shutil.copytree(src_folder, civil_path)
