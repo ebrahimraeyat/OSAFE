@@ -333,36 +333,49 @@ class FreecadReadwriteModel():
         scale_factor = self.safe.length_units['mm']
         if foun.foundation_type == 'Strip':
             slabs = foun.tape_slabs
-            i = j = 0
-            for slab in slabs:
-                p1 = slab.start_point
-                p2 = slab.end_point
-                coord1 = [i * scale_factor for i in (p1.x, p1.y, p1.z)]
-                coord2 = [i * scale_factor for i in (p2.x, p2.y, p2.z)]
-                p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)
-                p2_name = self.safe.is_point_exist(coord2, curr_point_content + points_content)
-                if p1_name is None:
-                    points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
-                    p1_name = self.last_point_number
-                    self.last_point_number += 1
-                if p2_name is None:
-                    points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
-                    p2_name = self.last_point_number
-                    self.last_point_number += 1
-                swl = ewl = (slab.width.Value / 2 + slab.offset) * scale_factor
-                swr = ewr = (slab.width.Value / 2 - slab.offset) * scale_factor
-                dx = abs(p1.x - p2.x)
-                dy = abs(p1.y - p2.y)
-                if dx > dy:
-                    layer = 'A'
-                    i += 1
-                    name = f'CS{layer}{i}'
-                else:
-                    layer = 'B'
-                    j += 1
-                    name = f'CS{layer}{j}'
-                strip_content += f'\tStrip={name}   Point={p1_name}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
-                strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr}\n'
+            continuous_slabs = punch_funcs.get_continuous_slabs(slabs)
+            i_strip = j = 0
+            for ss in continuous_slabs:
+                last = len(ss) - 1
+                for i, slab in enumerate(ss):
+                    if i == 0:
+                        p1 = slab.start_point
+                        coord1 = [coord * scale_factor for coord in (p1.x, p1.y, p1.z)]
+                        p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)
+                        if p1_name is None:
+                            points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
+                            p1_name = self.last_point_number
+                            self.last_point_number += 1
+                    p2 = slab.end_point
+                    coord2 = [coord * scale_factor for coord in (p2.x, p2.y, p2.z)]
+                    p2_name = self.safe.is_point_exist(coord2, curr_point_content + points_content)
+                    if p2_name is None:
+                        points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
+                        p2_name = self.last_point_number
+                        self.last_point_number += 1
+                    swl = ewl = (slab.width.Value / 2 + slab.offset) * scale_factor
+                    swr = ewr = (slab.width.Value / 2 - slab.offset) * scale_factor
+                    if i != last:
+                        next_slab = ss[i + 1]
+                        next_swl = (next_slab.width.Value / 2 + next_slab.offset) * scale_factor
+                        next_swr = (next_slab.width.Value / 2 - next_slab.offset) * scale_factor
+                    if i == 0:
+                        dx = abs(p1.x - p2.x)
+                        dy = abs(p1.y - p2.y)
+                        if dx > dy:
+                            layer = 'A'
+                            i_strip += 1
+                            name = f'CS{layer}{i_strip}'
+                        else:
+                            layer = 'B'
+                            j += 1
+                            name = f'CS{layer}{j}'
+                    if i == 0:
+                        strip_content += f'\tStrip={name}   Point={p1_name}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
+                    if i == last: # last strip
+                        strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr}\n'
+                    else:
+                        strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr} WALeft={next_swl}   WARight={next_swr} \n'
                 strip_assign_content += f'\tStrip={name}   Layer={layer}   DesignType=Column   RLLF=1   Design=Yes   IgnorePT=No   RebarMat=AIII   CoverType=Preferences\n'
         self.safe.add_content_to_table(point_coords_table_key, points_content)
         self.safe.add_content_to_table(strip_table_key, strip_content)
