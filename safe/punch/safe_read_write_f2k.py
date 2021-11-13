@@ -69,7 +69,7 @@ class Safe():
             coordinates = []
             for i, field_value in enumerate(fields_values[:-1]):
                 if i == 0:
-                    point_name = int(field_value.split('=')[1])
+                    point_name = str(field_value.split('=')[1])
                 else:
                     value = float(field_value.split('=')[1])
                     coordinates.append(value)

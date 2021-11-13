@@ -111,8 +111,8 @@ def test_get_points_coordinates():
                 Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n'''
 
     points_coordinates = safe.get_points_coordinates(content)
-    assert set(points_coordinates.keys()) == set([115, 117, 119, 121])
-    assert points_coordinates[115] == [2820, 0, 0]
+    assert set(points_coordinates.keys()) == set(['115', '117', '119', '121'])
+    assert points_coordinates['115'] == [2820, 0, 0]
 
 def test_is_point_exist():
     safe = Safe()
@@ -122,7 +122,7 @@ def test_is_point_exist():
                 Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n'''
 
     id = safe.is_point_exist([2820, 0, 0], content)
-    assert id == 115
+    assert id == '115'
     id = safe.is_point_exist([2820, 20, 0], content)
     assert not id
 
