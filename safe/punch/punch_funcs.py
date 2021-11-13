@@ -624,9 +624,9 @@ def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.
 		df1[col] = df1[col].astype(int)
 	return df1
 
-def get_contiues_edges(edges : list):
+def get_continuous_edges(edges : list):
 	'''
-	This function get a list of egdes and search for groups of egdes that create contiues edges in x or y direction
+	This function get a list of egdes and search for groups of egdes that create continuous edges in x or y direction
 	'''
 	df = get_similar_edge_direction_in_common_points_from_edges(edges)
 	all_edges = []
@@ -680,6 +680,9 @@ def get_contiues_edges(edges : list):
 						df['edge'] = df['edge'].replace([previous_edge], 0)
 						break
 	return all_edges
+
+def get_continuous_slabs(slabs : list) -> list:
+
 
 
 def get_in_direction_priority(edge, edges,

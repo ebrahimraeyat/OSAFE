@@ -178,10 +178,10 @@ def test_punch_null_points():
     assert len(null_edges) == 6
     assert len(null_points) == 6
 
-def test_get_contiues_edges():
+def test_get_continuous_edges():
     slabs = document.Foundation.tape_slabs
     edges = [s.Shape.Edges[0] for s in slabs]
-    edges_numbers = punch_funcs.get_contiues_edges(edges)
+    edges_numbers = punch_funcs.get_continuous_edges(edges)
     assert edges_numbers == [[6, 1, 2, 3], [11, 12, 13], [4, 5, 14], [8, 7], [10, 9], [15, 16]]
 
 
