@@ -682,8 +682,12 @@ def get_continuous_edges(edges : list):
 	return all_edges
 
 def get_continuous_slabs(slabs : list) -> list:
-
-
+	edges = [s.Shape.Edges[0] for s in slabs]
+	edges_numbers = get_continuous_edges(edges)
+	continuous_slabs = []
+	for numbers in edges_numbers:
+		continuous_slabs.append([slabs[i-1] for i in numbers])
+	return continuous_slabs
 
 def get_in_direction_priority(edge, edges,
 		angle: int = 45):

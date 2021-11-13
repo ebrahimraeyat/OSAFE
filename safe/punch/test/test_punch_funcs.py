@@ -184,6 +184,18 @@ def test_get_continuous_edges():
     edges_numbers = punch_funcs.get_continuous_edges(edges)
     assert edges_numbers == [[6, 1, 2, 3], [11, 12, 13], [4, 5, 14], [8, 7], [10, 9], [15, 16]]
 
+def test_get_continuous_slabs():
+    slabs = document.Foundation.tape_slabs
+    slab_lists = punch_funcs.get_continuous_slabs(slabs)
+    slab_names = []
+    for ss in slab_lists:
+        slab_names.append([s.Name for s in ss])
+    edges = [[6, 1, 2, 3], [11, 12, 13], [4, 5, 14], [8, 7], [10, 9], [15, 16]]
+    ret = []
+    for es in edges:
+        ret.append([slabs[i - 1].Name for i in es])
+    assert slab_names == ret
+
 
 
 
