@@ -14,7 +14,7 @@ try:
 except:
     pass
 
-__all__ = ['Safe', 'FreecadReadwriteModel']
+__all__ = ['Safe', 'Safe12', 'FreecadReadwriteModel']
 
 
 class Safe():
@@ -119,6 +119,117 @@ class Safe():
                 writer.write(f'\n\nTABLE:  "{table_key}"\n')
                 writer.write(content)
             writer.write("\nEND TABLE DATA")
+        return None
+
+    def get_force_units(self, force_unit : str):
+        '''
+        force_unit can be 'N', 'KN', 'Kgf', 'tonf'
+        '''
+        if force_unit == 'N':
+            return dict(N=1, KN=1000, Kgf=9.81, tonf=9810)
+        elif force_unit == 'KN':
+            return dict(N=.001, KN=1, Kgf=.00981, tonf=9.81)
+        elif force_unit == 'Kgf':
+            return dict(N=1/9.81, KN=1000/9.81, Kgf=1, tonf=1000)
+        elif force_unit == 'tonf':
+            return dict(N=.000981, KN=.981, Kgf=.001, tonf=1)
+        else:
+            raise KeyError
+
+    def get_length_units(self, length_unit : str):
+        '''
+        length_unit can be 'mm', 'cm', 'm'
+        '''
+        if length_unit == 'mm':
+            return dict(mm=1, cm=10, m=1000)
+        elif length_unit == 'cm':
+            return dict(mm=.1, cm=1, m=100)
+        elif length_unit == 'm':
+            return dict(mm=.001, cm=.01, m=1)
+        else:
+            raise KeyError
+
+class Safe12(Safe):
+    def __init__(self,
+            input_f2k_path : Path = None,
+            output_f2k_path : Path = None,
+        ) -> None:
+        super().__init__(input_f2k_path, output_f2k_path)
+        self.input_f2k_path = input_f2k_path
+
+    def get_tables_contents(self):
+        with open(self.input_f2k_path, 'r') as reader:
+            lines = reader.readlines()
+            tables_contents = dict()
+            n = len("$ ")
+            contex = ''
+            table_key = None
+            for line in lines:
+                if line.startswith("$"):
+                    if table_key and contex:
+                        tables_contents[table_key] = contex
+                    contex = ''
+                    table_key = line[n+1:-2]
+                else:
+                    contex += line
+        self.tables_contents = tables_contents
+        return tables_contents
+
+    def get_points_coordinates(self,
+            content : str = None,
+            ) -> dict:
+        if content is None:
+            content = self.tables_contents["POINT COORDINATES"]
+        lines = content.split('\n')
+        points_coordinates = dict()
+        for line in lines:
+            if not line:
+                continue
+            line = line.lstrip('  POINT')
+            fields_values = line.split()
+            coordinates = []
+            for i, field_value in enumerate(fields_values):
+                if i == 0:
+                    point_name = str(field_value).strip('"')
+                else:
+                    value = float(field_value)
+                    coordinates.append(value)
+            points_coordinates[point_name] = coordinates
+        return points_coordinates
+
+    def is_point_exist(self,
+            coordinate : list,
+            content : Union[str, bool] = None,
+            ):
+        points_coordinates = self.get_points_coordinates(content)
+        for id, coord in points_coordinates.items():
+            if coord == coordinate:
+                return id
+        return None
+                    
+    def force_length_unit(self,
+        content : Union[str, bool] = None,
+        ):
+        with open(self.input_f2k_path, 'r') as reader:
+            while True:
+                line = reader.readline()
+                if 'UNITS' in line:
+                    line = line.lstrip('  ')
+                    force, length = line.split()[1:]
+                    break
+        self.force_unit, self.length_unit = force, length
+        self.force_units = self.get_force_units(self.force_unit)
+        self.length_units = self.get_length_units(self.length_unit)
+        return force, length
+
+    def write(self):
+        if self.tables_contents is None:
+            self.get_tables_contents()
+        with open(self.output_f2k_path, 'w') as writer:
+            for table_key, content in self.tables_contents.items():
+                writer.write(f'\n\n$ "{table_key}"\n')
+                writer.write(content)
+            writer.write("\n  END\n$ END OF MODEL FILE\n")
         return None
 
     def get_force_units(self, force_unit : str):

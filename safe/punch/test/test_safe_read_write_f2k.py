@@ -16,7 +16,7 @@ punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
 
 from safe_read_write_f2k import FreecadReadwriteModel as FRW
-from safe_read_write_f2k import Safe
+from safe_read_write_f2k import Safe, Safe12
 
 def test_export_freecad_slabs():
     input_f2k_path = Path('~\input.f2k').expanduser()
@@ -153,7 +153,27 @@ def test_force_length_unit():
     assert pytest.approx(ks, 1.9613e-05, .01)
 
 
+def test_get_points_coordinates12():
+    safe = Safe12()
+    content = '''  POINT  "115"  2.82  0\n
+                    POINT  "117"  7.04  0\n
+                    POINT  "119"  14.69  0\n
+                    POINT  "121"  17.69  0'''
 
+    points_coordinates = safe.get_points_coordinates(content)
+    assert set(points_coordinates.keys()) == set(['115', '117', '119', '121'])
+    assert points_coordinates['115'] == [2.82, 0]
+
+def test_is_point_exist12():
+    safe = Safe12()
+    content = '''  POINT  "115"  2.82  0\n
+                    POINT  "117"  7.04  0\n
+                    POINT  "119"  14.69  0\n
+                    POINT  "121"  17.69  0'''
+    id = safe.is_point_exist([2.82, 0], content)
+    assert id == '115'
+    id = safe.is_point_exist([2.820, .20], content)
+    assert not id
 
 if __name__ == '__main__':
     test_export_freecad_strips()
