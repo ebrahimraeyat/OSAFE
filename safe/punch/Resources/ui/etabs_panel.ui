@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>414</height>
+    <height>443</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -93,6 +93,29 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Foundation Level</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSpinBox" name="height_spinbox">
+       <property name="suffix">
+        <string> cm</string>
+       </property>
+       <property name="maximum">
+        <number>500</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
+       <property name="value">
+        <number>80</number>
+       </property>
+      </widget>
+     </item>
      <item row="6" column="1">
       <widget class="QSpinBox" name="fc">
        <property name="suffix">
@@ -120,45 +143,17 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="QSpinBox" name="height_spinbox">
-       <property name="suffix">
-        <string> cm</string>
-       </property>
-       <property name="maximum">
-        <number>500</number>
-       </property>
-       <property name="singleStep">
-        <number>5</number>
-       </property>
-       <property name="value">
-        <number>80</number>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QDoubleSpinBox" name="cover">
-       <property name="suffix">
-        <string> cm</string>
-       </property>
-       <property name="decimals">
-        <number>1</number>
-       </property>
-       <property name="minimum">
-        <double>1.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>15.000000000000000</double>
-       </property>
-       <property name="value">
-        <double>7.500000000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="4" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Height</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="story_label">
+       <property name="text">
+        <string>From Story</string>
        </property>
       </widget>
      </item>
@@ -188,15 +183,46 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="story_label">
-       <property name="text">
-        <string>From Story</string>
+     <item row="5" column="1">
+      <widget class="QDoubleSpinBox" name="cover">
+       <property name="suffix">
+        <string> cm</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>15.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>7.500000000000000</double>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QComboBox" name="story"/>
+     </item>
+     <item row="8" column="1">
+      <widget class="QDoubleSpinBox" name="foundation_level">
+       <property name="suffix">
+        <string> m</string>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>100.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

@@ -11,11 +11,17 @@ class EtabsTaskPanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'etabs_panel.ui'))
         self.etabs = etabs_obj.EtabsModel(backup=False)
+        self.set_foundation_level()
         self.set_story()
         self.create_connections()
 
     def create_connections(self):
         self.form.import_button.clicked.connect(self.import_from_etabs)
+
+    def set_foundation_level(self):
+        self.etabs.set_current_unit('N', 'm')
+        base_level = self.etabs.story.get_base_name_and_level()[1]
+        self.form.foundation_level.setValue(base_level)
 
     def set_story(self):
         stories = self.etabs.SapModel.Story.GetNameList()[1]
@@ -28,6 +34,7 @@ class EtabsTaskPanel:
         fc = self.form.fc.value()
         height = self.form.height_spinbox.value() * 10
         width = self.form.width_spinbox.value() * 10
+        foundation_level = self.form.foundation_level.value() * 1000
         if self.form.mat.isChecked():
             foundation_type = 'Mat'
         elif self.form.strip.isChecked():
@@ -53,9 +60,12 @@ class EtabsTaskPanel:
                 width = width,
                 etabs_model = self.etabs,
                 beam_names = beams_names,
+                top_of_foundation=foundation_level,
                 foundation_type = foundation_type,
             )
         punch.import_data()
+        Gui.Control.closeDialog()
+
 
 
 if __name__ == '__main__':

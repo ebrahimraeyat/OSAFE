@@ -74,7 +74,7 @@ class EtabsPunch(object):
         self.create_slabs_plane()
         Load_cases = self.etabs.load_cases.get_loadcase_withtype(1)
         self.foundation = etabs_foundation.make_foundation(
-            self.cover, self.fc, self.height, self.foundation_type, Load_cases)
+            self.cover, self.fc, self.height, self.foundation_type, Load_cases, self.top_of_foundation)
 
     def create_punches(self):
         joint_design_reactions = self.etabs.database.get_joint_design_reactions()

@@ -460,7 +460,7 @@ def get_width_points(
 	width : float,
 	teta : Union[float, None] = None,
 	) -> list:
-	xs, ys, xe, ye = p1.x, p1.y, p2.x, p2.y
+	xs, ys, xe, ye, z = p1.x, p1.y, p2.x, p2.y, p1.z
 	if teta is None:
 		v = p2 - p1
 		teta = math.atan2(v.y, v.x)
@@ -469,16 +469,16 @@ def get_width_points(
 	_cos = math.cos(teta)
 	x = xs - width * _sin
 	y = ys + width * _cos
-	points.append(FreeCAD.Vector(x, y, 0))
+	points.append(FreeCAD.Vector(x, y, z))
 	x = xs + width * _sin
 	y = ys - width * _cos
-	points.append(FreeCAD.Vector(x, y, 0))
+	points.append(FreeCAD.Vector(x, y, z))
 	x = xe + width * _sin
 	y = ye - width * _cos
-	points.append(FreeCAD.Vector(x, y, 0))
+	points.append(FreeCAD.Vector(x, y, z))
 	x = xe - width * _sin
 	y = ye + width * _cos
-	points.append(FreeCAD.Vector(x, y, 0))
+	points.append(FreeCAD.Vector(x, y, z))
 	return points
 
 def get_offset_points(
@@ -535,7 +535,7 @@ def get_foundation_plane_without_openings(
 	shape = solids[0].fuse(solids[1:])
 	shape = shape.removeSplitter()
 	for f in shape.Faces:
-		if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+		if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == foundation.level.Value:
 			foundation_plane = f
 			break
 	if foundation.foundation_type == 'Strip':
@@ -553,7 +553,7 @@ def get_foundation_plan_with_openings(
 		new_shape = plan_with_openings.extrude(FreeCAD.Vector(0, 0, -1))
 		new_shape = new_shape.cut([o.Shape for o in foundation.openings])
 		for f in new_shape.Faces:
-			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
+			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == foundation.level.Value:
 				plan_with_openings = f
 				break
 	return plan_with_openings, plan_without_openings

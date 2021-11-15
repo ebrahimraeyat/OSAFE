@@ -96,6 +96,13 @@ class Foundation:
 				"Loads",
 				)
 
+		if not hasattr(obj, "level"):
+			obj.addProperty(
+				"App::PropertyDistance",
+				"level",
+				"Foundation",
+			)
+
 	def execute(self, obj):
 		doc = obj.Document
 		tape_slabs = []
@@ -110,7 +117,7 @@ class Foundation:
 		obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
 		obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 		for i, face in enumerate(obj.Shape.Faces, start=1):
-			if face.BoundBox.ZLength == 0 and face.BoundBox.ZMax == 0:
+			if face.BoundBox.ZLength == 0 and face.BoundBox.ZMax == obj.level.Value:
 				obj.top_face = f'Face{i}'
 		for o in doc.Objects:
 			if (
@@ -157,6 +164,7 @@ def make_foundation(
 	height : int = 800,
 	foundation_type : str = 'Strip',
 	load_cases : list = [],
+	level : float = 0,
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
 	# obj = FreeCAD.ActiveDocument.addObject("Part::MultiFuse", "Fusion")
@@ -169,6 +177,7 @@ def make_foundation(
 	obj.d = height - cover
 	obj.foundation_type = foundation_type
 	obj.loadcases = load_cases
+	obj.level = level
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 
