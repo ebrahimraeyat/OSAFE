@@ -173,6 +173,11 @@
          <string>SAFE 20</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>ETABS 19</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
