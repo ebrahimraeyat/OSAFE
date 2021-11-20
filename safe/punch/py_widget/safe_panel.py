@@ -12,22 +12,42 @@ class Safe12TaskPanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
         self.create_connections()
+        self.fill_f2k_filename()
 
     def create_connections(self):
         self.form.export_button.clicked.connect(self.export_to_safe)
-        self.form.browse_button.clicked.connect(self.browse)
+        self.form.browse_input.clicked.connect(self.browse)
+        self.form.browse_output.clicked.connect(self.browse)
+
+    def fill_f2k_filename(self):
+        if FreeCAD.ActiveDocument:
+            foun = FreeCAD.ActiveDocument.Foundation
+            if foun and hasattr(foun, 'F2K'):
+                self.form.input_f2k.setText(foun.F2K)
+                filename = Path(foun.F2K)
+                name = f"{filename.name.rstrip(filename.suffix)}_export{filename.suffix}"
+                filename = filename.with_name(name)
+                self.form.output_f2k.setText(str(filename))
 
     def browse(self):
         ext = '.f2k'
         from PySide2.QtWidgets import QFileDialog
         filters = f"{ext[1:]} (*{ext})"
-        filename, _ = QFileDialog.getOpenFileName(None, 'select file',
+        button = self.sender()
+        if 'input' in button.objecName:
+            filename, _ = QFileDialog.getOpenFileName(None, 'select file',
+                                                None, filters)
+        elif 'output' in button.objecName:
+            filename, _ = QFileDialog.getSaveFileName(None, 'select file',
                                                 None, filters)
         if not filename:
             return
         if not filename.lower().endswith(ext):
             filename += ext
-        self.form.f2k_line_edit.setText(filename)
+        if 'input' in button.objecName:
+            self.form.input_f2k.setText(filename)
+        elif 'output' in button.objecName:
+            self.form.output_f2k.setText(filename)
 
     def export_to_safe(self):
         software = self.form.software.currentText()
@@ -86,8 +106,8 @@ class Safe12TaskPanel:
             etabs.SapModel.View.RefreshView()
         elif software == 'SAFE 16':
             from safe.punch.safe_read_write_f2k import FreecadReadwriteModel as FRW
-            input_f2k_path = self.form.f2k_line_edit.text()
-            output_f2k_path = input_f2k_path[:-4] + '_output.f2k'
+            input_f2k_path = self.form.input_f2k.text()
+            output_f2k_path = self.form.output_f2k.text()
             rw = FRW(input_f2k_path, output_f2k_path, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(
@@ -118,6 +138,7 @@ class Safe12TaskPanel:
             if is_punches:
                 rw.export_punch_props()
             rw.safe.write()
+        Gui.Control.closeDialog()
 
 if __name__ == '__main__':
     panel = SafeTaskPanel()

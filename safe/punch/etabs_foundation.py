@@ -95,15 +95,33 @@ class Foundation:
 				"loadcases",
 				"Loads",
 				)
-
 		if not hasattr(obj, "level"):
 			obj.addProperty(
 				"App::PropertyDistance",
 				"level",
 				"Foundation",
 			)
+		if not hasattr(obj, "F2K"):
+			obj.addProperty(
+				"App::PropertyFile",
+				"F2K",
+				"Safe",
+			)
+		if not hasattr(obj, "redraw"):
+			obj.addProperty(
+				"App::PropertyBool",
+				"redraw",
+				"Foundation",
+				).redraw = True
+		obj.setEditorMode('redraw', 2)
+		
+	def onChanged(self, obj, prop):
+		if prop == 'F2K':
+			obj.redraw = False
 
 	def execute(self, obj):
+		if not obj.redraw:
+			return
 		doc = obj.Document
 		tape_slabs = []
 		for o in doc.Objects:
@@ -130,6 +148,7 @@ class Foundation:
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
 		self.set_properties(obj)
+		obj.redraw = True
 		
 class ViewProviderFoundation:
 
