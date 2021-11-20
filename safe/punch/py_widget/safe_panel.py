@@ -16,8 +16,8 @@ class Safe12TaskPanel:
 
     def create_connections(self):
         self.form.export_button.clicked.connect(self.export_to_safe)
-        self.form.browse_input.clicked.connect(self.browse)
-        self.form.browse_output.clicked.connect(self.browse)
+        self.form.browse_input.clicked.connect(self.openf2k)
+        self.form.browse_output.clicked.connect(self.savef2k)
 
     def fill_f2k_filename(self):
         if FreeCAD.ActiveDocument:
@@ -29,25 +29,29 @@ class Safe12TaskPanel:
                 filename = filename.with_name(name)
                 self.form.output_f2k.setText(str(filename))
 
-    def browse(self):
+    def openf2k(self):
         ext = '.f2k'
         from PySide2.QtWidgets import QFileDialog
         filters = f"{ext[1:]} (*{ext})"
-        button = self.sender()
-        if 'input' in button.objecName:
-            filename, _ = QFileDialog.getOpenFileName(None, 'select file',
-                                                None, filters)
-        elif 'output' in button.objecName:
-            filename, _ = QFileDialog.getSaveFileName(None, 'select file',
-                                                None, filters)
+        filename, _ = QFileDialog.getOpenFileName(None, 'select file',
+                                            None, filters)
         if not filename:
             return
         if not filename.lower().endswith(ext):
             filename += ext
-        if 'input' in button.objecName:
-            self.form.input_f2k.setText(filename)
-        elif 'output' in button.objecName:
-            self.form.output_f2k.setText(filename)
+        self.form.input_f2k.setText(filename)
+    
+    def savef2k(self):
+        ext = '.f2k'
+        from PySide2.QtWidgets import QFileDialog
+        filters = f"{ext[1:]} (*{ext})"
+        filename, _ = QFileDialog.getSaveFileName(None, 'select file',
+                                            None, filters)
+        if not filename:
+            return
+        if not filename.lower().endswith(ext):
+            filename += ext
+        self.form.output_f2k.setText(filename)
 
     def export_to_safe(self):
         software = self.form.software.currentText()
