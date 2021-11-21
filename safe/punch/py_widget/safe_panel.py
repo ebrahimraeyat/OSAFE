@@ -105,8 +105,8 @@ class Safe12TaskPanel:
                         hasattr(o.Proxy, "Type") and \
                         o.Proxy.Type == "Punch":
                         punches.append(o)
-                etabs.area.create_punching_shear_general_table(punches)
-                etabs.area.create_punching_shear_perimeter_table(punches)
+                etabs.database.create_punching_shear_general_table(punches)
+                etabs.database.create_punching_shear_perimeter_table(punches)
             etabs.SapModel.View.RefreshView()
         elif software == 'SAFE 16':
             from safe.punch.safe_read_write_f2k import FreecadReadwriteModel as FRW
