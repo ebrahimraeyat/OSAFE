@@ -515,6 +515,29 @@ def get_common_part_of_slabs(slabs):
 		comm = comm.common(sh)
 	return comm
 
+def get_common_part_of_strips(points, offset, width):
+	'''
+	getting a series of points that create a polyline with width and
+	then return the common part of all lines with width equal to width
+	'''
+	if len(points) < 3:
+		return None
+	commons = []
+	for i, p in enumerate(points[1:-1]):
+		new_points = points[i: i + 3]
+		shapes = []
+		for p1, p2 in zip(new_points[:-1], new_points[1:]):
+			p1, p2 = extend_two_points(p1, p2)
+			p1, p2 = get_offset_points(p1, p2, offset)
+			rectangle_points = get_width_points(p1, p2, width)
+			rectangle_points.append(rectangle_points[0])
+			shapes.append(Part.Face(Part.makePolygon(rectangle_points)))
+		comm = shapes[0]
+		for sh in shapes[1:]:
+			comm = comm.common(sh)
+		commons.append(comm)
+	return commons
+
 def get_common_parts_of_foundation_slabs(foundation):
 	points_slabs = get_points_connections_from_slabs(foundation.tape_slabs)
 	points_common_part = {}

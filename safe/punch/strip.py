@@ -2,23 +2,88 @@ import math
 from pathlib import Path
 import Part
 import FreeCAD
+from safe.punch import punch_funcs
 
 
-def make_strip(p1, p2, layer, design_type, swl, swr, ewl, ewr):
-    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
-    Strip(obj)
-    obj.start_point = p1
-    obj.end_point = p2
-    obj.layer = layer
-    obj.design_type = design_type
+def make_strip_segment(start_point, end_point, swl, swr, ewl, ewr):
+    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Segment")
+    StripSegment(obj)
+    obj.start_point = start_point
+    obj.end_point = end_point
     obj.start_width_left = swl
     obj.start_width_right = swr
     obj.end_width_left = ewl
     obj.end_width_right = ewr
     if FreeCAD.GuiUp:
+        ViewProviderStripSegment(obj.ViewObject)
+    FreeCAD.ActiveDocument.recompute()
+    return obj
+
+def make_strip(points, layer, design_type, segments):
+    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
+    Strip(obj)
+    obj.points = points
+    obj.layer = layer
+    obj.design_type = design_type
+    obj.segments = segments
+    if FreeCAD.GuiUp:
         ViewProviderStrip(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return obj
+
+
+class StripSegment:
+    def __init__(self, obj):
+        obj.Proxy = self
+        self.set_properties(obj)
+
+    def set_properties(self, obj):
+        if not hasattr(obj, "start_width_left"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "start_width_left",
+                "Segment",
+                )
+        if not hasattr(obj, "start_width_right"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "start_width_right",
+                "Segment",
+                )
+        if not hasattr(obj, "end_width_left"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "end_width_left",
+                "Segment",
+                )
+        if not hasattr(obj, "end_width_right"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "end_width_right",
+                "Segment",
+                )
+        if not hasattr(obj, "start_point"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "start_point",
+                "Segment",
+                )
+        if not hasattr(obj, "end_point"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "end_point",
+                "Segment",
+                )
+        obj.setEditorMode("start_point", 2)
+        obj.setEditorMode("end_point", 2)
+        obj.setEditorMode("end_width_left", 2)
+        obj.setEditorMode("end_width_right", 2)
+
+
+    def execute(self, obj):
+        p1 = obj.start_point
+        p2 = obj.end_point
+        obj.Shape = Part.makeLine(p1, p2)
 
 
 class Strip:
@@ -27,16 +92,10 @@ class Strip:
         self.set_properties(obj)
 
     def set_properties(self, obj):
-        if not hasattr(obj, "start_point"):
+        if not hasattr(obj, "points"):
             obj.addProperty(
-                "App::PropertyVector",
-                "start_point",
-                "Geometry",
-                )
-        if not hasattr(obj, "end_point"):
-            obj.addProperty(
-                "App::PropertyVector",
-                "end_point",
+                "App::PropertyVectorList",
+                "points",
                 "Geometry",
                 )
         if not hasattr(obj, "layer"):
@@ -51,82 +110,102 @@ class Strip:
                 "design_type",
                 "Strip",
                 ).design_type = ['column']
-        if not hasattr(obj, "start_width_left"):
+        if not hasattr(obj, "redraw"):
             obj.addProperty(
-                "App::PropertyLength",
-                "start_width_left",
+                "App::PropertyBool",
+                "redraw",
+                "Strip",
+                ).redraw = True
+        if not hasattr(obj, "segments"):
+            obj.addProperty(
+                "App::PropertyLinkList",
+                "segments",
                 "Strip",
                 )
-        if not hasattr(obj, "start_width_right"):
+        if not hasattr(obj, "left_width"):
             obj.addProperty(
                 "App::PropertyLength",
-                "start_width_right",
+                "left_width",
                 "Strip",
-                )
-        if not hasattr(obj, "end_width_left"):
+                ).left_width = '0.5 m'
+        if not hasattr(obj, "right_width"):
             obj.addProperty(
                 "App::PropertyLength",
-                "end_width_left",
+                "right_width",
                 "Strip",
-                )
-        if not hasattr(obj, "end_width_right"):
+                ).right_width = '0.5 m'
+        if not hasattr(obj, "width"):
             obj.addProperty(
                 "App::PropertyLength",
-                "end_width_right",
+                "width",
                 "Strip",
-                )
-        if not hasattr(obj, "angle"):
+                ).width = '1 m'
+        if not hasattr(obj, "fix_width_from"):
             obj.addProperty(
-            "App::PropertyAngle",
-            "angle",
-            "Strip",
-            )
+                "App::PropertyEnumeration",
+                "fix_width_from",
+                "Strip",
+                ).fix_width_from = ['Left', 'Right']
         
-    def onChanged(self, obj, prop):
-        return
+    # def onChanged(self, obj, prop):
+    #     if prop != 'points':
+    #         obj.redraw = False
 
     def execute(self, obj):
-        v = obj.end_point - obj.start_point
-        obj.angle = math.atan2(v.y, v.x)
-        self.create_width(obj)
+        if not obj.redraw:
+            return True
         if obj.layer == 'A':
-            obj.ViewObject.ShapeColor = (1.00,0.00,0.00)
+            obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
         elif obj.layer == 'B':
-            obj.ViewObject.ShapeColor = (0.00,1.00,0.00)
-
-    def create_width(self, obj):
-        p1 = obj.start_point
-        p2 = obj.end_point
+            obj.ViewObject.ShapeColor = (0.20,0.00,1.00)
+        elif obj.layer == 'other':
+            obj.ViewObject.ShapeColor = (0.20,1.00,0.00)
+        if obj.width.Value > 0:
+            if obj.fix_width_from == 'Left':
+                sl = obj.left_width.Value
+                sr = obj.width.Value - sl
+            elif obj.fix_width_from == 'Right':
+                sr = obj.right_width.Value
+                sl = obj.width.Value - sr
         shapes = []
-        shapes.append(Part.makeLine(p1, p2))
-        points = []
-        xs = obj.start_point.x
-        ys = obj.start_point.y
-        xe = obj.end_point.x
-        ye = obj.end_point.y
-        sl = obj.start_width_left.Value
-        sr = obj.start_width_right.Value
-        el = obj.end_width_left.Value
-        er = obj.end_width_right.Value
-        teta = obj.angle
-        FreeCAD.Console.PrintMessage(f"teta = {teta}")
-        _sin = math.sin(teta)
-        _cos = math.cos(teta)
-        x = xs - sl * _sin
-        y = ys + sl * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        x = xs + sr * _sin
-        y = ys - sr * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        x = xe + er * _sin
-        y = ye - er * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        x = xe - el * _sin
-        y = ye + el * _cos
-        points.append(FreeCAD.Vector(x, y, 0))
-        points.append(points[0])
-        shapes.append(Part.Face(Part.makePolygon(points)))
-        obj.Shape = Part.makeCompound(shapes)
+        for i, p in enumerate(obj.points[:-1]):
+            p1 = p
+            p2 = obj.points[i + 1]
+            if obj.width.Value == 0:
+                segment = obj.segments[i]
+                sl = segment.start_width_left.Value
+                sr = segment.start_width_right.Value
+            offset = (sl - sr) / 2
+            width = (sl + sr) / 2 # width is half of slab width
+            p1, p2 = punch_funcs.get_offset_points(p1, p2, offset)
+            points = punch_funcs.get_width_points(p1, p2, width)
+            points.append(points[0])
+            shapes.append(Part.Face(Part.makePolygon(points)))
+        comm = punch_funcs.get_common_part_of_strips(obj.points, offset, width)
+        fusion = shapes[0].fuse(shapes[1:] + comm)
+        faces = fusion.Faces
+        fusion = faces[0].fuse(faces[1:])
+        obj.Shape = fusion.removeSplitter()
+        obj.redraw = True
+
+
+class ViewProviderStripSegment:
+    def __init__(self, vobj):
+        vobj.Proxy = self        
+
+    def attach(self, vobj):
+        self.ViewObject = vobj
+        self.Object = vobj.Object
+
+    # def getIcon(self):
+    #     return str(Path(__file__).parent / "Resources" / "icons" / "strip.svg")
+
+    def __getstate__(self):
+        return None
+
+    def __setstate__(self, state):
+        return None
+
 
 
 class ViewProviderStrip:
@@ -137,6 +216,10 @@ class ViewProviderStrip:
         self.ViewObject = vobj
         self.Object = vobj.Object
 
+    def claimChildren(self):
+        children = [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.segments]
+        return children
+
     def getIcon(self):
         return str(Path(__file__).parent / "Resources" / "icons" / "strip.svg")
 
@@ -146,14 +229,26 @@ class ViewProviderStrip:
     def __setstate__(self, state):
         return None
 
+    def onDelete(self, vobj, subelements):
+        for name in [o.Name for o in self.Object.segments]:
+            FreeCAD.ActiveDocument.removeObject(name)
+        return True
+        
 
 if __name__ == "__main__":
-    make_strip(p1=FreeCAD.Vector(0, 16400, 0),
-               p2=FreeCAD.Vector(12210, 16400, 0),
-               layer='A',
-               design_type='column',
-               swl='25 cm',
-               swr=250,
-               ewl=250,
-               ewr=250,
-               )
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(5000, 0, 0)
+    p3 = FreeCAD.Vector(8000, 2000, 0)
+    p4 = FreeCAD.Vector(12000, 3000, 0)
+    points=[p1, p2, p3, p4]
+    sl = 300
+    sr = 700
+    segments = []
+    for i in range(len(points) - 1):
+        s = make_strip_segment(points[i], points[i + 1], sl, sr, sl, sr)
+        segments.append(s)
+    st1 = make_strip(points=points,
+                layer='A',
+                design_type='column',
+                segments=segments,
+                )
