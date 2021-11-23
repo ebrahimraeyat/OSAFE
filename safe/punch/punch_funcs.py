@@ -521,7 +521,7 @@ def get_common_part_of_strips(points, offset, width):
 	then return the common part of all lines with width equal to width
 	'''
 	if len(points) < 3:
-		return None
+		return []
 	commons = []
 	for i, p in enumerate(points[1:-1]):
 		new_points = points[i: i + 3]

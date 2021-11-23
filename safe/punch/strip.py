@@ -1,5 +1,6 @@
-import math
 from pathlib import Path
+from typing import Union
+from PySide2 import QtCore
 import Part
 import FreeCAD
 from safe.punch import punch_funcs
@@ -19,13 +20,19 @@ def make_strip_segment(start_point, end_point, swl, swr, ewl, ewr):
     FreeCAD.ActiveDocument.recompute()
     return obj
 
-def make_strip(points, layer, design_type, segments):
+def make_strip(
+        points,
+        layer,
+        design_type,
+        segments : Union[list, bool] = None,
+        ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
     Strip(obj)
     obj.points = points
     obj.layer = layer
     obj.design_type = design_type
-    obj.segments = segments
+    if segments is not None:
+        obj.segments = segments
     if FreeCAD.GuiUp:
         ViewProviderStrip(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -90,6 +97,7 @@ class Strip:
     def __init__(self, obj):
         obj.Proxy = self
         self.set_properties(obj)
+        self.obj_name = obj.Name
 
     def set_properties(self, obj):
         if not hasattr(obj, "points"):
@@ -115,7 +123,7 @@ class Strip:
                 "App::PropertyBool",
                 "redraw",
                 "Strip",
-                ).redraw = True
+                ).redraw = False
         if not hasattr(obj, "segments"):
             obj.addProperty(
                 "App::PropertyLinkList",
@@ -139,21 +147,30 @@ class Strip:
                 "App::PropertyLength",
                 "width",
                 "Strip",
-                ).width = '1 m'
+                ).width = '0 m'
         if not hasattr(obj, "fix_width_from"):
             obj.addProperty(
                 "App::PropertyEnumeration",
                 "fix_width_from",
                 "Strip",
-                ).fix_width_from = ['Left', 'Right']
+                ).fix_width_from = ['center', 'Left', 'Right']
         
     # def onChanged(self, obj, prop):
     #     if prop != 'points':
     #         obj.redraw = False
 
     def execute(self, obj):
-        if not obj.redraw:
-            return True
+        if obj.redraw:
+            obj.redraw = False
+            return
+        QtCore.QTimer().singleShot(50, self._execute)
+
+    def _execute(self):
+        obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
+        if not obj:
+            FreeCAD.ActiveDocument.recompute()
+            return
+        obj.redraw = True
         if obj.layer == 'A':
             obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
         elif obj.layer == 'B':
@@ -167,12 +184,21 @@ class Strip:
             elif obj.fix_width_from == 'Right':
                 sr = obj.right_width.Value
                 sl = obj.width.Value - sr
+            elif obj.fix_width_from == 'center':
+                sr = sl = obj.width.Value / 2
         shapes = []
+        segments = obj.segments
         for i, p in enumerate(obj.points[:-1]):
             p1 = p
             p2 = obj.points[i + 1]
             if obj.width.Value == 0:
-                segment = obj.segments[i]
+                if len(segments) <= i:
+                    sl = obj.left_width.Value
+                    sr = obj.right_width.Value
+                    segment = make_strip_segment(p1, p2, sl, sr, sl, sr)
+                    segments.append(segment)
+                else:
+                    segment = segments[i]
                 sl = segment.start_width_left.Value
                 sr = segment.start_width_right.Value
             offset = (sl - sr) / 2
@@ -181,12 +207,16 @@ class Strip:
             points = punch_funcs.get_width_points(p1, p2, width)
             points.append(points[0])
             shapes.append(Part.Face(Part.makePolygon(points)))
+        obj.segments = segments
         comm = punch_funcs.get_common_part_of_strips(obj.points, offset, width)
-        fusion = shapes[0].fuse(shapes[1:] + comm)
-        faces = fusion.Faces
-        fusion = faces[0].fuse(faces[1:])
-        obj.Shape = fusion.removeSplitter()
-        obj.redraw = True
+        if len(shapes) > 1:
+            fusion = shapes[0].fuse(shapes[1:] + comm)
+            faces = fusion.Faces
+            fusion = faces[0].fuse(faces[1:])
+            obj.Shape = fusion.removeSplitter()
+        else:
+            obj.Shape = shapes[0]
+        FreeCAD.ActiveDocument.recompute()
 
 
 class ViewProviderStripSegment:
@@ -243,12 +273,18 @@ if __name__ == "__main__":
     points=[p1, p2, p3, p4]
     sl = 300
     sr = 700
-    segments = []
-    for i in range(len(points) - 1):
-        s = make_strip_segment(points[i], points[i + 1], sl, sr, sl, sr)
-        segments.append(s)
-    st1 = make_strip(points=points,
-                layer='A',
-                design_type='column',
-                segments=segments,
-                )
+    make_strip(
+            points=[p1, p2],
+            layer='B',
+            design_type='column',
+            )
+    make_strip(
+            points=[p1, p2, p3],
+            layer='B',
+            design_type='column',
+            )
+    make_strip(
+            points=[p1, p2, p3, p4],
+            layer='other',
+            design_type='column',
+            )
