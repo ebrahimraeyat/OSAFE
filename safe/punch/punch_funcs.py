@@ -712,6 +712,22 @@ def get_continuous_slabs(slabs : list) -> list:
 		continuous_slabs.append([slabs[i-1] for i in numbers])
 	return continuous_slabs
 
+def get_continuous_points_from_slabs(slabs : list) -> list:
+	'''
+	This function get a list of slabs and calculate continuous slabs.
+	then it return a list contain list of continuous points in each 
+	list of slabs
+	'''
+	continuous_slabs = get_continuous_slabs(slabs)
+	continuous_points = []
+	for ss in continuous_slabs:
+		edges = [s.Shape.Edges[0] for s in ss]
+		points = get_sort_points(edges)
+		points.append(edges[-1].lastVertex())
+		continuous_points.append(points)
+	return continuous_points
+	
+
 def get_in_direction_priority(edge, edges,
 		angle: int = 45):
 	'''

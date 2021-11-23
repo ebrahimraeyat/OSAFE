@@ -196,6 +196,11 @@ def test_get_continuous_slabs():
         ret.append([slabs[i - 1].Name for i in es])
     assert slab_names == ret
 
+def test_get_continuous_points_from_slabs():
+    slabs = document.Foundation.tape_slabs
+    continuous_points = punch_funcs.get_continuous_points_from_slabs(slabs)
+    assert len(continuous_points) == 6
+
 
 
 
