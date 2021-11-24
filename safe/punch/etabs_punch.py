@@ -3,6 +3,7 @@ try:
     # from safe.punch.punch_funcs import remove_obj
     from safe.punch import etabs_foundation
     from safe.punch import rectangle_slab
+    from safe.punch import strip
     from safe.punch.punch import make_punch
 except:
     from axis import create_grids
@@ -68,6 +69,20 @@ class EtabsPunch(object):
             v2 = FreeCAD.Vector(xj, yj, self.top_of_foundation)
             slabs[slab_name] = rectangle_slab.make_rectangle_slab(v1, v2, self.width, self.height)
         return slabs
+    
+    def create_segments(self,
+        ):
+        segments = []
+        df_beams = self.etabs.database.get_frame_points_xyz(self.beam_names)
+        for _, row in df_beams.iterrows():
+            xi, yi = row['xi'], row['yi']
+            xj, yj = row['xj'], row['yj']
+            v1 = FreeCAD.Vector(xi, yi, self.top_of_foundation)
+            v2 = FreeCAD.Vector(xj, yj, self.top_of_foundation)
+            swl = swr = ewl = ewr = self.width / 2
+            segment =  strip.make_strip_segment(v1, v2, swl, swr, ewl, ewr)
+            segments.append(segment)
+        return segments
 
     def create_foundation(self,
         ):
@@ -149,7 +164,7 @@ class EtabsPunch(object):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
         self.create_foundation()
-        self.create_punches()
+        # self.create_punches()
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
         Gui.activeDocument().activeView().viewAxonometric()

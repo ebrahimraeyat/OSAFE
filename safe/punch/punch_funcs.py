@@ -300,10 +300,18 @@ def get_sort_points(edges, vector=True):
 	edges = Part.__sortEdges__(edges)
 	for e in edges:
 		v = e.firstVertex()
-		if vector is True:
-			points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
-		else:
-			points.append(v)
+		if len(points) > 0:
+			v0 = points[-1]
+			if all([
+				v.X == v0.X,
+				v.Y == v0.Y,
+				v.Z == v0.Z,
+			]):
+				v = e.lastVertex()
+				print('reverse edge')
+		points.append(v)
+	if vector is True:
+		points = [FreeCAD.Vector(v.X, v.Y, v.Z) for v in points]
 	return points
 
 def get_obj_points_with_scales(
@@ -538,6 +546,22 @@ def get_common_part_of_strips(points, offset, width):
 		commons.append(comm)
 	return commons
 
+def make_strips_from_segments(segments : list):
+	from safe.punch.strip import make_strip
+	continuous_points = get_continuous_points_from_slabs(segments)
+	strips = []
+	for points in continuous_points:
+		p1, p2 = points[:2]
+		dx = abs(p1.x - p2.x)
+		dy = abs(p1.y - p2.y)
+		if dx > dy:
+			layer = 'A'
+		else:
+			layer = 'B'
+		strip = make_strip(points, layer, 'column')
+		strips.append(strip)
+	return strips
+
 def get_common_parts_of_foundation_slabs(foundation):
 	points_slabs = get_points_connections_from_slabs(foundation.tape_slabs)
 	points_common_part = {}
@@ -723,7 +747,8 @@ def get_continuous_points_from_slabs(slabs : list) -> list:
 	for ss in continuous_slabs:
 		edges = [s.Shape.Edges[0] for s in ss]
 		points = get_sort_points(edges)
-		points.append(edges[-1].lastVertex())
+		v = edges[-1].lastVertex()
+		points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
 		continuous_points.append(points)
 	return continuous_points
 	

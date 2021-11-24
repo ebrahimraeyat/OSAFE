@@ -6,7 +6,7 @@ FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 import FreeCAD
 
-punch_path = Path(__file__).absolute().parent.parent
+punch_path = Path(__file__).absolute().parent.parent.parent
 sys.path.insert(0, str(punch_path))
 import etabs_punch
 document= FreeCAD.newDocument()
@@ -18,6 +18,9 @@ etabs = etabs_punch.EtabsPunch(beam_names=['114', '115', '116'])
 
 def test_create_slabs_plane():
 	etabs.create_slabs_plane()
+
+def test_create_segments():
+	etabs.create_segments()
 
 def test_create_foundation():
 	etabs.create_foundation()
@@ -37,4 +40,4 @@ def test_create_punches():
 
 
 if __name__ == '__main__':
-	test_create_foundation()
+	test_create_segments()

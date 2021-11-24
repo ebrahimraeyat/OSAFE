@@ -81,10 +81,17 @@ class StripSegment:
                 "end_point",
                 "Segment",
                 )
+        if not hasattr(obj, "height"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "height",
+                "Segment",
+                )
         obj.setEditorMode("start_point", 2)
         obj.setEditorMode("end_point", 2)
         obj.setEditorMode("end_width_left", 2)
         obj.setEditorMode("end_width_right", 2)
+        obj.setEditorMode("height", 2)
 
 
     def execute(self, obj):
@@ -96,6 +103,7 @@ class StripSegment:
 class Strip:
     def __init__(self, obj):
         obj.Proxy = self
+        self.Type = "Strip"
         self.set_properties(obj)
         self.obj_name = obj.Name
 
@@ -147,7 +155,7 @@ class Strip:
                 "App::PropertyLength",
                 "width",
                 "Strip",
-                ).width = '0 m'
+                ).width = '1 m'
         if not hasattr(obj, "fix_width_from"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -160,10 +168,11 @@ class Strip:
     #         obj.redraw = False
 
     def execute(self, obj):
-        if obj.redraw:
-            obj.redraw = False
-            return
-        QtCore.QTimer().singleShot(50, self._execute)
+        # if obj.redraw:
+        #     obj.redraw = False
+        #     return
+        self._execute()
+        # QtCore.QTimer().singleShot(50, self._execute)
 
     def _execute(self):
         obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
@@ -216,7 +225,7 @@ class Strip:
             obj.Shape = fusion.removeSplitter()
         else:
             obj.Shape = shapes[0]
-        FreeCAD.ActiveDocument.recompute()
+        # FreeCAD.ActiveDocument.recompute()
 
 
 class ViewProviderStripSegment:
