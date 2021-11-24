@@ -546,9 +546,9 @@ def get_common_part_of_strips(points, offset, width):
 		commons.append(comm)
 	return commons
 
-def make_strips_from_segments(segments : list):
+def make_strips_from_slabs(slabs : list):
 	from safe.punch.strip import make_strip
-	continuous_points = get_continuous_points_from_slabs(segments)
+	continuous_points = get_continuous_points_from_slabs(slabs)
 	strips = []
 	for points in continuous_points:
 		p1, p2 = points[:2]

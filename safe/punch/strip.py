@@ -42,6 +42,7 @@ def make_strip(
 class StripSegment:
     def __init__(self, obj):
         obj.Proxy = self
+        self.Type = 'Segment'
         self.set_properties(obj)
 
     def set_properties(self, obj):
@@ -168,11 +169,11 @@ class Strip:
     #         obj.redraw = False
 
     def execute(self, obj):
-        # if obj.redraw:
-        #     obj.redraw = False
-        #     return
-        self._execute()
-        # QtCore.QTimer().singleShot(50, self._execute)
+        if obj.redraw:
+            obj.redraw = False
+            return
+        # self._execute()
+        QtCore.QTimer().singleShot(50, self._execute)
 
     def _execute(self):
         obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
@@ -225,19 +226,19 @@ class Strip:
             obj.Shape = fusion.removeSplitter()
         else:
             obj.Shape = shapes[0]
-        # FreeCAD.ActiveDocument.recompute()
+        FreeCAD.ActiveDocument.recompute()
 
 
 class ViewProviderStripSegment:
     def __init__(self, vobj):
-        vobj.Proxy = self        
+        vobj.Proxy = self      
 
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
 
-    # def getIcon(self):
-    #     return str(Path(__file__).parent / "Resources" / "icons" / "strip.svg")
+    def getIcon(self):
+        return str(Path(__file__).parent / "Resources" / "icons" / "segment.png")
 
     def __getstate__(self):
         return None
@@ -249,7 +250,9 @@ class ViewProviderStripSegment:
 
 class ViewProviderStrip:
     def __init__(self, vobj):
-        vobj.Proxy = self        
+        vobj.Proxy = self
+        vobj.Transparency = 40
+        vobj.DisplayMode = "Shaded"
 
     def attach(self, vobj):
         self.ViewObject = vobj
@@ -282,16 +285,16 @@ if __name__ == "__main__":
     points=[p1, p2, p3, p4]
     sl = 300
     sr = 700
-    make_strip(
-            points=[p1, p2],
-            layer='B',
-            design_type='column',
-            )
-    make_strip(
-            points=[p1, p2, p3],
-            layer='B',
-            design_type='column',
-            )
+    # make_strip(
+    #         points=[p1, p2],
+    #         layer='B',
+    #         design_type='column',
+    #         )
+    # make_strip(
+    #         points=[p1, p2, p3],
+    #         layer='B',
+    #         design_type='column',
+    #         )
     make_strip(
             points=[p1, p2, p3, p4],
             layer='other',
