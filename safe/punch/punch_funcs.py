@@ -295,24 +295,57 @@ def sort_vertex(coords):
 	center = tuple(map(operator.truediv, reduce(lambda x, y: map(operator.add, x, y), coords), [len(coords)] * 2))
 	return sorted(coords, key=lambda coord: (-135 - math.degrees(math.atan2(*tuple(map(operator.sub, coord, center))[::-1]))) % 360)
 
-def get_sort_points(edges, vector=True):
-	points = []
+def get_sort_points(
+	edges,
+	vector=True,
+	get_last=False,
+	):
+	vectors = []
+	if len(edges) == 1:
+		for v in edges[0].Vertexes:
+			vectors.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+		return vectors
 	edges = Part.__sortEdges__(edges)
-	for e in edges:
-		v = e.firstVertex()
-		if len(points) > 0:
-			v0 = points[-1]
-			if all([
-				v.X == v0.X,
-				v.Y == v0.Y,
-				v.Z == v0.Z,
-			]):
-				v = e.lastVertex()
-				print('reverse edge')
-		points.append(v)
-	if vector is True:
-		points = [FreeCAD.Vector(v.X, v.Y, v.Z) for v in points]
-	return points
+	for e1, e2 in zip(edges[:-1], edges[1:]):
+		p = get_common_vector_in_two_edges(e1, e2)
+		vectors.append(p)
+	# add first point
+	e = edges[0]
+	v1 = e.firstVertex()
+	p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
+	p = vectors[0]
+	if p1.isEqual(p, True):
+		v1 = e.lastVertex()
+		p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
+	vectors.insert(0, p1)
+	if get_last:
+		last_edges = edges[-1]
+		v2 = last_edges.lastVertex()
+		p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
+		p = vectors[-1]
+		if p.isEqual(p2, True):
+			v2 = e.firsVertex()
+			p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
+		vectors.append(p2)
+
+	if vector:
+		return vectors
+	else:
+		return [Part.Vertex(v) for v in vectors]
+
+def get_common_vector_in_two_edges(e1, e2) -> FreeCAD.Vector:
+	v1 = e1.firstVertex()
+	v2 = e1.lastVertex()
+	v3 = e2.firstVertex()
+	v4 = e2.lastVertex()
+	p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
+	p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
+	p3 = FreeCAD.Vector(v3.X, v3.Y, v3.Z)
+	p4 = FreeCAD.Vector(v4.X, v4.Y, v4.Z)
+	if p2.isEqual(p3, True) or p2.isEqual(p4, True):
+		return p2
+	else:
+		return p1
 
 def get_obj_points_with_scales(
 	shape : Part.Shape, 
@@ -749,9 +782,7 @@ def get_continuous_points_from_slabs(slabs : list) -> list:
 	continuous_points = []
 	for ss in continuous_slabs:
 		edges = [s.Shape.Edges[0] for s in ss]
-		points = get_sort_points(edges)
-		v = edges[-1].lastVertex()
-		points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+		points = get_sort_points(edges, get_last=True)
 		continuous_points.append(points)
 	return continuous_points
 	

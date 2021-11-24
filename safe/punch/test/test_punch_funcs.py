@@ -24,6 +24,51 @@ def test_sort_vertex():
     points = punch_funcs.sort_vertex(points)
     assert points == [[0, 0], [0, 1], [1, 1], [1, 0]]
 
+def test_get_sort_points():
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(5, 0, 0)
+    v3 = FreeCAD.Vector(5, 0, 0)
+    v4 = FreeCAD.Vector(10, 0, 0)
+    l = Part.makeLine(v1, v2)
+    e1 = Part.Edge(l)
+    l = Part.makeLine(v4, v3)
+    e2 = Part.Edge(l)
+    edges = [e1, e2]
+    points = punch_funcs.get_sort_points(edges, get_last=True)
+    v11, v22, v33 = points
+    assert any([
+        all([
+            v11.isEqual(v1, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v4, True),
+            ]),
+        all([
+            v11.isEqual(v4, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v1, True),
+            ])
+    ])
+    # first edge reverse
+    l = Part.makeLine(v2, v1)
+    e1 = Part.Edge(l)
+    l = Part.makeLine(v3, v4)
+    e2 = Part.Edge(l)
+    edges = [e1, e2]
+    points = punch_funcs.get_sort_points(edges, get_last=True)
+    v11, v22, v33 = points
+    assert any([
+        all([
+            v11.isEqual(v1, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v4, True),
+            ]),
+        all([
+            v11.isEqual(v4, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v1, True),
+            ])
+    ])
+
 def test_get_obj_points_with_scales():
     points = punch_funcs.get_obj_points_with_scales(document.Foundation.plane_without_openings)
     assert len(points) == 3
