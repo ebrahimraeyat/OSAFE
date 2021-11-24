@@ -534,8 +534,11 @@ def get_common_part_of_strips(points, offset, width):
 	for i, p in enumerate(points[1:-1]):
 		new_points = points[i: i + 3]
 		shapes = []
-		for p1, p2 in zip(new_points[:-1], new_points[1:]):
-			p1, p2 = extend_two_points(p1, p2)
+		for j, (p1, p2) in enumerate(zip(new_points[:-1], new_points[1:])):
+			if j == 0:
+				_, p2 = extend_two_points(p1, p2)
+			elif j == 1:
+				p1, _ = extend_two_points(p1, p2)
 			p1, p2 = get_offset_points(p1, p2, offset)
 			rectangle_points = get_width_points(p1, p2, width)
 			rectangle_points.append(rectangle_points[0])

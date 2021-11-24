@@ -164,15 +164,10 @@ class Strip:
                 "Strip",
                 ).fix_width_from = ['center', 'Left', 'Right']
         
-    # def onChanged(self, obj, prop):
-    #     if prop != 'points':
-    #         obj.redraw = False
-
     def execute(self, obj):
         if obj.redraw:
             obj.redraw = False
             return
-        # self._execute()
         QtCore.QTimer().singleShot(50, self._execute)
 
     def _execute(self):
@@ -281,7 +276,7 @@ if __name__ == "__main__":
     p1 = FreeCAD.Vector(0, 0, 0)
     p2 = FreeCAD.Vector(5000, 0, 0)
     p3 = FreeCAD.Vector(8000, 2000, 0)
-    p4 = FreeCAD.Vector(12000, 3000, 0)
+    p4 = FreeCAD.Vector(9000, 3000, 0)
     points=[p1, p2, p3, p4]
     sl = 300
     sr = 700
