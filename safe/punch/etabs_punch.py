@@ -163,7 +163,8 @@ class EtabsPunch(object):
     def import_data(self):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
-        self.create_foundation()
+        self.create_slabs_plane()
+        # self.create_foundation()
         # self.create_punches()
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")

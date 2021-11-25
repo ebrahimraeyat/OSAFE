@@ -13,10 +13,6 @@ class EtabsTaskPanel:
         self.etabs = etabs_obj.EtabsModel(backup=False)
         self.set_foundation_level()
         self.set_story()
-        self.create_connections()
-
-    def create_connections(self):
-        self.form.import_button.clicked.connect(self.import_from_etabs)
 
     def set_foundation_level(self):
         self.etabs.set_current_unit('N', 'm')
@@ -28,7 +24,7 @@ class EtabsTaskPanel:
         self.form.story.addItems(stories)
         self.form.story.setCurrentIndex(len(stories) - 1)
 
-    def import_from_etabs(self):
+    def accept(self):
         from safe.punch import etabs_punch
         cover = self.form.cover.value() * 10
         fc = self.form.fc.value()

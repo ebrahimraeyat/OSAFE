@@ -25,12 +25,24 @@ def make_strip(
         layer,
         design_type,
         segments : Union[list, bool] = None,
+        width : float = 1000,
+        left_width : Union[float, bool] = None,
+        right_width : Union[float, bool] = None,
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
     Strip(obj)
     obj.points = points
     obj.layer = layer
     obj.design_type = design_type
+    obj.width = width
+    if left_width:
+        obj.left_width = left_width
+        obj.right_width = width - left_width
+    elif right_width:
+        obj.right_width = right_width
+        obj.left_width = width - right_width
+    else:
+        obj.left_width = obj.right_width = obj.width / 2
     if segments is not None:
         obj.segments = segments
     if FreeCAD.GuiUp:

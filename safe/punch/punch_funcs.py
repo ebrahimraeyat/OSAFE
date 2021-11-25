@@ -598,6 +598,31 @@ def make_strips_from_slabs(slabs : list):
 		strips.append(strip)
 	return strips
 
+def make_automatic_stirps_in_strip_foundation(
+		slabs,
+		width,
+		north_dist : Union[float, bool] = None,
+		south_dist : Union[float, bool] = None,
+		east_dist : Union[float, bool] = None,
+		west_dist : Union[float, bool] = None,
+		x_stirp_name : str = 'A',
+		y_stirp_name : str = 'B',
+		):
+	from safe.punch.strip import make_strip
+	continuous_points = get_continuous_points_from_slabs(slabs)
+	strips = []
+	for points in continuous_points:
+		p1, p2 = points[:2]
+		dx = abs(p1.x - p2.x)
+		dy = abs(p1.y - p2.y)
+		if dx > dy:
+			layer = x_stirp_name
+		else:
+			layer = y_stirp_name
+		strip = make_strip(points, layer, 'column', None, width)
+		strips.append(strip)
+	return strips
+
 def get_common_parts_of_foundation_slabs(foundation):
 	points_slabs = get_points_connections_from_slabs(foundation.tape_slabs)
 	points_common_part = {}
