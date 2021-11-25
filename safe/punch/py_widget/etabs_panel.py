@@ -26,15 +26,7 @@ class EtabsTaskPanel:
 
     def accept(self):
         from safe.punch import etabs_punch
-        cover = self.form.cover.value() * 10
-        fc = self.form.fc.value()
-        height = self.form.height_spinbox.value() * 10
-        width = self.form.width_spinbox.value() * 10
         foundation_level = self.form.foundation_level.value() * 1000
-        if self.form.mat.isChecked():
-            foundation_type = 'Mat'
-        elif self.form.strip.isChecked():
-            foundation_type = 'Strip'
         story = self.form.story.currentText()
         selected_beams = self.form.selected_beams.isChecked()
         exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
@@ -50,14 +42,9 @@ class EtabsTaskPanel:
         elif self.form.all_beams.isChecked():
             beams_names = beams
         punch = etabs_punch.EtabsPunch(
-                cover = cover,
-                fc = fc,
-                height = height,
-                width = width,
                 etabs_model = self.etabs,
                 beam_names = beams_names,
                 top_of_foundation=foundation_level,
-                foundation_type = foundation_type,
             )
         punch.import_data()
         Gui.Control.closeDialog()
