@@ -28,7 +28,7 @@ class Form:
             if (
                 hasattr(o, "Proxy") and
                 hasattr(o.Proxy, "Type") and
-                o.Proxy.Type in ("tape_slab", "trapezoidal_slab")
+                o.Proxy.Type == 'Beam'
                 ):
                 slabs.append(o)
         from safe.punch import punch_funcs
