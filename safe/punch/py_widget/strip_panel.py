@@ -21,6 +21,7 @@ class Form:
         x_stirp_name = self.form.x_strip_name.currentText()
         y_stirp_name = self.form.y_strip_name.currentText()
         width = self.form.width_spinbox.value() * 10
+        angle = self.form.angle_spinbox.value()
         doc = FreeCAD.ActiveDocument
         slabs = []
         for o in doc.Objects:
@@ -33,7 +34,7 @@ class Form:
         from safe.punch import punch_funcs
         if is_strip:
             punch_funcs.make_automatic_stirps_in_strip_foundation(slabs, width, north_dist, south_dist,
-                east_dist, west_dist, x_stirp_name, y_stirp_name)
+                east_dist, west_dist, x_stirp_name, y_stirp_name, angle)
         elif is_mat:
             pass # TODO
         Gui.Control.closeDialog()

@@ -582,9 +582,15 @@ def get_common_part_of_strips(points, offset, width):
 		commons.append(comm)
 	return commons
 
-def make_strips_from_slabs(slabs : list):
+def make_strips_from_slabs(
+		slabs : list,
+		angle : int = 45,
+		):
+	'''
+	angle is for finding continuous strip, with max angle between two adjacent slabs
+	'''
 	from safe.punch.strip import make_strip
-	continuous_points = get_continuous_points_from_slabs(slabs)
+	continuous_points = get_continuous_points_from_slabs(slabs, angle)
 	strips = []
 	for points in continuous_points:
 		p1, p2 = points[:2]
@@ -607,9 +613,10 @@ def make_automatic_stirps_in_strip_foundation(
 		west_dist : Union[float, bool] = None,
 		x_stirp_name : str = 'A',
 		y_stirp_name : str = 'B',
+		angle : int = 45,
 		):
 	from safe.punch.strip import make_strip
-	continuous_points = get_continuous_points_from_slabs(slabs)
+	continuous_points = get_continuous_points_from_slabs(slabs, angle)
 	strips = []
 	for points in continuous_points:
 		p1, p2 = points[:2]
@@ -691,12 +698,16 @@ def get_points_of_foundation_plan_and_holes(
 		points.append(get_sort_points(edges))
 	return points
 
-def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.DataFram':
+def get_similar_edge_direction_in_common_points_from_edges(
+		edges : list,
+		angle : int = 45,
+		) -> 'pd.DataFram':
 	'''
 	This function give a list of edges, find the common points of those edges.
 	then for each point and each edge of all edges that connected to this point,
 	it search for similarity direction with this edge. the df columns output is
 	like "point edge 1 2 3 4" 
+	angle is maximum angle between two adjacent slabs
 	'''
 
 	import pandas as pd
@@ -716,7 +727,7 @@ def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.
 		edges_from_point = list(frame['edge'])
 		for edge in edges_from_point:
 			edges_without_curr_edge = set(edges_from_point).difference([edge])
-			preferable_edges = get_in_direction_priority(edge, edges_without_curr_edge)
+			preferable_edges = get_in_direction_priority(edge, edges_without_curr_edge, angle)
 			none_exist_edge_len = max_number_edges_connect_to_point -  len(preferable_edges) - 1
 			preferable_edges += none_exist_edge_len * [None]
 			se = pd.Series([state, edge] +  preferable_edges, index=df1.columns)
@@ -732,11 +743,16 @@ def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.
 		df1[col] = df1[col].astype(int)
 	return df1
 
-def get_continuous_edges(edges : list):
+def get_continuous_edges(
+		edges : list,
+		angle : int = 45,
+		):
 	'''
 	This function get a list of egdes and search for groups of egdes that create continuous edges in x or y direction
+	angle is maximum angle between two adjacent slabs
+	
 	'''
-	df = get_similar_edge_direction_in_common_points_from_edges(edges)
+	df = get_similar_edge_direction_in_common_points_from_edges(edges, angle)
 	all_edges = []
 	end = False
 	used_edges = []
@@ -789,21 +805,32 @@ def get_continuous_edges(edges : list):
 						break
 	return all_edges
 
-def get_continuous_slabs(slabs : list) -> list:
+def get_continuous_slabs(
+		slabs : list,
+		angle : int = 45,
+		) -> list:
+	'''
+	angle is maximum angle between two adjacent slabs
+	'''
 	edges = [s.Shape.Edges[0] for s in slabs]
-	edges_numbers = get_continuous_edges(edges)
+	edges_numbers = get_continuous_edges(edges, angle)
 	continuous_slabs = []
 	for numbers in edges_numbers:
 		continuous_slabs.append([slabs[i-1] for i in numbers])
 	return continuous_slabs
 
-def get_continuous_points_from_slabs(slabs : list) -> list:
+def get_continuous_points_from_slabs(
+		slabs : list,
+		angle : int = 45,
+		) -> list:
 	'''
 	This function get a list of slabs and calculate continuous slabs.
 	then it return a list contain list of continuous points in each 
 	list of slabs
+
+	angle is maximum angle between two adjacent slabs
 	'''
-	continuous_slabs = get_continuous_slabs(slabs)
+	continuous_slabs = get_continuous_slabs(slabs, angle)
 	continuous_points = []
 	for ss in continuous_slabs:
 		edges = [s.Shape.Edges[0] for s in ss]
