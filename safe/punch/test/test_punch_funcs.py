@@ -243,7 +243,7 @@ def test_get_continuous_slabs():
 
 def test_get_continuous_points_from_slabs():
     slabs = document.Foundation.tape_slabs
-    continuous_points = punch_funcs.get_continuous_points_from_slabs(slabs)
+    continuous_points, _ = punch_funcs.get_continuous_points_from_slabs(slabs)
     assert len(continuous_points) == 6
 
 def test_make_automatic_stirps_in_strip_foundation():

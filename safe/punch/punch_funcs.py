@@ -590,7 +590,7 @@ def make_strips_from_slabs(
 	angle is for finding continuous strip, with max angle between two adjacent slabs
 	'''
 	from safe.punch.strip import make_strip
-	continuous_points = get_continuous_points_from_slabs(slabs, angle)
+	continuous_points, _ = get_continuous_points_from_slabs(slabs, angle)
 	strips = []
 	for points in continuous_points:
 		p1, p2 = points[:2]
@@ -616,9 +616,9 @@ def make_automatic_stirps_in_strip_foundation(
 		angle : int = 45,
 		):
 	from safe.punch.strip import make_strip
-	continuous_points = get_continuous_points_from_slabs(slabs, angle)
+	continuous_points, continuous_beams = get_continuous_points_from_slabs(slabs, angle)
 	strips = []
-	for points in continuous_points:
+	for i, points in enumerate(continuous_points):
 		p1, p2 = points[:2]
 		dx = abs(p1.x - p2.x)
 		dy = abs(p1.y - p2.y)
@@ -627,6 +627,7 @@ def make_automatic_stirps_in_strip_foundation(
 		else:
 			layer = y_stirp_name
 		strip = make_strip(points, layer, 'column', None, width)
+		strip.beams = continuous_beams[i]
 		strips.append(strip)
 	return strips
 
@@ -836,7 +837,7 @@ def get_continuous_points_from_slabs(
 		edges = [s.Shape.Edges[0] for s in ss]
 		points = get_sort_points(edges, get_last=True)
 		continuous_points.append(points)
-	return continuous_points
+	return continuous_points, continuous_slabs
 	
 
 def get_in_direction_priority(edge, edges,
