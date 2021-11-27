@@ -830,7 +830,7 @@ def get_continuous_slabs(
 	'''
 	angle is maximum angle between two adjacent slabs
 	'''
-	edges = [s.Shape.Edges[0] for s in slabs]
+	edges = [s.Shape.Edges[0] for s in slabs if s.Shape.Edges]
 	edges_numbers = get_continuous_edges(edges, angle)
 	continuous_slabs = []
 	for numbers in edges_numbers:
