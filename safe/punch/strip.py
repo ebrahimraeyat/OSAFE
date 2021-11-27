@@ -127,7 +127,7 @@ class Strip:
         elif obj.fix_width_from == 'center':
             sr = sl = obj.width.Value / 2
         shapes = []
-        obj.points = punch_funcs.get_continuous_points_from_slabs_list(obj.beams)
+        obj.points = punch_funcs.get_sort_points_from_slabs(obj.beams)
         for i, p in enumerate(obj.points[:-1]):
             p1 = p
             p2 = obj.points[i + 1]
