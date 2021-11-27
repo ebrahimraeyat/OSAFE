@@ -609,6 +609,20 @@ def get_sort_points_from_slabs(slabs : list) -> list:
 	continuous_points = get_sort_points(edges, get_last=True)
 	return continuous_points
 
+def get_almost_direction_of_edges_list(edges : list) -> str:
+	'''This functions give a list of edges and 
+		recognize direction of each edge and return
+		x if most of edges are in x direction, otherwise y'''
+	x_weight = 0
+	y_weight = 0
+	for edge in edges:
+		v = edge.tangentAt(0)
+		x_weight += abs(v.x) 
+		y_weight += abs(v.y)
+	if x_weight > y_weight:
+		return 'x'
+	return 'y'
+
 def make_automatic_stirps_in_strip_foundation(
 		slabs,
 		width,
@@ -621,18 +635,16 @@ def make_automatic_stirps_in_strip_foundation(
 		angle : int = 45,
 		):
 	from safe.punch.strip import make_strip
-	continuous_points, continuous_beams = get_continuous_points_from_slabs(slabs, angle)
+	continuous_slabs = get_continuous_slabs(slabs, angle)
 	strips = []
-	for i, points in enumerate(continuous_points):
-		p1, p2 = points[:2]
-		dx = abs(p1.x - p2.x)
-		dy = abs(p1.y - p2.y)
-		if dx > dy:
+	for slabs in continuous_slabs:
+		edges = [slab.Shape.Edges[0] for slab in slabs]
+		strip_direction = get_almost_direction_of_edges_list(edges)
+		if strip_direction == 'x':
 			layer = x_stirp_name
 		else:
 			layer = y_stirp_name
-		strip = make_strip(points, layer, 'column', None, width)
-		strip.beams = continuous_beams[i]
+		strip = make_strip(slabs, layer, 'column', width)
 		strips.append(strip)
 	return strips
 

@@ -229,6 +229,12 @@ def test_get_continuous_edges():
     edges_numbers = punch_funcs.get_continuous_edges(edges)
     assert edges_numbers == [[6, 1, 2, 3], [11, 12, 13], [4, 5, 14], [8, 7], [10, 9], [15, 16]]
 
+def test_get_almost_direction_of_edges_list():
+    slabs = document.Foundation.tape_slabs
+    edges = [s.Shape.Edges[0] for s in slabs]
+    direction = punch_funcs.get_almost_direction_of_edges_list([edges[5], edges[0], edges[1], edges[2]])
+    assert direction == 'x'
+
 def test_get_continuous_slabs():
     slabs = document.Foundation.tape_slabs
     slab_lists = punch_funcs.get_continuous_slabs(slabs)
