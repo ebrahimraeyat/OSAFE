@@ -7,17 +7,16 @@ from safe.punch import punch_funcs
 
 
 def make_strip(
-        points,
-        layer,
-        design_type,
-        segments : Union[list, bool] = None,
+        beams : list,
+        layer : str,
+        design_type : str,
         width : float = 1000,
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
     Strip(obj)
-    obj.points = points
+    obj.beams = beams
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
@@ -29,8 +28,6 @@ def make_strip(
         obj.left_width = width - right_width
     else:
         obj.left_width = obj.right_width = obj.width / 2
-    if segments is not None:
-        obj.segments = segments
     if FreeCAD.GuiUp:
         ViewProviderStrip(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -51,6 +48,12 @@ class Strip:
                 "points",
                 "Geometry",
                 )
+        if not hasattr(obj, "beams"):
+            obj.addProperty(
+                "App::PropertyLinkList",
+                "beams",
+                "Strip",
+                )
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -69,12 +72,6 @@ class Strip:
                 "redraw",
                 "Strip",
                 ).redraw = False
-        if not hasattr(obj, "beams"):
-            obj.addProperty(
-                "App::PropertyLinkList",
-                "beams",
-                "Strip",
-                )
         if not hasattr(obj, "left_width"):
             obj.addProperty(
                 "App::PropertyLength",
@@ -99,6 +96,7 @@ class Strip:
                 "fix_width_from",
                 "Strip",
                 ).fix_width_from = ['center', 'Left', 'Right']
+        obj.setEditorMode('points', 2)
 
     def execute(self, obj):
         if obj.width.Value == 0:
@@ -120,16 +118,16 @@ class Strip:
             obj.ViewObject.ShapeColor = (0.20,0.00,1.00)
         elif obj.layer == 'other':
             obj.ViewObject.ShapeColor = (0.20,1.00,0.00)
-        if obj.width.Value > 0:
-            if obj.fix_width_from == 'Left':
-                sl = obj.left_width.Value
-                sr = obj.width.Value - sl
-            elif obj.fix_width_from == 'Right':
-                sr = obj.right_width.Value
-                sl = obj.width.Value - sr
-            elif obj.fix_width_from == 'center':
-                sr = sl = obj.width.Value / 2
+        if obj.fix_width_from == 'Left':
+            sl = obj.left_width.Value
+            sr = obj.width.Value - sl
+        elif obj.fix_width_from == 'Right':
+            sr = obj.right_width.Value
+            sl = obj.width.Value - sr
+        elif obj.fix_width_from == 'center':
+            sr = sl = obj.width.Value / 2
         shapes = []
+        obj.points = punch_funcs.get_continuous_points_from_slabs_list(obj.beams)
         for i, p in enumerate(obj.points[:-1]):
             p1 = p
             p2 = obj.points[i + 1]
@@ -199,15 +197,14 @@ class ViewProviderStrip:
         
 
 if __name__ == "__main__":
+    from safe.punch.rectangle_slab import make_beam
     p1 = FreeCAD.Vector(0, 0, 0)
-    p2 = FreeCAD.Vector(5000, 0, 0)
-    p3 = FreeCAD.Vector(8000, 2000, 0)
-    p4 = FreeCAD.Vector(9000, 3000, 0)
-    points=[p1, p2, p3, p4]
-    sl = 300
-    sr = 700
+    p2 = FreeCAD.Vector(1000, 0, 0)
+    p3 = FreeCAD.Vector(3000, 2000, 0)
+    b1 = make_beam(p1, p2)
+    b2 = make_beam(p2, p3)
     make_strip(
-            points=[p1, p2, p3, p4],
+            beams=[b1, b2],
             layer='other',
             design_type='column',
             )

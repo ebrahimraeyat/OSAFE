@@ -604,6 +604,12 @@ def make_strips_from_slabs(
 		strips.append(strip)
 	return strips
 
+def get_continuous_points_from_slabs_list(slabs : list) -> list:
+	edges = [s.Shape.Edges[0] for s in slabs]
+	continuous_points = get_sort_points(edges, get_last=True)
+	return continuous_points
+
+
 def make_automatic_stirps_in_strip_foundation(
 		slabs,
 		width,
