@@ -582,27 +582,30 @@ def get_common_part_of_strips(points, offset, width):
 		commons.append(comm)
 	return commons
 
-def make_strips_from_slabs(
-		slabs : list,
-		angle : int = 45,
-		):
+def make_strip_shape_from_beams(
+		beams : list,
+		left_width : float,
+		right_width : float,
+		) -> tuple:
 	'''
-	angle is for finding continuous strip, with max angle between two adjacent slabs
+	get a list of beams and create the shape of strip
+	return shape of strip, left_wire, right_wire
 	'''
-	from safe.punch.strip import make_strip
-	continuous_points, _ = get_continuous_points_from_slabs(slabs, angle)
-	strips = []
-	for points in continuous_points:
-		p1, p2 = points[:2]
-		dx = abs(p1.x - p2.x)
-		dy = abs(p1.y - p2.y)
-		if dx > dy:
-			layer = 'A'
-		else:
-			layer = 'B'
-		strip = make_strip(points, layer, 'column')
-		strips.append(strip)
-	return strips
+	import DraftGeomUtils
+	es = [b.Shape.Edges[0] for b in beams]
+	wire = Part.Wire(es)
+	normal = FreeCAD.Vector(0, 0, 1)
+	dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
+	dvec.normalize()
+	dvec.multiply(right_width)
+	wr = DraftGeomUtils.offsetWire(wire,dvec)
+	dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
+	dvec.normalize()
+	dvec = dvec.negative()
+	dvec.multiply(left_width)
+	wl = DraftGeomUtils.offsetWire(wire,dvec)
+	sh = DraftGeomUtils.bind(wr,wl)
+	return sh, wl, wr
 
 def get_sort_points_from_slabs(slabs : list) -> list:
 	edges = [s.Shape.Edges[0] for s in slabs]

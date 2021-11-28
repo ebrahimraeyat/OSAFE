@@ -126,25 +126,8 @@ class Strip:
             sl = obj.width.Value - sr
         elif obj.fix_width_from == 'center':
             sr = sl = obj.width.Value / 2
-        shapes = []
-        obj.points = punch_funcs.get_sort_points_from_slabs(obj.beams)
-        for i, p in enumerate(obj.points[:-1]):
-            p1 = p
-            p2 = obj.points[i + 1]
-            offset = (sl - sr) / 2
-            width = (sl + sr) / 2 # width is half of slab width
-            p1, p2 = punch_funcs.get_offset_points(p1, p2, offset)
-            points = punch_funcs.get_width_points(p1, p2, width)
-            points.append(points[0])
-            shapes.append(Part.Face(Part.makePolygon(points)))
-        comm = punch_funcs.get_common_part_of_strips(obj.points, offset, width)
-        if len(shapes) > 1:
-            fusion = shapes[0].fuse(shapes[1:] + comm)
-            faces = fusion.Faces
-            fusion = faces[0].fuse(faces[1:])
-            obj.Shape = fusion.removeSplitter()
-        else:
-            obj.Shape = shapes[0]
+        shape, left_wire, right_wire = punch_funcs.make_strip_shape_from_beams(obj.beams, sl, sr)
+        obj.Shape = shape
         FreeCAD.ActiveDocument.recompute()
 
 
