@@ -599,13 +599,22 @@ def make_strip_shape_from_beams(
 	dvec.normalize()
 	dvec.multiply(right_width)
 	wr = DraftGeomUtils.offsetWire(wire,dvec)
+	wr = remove_null_edges_from_wire(wr)
 	dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
 	dvec.normalize()
 	dvec = dvec.negative()
 	dvec.multiply(left_width)
 	wl = DraftGeomUtils.offsetWire(wire,dvec)
+	wl = remove_null_edges_from_wire(wl)
 	sh = DraftGeomUtils.bind(wr,wl)
-	return sh, wl, wr
+	return sh, wire, wl, wr
+
+def remove_null_edges_from_wire(w):
+	es = []
+	for e in w.Edges:
+		if len(e.Vertexes) == 2:
+			es.append(e)
+	return Part.Wire(es)
 
 def get_sort_points_from_slabs(slabs : list) -> list:
 	edges = [s.Shape.Edges[0] for s in slabs]

@@ -96,6 +96,24 @@ class Strip:
                 "fix_width_from",
                 "Strip",
                 ).fix_width_from = ['center', 'Left', 'Right']
+        if not hasattr(obj, "left_wire"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "left_wire",
+                "Strip",
+                )
+        if not hasattr(obj, "right_wire"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "right_wire",
+                "Strip",
+                )
+        if not hasattr(obj, "main_wire"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "main_wire",
+                "Strip",
+                )
         obj.setEditorMode('points', 2)
 
     def execute(self, obj):
@@ -126,7 +144,10 @@ class Strip:
             sl = obj.width.Value - sr
         elif obj.fix_width_from == 'center':
             sr = sl = obj.width.Value / 2
-        shape, left_wire, right_wire = punch_funcs.make_strip_shape_from_beams(obj.beams, sl, sr)
+        shape, main_wire, left_wire, right_wire = punch_funcs.make_strip_shape_from_beams(obj.beams, sl, sr)
+        obj.left_wire = left_wire
+        obj.right_wire = right_wire
+        obj.main_wire = main_wire
         obj.Shape = shape
         FreeCAD.ActiveDocument.recompute()
 
