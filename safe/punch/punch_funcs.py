@@ -582,7 +582,7 @@ def get_common_part_of_strips(points, offset, width):
 		commons.append(comm)
 	return commons
 
-def make_strip_shape_from_beams(
+def make_base_foundation_shape_from_beams(
 		beams : list,
 		left_width : float,
 		right_width : float,
@@ -635,8 +635,8 @@ def get_almost_direction_of_edges_list(edges : list) -> str:
 		return 'x'
 	return 'y'
 
-def make_automatic_stirps_in_strip_foundation(
-		slabs,
+def make_automatic_base_foundation(
+		beams,
 		width,
 		north_dist : Union[float, bool] = None,
 		south_dist : Union[float, bool] = None,
@@ -646,17 +646,17 @@ def make_automatic_stirps_in_strip_foundation(
 		y_stirp_name : str = 'B',
 		angle : int = 45,
 		):
-	from safe.punch.strip import make_strip
-	continuous_slabs = get_continuous_slabs(slabs, angle)
+	from safe.punch.base_foundation import make_base_foundation
+	continuous_slabs = get_continuous_slabs(beams, angle)
 	strips = []
-	for slabs in continuous_slabs:
-		edges = [slab.Shape.Edges[0] for slab in slabs]
+	for beams in continuous_slabs:
+		edges = [slab.Shape.Edges[0] for slab in beams]
 		strip_direction = get_almost_direction_of_edges_list(edges)
 		if strip_direction == 'x':
 			layer = x_stirp_name
 		else:
 			layer = y_stirp_name
-		strip = make_strip(slabs, layer, 'column', width)
+		strip = make_base_foundation(beams, layer, 'column', width)
 		strips.append(strip)
 	return strips
 

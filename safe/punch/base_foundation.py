@@ -6,7 +6,7 @@ import FreeCAD
 from safe.punch import punch_funcs
 
 
-def make_strip(
+def make_base_foundation(
         beams : list,
         layer : str,
         design_type : str,
@@ -14,8 +14,8 @@ def make_strip(
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
         ):
-    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
-    Strip(obj)
+    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BaseFoundation")
+    BaseFoundation(obj)
     obj.beams = beams
     obj.layer = layer
     obj.design_type = design_type
@@ -29,15 +29,15 @@ def make_strip(
     else:
         obj.left_width = obj.right_width = obj.width / 2
     if FreeCAD.GuiUp:
-        ViewProviderStrip(obj.ViewObject)
+        ViewProviderBaseFoundation(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return obj
 
 
-class Strip:
+class BaseFoundation:
     def __init__(self, obj):
         obj.Proxy = self
-        self.Type = "Strip"
+        self.Type = "BaseFoundation"
         self.set_properties(obj)
         self.obj_name = obj.Name
 
@@ -52,67 +52,67 @@ class Strip:
             obj.addProperty(
                 "App::PropertyLinkList",
                 "beams",
-                "Strip",
+                "base_foundation",
                 )
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
                 "layer",
-                "Strip",
+                "strip",
                 ).layer = ['A', 'B', 'other']
         if not hasattr(obj, "design_type"):
             obj.addProperty(
                 "App::PropertyEnumeration",
                 "design_type",
-                "Strip",
+                "strip",
                 ).design_type = ['column']
         if not hasattr(obj, "redraw"):
             obj.addProperty(
                 "App::PropertyBool",
                 "redraw",
-                "Strip",
+                "base_foundation",
                 ).redraw = False
         if not hasattr(obj, "left_width"):
             obj.addProperty(
                 "App::PropertyLength",
                 "left_width",
-                "Strip",
+                "Geometry",
                 ).left_width = '0.5 m'
         if not hasattr(obj, "right_width"):
             obj.addProperty(
                 "App::PropertyLength",
                 "right_width",
-                "Strip",
+                "Geometry",
                 ).right_width = '0.5 m'
         if not hasattr(obj, "width"):
             obj.addProperty(
                 "App::PropertyLength",
                 "width",
-                "Strip",
+                "Geometry",
                 ).width = '1 m'
         if not hasattr(obj, "fix_width_from"):
             obj.addProperty(
                 "App::PropertyEnumeration",
                 "fix_width_from",
-                "Strip",
+                "Geometry",
                 ).fix_width_from = ['center', 'Left', 'Right']
         if not hasattr(obj, "left_wire"):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "left_wire",
-                "Strip",
+                "Geometry",
                 )
         if not hasattr(obj, "right_wire"):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "right_wire",
-                "Strip",
+                "Geometry",
                 )
         if not hasattr(obj, "main_wire"):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "main_wire",
-                "Strip",
+                "Geometry",
                 )
         obj.setEditorMode('points', 2)
 
@@ -144,7 +144,7 @@ class Strip:
             sl = obj.width.Value - sr
         elif obj.fix_width_from == 'center':
             sr = sl = obj.width.Value / 2
-        shape, main_wire, left_wire, right_wire = punch_funcs.make_strip_shape_from_beams(obj.beams, sl, sr)
+        shape, main_wire, left_wire, right_wire = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
         obj.left_wire = left_wire
         obj.right_wire = right_wire
         obj.main_wire = main_wire
@@ -152,26 +152,7 @@ class Strip:
         FreeCAD.ActiveDocument.recompute()
 
 
-class ViewProviderStripSegment:
-    def __init__(self, vobj):
-        vobj.Proxy = self      
-
-    def attach(self, vobj):
-        self.ViewObject = vobj
-        self.Object = vobj.Object
-
-    def getIcon(self):
-        return str(Path(__file__).parent / "Resources" / "icons" / "segment.png")
-
-    def __getstate__(self):
-        return None
-
-    def __setstate__(self, state):
-        return None
-
-
-
-class ViewProviderStrip:
+class ViewProviderBaseFoundation:
     def __init__(self, vobj):
         vobj.Proxy = self
         vobj.Transparency = 40
@@ -186,7 +167,7 @@ class ViewProviderStrip:
         return children
 
     def getIcon(self):
-        return str(Path(__file__).parent / "Resources" / "icons" / "strip.svg")
+        return str(Path(__file__).parent / "Resources" / "icons" / "base_foundation.svg")
 
     def __getstate__(self):
         return None
@@ -207,7 +188,7 @@ if __name__ == "__main__":
     p3 = FreeCAD.Vector(3000, 2000, 0)
     b1 = make_beam(p1, p2)
     b2 = make_beam(p2, p3)
-    make_strip(
+    make_base_foundation(
             beams=[b1, b2],
             layer='other',
             design_type='column',
