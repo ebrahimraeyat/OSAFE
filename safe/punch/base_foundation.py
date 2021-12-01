@@ -114,6 +114,12 @@ class BaseFoundation:
                 "main_wire",
                 "Geometry",
                 )
+        if not hasattr(obj, "extended_shape"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "extended_shape",
+                "Geometry",
+                )
         obj.setEditorMode('points', 2)
 
     def execute(self, obj):
@@ -145,6 +151,8 @@ class BaseFoundation:
         elif obj.fix_width_from == 'center':
             sr = sl = obj.width.Value / 2
         shape, main_wire, left_wire, right_wire = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
+        extended_main_wire = punch_funcs.get_extended_wire(main_wire)
+        obj.extended_shape, *_ = punch_funcs.get_left_right_offset_wire_and_shape(extended_main_wire, sl, sr)
         obj.left_wire = left_wire
         obj.right_wire = right_wire
         obj.main_wire = main_wire
@@ -155,7 +163,7 @@ class BaseFoundation:
 class ViewProviderBaseFoundation:
     def __init__(self, vobj):
         vobj.Proxy = self
-        vobj.Transparency = 40
+        vobj.Transparency = 80
         vobj.DisplayMode = "Shaded"
 
     def attach(self, vobj):

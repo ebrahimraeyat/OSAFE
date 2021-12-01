@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 
 import pytest
+
+from safe import punch
 FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 
@@ -11,8 +13,10 @@ import Part
 
 filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
+filename_base_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
+document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
 
 
 punch_path = Path(__file__).absolute().parent.parent
@@ -257,7 +261,21 @@ def test_make_automatic_stirps_in_strip_foundation():
     strips = punch_funcs.make_automatic_stirps_in_strip_foundation(slabs, 1200)
     assert len(strips) == 6
 
+def test_get_points_connections_from_base_foundations():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    ret = punch_funcs.get_points_connections_from_base_foundations(bfs)
+    assert True
 
+def test_get_common_part_of_base_foundation():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    ret = punch_funcs.get_common_part_of_base_foundation(bfs)
+    assert len(ret) == 20
 
 
 

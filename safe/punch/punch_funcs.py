@@ -442,6 +442,30 @@ def get_points_connections_from_slabs(slabs):
 				d[p].append(s)
 	return d
 
+def get_points_inside_base_foundations(
+	base_foundations : list,
+	) -> dict:
+	'''
+	get base foundation objects and return the dictionary of points as key and
+	base foundation name that point is inside them as values
+	'''
+	points = get_all_beam_points()
+	d = {key: set() for key in points}
+	for p in points:
+		point = FreeCAD.Vector(p)
+		for base in base_foundations:
+			if base.Shape.isInside(point, 1, True):
+				d[p].add(base.Name)
+	return d
+
+def get_all_beam_points():
+	points = set()
+	for o in FreeCAD.ActiveDocument.Objects:
+		if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Beam':
+			points.add(tuple(o.start_point))
+			points.add(tuple(o.end_point))
+	return points
+
 def get_line_equation(p1, p2):
 	x1, y1 = p1.x, p1.y
 	x2, y2 = p2.x, p2.y
@@ -541,6 +565,20 @@ def get_offset_points(
 		new_end_point = FreeCAD.Vector(x2, y2, p2.z)
 		return new_start_point, new_end_point
 
+def get_common_part_of_base_foundation(base_foundations):
+	if len(base_foundations) < 2:
+		return None
+	points_base_connections = get_points_inside_base_foundations(base_foundations)
+	points_common_shape = {}
+	for point, names in points_base_connections.items():
+		if len(names) > 1:
+			bases = [FreeCAD.ActiveDocument.getObject(name) for name in names]
+			comm = bases[0].extended_shape
+			for base in bases[1:]:
+				comm = comm.common(base.extended_shape)
+			points_common_shape[point] = comm
+	return points_common_shape
+
 def get_common_part_of_slabs(slabs):
 	if len(slabs) < 2:
 		return None
@@ -591,23 +629,60 @@ def make_base_foundation_shape_from_beams(
 	get a list of beams and create the shape of strip
 	return shape of strip, left_wire, right_wire
 	'''
-	import DraftGeomUtils
 	es = [b.Shape.Edges[0] for b in beams]
-	wire = Part.Wire(es)
+	wire = get_wire_with_sorted_points(es)
+	sh, wl, wr = get_left_right_offset_wire_and_shape(wire, left_width, right_width)
+	return sh, wire, wl, wr
+
+def get_left_right_offset_wire_and_shape(wire, left_width, right_width):
+	import DraftGeomUtils
 	normal = FreeCAD.Vector(0, 0, 1)
 	dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
 	dvec.normalize()
 	dvec.multiply(right_width)
-	wr = DraftGeomUtils.offsetWire(wire,dvec)
-	wr = remove_null_edges_from_wire(wr)
+	right_wire = DraftGeomUtils.offsetWire(wire,dvec)
+	right_wire = remove_null_edges_from_wire(right_wire)
 	dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
 	dvec.normalize()
 	dvec = dvec.negative()
 	dvec.multiply(left_width)
-	wl = DraftGeomUtils.offsetWire(wire,dvec)
-	wl = remove_null_edges_from_wire(wl)
-	sh = DraftGeomUtils.bind(wr,wl)
-	return sh, wire, wl, wr
+	left_wire = DraftGeomUtils.offsetWire(wire,dvec)
+	left_wire = remove_null_edges_from_wire(left_wire)
+	shape = DraftGeomUtils.bind(left_wire, right_wire)
+	return shape, left_wire, right_wire
+
+def get_extended_wire_first_last_edge(wire, length=2000):
+	'''
+	return the first and last edges with lenght equal to length that elongation wire
+	'''
+	start_edge = wire.Edges[0]
+	end_edge = wire.Edges[-1]
+	if len(wire.Edges) == 1:
+		v1, v4 = start_edge.Vertexes
+		p1 = v1.Point
+		p4 = v4.Point
+		p11, p22 = extend_two_points(p1, p4, length)
+
+	else:
+		v1 = start_edge.firstVertex()
+		v2 = start_edge.lastVertex()
+		p1 = v1.Point
+		p2 = v2.Point
+		p11, _ = extend_two_points(p1, p2, length)
+		v3 = end_edge.firstVertex()
+		v4 = end_edge.lastVertex()
+		p3 = v3.Point
+		p4 = v4.Point
+		_, p22 = extend_two_points(p3, p4, length)
+	e1 = Part.makeLine(p11, p1)
+	e2 = Part.makeLine(p4, p22)
+	return e1, e2
+
+def get_extended_wire(wire, length=2000):
+	e1, e2 = get_extended_wire_first_last_edge(wire, length)
+	edges = [e1] + wire.Edges + [e2]
+	return Part.Wire(edges)
+	
 
 def remove_null_edges_from_wire(w):
 	es = []
@@ -620,6 +695,16 @@ def get_sort_points_from_slabs(slabs : list) -> list:
 	edges = [s.Shape.Edges[0] for s in slabs]
 	continuous_points = get_sort_points(edges, get_last=True)
 	return continuous_points
+
+def get_wire_with_sorted_points(edges):
+	if type(edges) == Part.Wire:
+		edges = edges.Edges
+	sorted_points = get_sort_points(edges, get_last=True)
+	edges = []
+	for p1, p2 in zip(sorted_points[:-1], sorted_points[1:]):
+		edge = Part.makeLine(p1, p2)
+		edges.append(edge)
+	return Part.Wire(edges)
 
 def get_almost_direction_of_edges_list(edges : list) -> str:
 	'''This functions give a list of edges and 
