@@ -3,6 +3,7 @@ import math
 
 import FreeCAD
 import Part
+import DraftGeomUtils
 
 from etabs_api.frame_obj import FrameObj
 
@@ -570,6 +571,7 @@ def get_common_part_of_base_foundation(base_foundations):
 		return None
 	points_base_connections = get_points_inside_base_foundations(base_foundations)
 	points_common_shape = {}
+	base_name_common_shape = {}
 	for point, names in points_base_connections.items():
 		if len(names) > 1:
 			bases = [FreeCAD.ActiveDocument.getObject(name) for name in names]
@@ -577,7 +579,13 @@ def get_common_part_of_base_foundation(base_foundations):
 			for base in bases[1:]:
 				comm = comm.common(base.extended_shape)
 			points_common_shape[point] = comm
-	return points_common_shape
+			for name in names:
+				commons = base_name_common_shape.get(name, None)
+				if commons is None:
+					base_name_common_shape[name] = [comm]
+				else:
+					base_name_common_shape[name].append(comm)
+	return points_common_shape, base_name_common_shape
 
 def get_common_part_of_slabs(slabs):
 	if len(slabs) < 2:
@@ -676,12 +684,13 @@ def get_extended_wire_first_last_edge(wire, length=2000):
 		_, p22 = extend_two_points(p3, p4, length)
 	e1 = Part.makeLine(p11, p1)
 	e2 = Part.makeLine(p4, p22)
-	return e1, e2
+	return e1, e2, p1, p4
 
 def get_extended_wire(wire, length=2000):
-	e1, e2 = get_extended_wire_first_last_edge(wire, length)
+	e1, e2, start_point, end_point = get_extended_wire_first_last_edge(wire, length)
 	edges = [e1] + wire.Edges + [e2]
-	return Part.Wire(edges)
+	wire = Part.Wire(edges)
+	return wire, e1, e2, start_point, end_point
 	
 
 def remove_null_edges_from_wire(w):

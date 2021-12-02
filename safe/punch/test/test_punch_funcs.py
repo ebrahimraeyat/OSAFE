@@ -272,10 +272,11 @@ def test_get_points_connections_from_base_foundations():
 def test_get_common_part_of_base_foundation():
     bfs = []
     for o in document_base_foundation.Objects:
-        if o.Proxy.Type == 'BaseFoundation':
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
             bfs.append(o)
-    ret = punch_funcs.get_common_part_of_base_foundation(bfs)
-    assert len(ret) == 20
+    points_common_shape, base_name_common_shape = punch_funcs.get_common_part_of_base_foundation(bfs)
+    assert len(points_common_shape) == 20
+    assert len(base_name_common_shape) == len(bfs)
 
 
 

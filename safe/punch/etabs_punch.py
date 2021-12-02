@@ -1,16 +1,16 @@
 try:
-    from safe.punch.axis import create_grids
+    # from safe.punch.axis import create_grids
     # from safe.punch.punch_funcs import remove_obj
-    from safe.punch import etabs_foundation
     from safe.punch import rectangle_slab
-    from safe.punch import strip
-    from safe.punch.punch import make_punch
+    from safe.punch import etabs_foundation
+    # from safe.punch import strip
+    # from safe.punch.punch import make_punch
 except:
-    from axis import create_grids
+    # from axis import create_grids
     # from punch_funcs import remove_obj
     import etabs_foundation
     import rectangle_slab
-    from punch import make_punch
+    # from punch import make_punch
 import Draft
 import FreeCAD
 import FreeCADGui as Gui
@@ -67,4 +67,9 @@ class EtabsPunch(object):
         # self.create_punches()
         FreeCAD.ActiveDocument.recompute()
         Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewAxonometric()
+        Gui.activeDocument().activeView().viewTop()
+        FreeCAD.DraftWorkingPlane.alignToPointAndAxis(
+            FreeCAD.Vector(0.0, 0.0, 0.0),
+            FreeCAD.Vector(0, 0, 1),
+            self.top_of_foundation)
+

@@ -120,7 +120,34 @@ class BaseFoundation:
                 "extended_shape",
                 "Geometry",
                 )
+        if not hasattr(obj, "extended_first_edge"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "extended_first_edge",
+                "Geometry",
+                )
+        if not hasattr(obj, "extended_last_edge"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "extended_last_edge",
+                "Geometry",
+                )
+        if not hasattr(obj, "main_wire_first_point"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "main_wire_first_point",
+                "Geometry",
+                )
+        if not hasattr(obj, "main_wire_last_point"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "main_wire_last_point",
+                "Geometry",
+                )
+            
         obj.setEditorMode('points', 2)
+        obj.setEditorMode('main_wire_first_point', 2)
+        obj.setEditorMode('main_wire_last_point', 2)
 
     def execute(self, obj):
         if obj.width.Value == 0:
@@ -151,7 +178,11 @@ class BaseFoundation:
         elif obj.fix_width_from == 'center':
             sr = sl = obj.width.Value / 2
         shape, main_wire, left_wire, right_wire = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
-        extended_main_wire = punch_funcs.get_extended_wire(main_wire)
+        extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)
+        obj.extended_first_edge = e1
+        obj.extended_last_edge = e2
+        obj.main_wire_first_point = p1
+        obj.main_wire_last_point = p2
         obj.extended_shape, *_ = punch_funcs.get_left_right_offset_wire_and_shape(extended_main_wire, sl, sr)
         obj.left_wire = left_wire
         obj.right_wire = right_wire
