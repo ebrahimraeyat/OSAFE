@@ -455,7 +455,7 @@ def get_points_inside_base_foundations(
 	for p in points:
 		point = FreeCAD.Vector(p)
 		for base in base_foundations:
-			if base.base_shape.isInside(point, 1, True):
+			if base.Shape.isInside(point, 1, True):
 				d[p].add(base.Name)
 	return d
 
@@ -587,9 +587,17 @@ def get_common_part_of_base_foundation(base_foundations):
 					base_name_common_shape[name].append(comm)
 	return points_common_shape, base_name_common_shape
 
-def refine_end_shape_and_beams_of_base_foundation(base_foundations):
+def get_foundation_shape_from_base_foundations(
+		base_foundations,
+		height : float = 0,
+		foundation_type : str = 'Strip',
+		continuoues_layer : str = 'A',
+		):
 	'''
-	get the base foundations and 
+	Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
+	used to create foundation shape
+	continuoues_dir : in Strip foundation, the strips with layer name equals to continuoues_dir get
+		continuoes and other side cut with this shapes
 	'''
 
 	def get_cut_faces(sh1, sh2):
@@ -603,21 +611,17 @@ def refine_end_shape_and_beams_of_base_foundation(base_foundations):
 		else:
 			return None
 	points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
-	# names = [base.Name for base in base_foundations]
-	# extra_edges = {name : [None, None] for name in names}
+	contiuoues_layer_shapes = []
+	cut_layer_shapes = []
 	for base_foundation in base_foundations:
+		shapes = []
+		cut_shape = []
 		first_point = tuple(base_foundation.main_wire_first_point)
 		last_point = tuple(base_foundation.main_wire_last_point)
 		comm = points_common_shape.get(first_point, None)
-		cut_shape = []
-		base_foundation.first_common_shape = Part.Shape()
-		base_foundation.last_common_shape = Part.Shape()
-		base_foundation.first_edge = Part.Shape()
-		base_foundation.last_edge = Part.Shape()
-		base_foundation.cut_shapes = Part.Shape()
 		if comm is not None:
-			base_foundation.first_common_shape = comm
-			faces = get_cut_faces(base_foundation.base_shape, comm)
+			shapes.append(comm)
+			faces = get_cut_faces(base_foundation.Shape, comm)
 			if faces is not None:
 				cut_shape.extend(faces)
 			for e in comm.Edges:
@@ -626,7 +630,6 @@ def refine_end_shape_and_beams_of_base_foundation(base_foundations):
 					base_foundation.extended_first_edge,
 					)
 				if intersection:
-					# extra_edges[base_foundation.Name][0]
 					base_foundation.first_edge = \
 						Part.makeLine(
 							intersection[0], FreeCAD.Vector(*first_point))
@@ -634,8 +637,8 @@ def refine_end_shape_and_beams_of_base_foundation(base_foundations):
 
 		comm = points_common_shape.get(last_point, None)
 		if comm is not None:
-			base_foundation.last_common_shape = comm
-			faces = get_cut_faces(base_foundation.base_shape, comm)
+			shapes.append(comm)
+			faces = get_cut_faces(base_foundation.Shape, comm)
 			if faces is not None:
 				cut_shape.extend(faces)
 			for e in comm.Edges:
@@ -644,16 +647,27 @@ def refine_end_shape_and_beams_of_base_foundation(base_foundations):
 					base_foundation.extended_last_edge,
 					)
 				if intersection:
-					# extra_edges[base_foundation.Name][1] = \
 					base_foundation.last_edge = \
 						Part.makeLine(
 							FreeCAD.Vector(*last_point), intersection[0]
 								)
 					break
+		shapes.append(base_foundation.Shape)
+		shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
+		shape = shapes[0].fuse(shapes[1:])
+		shape = shape.removeSplitter()
 		if cut_shape:
-			base_foundation.cut_shapes = Part.makeCompound(cut_shape)
-		base_foundation.recompute()
-	# return extra_edges
+			cut_shape = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in cut_shape]
+			shape = shape.cut(cut_shape)
+		if base_foundation.layer == continuoues_layer:
+			contiuoues_layer_shapes.append(shape)
+		else:
+			cut_layer_shapes.append(shape)
+	contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
+	cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
+	shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
+	shape = Part.makeCompound([shape] + [contiuoues_layer_shapes])
+	return shape
 
 def get_common_part_of_slabs(slabs):
 	if len(slabs) < 2:

@@ -44,6 +44,9 @@ class ViewProviderBeam:
     def __init__(self, vobj):
         vobj.Proxy = self
         vobj.LineColor = (1., 0., 0.)
+        vobj.LineWidth = 1.
+        vobj.PointSize = 1.00
+        vobj.PointColor = (1., 0., 0.)
 
     def attach(self, vobj):
         self.ViewObject = vobj

@@ -1,9 +1,11 @@
 from os.path import join, dirname, abspath
 from typing import Union
 
+from PySide2 import QtCore
 import FreeCAD
 import FreeCADGui
 import Part
+from safe.punch.base_foundation import BaseFoundation
 
 try:
 	from safe.punch import punch_funcs
@@ -16,6 +18,7 @@ class Foundation:
 		obj.Proxy = self
 		self.Type = "Foundation"
 		self.set_properties(obj)
+		self.obj_name = obj.Name
 
 	def set_properties(self, obj):
 
@@ -46,10 +49,10 @@ class Foundation:
 				"Foundation",
 				)
 
-		if not hasattr(obj, "tape_slabs"):
+		if not hasattr(obj, "base_foundations"):
 			obj.addProperty(
 				"App::PropertyLinkList",
-				"tape_slabs",
+				"base_foundations",
 				"Foundation",
 				)
 
@@ -83,67 +86,73 @@ class Foundation:
 				"foundation_type",
 				"Foundation",
 				).foundation_type = ['Strip', 'Mat']
-		if not hasattr(obj, "top_face"):
-			obj.addProperty(
-				"App::PropertyString",
-				"top_face",
-				"Foundation",
-				)
-		if not hasattr(obj, "loadcases"):
-			obj.addProperty(
-				"App::PropertyStringList",
-				"loadcases",
-				"Loads",
-				)
+		# if not hasattr(obj, "top_face"):
+		# 	obj.addProperty(
+		# 		"App::PropertyString",
+		# 		"top_face",
+		# 		"Foundation",
+		# 		)
+		# if not hasattr(obj, "loadcases"):
+		# 	obj.addProperty(
+		# 		"App::PropertyStringList",
+		# 		"loadcases",
+		# 		"Loads",
+		# 		)
 		if not hasattr(obj, "level"):
 			obj.addProperty(
 				"App::PropertyDistance",
 				"level",
 				"Foundation",
 			)
-		if not hasattr(obj, "F2K"):
-			obj.addProperty(
-				"App::PropertyFile",
-				"F2K",
-				"Safe",
-			)
+		# if not hasattr(obj, "F2K"):
+		# 	obj.addProperty(
+		# 		"App::PropertyFile",
+		# 		"F2K",
+		# 		"Safe",
+		# 	)
 		if not hasattr(obj, "redraw"):
 			obj.addProperty(
 				"App::PropertyBool",
 				"redraw",
 				"Foundation",
-				).redraw = True
+				).redraw = False
 		obj.setEditorMode('redraw', 2)
 		
-	def onChanged(self, obj, prop):
-		if prop == 'F2K':
-			obj.redraw = False
+	# def onChanged(self, obj, prop):
+	# 	if prop == 'F2K':
+	# 		obj.redraw = False
+	
 
 	def execute(self, obj):
-		if not obj.redraw:
+		if obj.redraw:
+			obj.redraw = False
 			return
-		doc = obj.Document
-		tape_slabs = []
-		for o in doc.Objects:
-			if (
-				hasattr(o, "Proxy") and
-				hasattr(o.Proxy, "Type") and
-				o.Proxy.Type in ("tape_slab", "trapezoidal_slab")
-				):
-				tape_slabs.append(o)
-		obj.tape_slabs = tape_slabs
-		obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
-		obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
-		for i, face in enumerate(obj.Shape.Faces, start=1):
-			if face.BoundBox.ZLength == 0 and face.BoundBox.ZMax == obj.level.Value:
-				obj.top_face = f'Face{i}'
-		for o in doc.Objects:
-			if (
-				hasattr(o, 'TypeId') and
-				o.TypeId == 'Fem::ConstraintForce'
-				):
-				o.References = [obj, obj.top_face]
-		obj.d = obj.height - obj.cover
+		QtCore.QTimer().singleShot(50, self._execute)
+
+	def _execute(self):
+		obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
+		if not obj:
+			FreeCAD.ActiveDocument.recompute()
+			return
+		obj.redraw = True
+		obj.Shape = punch_funcs.get_foundation_shape_from_base_foundations(
+				obj.base_foundations,
+				height = obj.height,
+				foundation_type = obj.foundation_type,
+				)
+		# obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
+		# obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+		# for i, face in enumerate(obj.Shape.Faces, start=1):
+		# 	if face.BoundBox.ZLength == 0 and face.BoundBox.ZMax == obj.level.Value:
+		# 		obj.top_face = f'Face{i}'
+		# for o in doc.Objects:
+		# 	if (
+		# 		hasattr(o, 'TypeId') and
+		# 		o.TypeId == 'Fem::ConstraintForce'
+		# 		):
+		# 		o.References = [obj, obj.top_face]
+		# obj.d = obj.height - obj.cover
+		FreeCAD.ActiveDocument.recompute()
 
 	def onDocumentRestored(self, obj):
 		obj.Proxy = self
@@ -155,8 +164,8 @@ class ViewProviderFoundation:
 	def __init__(self, vobj):
 
 		vobj.Proxy = self
-		vobj.Transparency = 40
-		vobj.ShapeColor = (0.32,0.42,1.00)
+		# vobj.Transparency = 40
+		vobj.ShapeColor = (0.45, 0.45, 0.45)
 		vobj.DisplayMode = "Shaded"
 
 	def attach(self, vobj):
@@ -173,7 +182,7 @@ class ViewProviderFoundation:
 		return None
 
 	def claimChildren(self):
-		children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.tape_slabs] + \
+		children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.base_foundations] + \
 				[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
 		return children
 
@@ -182,11 +191,11 @@ def make_foundation(
 	fc: int = 25,
 	height : int = 800,
 	foundation_type : str = 'Strip',
-	load_cases : list = [],
+	# load_cases : list = [],
 	level : float = 0,
+	base_foundations : Union[list, None] = None,
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
-	# obj = FreeCAD.ActiveDocument.addObject("Part::MultiFuse", "Fusion")
 	Foundation(obj)
 	if FreeCAD.GuiUp:
 		ViewProviderFoundation(obj.ViewObject)
@@ -195,7 +204,13 @@ def make_foundation(
 	obj.height = height
 	obj.d = height - cover
 	obj.foundation_type = foundation_type
-	obj.loadcases = load_cases
+	if base_foundations is None:
+		base_foundations = []
+		for o in FreeCAD.ActiveDocument.Objects:
+			if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+				base_foundations.append(o)
+	obj.base_foundations = base_foundations
+	# obj.loadcases = load_cases
 	obj.level = level
 	FreeCAD.ActiveDocument.recompute()
 	return obj
