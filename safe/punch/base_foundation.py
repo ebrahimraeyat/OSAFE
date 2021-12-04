@@ -132,6 +132,18 @@ class BaseFoundation:
                 "extended_last_edge",
                 "Geometry",
                 )
+        if not hasattr(obj, "first_edge"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "first_edge",
+                "Geometry",
+                )
+        if not hasattr(obj, "last_edge"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "last_edge",
+                "Geometry",
+                )
         if not hasattr(obj, "main_wire_first_point"):
             obj.addProperty(
                 "App::PropertyVector",
@@ -144,25 +156,68 @@ class BaseFoundation:
                 "main_wire_last_point",
                 "Geometry",
                 )
+        if not hasattr(obj, "final_wire_first_point"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "final_wire_first_point",
+                "Geometry",
+                )
+        if not hasattr(obj, "final_wire_last_point"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "final_wire_last_point",
+                "Geometry",
+                )
+        if not hasattr(obj, "cut_shapes"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "cut_shapes",
+                "Geometry",
+                )
+        if not hasattr(obj, "first_common_shape"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "first_common_shape",
+                "Geometry",
+                )
+        if not hasattr(obj, "last_common_shape"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "last_common_shape",
+                "Geometry",
+                )
+        if not hasattr(obj, "base_shape"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "base_shape",
+                "Geometry",
+                "the shape that created from beams",
+                )
             
         obj.setEditorMode('points', 2)
         obj.setEditorMode('main_wire_first_point', 2)
         obj.setEditorMode('main_wire_last_point', 2)
+        obj.setEditorMode('final_wire_first_point', 2)
+        obj.setEditorMode('final_wire_last_point', 2)
 
+    def onChanged(self, obj, prop):
+        print(f'onChanged {obj.Name}, {prop}')
+    
     def execute(self, obj):
+        print(f'Executed {obj.Name}')
         if obj.width.Value == 0:
             return
-        if obj.redraw:
-            obj.redraw = False
-            return
-        QtCore.QTimer().singleShot(50, self._execute)
+    #     if obj.redraw:
+    #         obj.redraw = False
+    #         return
+    #     QtCore.QTimer().singleShot(50, self._execute)
 
-    def _execute(self):
-        obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
-        if not obj:
-            FreeCAD.ActiveDocument.recompute()
-            return
-        obj.redraw = True
+    # def _execute(self):
+    #     obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
+    #     if not obj:
+    #         FreeCAD.ActiveDocument.recompute()
+    #         return
+    #     obj.redraw = True
         if obj.layer == 'A':
             obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
         elif obj.layer == 'B':
@@ -179,6 +234,7 @@ class BaseFoundation:
             sr = sl = obj.width.Value / 2
         shape, main_wire, left_wire, right_wire = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
         extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)
+        obj.base_shape = shape
         obj.extended_first_edge = e1
         obj.extended_last_edge = e2
         obj.main_wire_first_point = p1
@@ -187,15 +243,32 @@ class BaseFoundation:
         obj.left_wire = left_wire
         obj.right_wire = right_wire
         obj.main_wire = main_wire
+        shape = [shape]
+        if not obj.first_common_shape.isNull():
+            shape.append(obj.first_common_shape)
+        if not obj.last_common_shape.isNull():
+            shape.append(obj.last_common_shape)
+        # if not obj.first_edge.isNull():
+        #     shape.append(obj.first_edge)
+        # if not obj.last_edge.isNull():
+        #     shape.append(obj.last_edge)
+        # shape.append(obj.main_wire)
+        if len(shape) > 1:
+            shape = shape[0].fuse(shape[1:])
+            shape = shape.removeSplitter()
+        else:
+            shape = shape[0]
+        if not obj.cut_shapes.isNull():
+            shape = shape.cut(obj.cut_shapes)
         obj.Shape = shape
-        FreeCAD.ActiveDocument.recompute()
+        # FreeCAD.ActiveDocument.recompute()
 
 
 class ViewProviderBaseFoundation:
     def __init__(self, vobj):
         vobj.Proxy = self
         vobj.Transparency = 80
-        vobj.DisplayMode = "Shaded"
+        vobj.DisplayMode = "Flat Lines"
 
     def attach(self, vobj):
         self.ViewObject = vobj

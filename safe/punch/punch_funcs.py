@@ -455,7 +455,7 @@ def get_points_inside_base_foundations(
 	for p in points:
 		point = FreeCAD.Vector(p)
 		for base in base_foundations:
-			if base.Shape.isInside(point, 1, True):
+			if base.base_shape.isInside(point, 1, True):
 				d[p].add(base.Name)
 	return d
 
@@ -480,7 +480,7 @@ def get_line_equation(p1, p2):
 def extend_two_points(
 	p1 : FreeCAD.Vector,
 	p2 : FreeCAD.Vector,
-	length : float = 2000,
+	length : float = 4000,
 	) -> tuple:
 	xs = p1.x
 	xe = p2.x
@@ -586,6 +586,74 @@ def get_common_part_of_base_foundation(base_foundations):
 				else:
 					base_name_common_shape[name].append(comm)
 	return points_common_shape, base_name_common_shape
+
+def refine_end_shape_and_beams_of_base_foundation(base_foundations):
+	'''
+	get the base foundations and 
+	'''
+
+	def get_cut_faces(sh1, sh2):
+		cut = sh1.cut(sh2)
+		if len(cut.Faces) > 1:
+			faces = cut.Faces
+			areas = [f.Area for f in faces]
+			i = areas.index(max(areas))
+			faces.remove(faces[i])
+			return faces
+		else:
+			return None
+	points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
+	# names = [base.Name for base in base_foundations]
+	# extra_edges = {name : [None, None] for name in names}
+	for base_foundation in base_foundations:
+		first_point = tuple(base_foundation.main_wire_first_point)
+		last_point = tuple(base_foundation.main_wire_last_point)
+		comm = points_common_shape.get(first_point, None)
+		cut_shape = []
+		base_foundation.first_common_shape = Part.Shape()
+		base_foundation.last_common_shape = Part.Shape()
+		base_foundation.first_edge = Part.Shape()
+		base_foundation.last_edge = Part.Shape()
+		base_foundation.cut_shapes = Part.Shape()
+		if comm is not None:
+			base_foundation.first_common_shape = comm
+			faces = get_cut_faces(base_foundation.base_shape, comm)
+			if faces is not None:
+				cut_shape.extend(faces)
+			for e in comm.Edges:
+				intersection = DraftGeomUtils.findIntersection(
+					e,
+					base_foundation.extended_first_edge,
+					)
+				if intersection:
+					# extra_edges[base_foundation.Name][0]
+					base_foundation.first_edge = \
+						Part.makeLine(
+							intersection[0], FreeCAD.Vector(*first_point))
+					break
+
+		comm = points_common_shape.get(last_point, None)
+		if comm is not None:
+			base_foundation.last_common_shape = comm
+			faces = get_cut_faces(base_foundation.base_shape, comm)
+			if faces is not None:
+				cut_shape.extend(faces)
+			for e in comm.Edges:
+				intersection = DraftGeomUtils.findIntersection(
+					e,
+					base_foundation.extended_last_edge,
+					)
+				if intersection:
+					# extra_edges[base_foundation.Name][1] = \
+					base_foundation.last_edge = \
+						Part.makeLine(
+							FreeCAD.Vector(*last_point), intersection[0]
+								)
+					break
+		if cut_shape:
+			base_foundation.cut_shapes = Part.makeCompound(cut_shape)
+		base_foundation.recompute()
+	# return extra_edges
 
 def get_common_part_of_slabs(slabs):
 	if len(slabs) < 2:

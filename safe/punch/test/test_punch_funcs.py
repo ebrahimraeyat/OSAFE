@@ -278,6 +278,14 @@ def test_get_common_part_of_base_foundation():
     assert len(points_common_shape) == 20
     assert len(base_name_common_shape) == len(bfs)
 
+def test_refine_end_shape_and_beams_of_base_foundation():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    edges = punch_funcs.refine_end_shape_and_beams_of_base_foundation(bfs)
+    # assert len(edges) == 20
+
 
 
 
