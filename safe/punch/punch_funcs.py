@@ -610,6 +610,7 @@ def get_foundation_shape_from_base_foundations(
 			return faces
 		else:
 			return None
+	foundation_height = height
 	points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
 	contiuoues_layer_shapes = []
 	cut_layer_shapes = []
@@ -653,6 +654,8 @@ def get_foundation_shape_from_base_foundations(
 								)
 					break
 		shapes.append(base_foundation.Shape)
+		if foundation_height == 0:
+			height = base_foundation.height.Value
 		shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
 		shape = shapes[0].fuse(shapes[1:])
 		shape = shape.removeSplitter()
@@ -821,6 +824,8 @@ def make_automatic_base_foundation(
 		x_stirp_name : str = 'A',
 		y_stirp_name : str = 'B',
 		angle : int = 45,
+		height : int = 1000,
+		soil_modulus : int = 2,
 		):
 	from safe.punch.base_foundation import make_base_foundation
 	continuous_slabs = get_continuous_slabs(beams, angle)
@@ -832,7 +837,7 @@ def make_automatic_base_foundation(
 			layer = x_stirp_name
 		else:
 			layer = y_stirp_name
-		strip = make_base_foundation(beams, layer, 'column', width)
+		strip = make_base_foundation(beams, layer, 'column', width, height, soil_modulus)
 		strips.append(strip)
 	return strips
 

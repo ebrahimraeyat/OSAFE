@@ -19,6 +19,8 @@ class Form:
         x_stirp_name = self.form.x_strip_name.currentText()
         y_stirp_name = self.form.y_strip_name.currentText()
         width = self.form.width_spinbox.value() * 10
+        height = self.form.height_spinbox.value() * 10
+        soil_modulus = self.form.soil_modulus.value()
         angle = self.form.angle_spinbox.value()
         doc = FreeCAD.ActiveDocument
         beams = []
@@ -31,5 +33,5 @@ class Form:
                 beams.append(o)
         from safe.punch import punch_funcs
         punch_funcs.make_automatic_base_foundation(beams, width, north_dist, south_dist,
-                east_dist, west_dist, x_stirp_name, y_stirp_name, angle)
+                east_dist, west_dist, x_stirp_name, y_stirp_name, angle, height, soil_modulus)
         Gui.Control.closeDialog()

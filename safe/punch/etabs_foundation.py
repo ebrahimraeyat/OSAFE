@@ -137,7 +137,7 @@ class Foundation:
 		obj.redraw = True
 		obj.Shape = punch_funcs.get_foundation_shape_from_base_foundations(
 				obj.base_foundations,
-				height = obj.height,
+				height = obj.height.Value,
 				foundation_type = obj.foundation_type,
 				)
 		# obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
