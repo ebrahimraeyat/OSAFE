@@ -117,6 +117,8 @@ class Foundation:
 				"Foundation",
 				).redraw = False
 		obj.setEditorMode('redraw', 2)
+		obj.setEditorMode('level', 1)
+		obj.setEditorMode('d', 1)
 		
 	# def onChanged(self, obj, prop):
 	# 	if prop == 'F2K':
@@ -192,7 +194,6 @@ def make_foundation(
 	height : int = 800,
 	foundation_type : str = 'Strip',
 	# load_cases : list = [],
-	level : float = 0,
 	base_foundations : Union[list, None] = None,
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
@@ -210,8 +211,6 @@ def make_foundation(
 			if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
 				base_foundations.append(o)
 	obj.base_foundations = base_foundations
-	# obj.loadcases = load_cases
-	obj.level = level
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 
