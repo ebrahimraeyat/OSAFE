@@ -86,6 +86,12 @@ class Foundation:
 				"foundation_type",
 				"Foundation",
 				).foundation_type = ['Strip', 'Mat']
+		if not hasattr(obj, "continuous_layer"):
+			obj.addProperty(
+				"App::PropertyEnumeration",
+				"continuous_layer",
+				"Foundation",
+				).continuous_layer = ['A', 'B']
 		# if not hasattr(obj, "top_face"):
 		# 	obj.addProperty(
 		# 		"App::PropertyString",
@@ -141,6 +147,7 @@ class Foundation:
 				obj.base_foundations,
 				height = obj.height.Value,
 				foundation_type = obj.foundation_type,
+				continuous_layer = obj.continuous_layer,
 				)
 		# obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
 		# obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
@@ -195,6 +202,7 @@ def make_foundation(
 	foundation_type : str = 'Strip',
 	# load_cases : list = [],
 	base_foundations : Union[list, None] = None,
+	continuous_layer : str = 'A',
 	):
 	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
 	Foundation(obj)
@@ -211,6 +219,7 @@ def make_foundation(
 			if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
 				base_foundations.append(o)
 	obj.base_foundations = base_foundations
+	obj.continuous_layer = continuous_layer
 	FreeCAD.ActiveDocument.recompute()
 	return obj
 

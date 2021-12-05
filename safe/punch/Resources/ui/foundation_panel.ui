@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>319</height>
+    <height>227</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Import Foundation Geometry</string>
+   <string>Create Foundation</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -53,65 +53,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="beams_group">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Beams to Use</string>
-     </property>
-     <property name="flat">
-      <bool>true</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="leftMargin">
-       <number>25</number>
-      </property>
-      <item>
-       <widget class="QRadioButton" name="all_beams">
-        <property name="text">
-         <string>All Beams</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="selected_beams">
-        <property name="text">
-         <string>Selected Beams</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="exclude_selected_beams">
-        <property name="text">
-         <string>Exclude Selected Beams</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="height_spinbox">
-       <property name="suffix">
-        <string> cm</string>
-       </property>
-       <property name="maximum">
-        <number>500</number>
-       </property>
-       <property name="singleStep">
-        <number>5</number>
-       </property>
-       <property name="value">
-        <number>0</number>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>f'c</string>
        </property>
       </widget>
      </item>
@@ -128,13 +74,6 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>f'c</string>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
@@ -142,10 +81,19 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Height</string>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="height_spinbox">
+       <property name="suffix">
+        <string> cm</string>
+       </property>
+       <property name="maximum">
+        <number>500</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -166,6 +114,34 @@
        <property name="value">
         <double>7.500000000000000</double>
        </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Height</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Continuous layer</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="continuous_layer">
+       <item>
+        <property name="text">
+         <string>A</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>B</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>

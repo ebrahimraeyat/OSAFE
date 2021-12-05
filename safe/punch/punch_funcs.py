@@ -591,7 +591,7 @@ def get_foundation_shape_from_base_foundations(
 		base_foundations,
 		height : float = 0,
 		foundation_type : str = 'Strip',
-		continuoues_layer : str = 'A',
+		continuous_layer : str = 'A',
 		):
 	'''
 	Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
@@ -615,6 +615,7 @@ def get_foundation_shape_from_base_foundations(
 	contiuoues_layer_shapes = []
 	cut_layer_shapes = []
 	for base_foundation in base_foundations:
+		print(base_foundation.Name)
 		shapes = []
 		cut_shape = []
 		first_point = tuple(base_foundation.main_wire_first_point)
@@ -657,15 +658,19 @@ def get_foundation_shape_from_base_foundations(
 		if foundation_height == 0:
 			height = base_foundation.height.Value
 		shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
-		shape = shapes[0].fuse(shapes[1:])
-		shape = shape.removeSplitter()
+		if len(shapes) > 1:
+			shape = shapes[0].fuse(shapes[1:])
+			shape = shape.removeSplitter()
+		else:
+			shape = shapes[0]
 		if cut_shape:
 			cut_shape = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in cut_shape]
 			shape = shape.cut(cut_shape)
-		if base_foundation.layer == continuoues_layer:
+		if base_foundation.layer == continuous_layer:
 			contiuoues_layer_shapes.append(shape)
 		else:
 			cut_layer_shapes.append(shape)
+		base_foundation.ViewObject.Visibility = False
 	contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
 	cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
 	shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
@@ -744,7 +749,7 @@ def get_left_right_offset_wire_and_shape(wire, left_width, right_width):
 	shape = DraftGeomUtils.bind(left_wire, right_wire)
 	return shape, left_wire, right_wire
 
-def get_extended_wire_first_last_edge(wire, length=2000):
+def get_extended_wire_first_last_edge(wire, length=4000):
 	'''
 	return the first and last edges with lenght equal to length that elongation wire
 	'''

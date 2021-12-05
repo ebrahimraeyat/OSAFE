@@ -14,6 +14,7 @@ class Form:
         cover = self.form.cover.value() * 10
         fc = self.form.fc.value()
         height = self.form.height_spinbox.value() * 10
+        continuous_layer = self.form.continuous_layer.currentText()
         if self.form.mat.isChecked():
             foundation_type = 'Mat'
         elif self.form.strip.isChecked():
@@ -24,6 +25,7 @@ class Form:
             fc=fc,
             height= height,
             foundation_type=foundation_type,
+            continuous_layer=continuous_layer,
             )
         Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
         Gui.Control.closeDialog()
