@@ -123,7 +123,7 @@ class Foundation:
 				"Foundation",
 				).redraw = False
 		obj.setEditorMode('redraw', 2)
-		obj.setEditorMode('level', 1)
+		obj.setEditorMode('level', 2)
 		obj.setEditorMode('d', 1)
 		
 	# def onChanged(self, obj, prop):
@@ -218,6 +218,8 @@ def make_foundation(
 		for o in FreeCAD.ActiveDocument.Objects:
 			if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
 				base_foundations.append(o)
+	level = base_foundations[0].beams[0].start_point.z
+	obj.level = level
 	obj.base_foundations = base_foundations
 	obj.continuous_layer = continuous_layer
 	FreeCAD.ActiveDocument.recompute()

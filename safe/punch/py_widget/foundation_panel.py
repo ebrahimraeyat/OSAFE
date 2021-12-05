@@ -9,6 +9,17 @@ class Form:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'foundation_panel.ui'))
+        self.fill_height()
+
+    def fill_height(self):
+        try:
+            import FreeCAD
+            doc = FreeCAD.ActiveDocument
+            base = doc.BaseFoundation
+            height = base.height.Value
+            self.form.height_spinbox.setValue(int(height / 10))
+        except:
+            pass
 
     def accept(self):
         cover = self.form.cover.value() * 10
