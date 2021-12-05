@@ -104,4 +104,4 @@ def test_create_f2k(shayesteh):
 
 if __name__ == '__main__':
     etabs = etabs_obj.EtabsModel(backup=False)
-    test_add_load_patterns(etabs)
+    test_add_loadcase_definitions(etabs)

@@ -197,13 +197,16 @@ class CreateF2kFile(Safe):
         filt = df['Type'] == 'Seismic (Drift)'
         df = df.loc[~filt]
         # drift_names = df.loc[filt]['Name'].unique()
-        replacements = {
-            'Seismic' : 'QUAKE',
-            'Roof Live' : 'LIVE',
-            }
-        df.replace({'Type' : replacements}, inplace=True)
-        df.Type = df.Type.str.upper()
-        df['Type'] = '"' + df['Type'] + '"'
+        df['Type'] = df.Name.apply(get_design_type, args=(self.etabs,))
+        df.dropna(inplace=True)
+        # replacements = {
+        #     'Seismic' : 'QUAKE',
+        #     'Roof Live' : 'LIVE',
+        #     'Notional' : 'OTHER',
+        #     }
+        # df.replace({'Type' : replacements}, inplace=True)
+        # df.Type = df.Type.str.upper()
+        # df['Type'] = '"' + df['Type'] + '"'
         # add load cases ! with 2 or more load patterns. Safe define
         # this load cases in load patterns!
         load_pats = list(df.Name.unique())
@@ -216,6 +219,8 @@ class CreateF2kFile(Safe):
                 n = loads[0]
                 if n > 1:
                     type_ = get_design_type(load_case, self.etabs)
+                    if type_ is None:
+                        continue
                     load_pats = pd.Series([load_case, type_, 0], index=df.columns)
                     df = df.append(load_pats, ignore_index=True)
             except IndexError:
@@ -261,6 +266,9 @@ class CreateF2kFile(Safe):
         if drifts:
             filt = df['LoadName'].isin(drifts)
             df = df.loc[~filt]
+            filt = df['Name'].isin(drifts)
+            df = df.loc[~filt]
+        df.dropna(inplace=True)
         d = {
             'Name': 'LoadCase=',
             'LoadName': 'LoadPat=',
