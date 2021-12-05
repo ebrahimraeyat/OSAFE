@@ -199,14 +199,6 @@ class CreateF2kFile(Safe):
         # drift_names = df.loc[filt]['Name'].unique()
         df['Type'] = df.Name.apply(get_design_type, args=(self.etabs,))
         df.dropna(inplace=True)
-        # replacements = {
-        #     'Seismic' : 'QUAKE',
-        #     'Roof Live' : 'LIVE',
-        #     'Notional' : 'OTHER',
-        #     }
-        # df.replace({'Type' : replacements}, inplace=True)
-        # df.Type = df.Type.str.upper()
-        # df['Type'] = '"' + df['Type'] + '"'
         # add load cases ! with 2 or more load patterns. Safe define
         # this load cases in load patterns!
         load_pats = list(df.Name.unique())
