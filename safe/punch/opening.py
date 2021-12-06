@@ -53,8 +53,23 @@ class Opening(ArchComponent.Component):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "plane",
-                "openning",
+                "opening",
                 )
+<<<<<<< HEAD
+=======
+        # if not hasattr(obj, "solid"):
+        #     obj.addProperty(
+        #         "Part::PropertyPartShape",
+        #         "solid",
+        #         "opening",
+        #         )
+        # if not hasattr(obj, "foundation"):
+        #     obj.addProperty(
+        #         "Part::PropertyLink",
+        #         "foundation",
+        #         "opening",
+        #         )
+>>>>>>> 20063b9 (Fix various source typos)
         if not hasattr(obj, "height"):
             obj.addProperty(
             "App::PropertyLength",

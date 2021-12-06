@@ -41,16 +41,16 @@ class Safe():
             lines = reader.readlines()
             tables_contents = dict()
             n = len("TABLE:  ")
-            contex = ''
+            context = ''
             table_key = None
             for line in lines:
                 if line.startswith("TABLE:"):
-                    if table_key and contex:
-                        tables_contents[table_key] = contex
-                    contex = ''
+                    if table_key and context:
+                        tables_contents[table_key] = context
+                    context = ''
                     table_key = line[n+1:-2]
                 else:
-                    contex += line
+                    context += line
         self.tables_contents = tables_contents
         return tables_contents
 
@@ -162,16 +162,16 @@ class Safe12(Safe):
             lines = reader.readlines()
             tables_contents = dict()
             n = len("$ ")
-            contex = ''
+            context = ''
             table_key = None
             for line in lines:
                 if line.startswith("$"):
-                    if table_key and contex:
-                        tables_contents[table_key] = contex
-                    contex = ''
+                    if table_key and context:
+                        tables_contents[table_key] = context
+                    context = ''
                     table_key = line[n+1:-2]
                 else:
-                    contex += line
+                    context += line
         self.tables_contents = tables_contents
         return tables_contents
 
