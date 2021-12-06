@@ -127,7 +127,7 @@ def center_of_mass(
 	faces: List[Part.Face],
 	) -> FreeCAD.Vector:
 	'''
-	gives faces and return the center of mass coordinate
+	gives faces and returns the center of mass coordinate
 	'''
 	sorat_x = 0
 	sorat_y = 0
@@ -151,7 +151,7 @@ def moment_inersia(
 	faces: List[Part.Face],
 	):
 	'''
-	return rotational moment inersia of faces list Ixx, Iyy
+	return rotational moment inertia of faces list Ixx, Iyy
 	'''
 	Ixx = 0
 	Iyy = 0
@@ -585,9 +585,9 @@ def get_points_of_foundation_plan_and_holes(
 
 def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.DataFram':
 	'''
-	This function give a list of edges, find the common points of those edges.
-	then for each point and each edge of all edges that connected to this point,
-	it search for similarity direction with this edge. the df columns output is
+	This function gives a list of edges, finds the common points of those edges.
+	Then for each point and each edge of all edges that connected to this point,
+	it searches for similar directions with this edge. The df column's output is
 	like "point edge 1 2 3 4" 
 	'''
 
@@ -626,7 +626,8 @@ def get_similar_edge_direction_in_common_points_from_edges(edges : list) -> 'pd.
 
 def get_continuous_edges(edges : list):
 	'''
-	This function get a list of egdes and search for groups of egdes that create continuous edges in x or y direction
+	This function gets a list of edges and search for groups of edges that create
+	continuous edges in x or y direction
 	'''
 	df = get_similar_edge_direction_in_common_points_from_edges(edges)
 	all_edges = []
@@ -693,8 +694,8 @@ def get_in_direction_priority(edge, edges,
 		angle: int = 45):
 	'''
 	Getting an edge and calculate angle between edge and each member of edges and then
-	sort them from large to small. angle is acceptable angle that ilustrate edge is in direction
-	of other edges
+	sort them from large to small. angle is acceptable angle that illustrates edge is 
+	in direction of other edges
 	'''
 	acceptable_anlge = 180 - angle
 	if len(edges) == 0:
@@ -751,16 +752,3 @@ def find_common_point(p1, p2, p3, p4):
 	elif p2.isEqual(p4, .001):
 		return p2, p1, p2, p3
 
-
-	
-
-	
-
-
-
-
-
-	
-
-
-	

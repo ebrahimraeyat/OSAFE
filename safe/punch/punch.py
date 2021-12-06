@@ -348,12 +348,12 @@ class ViewProviderPunch:
 
 	def getIcon(self):
 		''' Return the icon in XMP format which will appear in the tree view. This method is optional
-		and if not defined a default icon is shown.
+		and if not defined, a default icon is shown.
 		'''
 		return str(Path(__file__).parent / "Resources" / "icons" / "punch.svg")
 
 	def __getstate__(self):
-		''' When saving the document this object gets stored using Python's cPickle module.
+		''' When saving the document, this object gets stored using Python's cPickle module.
 		Since we have some un-pickable here -- the Coin stuff -- we must define this method
 		to return a tuple of all pickable objects or None.
 		'''

@@ -48,7 +48,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>export picture extention</string>
+        <string>Export picture extension</string>
        </property>
       </widget>
      </item>
