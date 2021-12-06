@@ -17,7 +17,8 @@ class Punch:
 		obj.Proxy = self
 		self.Type = "Punch"
 		self.set_properties(obj)
-		obj.Location = ['Corner 1', 'Corner 2', 'Corner 3', 'Corner 4', 'Edge 1', 'Edge 2', 'Edge 3', 'Edge 4', 'Interior']
+		obj.Location = ['Corner 1', 'Corner 2', 'Corner 3', 'Corner 4',
+						'Edge 1', 'Edge 2', 'Edge 3', 'Edge 4', 'Interior']
 
 	def set_properties(self, obj):
 		if not hasattr(obj, "text"):
@@ -170,7 +171,7 @@ class Punch:
 			faces = punch_funcs.get_user_location_faces(faces, obj.Location)
 		obj.Location = punch_funcs.location_of_column(faces)
 		obj.alpha_s = self.alphas(obj.Location)
-		obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inersia(faces)
+		obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inertia(faces)
 		if 'Corner' in obj.Location:
 			obj.I23 = 0
 		obj.Area = punch_funcs.area(faces)
@@ -348,12 +349,12 @@ class ViewProviderPunch:
 
 	def getIcon(self):
 		''' Return the icon in XMP format which will appear in the tree view. This method is optional
-		and if not defined a default icon is shown.
+		and if not defined, a default icon is shown.
 		'''
 		return str(Path(__file__).parent / "Resources" / "icons" / "punch.svg")
 
 	def __getstate__(self):
-		''' When saving the document this object gets stored using Python's cPickle module.
+		''' When saving the document, this object gets stored using Python's cPickle module.
 		Since we have some un-pickable here -- the Coin stuff -- we must define this method
 		to return a tuple of all pickable objects or None.
 		'''
