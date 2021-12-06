@@ -17,7 +17,8 @@ class Punch:
 		obj.Proxy = self
 		self.Type = "Punch"
 		self.set_properties(obj)
-		obj.Location = ['Corner 1', 'Corner 2', 'Corner 3', 'Corner 4', 'Edge 1', 'Edge 2', 'Edge 3', 'Edge 4', 'Interior']
+		obj.Location = ['Corner 1', 'Corner 2', 'Corner 3', 'Corner 4',
+						'Edge 1', 'Edge 2', 'Edge 3', 'Edge 4', 'Interior']
 
 	def set_properties(self, obj):
 		if not hasattr(obj, "text"):
@@ -170,7 +171,7 @@ class Punch:
 			faces = punch_funcs.get_user_location_faces(faces, obj.Location)
 		obj.Location = punch_funcs.location_of_column(faces)
 		obj.alpha_s = self.alphas(obj.Location)
-		obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inersia(faces)
+		obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inertia(faces)
 		if 'Corner' in obj.Location:
 			obj.I23 = 0
 		obj.Area = punch_funcs.area(faces)

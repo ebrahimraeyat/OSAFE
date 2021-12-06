@@ -147,7 +147,7 @@ def center_of_mass(
 		return None
 	return FreeCAD.Vector(sorat_x / makhraj, sorat_y / makhraj, sorat_z / makhraj)
 
-def moment_inersia(
+def moment_inertia(
 	faces: List[Part.Face],
 	):
 	'''

@@ -35,19 +35,19 @@ class Opening:
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "plane",
-                "openning",
+                "opening",
                 )
         # if not hasattr(obj, "solid"):
         #     obj.addProperty(
         #         "Part::PropertyPartShape",
         #         "solid",
-        #         "openning",
+        #         "opening",
         #         )
         # if not hasattr(obj, "foundation"):
         #     obj.addProperty(
         #         "Part::PropertyLink",
         #         "foundation",
-        #         "openning",
+        #         "opening",
         #         )
         if not hasattr(obj, "height"):
             obj.addProperty(
