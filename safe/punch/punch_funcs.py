@@ -600,79 +600,26 @@ def get_foundation_shape_from_base_foundations(
 	continuoues_dir : in Strip foundation, the strips with layer name equals to continuoues_dir get
 		continuoes and other side cut with this shapes
 	'''
-
-	def get_cut_faces(sh1, sh2):
-		cut = sh1.cut(sh2)
-		if len(cut.Faces) > 1:
-			faces = cut.Faces
-			areas = [f.Area for f in faces]
-			i = areas.index(max(areas))
-			faces.remove(faces[i])
-			return faces
-		else:
-			return None
-	foundation_height = height
 	points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
 	contiuoues_layer_shapes = []
 	cut_layer_shapes = []
-	for base_foundation in base_foundations:
-		print(base_foundation.Name)
-		shapes = []
-		cut_shape = []
-		first_point = tuple(base_foundation.main_wire_first_point)
-		last_point = tuple(base_foundation.main_wire_last_point)
-		comm = points_common_shape.get(first_point, None)
-		if comm is not None:
-			shapes.append(comm)
-			faces = get_cut_faces(base_foundation.Shape, comm)
-			if faces is not None:
-				cut_shape.extend(faces)
-			for e in comm.Edges:
-				intersection = DraftGeomUtils.findIntersection(
-					e,
-					base_foundation.extended_first_edge,
-					)
-				if intersection:
-					base_foundation.first_edge = \
-						Part.makeLine(
-							intersection[0], FreeCAD.Vector(*first_point))
-					break
-
-		comm = points_common_shape.get(last_point, None)
-		if comm is not None:
-			shapes.append(comm)
-			faces = get_cut_faces(base_foundation.Shape, comm)
-			if faces is not None:
-				cut_shape.extend(faces)
-			for e in comm.Edges:
-				intersection = DraftGeomUtils.findIntersection(
-					e,
-					base_foundation.extended_last_edge,
-					)
-				if intersection:
-					base_foundation.last_edge = \
-						Part.makeLine(
-							FreeCAD.Vector(*last_point), intersection[0]
-								)
-					break
-		shapes.append(base_foundation.Shape)
-		if foundation_height == 0:
-			height = base_foundation.height.Value
-		shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
-		if len(shapes) > 1:
-			shape = shapes[0].fuse(shapes[1:])
-			shape = shape.removeSplitter()
-		else:
-			shape = shapes[0]
-		if cut_shape:
-			cut_shape = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in cut_shape]
-			shape = shape.cut(cut_shape)
+	if height == 0:
+		heights = [base_foundation.height.Value for base_foundation in base_foundations]
+	else:
+		heights = [height] * len(base_foundations)
+	for base_foundation, height in zip(base_foundations, heights):
+		shape = get_continuous_base_foundation_shape(
+				base_foundation,
+				points_common_shape,
+				height,
+				)
 		if base_foundation.layer == continuous_layer:
 			contiuoues_layer_shapes.append(shape)
 		else:
 			cut_layer_shapes.append(shape)
 		base_foundation.ViewObject.Visibility = False
 	openings_shapes = [o.Shape for o in openings]
+	
 	if foundation_type == 'Strip':
 		contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
 		cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
@@ -682,6 +629,7 @@ def get_foundation_shape_from_base_foundations(
 
 		shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
 		shape = Part.makeCompound([shape] + [contiuoues_layer_shapes])
+	
 	elif foundation_type == 'Mat':
 		if len(contiuoues_layer_shapes) > 1:
 			shape = contiuoues_layer_shapes[0].fuse(contiuoues_layer_shapes[1:] + cut_layer_shapes)
@@ -717,6 +665,77 @@ def get_common_part_of_slabs(slabs):
 	for sh in shapes[1:]:
 		comm = comm.common(sh)
 	return comm
+
+def get_continuous_base_foundation_shape(
+		base_foundation,
+		points_common_shape,
+		height : float,
+		):
+	'''
+	This function gets the one base of foundation object, common shapes with
+	other of base foundations and return a solid shape
+	'''
+
+	def get_cut_faces(sh1, sh2):
+		cut = sh1.cut(sh2)
+		if len(cut.Faces) > 1:
+			faces = cut.Faces
+			areas = [f.Area for f in faces]
+			i = areas.index(max(areas))
+			faces.remove(faces[i])
+			return faces
+		else:
+			return None
+
+	shapes = []
+	cut_shape = []
+	
+	first_point = tuple(base_foundation.main_wire_first_point)
+	last_point = tuple(base_foundation.main_wire_last_point)
+	comm = points_common_shape.get(first_point, None)
+	if comm is not None:
+		shapes.append(comm)
+		faces = get_cut_faces(base_foundation.Shape, comm)
+		if faces is not None:
+			cut_shape.extend(faces)
+		for e in comm.Edges:
+			intersection = DraftGeomUtils.findIntersection(
+				e,
+				base_foundation.extended_first_edge,
+				)
+			if intersection:
+				base_foundation.first_edge = \
+					Part.makeLine(
+						intersection[0], FreeCAD.Vector(*first_point))
+				break
+	comm = points_common_shape.get(last_point, None)
+	if comm is not None:
+		shapes.append(comm)
+		faces = get_cut_faces(base_foundation.Shape, comm)
+		if faces is not None:
+			cut_shape.extend(faces)
+		for e in comm.Edges:
+			intersection = DraftGeomUtils.findIntersection(
+				e,
+				base_foundation.extended_last_edge,
+				)
+			if intersection:
+				base_foundation.last_edge = \
+					Part.makeLine(
+						FreeCAD.Vector(*last_point), intersection[0]
+							)
+				break
+	shapes.append(base_foundation.Shape)
+	shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
+	if len(shapes) > 1:
+		shape = shapes[0].fuse(shapes[1:])
+		shape = shape.removeSplitter()
+	else:
+		shape = shapes[0]
+	if cut_shape:
+		cut_shape = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in cut_shape]
+		shape = shape.cut(cut_shape)
+	return shape
 
 def get_common_part_of_strips(points, offset, width):
 	'''
