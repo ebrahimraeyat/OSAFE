@@ -671,10 +671,28 @@ def get_foundation_shape_from_base_foundations(
 		else:
 			cut_layer_shapes.append(shape)
 		base_foundation.ViewObject.Visibility = False
-	contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
-	cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
-	shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
-	shape = Part.makeCompound([shape] + [contiuoues_layer_shapes])
+	if foundation_type == 'Strip':
+		contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
+		cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
+		shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
+		shape = Part.makeCompound([shape] + [contiuoues_layer_shapes])
+	elif foundation_type == 'Mat':
+		if len(contiuoues_layer_shapes) > 1:
+			shape = contiuoues_layer_shapes[0].fuse(contiuoues_layer_shapes[1:] + cut_layer_shapes)
+		elif len(contiuoues_layer_shapes) == 1:
+			shape = contiuoues_layer_shapes[0].fuse(cut_layer_shapes)
+		elif len(cut_layer_shapes) > 1:
+			shape = cut_layer_shapes[0].fuse(cut_layer_shapes[1:])
+		elif len(cut_layer_shapes) == 1:
+			shape = cut_layer_shapes[0]
+		shape = shape.removeSplitter()
+		z_max = shape.BoundBox.ZMax
+		for f in shape.Faces:
+			if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == z_max:
+				plane = f
+				break
+		plane = Part.Face(plane.OuterWire)
+		shape = plane.extrude(FreeCAD.Vector(0, 0, -height))
 	return shape
 
 def get_common_part_of_slabs(slabs):
