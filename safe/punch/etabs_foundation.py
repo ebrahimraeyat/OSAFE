@@ -148,6 +148,7 @@ class Foundation:
 				height = obj.height.Value,
 				foundation_type = obj.foundation_type,
 				continuous_layer = obj.continuous_layer,
+				openings=obj.openings,
 				)
 		# obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
 		# obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))

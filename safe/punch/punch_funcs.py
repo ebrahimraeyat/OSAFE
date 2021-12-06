@@ -592,6 +592,7 @@ def get_foundation_shape_from_base_foundations(
 		height : float = 0,
 		foundation_type : str = 'Strip',
 		continuous_layer : str = 'A',
+		openings : list = [],
 		):
 	'''
 	Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
@@ -671,9 +672,14 @@ def get_foundation_shape_from_base_foundations(
 		else:
 			cut_layer_shapes.append(shape)
 		base_foundation.ViewObject.Visibility = False
+	openings_shapes = [o.Shape for o in openings]
 	if foundation_type == 'Strip':
 		contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
 		cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
+		if openings:
+			contiuoues_layer_shapes = contiuoues_layer_shapes.cut(openings_shapes)
+			cut_layer_shapes = cut_layer_shapes.cut(openings_shapes)
+
 		shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
 		shape = Part.makeCompound([shape] + [contiuoues_layer_shapes])
 	elif foundation_type == 'Mat':
@@ -693,6 +699,8 @@ def get_foundation_shape_from_base_foundations(
 				break
 		plane = Part.Face(plane.OuterWire)
 		shape = plane.extrude(FreeCAD.Vector(0, 0, -height))
+		if openings:
+			shape = shape.cut(openings_shapes)
 	return shape
 
 def get_common_part_of_slabs(slabs):
