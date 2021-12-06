@@ -601,44 +601,49 @@ def get_foundation_shape_from_base_foundations(
 		continuoes and other side cut with this shapes
 	'''
 	points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
-	contiuoues_layer_shapes = []
-	cut_layer_shapes = []
+	shapes = []
 	if height == 0:
 		heights = [base_foundation.height.Value for base_foundation in base_foundations]
 	else:
 		heights = [height] * len(base_foundations)
+	openings_shapes = [o.Shape for o in openings]
+	used_commons_center_point = []
 	for base_foundation, height in zip(base_foundations, heights):
 		shape = get_continuous_base_foundation_shape(
 				base_foundation,
 				points_common_shape,
 				height,
 				)
-		if base_foundation.layer == continuous_layer:
-			contiuoues_layer_shapes.append(shape)
+		if foundation_type == 'Strip':
+			if base_foundation.layer == continuous_layer:
+				if openings:
+					shape = shape.cut(openings_shapes)
+				shapes.append(shape)
+			else:
+				commons = base_name_common_shape.get(base_foundation.Name, None)
+				unused_common = []
+				if commons:
+					for comm in commons:
+						for p in used_commons_center_point:
+							if comm.BoundBox.Center.isEqual(p, 1):
+								break
+						else:
+							used_commons_center_point.append(comm.BoundBox.Center)
+							unused_common.append(comm)
+					commons = [comm.extrude(FreeCAD.Vector(0, 0, -height)) for comm in unused_common]
+					if openings:
+						shape = shape.cut(commons + openings_shapes)
+					else:
+						shape = shape.cut(commons)
+					shapes.append(shape)
 		else:
-			cut_layer_shapes.append(shape)
-		base_foundation.ViewObject.Visibility = False
-	openings_shapes = [o.Shape for o in openings]
+			shapes.append(shape)
 	
 	if foundation_type == 'Strip':
-		contiuoues_layer_shapes = Part.makeCompound(contiuoues_layer_shapes)
-		cut_layer_shapes = Part.makeCompound(cut_layer_shapes)
-		if openings:
-			contiuoues_layer_shapes = contiuoues_layer_shapes.cut(openings_shapes)
-			cut_layer_shapes = cut_layer_shapes.cut(openings_shapes)
-
-		shape = cut_layer_shapes.cut(contiuoues_layer_shapes)
-		shape = Part.makeCompound([shape] + [contiuoues_layer_shapes])
-	
+		shape = Part.makeCompound(shapes)
 	elif foundation_type == 'Mat':
-		if len(contiuoues_layer_shapes) > 1:
-			shape = contiuoues_layer_shapes[0].fuse(contiuoues_layer_shapes[1:] + cut_layer_shapes)
-		elif len(contiuoues_layer_shapes) == 1:
-			shape = contiuoues_layer_shapes[0].fuse(cut_layer_shapes)
-		elif len(cut_layer_shapes) > 1:
-			shape = cut_layer_shapes[0].fuse(cut_layer_shapes[1:])
-		elif len(cut_layer_shapes) == 1:
-			shape = cut_layer_shapes[0]
+		if len(shapes) > 1:
+			shape = shapes[0].fuse(shapes[1:])
 		shape = shape.removeSplitter()
 		z_max = shape.BoundBox.ZMax
 		for f in shape.Faces:

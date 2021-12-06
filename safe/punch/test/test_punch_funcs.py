@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-from safe import punch
 FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 
@@ -278,16 +277,16 @@ def test_get_common_part_of_base_foundation():
     assert len(points_common_shape) == 20
     assert len(base_name_common_shape) == len(bfs)
 
-def test_refine_end_shape_and_beams_of_base_foundation():
+def test_get_foundation_shape_from_base_foundations():
     bfs = []
     for o in document_base_foundation.Objects:
         if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
             bfs.append(o)
-    edges = punch_funcs.refine_end_shape_and_beams_of_base_foundation(bfs)
+    shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, continuous_layer='B')
     # assert len(edges) == 20
 
 
 
 
 if __name__ == '__main__':
-    test_get_xy_strips()
+    test_get_foundation_shape_from_base_foundations()
