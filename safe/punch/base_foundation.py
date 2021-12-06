@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Union
 from PySide2 import QtCore
-import Part
 import FreeCAD
 from safe.punch import punch_funcs
 
@@ -43,7 +42,6 @@ class BaseFoundation:
         obj.Proxy = self
         self.Type = "BaseFoundation"
         self.set_properties(obj)
-        self.obj_name = obj.Name
 
     def set_properties(self, obj):
         if not hasattr(obj, "points"):
@@ -70,12 +68,6 @@ class BaseFoundation:
                 "design_type",
                 "strip",
                 ).design_type = ['column']
-        if not hasattr(obj, "redraw"):
-            obj.addProperty(
-                "App::PropertyBool",
-                "redraw",
-                "base_foundation",
-                ).redraw = False
         if not hasattr(obj, "left_width"):
             obj.addProperty(
                 "App::PropertyLength",
