@@ -43,33 +43,18 @@ class Opening(ArchComponent.Component):
         obj.Proxy = self
 
     def set_properties(self, obj):
-        # if not hasattr(obj, "points"):
-        #     obj.addProperty(
-        #     "App::PropertyVectorList",
-        #     "points",
-        #     "Geometry",
-        #     )
         if not hasattr(obj, "plane"):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "plane",
                 "opening",
                 )
-<<<<<<< HEAD
-=======
         # if not hasattr(obj, "solid"):
         #     obj.addProperty(
         #         "Part::PropertyPartShape",
         #         "solid",
         #         "opening",
         #         )
-        # if not hasattr(obj, "foundation"):
-        #     obj.addProperty(
-        #         "Part::PropertyLink",
-        #         "foundation",
-        #         "opening",
-        #         )
->>>>>>> 20063b9 (Fix various source typos)
         if not hasattr(obj, "height"):
             obj.addProperty(
             "App::PropertyLength",
