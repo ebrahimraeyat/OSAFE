@@ -7,106 +7,106 @@ import Part
 
 
 class Foundation:
-	def __init__(self, obj):
-		obj.Proxy = self
-		self.Type = "Foundation"
-		self.set_properties(obj)
+    def __init__(self, obj):
+        obj.Proxy = self
+        self.Type = "Foundation"
+        self.set_properties(obj)
 
-	def set_properties(self, obj):
+    def set_properties(self, obj):
 
-		if not hasattr(obj, "fc"):
-			obj.addProperty(
-				"App::PropertyPressure",
-				"fc",
-				"Concrete",
-				)
+        if not hasattr(obj, "fc"):
+            obj.addProperty(
+                "App::PropertyPressure",
+                "fc",
+                "Concrete",
+                )
 
-		if not hasattr(obj, "height"):
-			obj.addProperty(
-				"App::PropertyLength",
-				"height",
-				"Foundation",
-				)
+        if not hasattr(obj, "height"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "height",
+                "Foundation",
+                )
 
-		if not hasattr(obj, "cover"):
-			obj.addProperty(
-				"App::PropertyLength",
-				"cover",
-				"Foundation",
-				)
+        if not hasattr(obj, "cover"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "cover",
+                "Foundation",
+                )
 
-		if not hasattr(obj, "d"):
-			obj.addProperty(
-				"App::PropertyLength",
-				"d",
-				"Foundation",
-				)
+        if not hasattr(obj, "d"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "d",
+                "Foundation",
+                )
 
-		if not hasattr(obj, "plane"):
-			obj.addProperty(
-				"Part::PropertyPartShape",
-				"plane",
-				"Foundation",
-				)
+        if not hasattr(obj, "plane"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "plane",
+                "Foundation",
+                )
 
-		obj.setEditorMode("d", 2)
+        obj.setEditorMode("d", 2)
 
-	def onDocumentRestored(self, obj):
-		obj.Proxy = self
-		self.set_properties(obj)
+    def onDocumentRestored(self, obj):
+        obj.Proxy = self
+        self.set_properties(obj)
 
-	def execute(self, obj):
-		obj.d = obj.height - obj.cover
-		sh = obj.plane.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
-		obj.Shape = sh
+    def execute(self, obj):
+        obj.d = obj.height - obj.cover
+        sh = obj.plane.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
+        obj.Shape = sh
 
 
 class ViewProviderFoundation:
 
-	def __init__(self, vobj):
+    def __init__(self, vobj):
 
-		vobj.Proxy = self
-		vobj.Transparency = 40
-		vobj.DisplayMode = "Shaded"
+        vobj.Proxy = self
+        vobj.Transparency = 40
+        vobj.DisplayMode = "Shaded"
 
 
-	def attach(self, vobj):
-		self.ViewObject = vobj
-		self.Object = vobj.Object
+    def attach(self, vobj):
+        self.ViewObject = vobj
+        self.Object = vobj.Object
 
-	def getIcon(self):
-		return join(dirname(abspath(__file__)), "Resources", "icons","foundation.png")
+    def getIcon(self):
+        return join(dirname(abspath(__file__)), "Resources", "icons","foundation.png")
 
-	def __getstate__(self):
-		return None
+    def __getstate__(self):
+        return None
 
-	def __setstate__(self, state):
-		return None
+    def __setstate__(self, state):
+        return None
 
 
 
 def make_foundation(
-	base: Part.Shape = None,
-	height: Union[float, str] = 1000,
-	cover: Union[float, str] = 75,
-	fc: Union[float, str] = 25
-	):
-	if not base:
-		base = FreeCADGui.Selection.getSelection()[0].Shape
+    base: Part.Shape = None,
+    height: Union[float, str] = 1000,
+    cover: Union[float, str] = 75,
+    fc: Union[float, str] = 25
+    ):
+    if not base:
+        base = FreeCADGui.Selection.getSelection()[0].Shape
 
-	obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
-	Foundation(obj)
-	ViewProviderFoundation(obj.ViewObject)
-	obj.plane = base
-	obj.height = height
-	obj.cover = cover
-	obj.fc = f"{fc} MPa"
+    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
+    Foundation(obj)
+    ViewProviderFoundation(obj.ViewObject)
+    obj.plane = base
+    obj.height = height
+    obj.cover = cover
+    obj.fc = f"{fc} MPa"
 
-	FreeCAD.ActiveDocument.recompute()
+    FreeCAD.ActiveDocument.recompute()
 
-	return obj
-
-
+    return obj
 
 
-		
+
+
+        
