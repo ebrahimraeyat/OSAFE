@@ -600,46 +600,38 @@ def get_foundation_shape_from_base_foundations(
     continuoues_dir : in Strip foundation, the strips with layer name equals to continuoues_dir get
         continuoes and other side cut with this shapes
     '''
-    points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
-    shapes = []
     if height == 0:
         heights = [base_foundation.height.Value for base_foundation in base_foundations]
     else:
         heights = [height] * len(base_foundations)
     openings_shapes = [o.Shape for o in openings]
+    points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
     used_commons_center_point = []
+    shapes = []
     for base_foundation, height in zip(base_foundations, heights):
         shape = get_continuous_base_foundation_shape(
                 base_foundation,
                 points_common_shape,
                 height,
                 )
-        if foundation_type == 'Strip' and continuous_layer != 'AB':
-            if base_foundation.layer == continuous_layer:
-                if openings:
-                    shape = shape.cut(openings_shapes)
-                shapes.append(shape)
-            else:
-                commons = base_name_common_shape.get(base_foundation.Name, None)
-                unused_common = []
-                if commons:
-                    for comm in commons:
-                        for p in used_commons_center_point:
-                            if comm.BoundBox.Center.isEqual(p, 1):
-                                break
-                        else:
-                            used_commons_center_point.append(comm.BoundBox.Center)
-                            unused_common.append(comm)
-                    commons = [comm.extrude(FreeCAD.Vector(0, 0, -height)) for comm in unused_common]
-                    if openings:
-                        shape = shape.cut(commons + openings_shapes)
+        if foundation_type == 'Strip' and \
+            continuous_layer != 'AB' and \
+            base_foundation.layer != continuous_layer:
+            commons = base_name_common_shape.get(base_foundation.Name, None)
+            unused_common = []
+            if commons:
+                for comm in commons:
+                    for p in used_commons_center_point:
+                        if comm.BoundBox.Center.isEqual(p, 1):
+                            break
                     else:
-                        shape = shape.cut(commons)
-                    shapes.append(shape)
-        else:
-            if openings:
-                shape = shape.cut(openings_shapes)
-            shapes.append(shape)
+                        used_commons_center_point.append(comm.BoundBox.Center)
+                        unused_common.append(comm)
+                commons = [comm.extrude(FreeCAD.Vector(0, 0, -height)) for comm in unused_common]
+                shape = shape.cut(commons)
+        if foundation_type == 'Strip' and openings:
+            shape = shape.cut(openings_shapes)
+        shapes.append(shape)
     
     if foundation_type == 'Strip':
         shape = Part.makeCompound(shapes)
