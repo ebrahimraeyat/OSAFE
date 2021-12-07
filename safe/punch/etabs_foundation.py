@@ -91,7 +91,7 @@ class Foundation:
 				"App::PropertyEnumeration",
 				"continuous_layer",
 				"Foundation",
-				).continuous_layer = ['A', 'B']
+				).continuous_layer = ['A', 'B', 'AB']
 		# if not hasattr(obj, "top_face"):
 		# 	obj.addProperty(
 		# 		"App::PropertyString",

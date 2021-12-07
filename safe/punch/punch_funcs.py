@@ -614,7 +614,7 @@ def get_foundation_shape_from_base_foundations(
 				points_common_shape,
 				height,
 				)
-		if foundation_type == 'Strip':
+		if foundation_type == 'Strip' and continuous_layer != 'AB':
 			if base_foundation.layer == continuous_layer:
 				if openings:
 					shape = shape.cut(openings_shapes)
@@ -637,6 +637,8 @@ def get_foundation_shape_from_base_foundations(
 						shape = shape.cut(commons)
 					shapes.append(shape)
 		else:
+			if openings:
+				shape = shape.cut(openings_shapes)
 			shapes.append(shape)
 	
 	if foundation_type == 'Strip':
