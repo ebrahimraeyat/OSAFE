@@ -44,19 +44,19 @@ class Slab(ArchComponent.Component):
             obj.addProperty(
             "App::PropertyLength",
             "height",
-            "Slab",
+            "Base",
             )
         if not hasattr(obj, "soil"):
             obj.addProperty(
             "App::PropertyMaterial",
             "soil",
-            "Slab",
+            "Base",
             )
         if not hasattr(obj, "Concrete"):
             obj.addProperty(
             "App::PropertyMaterial",
             "Concrete",
-            "Slab",
+            "Base",
             )
         
 
