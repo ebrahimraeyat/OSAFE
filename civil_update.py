@@ -7,7 +7,10 @@ from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
 
-def update():
+def update(
+    branch='master',
+    git_url="https://github.com/ebrahimraeyat/Civil.git",
+    ):
     if (QMessageBox.question(None, "update", "update to latest version?!",
                              QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.No):
         return
@@ -27,8 +30,7 @@ def update():
     g = git.cmd.Git(civil_path)
     msg = ''
     try:
-        g.execute('git submodule update --init --recursive')
-        msg = g.execute('git pull --recurse-submodules origin master')
+        msg = g.execute(f'git pull  origin {branch}')
         if not 'already' in msg.lower():
             msg = 'update done successfully.'
     except:
@@ -40,7 +42,7 @@ def update():
         punch_temp_dir = Path.joinpath(Path(default_tmp_dir), 'Civil' + name)
         os.mkdir(punch_temp_dir)
         os.chdir(punch_temp_dir)
-        g.execute('git clone --depth 1 --recurse-submodules https://github.com/ebrahimraeyat/Civil.git')
+        g.execute(f'git clone --branch {branch} --depth 1  {git_url}')
         src_folder = Path.joinpath(punch_temp_dir, 'Civil')
         if Path.exists(civil_path):
             shutil.rmtree(civil_path)
@@ -50,7 +52,6 @@ def update():
     else:
         if not msg:
             msg = 'error occurred during update\nplease contact with @roknabadi'
-    # msg += '\n please restart the program.'
     QMessageBox.information(None, 'update', msg)
 
 def internet(host="8.8.8.8", port=53, timeout=3):
