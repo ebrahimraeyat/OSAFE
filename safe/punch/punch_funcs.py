@@ -587,6 +587,14 @@ def get_common_part_of_base_foundation(base_foundations):
                     base_name_common_shape[name].append(comm)
     return points_common_shape, base_name_common_shape
 
+def get_top_faces(shape):
+    z_max = shape.BoundBox.ZMax
+    faces = []
+    for f in shape.Faces:
+        if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == z_max:
+            faces.append(f)
+    return faces
+
 def get_foundation_shape_from_base_foundations(
         base_foundations,
         height : float = 0,
@@ -632,18 +640,18 @@ def get_foundation_shape_from_base_foundations(
         if foundation_type == 'Strip' and openings:
             shape = shape.cut(openings_shapes)
         shapes.append(shape)
-    
+        if foundation_type == 'Strip':
+            base_foundation.plan = Part.makeCompound(get_top_faces(shape))
+            if FreeCAD.GuiUp:
+                base_foundation.ViewObject.Visibility = False
+        
     if foundation_type == 'Strip':
         shape = Part.makeCompound(shapes)
     elif foundation_type == 'Mat':
         if len(shapes) > 1:
             shape = shapes[0].fuse(shapes[1:])
         shape = shape.removeSplitter()
-        z_max = shape.BoundBox.ZMax
-        for f in shape.Faces:
-            if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == z_max:
-                plane = f
-                break
+        plane = get_top_face(shape)
         plane = Part.Face(plane.OuterWire)
         shape = plane.extrude(FreeCAD.Vector(0, 0, -height))
         if openings:

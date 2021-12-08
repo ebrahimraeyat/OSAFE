@@ -44,19 +44,19 @@ class Slab(ArchComponent.Component):
             obj.addProperty(
             "App::PropertyLength",
             "height",
-            "Base",
+            "Slab",
             )
         if not hasattr(obj, "soil"):
             obj.addProperty(
             "App::PropertyMaterial",
             "soil",
-            "Base",
+            "Slab",
             )
         if not hasattr(obj, "Concrete"):
             obj.addProperty(
             "App::PropertyMaterial",
             "Concrete",
-            "Base",
+            "Slab",
             )
         
 
@@ -99,16 +99,21 @@ class ViewProviderSlab:
 
 
 if __name__ == "__main__":
-    x1 = 10
-    x2 = 2500
-    y1 = 7
-    y2 = 1700
-    p1=FreeCAD.Vector(x1, y1, 0)
-    p2=FreeCAD.Vector(x2, y1, 0)
-    p3=FreeCAD.Vector(x2, y2, 0)
-    p4=FreeCAD.Vector(x1, y2, 0)
-    points = [p1, p2, p3, p4]
-    make_opening(
-            points=points,
-            # height = 3,
+    import FreeCADGui as Gui
+    sel = Gui.Selection.getSelection()
+    if sel:
+        wire = sel[0]
+    else:
+        x1 = 0
+        x2 = 2500
+        y1 = 0
+        y2 = 1700
+        p1=FreeCAD.Vector(x1, y1, 0)
+        p2=FreeCAD.Vector(x2, y1, 0)
+        p3=FreeCAD.Vector(x2, y2, 0)
+        p4=FreeCAD.Vector(x1, y2, 0)
+        points = [p1, p2, p3, p4, p1]
+        import Draft
+        wire = Draft.make_wire(points)
+    make_slab(base=wire,
                )

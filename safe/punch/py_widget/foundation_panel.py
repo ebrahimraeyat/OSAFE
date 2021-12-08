@@ -1,8 +1,11 @@
 from pathlib import Path
 
+import FreeCAD
 import FreeCADGui as Gui
+from safe.punch import punch_funcs
 
 punch_path = Path(__file__).parent.parent
+
 
 
 class Form:
@@ -30,6 +33,17 @@ class Form:
             foundation_type = 'Mat'
         elif self.form.strip.isChecked():
             foundation_type = 'Strip'
+        base_foundations = []
+        if self.form.selection_only.isChecked():
+            sel = Gui.Selection.getSelection()
+            if sel:
+                for o in sel:
+                    if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+                        base_foundations.append(o)
+        if not base_foundations:
+            for o in FreeCAD.ActiveDocument.Objects:
+                if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+                    base_foundations.append(o)
         from safe.punch.etabs_foundation import make_foundation
         make_foundation(
             cover=cover,
@@ -37,6 +51,7 @@ class Form:
             height= height,
             foundation_type=foundation_type,
             continuous_layer=continuous_layer,
+            base_foundations=base_foundations,
             )
-        Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
+        # Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
         Gui.Control.closeDialog()

@@ -134,6 +134,12 @@ class BaseFoundation:
                 "last_edge",
                 "Geometry",
                 )
+        if not hasattr(obj, "plan"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "plan",
+                "Geometry",
+                )
         if not hasattr(obj, "main_wire_first_point"):
             obj.addProperty(
                 "App::PropertyVector",

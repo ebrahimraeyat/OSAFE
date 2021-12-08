@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>361</width>
+    <width>302</width>
     <height>227</height>
    </rect>
   </property>
@@ -134,11 +134,6 @@
       <widget class="QComboBox" name="continuous_layer">
        <item>
         <property name="text">
-         <string>AB</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
          <string>A</string>
         </property>
        </item>
@@ -147,9 +142,21 @@
          <string>B</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>AB</string>
+        </property>
+       </item>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="selection_only">
+     <property name="text">
+      <string>Selections Only</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
