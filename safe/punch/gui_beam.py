@@ -51,6 +51,8 @@ class Beam(Line):
 
         if len(self.node) > 1:
             points_string = [DraftVecUtils.toString(p) for p in self.node]
+            if closed == True:
+                points_string.append(DraftVecUtils.toString(self.node[0]))
             cmd_list = ['from safe.punch.rectangle_slab import make_beam']
             for p1, p2 in zip(points_string[:-1], points_string[1:]):
                 cmd_list.append(f'make_beam({p1}, {p2})')
