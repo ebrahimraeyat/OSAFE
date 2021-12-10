@@ -1,7 +1,7 @@
 try:
     # from safe.punch.axis import create_grids
     # from safe.punch.punch_funcs import remove_obj
-    from safe.punch import rectangle_slab
+    from safe.punch import beam
     from safe.punch import etabs_foundation
     # from safe.punch import strip
     # from safe.punch.punch import make_punch
@@ -9,7 +9,7 @@ except:
     # from axis import create_grids
     # from punch_funcs import remove_obj
     import etabs_foundation
-    import rectangle_slab
+    import beam
     # from punch import make_punch
 import Draft
 import FreeCAD
@@ -42,7 +42,7 @@ class EtabsPunch(object):
             xj, yj = row['xj'], row['yj']
             v1 = FreeCAD.Vector(xi, yi, self.top_of_foundation)
             v2 = FreeCAD.Vector(xj, yj, self.top_of_foundation)
-            slabs[slab_name] = rectangle_slab.make_beam(v1, v2)
+            slabs[slab_name] = beam.make_beam(v1, v2)
         return slabs
     
     

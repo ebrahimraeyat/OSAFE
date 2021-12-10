@@ -7,8 +7,8 @@ from safe.punch import punch_funcs
 
 def make_base_foundation(
         beams : list,
-        layer : str,
-        design_type : str,
+        layer : str = 'A',
+        design_type : str = 'column',
         width : float = 1000,
         height : float = 1000,
         # soil_modulus : float =2,

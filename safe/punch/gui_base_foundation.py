@@ -12,7 +12,7 @@ from draftutils.translate import translate
 from draftguitools.gui_lines import Line
 
 
-class Beam(Line):
+class BaseFoundation(Line):
     """Gui command for the Beam tool."""
 
     def __init__(self, wiremode=True):
@@ -21,13 +21,13 @@ class Beam(Line):
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
-            "civil_beam",
-            "Create beam")
+            "civil_base_foundation",
+            "Create base_foundation")
         tool_tip = QtCore.QT_TRANSLATE_NOOP(
-            "civil_beam",
-            "Create beam")
+            "civil_base_foundation",
+            "Create base_foundation")
         path = str(
-                   Path(__file__).parent.absolute() / "Resources" / "icons" / "beam.svg"
+                   Path(__file__).parent.absolute() / "Resources" / "icons" / "base_foundation.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': menu_text,
@@ -53,10 +53,16 @@ class Beam(Line):
             points_string = [DraftVecUtils.toString(p) for p in self.node]
             if closed == True:
                 points_string.append(DraftVecUtils.toString(self.node[0]))
-            cmd_list = ['from safe.punch.beam import make_beam']
+            cmd_list = [
+                    'from safe.punch.beam import make_beam',
+                    'from safe.punch.base_foundation import make_base_foundation',
+                    'beams = []',
+                    ]
             for p1, p2 in zip(points_string[:-1], points_string[1:]):
-                cmd_list.append(f'make_beam({p1}, {p2})')
-            self.commit(translate("civil", "Create beam"),
+                cmd_list.append(f'beam = make_beam({p1}, {p2})')
+                cmd_list.append(f'beams.append(beam)')
+            cmd_list.append(f'make_base_foundation(beams)')
+            self.commit(translate("civil", "Create Base Foundation"),
                         cmd_list)
         super(Line, self).finish()
         
