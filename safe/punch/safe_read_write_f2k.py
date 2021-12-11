@@ -264,20 +264,26 @@ class FreecadReadwriteModel():
 
     def __init__(
                 self,
-                input_f2k_path : Path,
+                input_f2k_path : Path = None,
                 output_f2k_path : Path = None,
                 doc: 'App.Document' = None,
                 ):
-        if output_f2k_path is None:
-            output_f2k_path = input_f2k_path
+        if doc is None:
+            doc = FreeCAD.ActiveDocument
+        self.doc = doc
+        if not input_f2k_path:
+            if hasattr(doc, 'Safe') and hasattr(doc.Safe, 'input'):
+                input_f2k_path = Path(doc.Safe.input)
+        if not output_f2k_path:
+            if hasattr(doc, 'Safe') and hasattr(doc.Safe, 'output'):
+                output_f2k_path = Path(doc.Safe.output)
+            else:
+                output_f2k_path = input_f2k_path
         self.safe = Safe(input_f2k_path, output_f2k_path)
         self.safe.get_tables_contents()
         self.safe.force_length_unit()
         self.force_unit = self.safe.force_unit
         self.length_unit = self.safe.length_unit
-        if doc is None:
-            doc = FreeCAD.ActiveDocument
-        self.doc = doc
         self.last_point_number = 1000
         self.last_area_number = 1000
         self.last_line_number = 1000
@@ -290,28 +296,32 @@ class FreecadReadwriteModel():
             ):
         
         foun = self.doc.Foundation
-        if slab_sec_name is None:
-            foun_height = foun.height.getValueAs(f'{self.length_unit}')
-            slab_sec_name = f'SLAB{foun_height}'
         # creating concrete material
         mat_name = self.create_concrete_material(foun=foun)
-        # define slab
-        self.create_solid_slab(slab_sec_name, 'Mat', mat_name, foun_height)
+        
         slab_names = []
         if foun.foundation_type == 'Strip':
             # soil content
             names_props = [(soil_name, soil_modulus)]
             soil_content = self.create_soil_table(names_props)
-            points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
-            name = self.create_area_by_coord(points[0], slab_sec_name)
-            slab_names.append(name)
+            slab_sec_names = []
+            for base_foundation in foun.base_foundations:
+                height = int(base_foundation.height.getValueAs('cm'))
+                slab_sec_name = f'SLAB{height}'
+                if slab_sec_name not in slab_sec_names:
+                    # define slab
+                    self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
+                    slab_sec_names.append(slab_sec_name)
+                faces = base_foundation.plan.Faces
+                for face in faces:
+                    points = self.get_sort_points(face.Edges)
+                    name = self.create_area_by_coord(points, slab_sec_name)
+                    slab_names.append(name)
             soil_assignment_content =  self.export_freecad_soil_support(
                 slab_names=slab_names,
                 soil_name=soil_name,
                 soil_modulus=None,
             )
-            for pts in points[1:]:
-                self.create_area_by_coord(pts, is_opening=True)
         
         elif foun.foundation_type == 'Mat':
             if split_mat:

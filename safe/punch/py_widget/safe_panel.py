@@ -21,13 +21,11 @@ class Safe12TaskPanel:
 
     def fill_f2k_filename(self):
         if FreeCAD.ActiveDocument:
-            foun = FreeCAD.ActiveDocument.Foundation
-            if foun and hasattr(foun, 'F2K'):
-                self.form.input_f2k.setText(foun.F2K)
-                filename = Path(foun.F2K)
-                name = f"{filename.name.rstrip(filename.suffix)}_export{filename.suffix}"
-                filename = filename.with_name(name)
-                self.form.output_f2k.setText(str(filename))
+            safe = FreeCAD.ActiveDocument.Safe
+            if safe and hasattr(safe, 'input'):
+                self.form.input_f2k.setText(safe.input)
+            if safe and hasattr(safe, 'output'):
+                self.form.output_f2k.setText(safe.output)
 
     def openf2k(self):
         ext = '.f2k'
@@ -119,28 +117,28 @@ class Safe12TaskPanel:
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
-                if is_area_loads:
-                    try:
-                        loads = doc.findObjects(Type='Fem::ConstraintForce')
-                        for load in loads:
-                            rw.add_uniform_gravity_load(
-                                slab_names,
-                                load.loadcase,
-                                load.Force,
-                                )
-                    except TypeError:
-                        print('Can not find any loads in model')
-            if self.form.wall_loads.isChecked():
-                rw.export_freecad_wall_loads()
-            if is_openings:
-                rw.export_freecad_openings(doc)
-            if is_strips:
-                if doc.Foundation.foundation_type == 'Strip':
-                    rw.export_freecad_strips()
-            if is_stiffs:
-                rw.export_freecad_stiff_elements()
-            if is_punches:
-                rw.export_punch_props()
+            #     if is_area_loads:
+            #         try:
+            #             loads = doc.findObjects(Type='Fem::ConstraintForce')
+            #             for load in loads:
+            #                 rw.add_uniform_gravity_load(
+            #                     slab_names,
+            #                     load.loadcase,
+            #                     load.Force,
+            #                     )
+            #         except TypeError:
+            #             print('Can not find any loads in model')
+            # if self.form.wall_loads.isChecked():
+            #     rw.export_freecad_wall_loads()
+            # if is_openings:
+            #     rw.export_freecad_openings(doc)
+            # if is_strips:
+            #     if doc.Foundation.foundation_type == 'Strip':
+            #         rw.export_freecad_strips()
+            # if is_stiffs:
+            #     rw.export_freecad_stiff_elements()
+            # if is_punches:
+            #     rw.export_punch_props()
             rw.safe.write()
         Gui.Control.closeDialog()
 
