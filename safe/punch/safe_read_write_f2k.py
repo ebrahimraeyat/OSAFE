@@ -298,30 +298,39 @@ class FreecadReadwriteModel():
         foun = self.doc.Foundation
         # creating concrete material
         mat_name = self.create_concrete_material(foun=foun)
-        
-        slab_names = []
+        soil_assignment_content = ''
+        all_slab_names = []
+        soil_names = []
+        names_props = []
+        slab_sec_names = []
         if foun.foundation_type == 'Strip':
-            # soil content
-            names_props = [(soil_name, soil_modulus)]
-            soil_content = self.create_soil_table(names_props)
-            slab_sec_names = []
             for base_foundation in foun.base_foundations:
+                # create slab section
                 height = int(base_foundation.height.getValueAs('cm'))
                 slab_sec_name = f'SLAB{height}'
                 if slab_sec_name not in slab_sec_names:
                     # define slab
                     self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
                     slab_sec_names.append(slab_sec_name)
+                # create soil
+                ks = base_foundation.Ks
+                soil_name = f'Soil_{ks}'
+                if soil_name not in soil_names:
+                    # soil content
+                    names_props.append((soil_name, ks))
+                    soil_names.append(soil_name)
                 faces = base_foundation.plan.Faces
+                slab_names = []
                 for face in faces:
                     points = self.get_sort_points(face.Edges)
                     name = self.create_area_by_coord(points, slab_sec_name)
                     slab_names.append(name)
-            soil_assignment_content =  self.export_freecad_soil_support(
-                slab_names=slab_names,
-                soil_name=soil_name,
-                soil_modulus=None,
-            )
+                all_slab_names.extend(slab_names)
+                soil_assignment_content +=  self.export_freecad_soil_support(
+                    slab_names=slab_names,
+                    soil_name=soil_name,
+                    soil_modulus=None,
+                )
         
         elif foun.foundation_type == 'Mat':
             if split_mat:
@@ -365,11 +374,12 @@ class FreecadReadwriteModel():
                     soil_name=soil_name,
                     soil_modulus=None,
                 )
+        soil_content = self.create_soil_table(names_props)
         table_key = "SOIL PROPERTIES"
         self.safe.add_content_to_table(table_key, soil_content)
         table_key = "SOIL PROPERTY ASSIGNMENTS"
         self.safe.add_content_to_table(table_key, soil_assignment_content)
-        return slab_names
+        return all_slab_names
 
     def get_sort_points(self, edges, vector=True):
         points = []

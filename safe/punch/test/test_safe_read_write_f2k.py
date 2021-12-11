@@ -24,7 +24,7 @@ def test_export_freecad_slabs():
     rw = FRW(doc=document_kazemi)
     slabs = rw.export_freecad_slabs()
     rw.safe.write()
-    assert len(slabs) == 31
+    assert len(slabs) == 33
 
 def test_export_freecad_wall_loads():
     input_f2k_path = Path('~\input.f2k').expanduser()
