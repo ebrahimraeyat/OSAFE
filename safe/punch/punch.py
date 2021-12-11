@@ -195,7 +195,6 @@ class Punch:
                 obj.angle.Value,
             )
         obj.rect = rect
-        col = obj.rect.extrude(FreeCAD.Vector(0, 0, 4000))
         obj.faces = Part.makeCompound(faces)
         if obj.angle.Value != 0:
             faces = [f.rotate(
@@ -203,10 +202,9 @@ class Punch:
                     FreeCAD.Vector(0, 0, 1),
                     obj.angle.Value,
                 ) for f in faces]
-        comp = Part.makeCompound(faces + [col])
+        comp = Part.makeCompound(faces)
         obj.Shape = comp
         self.punch_ratios(obj)
-        return
 
     def alphas(self, location):
         if 'Interior' in location:

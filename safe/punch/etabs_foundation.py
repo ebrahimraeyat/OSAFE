@@ -3,9 +3,6 @@ from typing import Union
 
 from PySide2 import QtCore
 import FreeCAD
-import FreeCADGui
-import Part
-from safe.punch.base_foundation import BaseFoundation
 
 try:
     from safe.punch import punch_funcs
@@ -139,6 +136,7 @@ class Foundation:
 
     def _execute(self):
         obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
+        obj.d = obj.height - obj.cover
         if not obj:
             FreeCAD.ActiveDocument.recompute()
             return
@@ -150,6 +148,15 @@ class Foundation:
                 continuous_layer = obj.continuous_layer,
                 openings=obj.openings,
                 )
+        all_faces = obj.Shape.Faces
+        top_faces = []
+        for f in all_faces:
+            if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == obj.level.Value:
+                top_faces.append(f)
+        plan = top_faces[0].fuse(top_faces[1:])
+        plan = plan.removeSplitter()
+        obj.plane = plan
+        
         # obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
         # obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
         # for i, face in enumerate(obj.Shape.Faces, start=1):
@@ -174,7 +181,7 @@ class ViewProviderFoundation:
     def __init__(self, vobj):
 
         vobj.Proxy = self
-        # vobj.Transparency = 40
+        vobj.Transparency = 30
         vobj.ShapeColor = (0.45, 0.45, 0.45)
         vobj.DisplayMode = "Shaded"
 
