@@ -71,10 +71,7 @@ def test_export_freecad_openings():
     assert len(slabs) == 1
 
 def test_export_freecad_strips():
-    input_f2k_path = Path('~\input.f2k').expanduser()
-    input_f2k_path.touch()
-    output_f2k_path = Path('~\strip.f2k').expanduser()
-    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw = FRW(doc=document_kazemi)
     rw.export_freecad_strips()
     rw.safe.write()
 
