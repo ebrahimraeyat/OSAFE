@@ -515,12 +515,13 @@ class FreecadReadwriteModel():
         thickness = 1500 * self.safe.length_units['mm']
         self.create_solid_slab('COL_STIFF', 'Stiff', 'CONCRETE_ZERO', thickness)
         for o in self.doc.Objects:
-            if (hasattr(o, "Proxy") and 
-                hasattr(o.Proxy, "Type") and 
-                o.Proxy.Type == "Punch"
-                ):
-                points = self.get_sort_points(o.rect.Edges)
-                self.create_area_by_coord(points, prop_name='COL_STIFF')
+            if hasattr(o, "IfcType") and o.IfcType == "Column":
+                z_min = o.Shape.BoundBox.ZMin
+                for f in o.Shape.Faces:
+                    if f.BoundBox.ZLength == 0 and f.BoundBox.ZMin == z_min:
+                        points = self.get_sort_points(f.Edges)
+                        self.create_area_by_coord(points, prop_name='COL_STIFF')
+                        break
     
     def export_freecad_wall_loads(self):
         point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"

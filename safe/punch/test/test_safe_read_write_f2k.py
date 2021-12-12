@@ -84,10 +84,7 @@ def test_add_preferences():
     rw.safe.write()
 
 def test_export_freecad_stiff_elements():
-    input_f2k_path = Path('~\input.f2k').expanduser()
-    input_f2k_path.touch()
-    output_f2k_path = Path('~\stiff.f2k').expanduser()
-    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw = FRW(doc=document_kazemi)
     rw.export_freecad_stiff_elements()
     rw.safe.write()
 
