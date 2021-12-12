@@ -283,6 +283,13 @@ def test_get_foundation_shape_from_base_foundations():
         if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
             bfs.append(o)
     shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, continuous_layer='B')
+
+def test_get_foundation_shape_from_base_foundations_mat():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, foundation_type='Mat')
     # assert len(edges) == 20
 
 

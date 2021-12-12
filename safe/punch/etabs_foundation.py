@@ -30,20 +30,20 @@ class Foundation:
             obj.addProperty(
                 "App::PropertyLength",
                 "height",
-                "Foundation",
+                "Geometry",
                 )
 
         if not hasattr(obj, "cover"):
             obj.addProperty(
                 "App::PropertyLength",
                 "cover",
-                "Foundation",
+                "Geometry",
                 )
         if not hasattr(obj, "d"):
             obj.addProperty(
                 "App::PropertyLength",
                 "d",
-                "Foundation",
+                "Geometry",
                 )
 
         if not hasattr(obj, "base_foundations"):
@@ -71,12 +71,12 @@ class Foundation:
                 "openings",
                 "Foundation",
                 )
-        # if not hasattr(obj, "split"):
-        # 	obj.addProperty(
-        # 		"App::PropertyBool",
-        # 		"split",
-        # 		"Foundation",
-        # 		).split = True
+        if not hasattr(obj, "split"):
+        	obj.addProperty(
+        		"App::PropertyBool",
+        		"split",
+        		"Mat",
+        		).split = True
         if not hasattr(obj, "foundation_type"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -87,7 +87,7 @@ class Foundation:
             obj.addProperty(
                 "App::PropertyEnumeration",
                 "continuous_layer",
-                "Foundation",
+                "Strip",
                 ).continuous_layer = ['A', 'B', 'AB']
         # if not hasattr(obj, "top_face"):
         # 	obj.addProperty(
@@ -147,14 +147,18 @@ class Foundation:
                 foundation_type = obj.foundation_type,
                 continuous_layer = obj.continuous_layer,
                 openings=obj.openings,
+                split_mat=obj.split,
                 )
         all_faces = obj.Shape.Faces
         top_faces = []
         for f in all_faces:
             if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == obj.level.Value:
                 top_faces.append(f)
-        plan = top_faces[0].fuse(top_faces[1:])
-        plan = plan.removeSplitter()
+        if len(top_faces) > 1:
+            plan = top_faces[0].fuse(top_faces[1:])
+            plan = plan.removeSplitter()
+        else:
+            plan = top_faces[0]
         obj.plane = plan
         
         # obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
