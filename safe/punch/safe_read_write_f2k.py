@@ -342,23 +342,23 @@ class FreecadReadwriteModel():
                 ]
                 soil_content = self.create_soil_table(names_props)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
-                    foun.plane_without_openings,
+                    foun.plane,
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points, slab_sec_name)
-                    slab_names.append(name)
+                    all_slab_names.append(name)
                 soil_assignment_content = self.export_freecad_soil_support(
-                    slab_names=[slab_names[-1]],
+                    slab_names=[all_slab_names[-1]],
                     soil_name=soil_name,
                     soil_modulus=None,
                 )
                 soil_assignment_content += self.export_freecad_soil_support(
-                    slab_names=slab_names[:2],
+                    slab_names=all_slab_names[:2],
                     soil_name=f'{soil_name}_2',
                     soil_modulus=None,
                 )
                 soil_assignment_content += self.export_freecad_soil_support(
-                    slab_names=slab_names[2:4],
+                    slab_names=all_slab_names[2:4],
                     soil_name=f'{soil_name}_1.5',
                     soil_modulus=None,
                 )
@@ -369,9 +369,9 @@ class FreecadReadwriteModel():
                 edges = foun.plane_without_openings.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points, slab_sec_name)
-                slab_names.append(name)
+                all_slab_names.append(name)
                 soil_assignment_content = self.export_freecad_soil_support(
-                    slab_names=slab_names,
+                    slab_names=all_slab_names,
                     soil_name=soil_name,
                     soil_modulus=None,
                 )
