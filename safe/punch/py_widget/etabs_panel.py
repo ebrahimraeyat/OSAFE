@@ -85,30 +85,30 @@ class EtabsTaskPanel:
         output_filename = self.form.output_f2k.text()
         from etabs_api.safe import create_f2k
         from safe.punch.f2k_object import make_safe_f2k
-        writer = create_f2k.CreateF2kFile(Path(filename), self.etabs)
         make_safe_f2k(filename, output_filename)
-        pixmap = QPixmap(str(punch_path / 'Resources' / 'icons' / 'tick.svg'))
-        d = {
-            1 : self.form.one,
-            2 : self.form.two,
-            3 : self.form.three,
-            4 : self.form.four,
-            5 : self.form.five,
-        }
-        for ret in writer.create_f2k():
-            if type(ret) == tuple and len(ret) == 3:
-                message, percent, number = ret
-                if type(message) == str and type(percent) == int:
-                    self.form.result_label.setText(message)
-                    self.form.progressbar.setValue(percent)
-                    if number < 6:
-                        d[number].setPixmap(pixmap)
-            elif type(ret) == bool:
-                if not ret:
-                    self.form.result_label.setText("Error Occurred, process did not finished.")
-                self.form.start_button.setEnabled(False)
-            elif type(ret) == str:
-                self.form.result_label.setText(ret)
+        # writer = create_f2k.CreateF2kFile(Path(filename), self.etabs)
+        # pixmap = QPixmap(str(punch_path / 'Resources' / 'icons' / 'tick.svg'))
+        # d = {
+        #     1 : self.form.one,
+        #     2 : self.form.two,
+        #     3 : self.form.three,
+        #     4 : self.form.four,
+        #     5 : self.form.five,
+        # }
+        # for ret in writer.create_f2k():
+        #     if type(ret) == tuple and len(ret) == 3:
+        #         message, percent, number = ret
+        #         if type(message) == str and type(percent) == int:
+        #             self.form.result_label.setText(message)
+        #             self.form.progressbar.setValue(percent)
+        #             if number < 6:
+        #                 d[number].setPixmap(pixmap)
+        #     elif type(ret) == bool:
+        #         if not ret:
+        #             self.form.result_label.setText("Error Occurred, process did not finished.")
+        #         self.form.start_button.setEnabled(False)
+        #     elif type(ret) == str:
+        #         self.form.result_label.setText(ret)
  
 if __name__ == '__main__':
     panel = EtabsTaskPanel()

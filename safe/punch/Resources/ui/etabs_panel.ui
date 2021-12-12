@@ -98,6 +98,9 @@
    </item>
    <item>
     <widget class="QGroupBox" name="f2k_groupbox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Create Input F2k</string>
      </property>
