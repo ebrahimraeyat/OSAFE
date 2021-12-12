@@ -231,13 +231,14 @@ class CreateF2kFile(Safe):
         table_key = 'Load Case Definitions - Summary'
         cols = ['Name', 'Type']
         df = self.etabs.database.read(table_key, to_dataframe=True, cols=cols)
-        filt = df['Type'].isin(('Linear Static', 'Response Spectrum'))
+        filt = df['Type'].isin(('Linear Static', 'Response Spectrum', 'Modal - Eigen'))
         df = df.loc[filt]
         df['DesignType'] = df.Name.apply(get_design_type, args=(self.etabs,))
         df.dropna(inplace=True)
         replacements = {
             'Linear Static' : 'LinStatic',
             'Response Spectrum' : 'LinRespSpec',
+            'Modal - Eigen' : 'LinModal',
             }
         df.replace({'Type' : replacements}, inplace=True)
         d = {
@@ -247,6 +248,25 @@ class CreateF2kFile(Safe):
             }
         content = self.add_assign_to_fields_of_dataframe(df, d)
         table_key = "LOAD CASES 01 - GENERAL"
+        self.add_content_to_table(table_key, content)
+        return content
+    
+    def add_modal_loadcase_definitions(self):
+        table_key = 'Modal Case Definitions - Eigen'
+        cols = ['Name', 'MaxModes', 'MinModes']
+        df = self.etabs.database.read(table_key, to_dataframe=True, cols=cols)
+        df.dropna(inplace=True)
+        df['InitialCond'] = 'Zero'
+        df['ModeType'] = 'Eigen'
+        d = {
+            'Name': 'LoadCase=',
+            'MaxModes' : 'MaxModes=',
+            'MinModes' : 'MinModes=',
+            'InitialCond' : 'InitialCond=',
+            'ModeType' : 'ModeType=',
+            }
+        content = self.add_assign_to_fields_of_dataframe(df, d)
+        table_key = "LOAD CASES 04 - MODAL"
         self.add_content_to_table(table_key, content)
         return content
     
@@ -336,6 +356,7 @@ class CreateF2kFile(Safe):
         self.add_load_patterns()
         yield ('Add Load Cases ...', 30, 3)
         self.add_loadcase_general()
+        self.add_modal_loadcase_definitions()
         self.add_loadcase_definitions()
         yield ('Add Loads ...', 50, 4)
         self.add_point_loads()
