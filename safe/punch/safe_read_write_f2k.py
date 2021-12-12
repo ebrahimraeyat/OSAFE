@@ -306,8 +306,9 @@ class FreecadReadwriteModel():
         if foun.foundation_type == 'Strip':
             for base_foundation in foun.base_foundations:
                 # create slab section
-                height = int(base_foundation.height.getValueAs('cm'))
-                slab_sec_name = f'SLAB{height}'
+                height_name = int(base_foundation.height.getValueAs('cm'))
+                height = int(base_foundation.height.getValueAs(f'{self.length_unit}'))
+                slab_sec_name = f'SLAB{height_name}'
                 if slab_sec_name not in slab_sec_names:
                     # define slab
                     self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)

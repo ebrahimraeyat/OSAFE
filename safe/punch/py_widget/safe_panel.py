@@ -117,28 +117,29 @@ class Safe12TaskPanel:
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
-            #     if is_area_loads:
-            #         try:
-            #             loads = doc.findObjects(Type='Fem::ConstraintForce')
-            #             for load in loads:
-            #                 rw.add_uniform_gravity_load(
-            #                     slab_names,
-            #                     load.loadcase,
-            #                     load.Force,
-            #                     )
-            #         except TypeError:
-            #             print('Can not find any loads in model')
-            # if self.form.wall_loads.isChecked():
-            #     rw.export_freecad_wall_loads()
-            # if is_openings:
-            #     rw.export_freecad_openings(doc)
-            # if is_strips:
-            #     if doc.Foundation.foundation_type == 'Strip':
-            #         rw.export_freecad_strips()
-            # if is_stiffs:
-            #     rw.export_freecad_stiff_elements()
-            # if is_punches:
-            #     rw.export_punch_props()
+                if is_area_loads:
+                    try:
+                        loads = doc.findObjects(Type='Fem::ConstraintForce')
+                        for load in loads:
+                            rw.add_uniform_gravity_load(
+                                slab_names,
+                                load.loadcase,
+                                load.Force,
+                                )
+                    except TypeError:
+                        print('Can not find any loads in model')
+            if self.form.wall_loads.isChecked():
+                rw.export_freecad_wall_loads()
+            if is_openings:
+                rw.export_freecad_openings(doc)
+            if is_strips:
+                if doc.Foundation.foundation_type == 'Strip':
+                    rw.export_freecad_strips()
+            if is_stiffs:
+                rw.export_freecad_stiff_elements()
+            if is_punches:
+                rw.export_punch_props()
+            rw.add_preferences()
             rw.safe.write()
         Gui.Control.closeDialog()
 
