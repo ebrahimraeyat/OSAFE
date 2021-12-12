@@ -478,7 +478,12 @@ class FreecadReadwriteModel():
         if foun.foundation_type == 'Strip':
             for i, base_foundation in enumerate(foun.base_foundations):
                 layer = base_foundation.layer
-                edges = [base_foundation.first_edge] + base_foundation.main_wire.Edges + [base_foundation.last_edge]
+                edges = []
+                if not base_foundation.first_edge.isNull():
+                    edges.append(base_foundation.first_edge)
+                edges.extend(base_foundation.main_wire.Edges)
+                if not base_foundation.last_edge.isNull():
+                    edges.append(base_foundation.last_edge)
                 points = self.get_sort_points(edges, last=True, sort_edges=False)
                 last = len(edges)
                 strip_name = f'CS{layer}{i}'
