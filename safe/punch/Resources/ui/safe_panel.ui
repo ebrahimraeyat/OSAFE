@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>268</width>
-    <height>471</height>
+    <height>444</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,24 +90,10 @@
       <string>Soil Properties</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="soil_name">
-        <property name="text">
-         <string>SOIL</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Modulus</string>
         </property>
        </widget>
       </item>
@@ -136,16 +122,17 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="split">
-        <property name="toolTip">
-         <string>Split mat foundation to 3 Area</string>
-        </property>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="soil_name">
         <property name="text">
-         <string>Split Mat</string>
+         <string>SOIL</string>
         </property>
-        <property name="checked">
-         <bool>true</bool>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Modulus</string>
         </property>
        </widget>
       </item>
@@ -166,16 +153,6 @@
        <item>
         <property name="text">
          <string>SAFE 16</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>SAFE 20</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ETABS 19</string>
         </property>
        </item>
       </widget>

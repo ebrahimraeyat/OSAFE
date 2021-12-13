@@ -289,7 +289,6 @@ class FreecadReadwriteModel():
         self.last_line_number = 1000
 
     def export_freecad_slabs(self,
-        split_mat : bool = True,
         soil_name : str = 'SOIL',
         soil_modulus : float = 2,
         slab_sec_name : Union[str, None] = None,
@@ -334,7 +333,14 @@ class FreecadReadwriteModel():
                 )
         
         elif foun.foundation_type == 'Mat':
-            if split_mat:
+            height_name = int(foun.height.getValueAs('cm'))
+            height = int(foun.height.getValueAs(f'{self.length_unit}'))
+            slab_sec_name = f'SLAB{height_name}'
+            if slab_sec_name not in slab_sec_names:
+                # define slab
+                self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
+                slab_sec_names.append(slab_sec_name)
+            if foun.split:
                 names_props = [
                     (soil_name, soil_modulus),
                     (f'{soil_name}_1.5', soil_modulus * 1.5),
@@ -366,7 +372,7 @@ class FreecadReadwriteModel():
             else:
                 names_props = [(soil_name, soil_modulus)]
                 soil_content = self.create_soil_table(names_props)
-                edges = foun.plane_without_openings.Edges
+                edges = foun.plane.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points, slab_sec_name)
                 all_slab_names.append(name)

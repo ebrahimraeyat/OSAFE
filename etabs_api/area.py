@@ -25,7 +25,6 @@ class Area:
 
     def export_freecad_slabs(self,
         doc : 'App.Document' = None,
-        split_mat : bool = True,
         soil_name : str = 'SOIL',
         soil_modulus : float = 2,
         slab_sec_name : Union[str, None] = None,
@@ -67,7 +66,7 @@ class Area:
                 name = ret[3]
                 self.SapModel.AreaObj.SetOpening(name, True)
         elif foun.foundation_type == 'Mat':
-            if split_mat:
+            if foun.split:
                 names_props = [
                     (soil_name, f'{soil_modulus}'),
                     (f'{soil_name}_1.5', f'{soil_modulus * 1.5}'),

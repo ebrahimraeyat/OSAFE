@@ -149,9 +149,8 @@ class Foundation:
                 openings=obj.openings,
                 split_mat=obj.split,
                 )
-        all_faces = obj.Shape.Faces
         top_faces = []
-        for f in all_faces:
+        for f in obj.Shape.Faces:
             if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == obj.level.Value:
                 top_faces.append(f)
         if len(top_faces) > 1:

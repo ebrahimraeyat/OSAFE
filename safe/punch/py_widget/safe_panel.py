@@ -53,7 +53,6 @@ class Safe12TaskPanel:
 
     def export_to_safe(self):
         software = self.form.software.currentText()
-        split = self.form.split.isChecked()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
         is_openings = self.form.openings_checkbox.isChecked()
@@ -72,7 +71,6 @@ class Safe12TaskPanel:
             if is_slabs:
                 slab_names = etabs.area.export_freecad_slabs(
                     doc,
-                    split_mat = split,
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
@@ -113,7 +111,6 @@ class Safe12TaskPanel:
             rw = FRW(input_f2k_path, output_f2k_path, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(
-                    split_mat = split,
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
