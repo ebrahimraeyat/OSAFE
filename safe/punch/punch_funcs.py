@@ -668,9 +668,9 @@ def get_foundation_shape_from_base_foundations(
         shape = Part.makeCompound(shapes)
         plan = get_top_faces(strip_shape, fuse=True)
     elif foundation_type == 'Mat':
+        outer_wire = get_top_faces(strip_shape, fuse=True).OuterWire
+        plan_without_openings = Part.Face(outer_wire)
         if split_mat:
-            outer_wire = get_top_faces(strip_shape, fuse=True).OuterWire
-            plan_without_openings = Part.Face(outer_wire)
             faces = split_face_with_scales(plan_without_openings)
             shapes = []
             for face in faces:
