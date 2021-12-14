@@ -346,9 +346,8 @@ class FreecadReadwriteModel():
                     (f'{soil_name}_1.5', soil_modulus * 1.5),
                     (f'{soil_name}_2', soil_modulus * 2),
                 ]
-                soil_content = self.create_soil_table(names_props)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
-                    foun.plan,
+                    foun.plan_without_openings,
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points, slab_sec_name)
@@ -371,8 +370,7 @@ class FreecadReadwriteModel():
                 
             else:
                 names_props = [(soil_name, soil_modulus)]
-                soil_content = self.create_soil_table(names_props)
-                edges = foun.plan.Edges
+                edges = foun.outer_wire.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points, slab_sec_name)
                 all_slab_names.append(name)

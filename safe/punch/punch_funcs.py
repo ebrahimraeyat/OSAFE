@@ -627,7 +627,8 @@ def get_foundation_shape_from_base_foundations(
     points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
     used_commons_center_point = []
     shapes = []
-    outer_wire = None
+    outer_wire = Part.Shape()
+    plan_without_openings = Part.Shape()
     for base_foundation, height in zip(base_foundations, heights):
         shape = get_continuous_base_foundation_shape(
                 base_foundation,
@@ -659,18 +660,18 @@ def get_foundation_shape_from_base_foundations(
                 base_foundation.ViewObject.Visibility = False
         
     if len(shapes) > 1:
-        shape = shapes[0].fuse(shapes[1:])
-        shape = shape.removeSplitter()
+        strip_shape = shapes[0].fuse(shapes[1:])
+        strip_shape = strip_shape.removeSplitter()
     else:
-        shape = shapes[0]
-    plan_without_opening = get_top_faces(shape, fuse=True)
+        strip_shape = shapes[0]
     if foundation_type == 'Strip':
         shape = Part.makeCompound(shapes)
+        plan = get_top_faces(strip_shape, fuse=True)
     elif foundation_type == 'Mat':
-        outer_wire = plan_without_opening.OuterWire
-        plan = Part.Face(outer_wire)
         if split_mat:
-            faces = split_face_with_scales(plan)
+            outer_wire = get_top_faces(strip_shape, fuse=True).OuterWire
+            plan_without_openings = Part.Face(outer_wire)
+            faces = split_face_with_scales(plan_without_openings)
             shapes = []
             for face in faces:
                 shape = face.extrude(FreeCAD.Vector(0, 0, -height))
@@ -679,10 +680,11 @@ def get_foundation_shape_from_base_foundations(
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
         else:
-            shape = plan.extrude(FreeCAD.Vector(0, 0, -height))
+            shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
                 shape = shape.cut(openings_shapes)
-    return shape, outer_wire, plan_without_opening
+        plan = get_top_faces(shape, fuse=True)
+    return shape, outer_wire, plan, plan_without_openings
 
 def get_common_part_of_slabs(slabs):
     if len(slabs) < 2:

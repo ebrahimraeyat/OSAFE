@@ -3,6 +3,7 @@ from typing import Union
 
 from PySide2 import QtCore
 import FreeCAD
+import Part
 
 try:
     from safe.punch import punch_funcs
@@ -57,6 +58,12 @@ class Foundation:
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "plan",
+                "Foundation",
+                )
+        if not hasattr(obj, "plan_without_openings"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "plan_without_openings",
                 "Foundation",
                 )
         if not hasattr(obj, "outer_wire"):
@@ -124,7 +131,7 @@ class Foundation:
             FreeCAD.ActiveDocument.recompute()
             return
         obj.redraw = True
-        obj.Shape, outer_wire, obj.plan = punch_funcs.get_foundation_shape_from_base_foundations(
+        obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
                 obj.base_foundations,
                 height = obj.height.Value,
                 foundation_type = obj.foundation_type,
@@ -132,8 +139,7 @@ class Foundation:
                 openings=obj.openings,
                 split_mat=obj.split,
                 )
-        if outer_wire is not None:
-            obj.outer_wire  = outer_wire
+            
         
         # obj.plan, obj.plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
         # obj.Shape = obj.plan.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
