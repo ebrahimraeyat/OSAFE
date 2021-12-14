@@ -313,7 +313,7 @@ class FreecadReadwriteModel():
                     self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
                     slab_sec_names.append(slab_sec_name)
                 # create soil
-                ks = base_foundation.Ks
+                ks = base_foundation.ks
                 soil_name = f'Soil_{ks}'
                 if soil_name not in soil_names:
                     # soil content
