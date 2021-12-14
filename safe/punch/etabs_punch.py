@@ -34,7 +34,7 @@ class EtabsPunch(object):
         self.beam_names = beam_names
         self.top_of_foundation = top_of_foundation
 
-    def create_slabs_plane(self,
+    def create_slabs_plan(self,
         ):
         slabs = {}
         df_beams = self.etabs.database.get_frame_points_xyz(self.beam_names)
@@ -49,7 +49,7 @@ class EtabsPunch(object):
 
     # def create_foundation(self,
     #     ):
-    #     self.create_slabs_plane()
+    #     self.create_slabs_plan()
     #     Load_cases = self.etabs.load_cases.get_loadcase_withtype(1)
     #     self.foundation = etabs_foundation.make_foundation(
     #         self.cover, self.fc, self.height, self.foundation_type, Load_cases, self.top_of_foundation)
@@ -130,7 +130,7 @@ class EtabsPunch(object):
     def import_data(self):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
-        self.create_slabs_plane()
+        self.create_slabs_plan()
         self.create_columns()
         # self.create_foundation()
         # self.create_punches()

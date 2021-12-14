@@ -16,8 +16,8 @@ etabs = etabs_punch.EtabsPunch(beam_names=['114', '115', '116'])
 # 	etabs.create_vectors()
 # 	assert True
 
-def test_create_slabs_plane():
-    etabs.create_slabs_plane()
+def test_create_slabs_plan():
+    etabs.create_slabs_plan()
 
 def test_create_segments():
     etabs.create_segments()

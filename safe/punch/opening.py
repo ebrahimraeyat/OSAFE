@@ -43,10 +43,10 @@ class Opening(ArchComponent.Component):
         obj.Proxy = self
 
     def set_properties(self, obj):
-        if not hasattr(obj, "plane"):
+        if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
-                "plane",
+                "plan",
                 "opening",
                 )
         # if not hasattr(obj, "solid"):
@@ -70,8 +70,8 @@ class Opening(ArchComponent.Component):
     def execute(self, obj):
         if hasattr(obj, "Base") and obj.Base:
             wire = obj.Base.Shape.Wires[0]
-            obj.plane = Part.Face(wire)
-            obj.Shape = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+            obj.plan = Part.Face(wire)
+            obj.Shape = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
 
 class _ViewProviderOpening:

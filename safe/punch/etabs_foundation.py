@@ -53,16 +53,16 @@ class Foundation:
                 "Foundation",
                 )
 
-        if not hasattr(obj, "plane"):
+        if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
-                "plane",
+                "plan",
                 "Foundation",
                 )
-        if not hasattr(obj, "plane_without_openings"):
+        if not hasattr(obj, "outer_wire"):
             obj.addProperty(
                 "Part::PropertyPartShape",
-                "plane_without_openings",
+                "outer_wire",
                 "Foundation",
                 )
         if not hasattr(obj, "openings"):
@@ -89,12 +89,6 @@ class Foundation:
                 "continuous_layer",
                 "Strip",
                 ).continuous_layer = ['A', 'B', 'AB']
-        # if not hasattr(obj, "top_face"):
-        # 	obj.addProperty(
-        # 		"App::PropertyString",
-        # 		"top_face",
-        # 		"Foundation",
-        # 		)
         # if not hasattr(obj, "loadcases"):
         # 	obj.addProperty(
         # 		"App::PropertyStringList",
@@ -107,12 +101,6 @@ class Foundation:
                 "level",
                 "Foundation",
             )
-        # if not hasattr(obj, "F2K"):
-        # 	obj.addProperty(
-        # 		"App::PropertyFile",
-        # 		"F2K",
-        # 		"Safe",
-        # 	)
         if not hasattr(obj, "redraw"):
             obj.addProperty(
                 "App::PropertyBool",
@@ -122,11 +110,6 @@ class Foundation:
         obj.setEditorMode('redraw', 2)
         obj.setEditorMode('level', 2)
         obj.setEditorMode('d', 1)
-        
-    # def onChanged(self, obj, prop):
-    # 	if prop == 'F2K':
-    # 		obj.redraw = False
-    
 
     def execute(self, obj):
         if obj.redraw:
@@ -141,7 +124,7 @@ class Foundation:
             FreeCAD.ActiveDocument.recompute()
             return
         obj.redraw = True
-        obj.Shape = punch_funcs.get_foundation_shape_from_base_foundations(
+        obj.Shape, outer_wire, obj.plan = punch_funcs.get_foundation_shape_from_base_foundations(
                 obj.base_foundations,
                 height = obj.height.Value,
                 foundation_type = obj.foundation_type,
@@ -149,19 +132,11 @@ class Foundation:
                 openings=obj.openings,
                 split_mat=obj.split,
                 )
-        top_faces = []
-        for f in obj.Shape.Faces:
-            if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == obj.level.Value:
-                top_faces.append(f)
-        if len(top_faces) > 1:
-            plan = top_faces[0].fuse(top_faces[1:])
-            plan = plan.removeSplitter()
-        else:
-            plan = top_faces[0]
-        obj.plane = plan
+        if outer_wire is not None:
+            obj.outer_wire  = outer_wire
         
-        # obj.plane, obj.plane_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
-        # obj.Shape = obj.plane.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+        # obj.plan, obj.plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
+        # obj.Shape = obj.plan.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
         # for i, face in enumerate(obj.Shape.Faces, start=1):
         # 	if face.BoundBox.ZLength == 0 and face.BoundBox.ZMax == obj.level.Value:
         # 		obj.top_face = f'Face{i}'

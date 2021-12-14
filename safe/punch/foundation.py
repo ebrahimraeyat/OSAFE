@@ -42,10 +42,10 @@ class Foundation:
                 "Foundation",
                 )
 
-        if not hasattr(obj, "plane"):
+        if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
-                "plane",
+                "plan",
                 "Foundation",
                 )
 
@@ -57,7 +57,7 @@ class Foundation:
 
     def execute(self, obj):
         obj.d = obj.height - obj.cover
-        sh = obj.plane.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
+        sh = obj.plan.extrude(FreeCAD.Vector(0, 0, -(obj.d.Value)))
         obj.Shape = sh
 
 
@@ -97,7 +97,7 @@ def make_foundation(
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
     Foundation(obj)
     ViewProviderFoundation(obj.ViewObject)
-    obj.plane = base
+    obj.plan = base
     obj.height = height
     obj.cover = cover
     obj.fc = f"{fc} MPa"

@@ -75,7 +75,7 @@ class Area:
                 self.etabs.database.create_area_spring_table(names_props)
                 self.etabs.set_current_unit('kN', 'mm')
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
-                    foun.plane_without_openings,
+                    foun.plan_without_openings,
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points, slab_sec_name)
@@ -99,7 +99,7 @@ class Area:
                 names_props = [(soil_name, f'{soil_modulus}')]
                 self.etabs.database.create_area_spring_table(names_props)
                 self.etabs.set_current_unit('kN', 'mm')
-                edges = foun.plane_without_openings.Edges
+                edges = foun.plan_without_openings.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points, slab_sec_name)
                 slab_names.append(name)
@@ -292,7 +292,7 @@ if __name__ == '__main__':
     sys.path.insert(0, str(current_path))
     from etabs_obj import EtabsModel
     etabs = EtabsModel(backup=False, software='SAFE')
-    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
+    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plan_without_openings)
     SapModel = etabs.SapModel
     ret = etabs.area.export_freecad_slabs(document)
     ret = etabs.area.export_freecad_openings(openings)

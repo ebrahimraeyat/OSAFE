@@ -88,10 +88,10 @@ class TrapezoidalSlab:
                 "App::PropertyAngle",
                 "angle",
                 "Geometry", "")
-        if not hasattr(obj, "plane"):
+        if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
-                "plane",
+                "plan",
                 "TrapezoidalSlab",
                 )
         if not hasattr(obj, "solid"):
@@ -138,8 +138,8 @@ class TrapezoidalSlab:
         y = ye + el * _cos
         points.append(FreeCAD.Vector(x, y, 0))
         points.append(points[0])
-        obj.plane = Part.Face(Part.makePolygon(points))
-        obj.solid = obj.plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+        obj.plan = Part.Face(Part.makePolygon(points))
+        obj.solid = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
 
 class _ViewProviderStrip:

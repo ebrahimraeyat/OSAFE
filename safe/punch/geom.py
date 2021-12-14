@@ -79,13 +79,13 @@ class Geom(object):
         # self.bar_label.setText("Creating Punch Objects")
         for f in self.foundation.Faces:
             if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == 0:
-                foundation_plane = f
+                foundation_plan = f
                 break
         d = self.foundation.BoundBox.ZLength
         cover = 93
         h = d + cover
         fc = self._safe.fc
-        foun_obj = foundation.make_foundation(foundation_plane, height=h, cover=cover, fc=fc)
+        foun_obj = foundation.make_foundation(foundation_plan, height=h, cover=cover, fc=fc)
 
         for key in self.columns_id:
             value = self._safe.point_loads[key]

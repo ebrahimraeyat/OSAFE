@@ -25,7 +25,7 @@ def test_make_trapezoidal_slab():
                ewl=250,
                ewr=250,
                )
-    assert obj.plane.Area == 12210 * 500
+    assert obj.plan.Area == 12210 * 500
     assert obj.layer == 'A'
 
 

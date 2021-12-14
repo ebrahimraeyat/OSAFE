@@ -78,10 +78,10 @@ class Punch:
                 "Punch",
                 )
 
-        if not hasattr(obj, "foundation_plane"):
+        if not hasattr(obj, "foundation_plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
-                "foundation_plane",
+                "foundation_plan",
                 "Punch",
                 )
         if not hasattr(obj, "rect"):
@@ -158,7 +158,7 @@ class Punch:
         x = obj.bx + d
         y = obj.by + d
         offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
-        foun_plan = obj.foundation.plane.copy()
+        foun_plan = obj.foundation.plan.copy()
         if obj.angle != 0:
             foun_plan.rotate(
                 obj.center_of_load,
@@ -460,7 +460,7 @@ def get_color(pref_intity, color=16711935):
     return (r, g, b)
 
 def make_punch(
-    # foundation_plane: Part.Face,
+    # foundation_plan: Part.Face,
     foun_obj,
     bx: Union[float, int],
     by: Union[float, int],
@@ -474,7 +474,7 @@ def make_punch(
     Punch(p)
     if FreeCAD.GuiUp:
         ViewProviderPunch(p.ViewObject)
-    # p.foundation_plane = foundation_plane
+    # p.foundation_plan = foundation_plan
     p.foundation = foun_obj
     p.bx = bx
     p.by = by

@@ -73,24 +73,24 @@ def test_get_sort_points():
     ])
 
 def test_get_obj_points_with_scales():
-    points = punch_funcs.get_obj_points_with_scales(document.Foundation.plane_without_openings)
+    points = punch_funcs.get_obj_points_with_scales(document.Foundation.plan_without_openings)
     assert len(points) == 3
     assert len(points[0]) == 21
     assert len(points[1]) == 21
     assert len(points[2]) == 21
     # face0 = Part.Face(Part.makePolygon(points[0]))
-    # plan = Part.Face(document.Foundation.plane_without_openings.OuterWire)
+    # plan = Part.Face(document.Foundation.plan_without_openings.OuterWire)
     # assert pytest.approx(face0.Area, abs=.1) == plan.Area
 
 def test_get_scale_area_points_with_scale():
-    points = punch_funcs.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
+    points = punch_funcs.get_scale_area_points_with_scale(document.Foundation.plan_without_openings)
     assert len(points) == 5
     assert len(points[-1]) == 21
     assert len(points[0]) == 22
     assert len(points[1]) == 22
 
 def test_split_face_with_scales():
-    plan = document_mat.Foundation.plane_without_openings
+    plan = document_mat.Foundation.plan_without_openings
     faces = punch_funcs.split_face_with_scales(plan)
     assert len(faces) == 5
     area = 0
@@ -99,7 +99,7 @@ def test_split_face_with_scales():
     assert pytest.approx(area, abs=.1) == plan.Area
 
 def test_get_sub_areas_points_from_face_with_scales():
-    plan = document_mat.Foundation.plane_without_openings
+    plan = document_mat.Foundation.plan_without_openings
     points = punch_funcs.get_sub_areas_points_from_face_with_scales(plan)
     assert len(points) == 5
     assert len(points[-1]) == 21
@@ -167,8 +167,8 @@ def test_get_common_parts_of_foundation_slabs():
     points_commons = punch_funcs.get_common_parts_of_foundation_slabs(document.Foundation)
     assert len(points_commons) == 11
 
-def test_get_foundation_plane_without_openings():
-    plan = punch_funcs.get_foundation_plane_without_openings(document.Foundation)
+def test_get_foundation_plan_without_openings():
+    plan = punch_funcs.get_foundation_plan_without_openings(document.Foundation)
     assert len(plan.Faces) == 1
     assert len(plan.Edges) == 30
 
@@ -208,7 +208,7 @@ def test_punch_area_edges():
     x = obj.bx + d
     y = obj.by + d
     offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
-    foun_plan = obj.foundation.plane.copy()
+    foun_plan = obj.foundation.plan.copy()
     edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
     assert len(edges) == 3
 

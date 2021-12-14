@@ -30,7 +30,7 @@ def make_base_foundation(
     else:
         obj.left_width = obj.right_width = obj.width / 2
     obj.height = height
-    obj.Ks = soil_modulus
+    obj.ks = soil_modulus
     if FreeCAD.GuiUp:
         ViewProviderBaseFoundation(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -68,12 +68,12 @@ class BaseFoundation:
                 "design_type",
                 "Strip",
                 ).design_type = ['column']
-        if not hasattr(obj, "Ks"):
+        if not hasattr(obj, "ks"):
             obj.addProperty(
                 "App::PropertyFloat",
-                "Ks",
+                "ks",
                 "Soil",
-                ).design_type = ['column']
+                )
         if not hasattr(obj, "left_width"):
             obj.addProperty(
                 "App::PropertyLength",

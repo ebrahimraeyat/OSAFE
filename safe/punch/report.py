@@ -44,7 +44,7 @@ def add_edges_to_ax(obj, ax, linewidth=.5):
 
 def add_key_plan_edges_to_ax(punch, ax):
     comp = Part.makeCompound([
-            punch.foundation.plane,
+            punch.foundation.plan,
             punch.edges,
         ])
     add_edges_to_ax(comp, ax, linewidth=.1)

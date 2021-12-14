@@ -348,7 +348,7 @@ class FreecadReadwriteModel():
                 ]
                 soil_content = self.create_soil_table(names_props)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
-                    foun.plane,
+                    foun.plan,
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points, slab_sec_name)
@@ -372,7 +372,7 @@ class FreecadReadwriteModel():
             else:
                 names_props = [(soil_name, soil_modulus)]
                 soil_content = self.create_soil_table(names_props)
-                edges = foun.plane.Edges
+                edges = foun.plan.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points, slab_sec_name)
                 all_slab_names.append(name)
@@ -465,7 +465,7 @@ class FreecadReadwriteModel():
         openings = foun.openings
         names = []
         for opening in openings:
-            points = opening.points
+            points = [v.Point for v in opening.Base.Shape.Vertexes]
             name = self.create_area_by_coord(points, is_opening=True)
             names.append(name)
         return names
@@ -732,7 +732,7 @@ if __name__ == '__main__':
     sys.path.insert(0, str(current_path))
     from etabs_obj import EtabsModel
     etabs = EtabsModel(backup=False, software='SAFE')
-    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
+    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plan_without_openings)
     SapModel = etabs.SapModel
     ret = etabs.area.export_freecad_slabs(document)
     ret = etabs.area.export_freecad_openings(openings)

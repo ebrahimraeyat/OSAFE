@@ -8,18 +8,18 @@ import ArchComponent
 def make_slab(
         base,
         height=1000,
-        soil_mat = None,
-        concret_mat = None,
+        ks = None,
+        fc = None,
         ):
     doc = FreeCAD.ActiveDocument
     obj = doc.addObject("Part::FeaturePython", "Slab")
     Slab(obj)
     obj.Base = base
     obj.height = height
-    if soil_mat is not None:
-        obj.soil_mat = soil_mat
-    if concret_mat is not None:
-        obj.concret_mat = concret_mat
+    if ks is not None:
+        obj.ks = ks
+    if fc is not None:
+        obj.fc = fc
     if FreeCAD.GuiUp:
         ViewProviderSlab(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -34,29 +34,23 @@ class Slab(ArchComponent.Component):
         obj.Proxy = self
 
     def set_properties(self, obj):
-        # if not hasattr(obj, "plane"):
-        #     obj.addProperty(
-        #         "Part::PropertyPartShape",
-        #         "plane",
-        #         "Slab",
-        #         )
         if not hasattr(obj, "height"):
             obj.addProperty(
             "App::PropertyLength",
             "height",
             "Base",
             )
-        if not hasattr(obj, "soil"):
+        if not hasattr(obj, "ks"):
             obj.addProperty(
-            "App::PropertyMaterial",
-            "soil",
-            "Base",
+            "App::PropertyFloat",
+            "ks",
+            "Soil",
             )
-        if not hasattr(obj, "Concrete"):
+        if not hasattr(obj, "fc"):
             obj.addProperty(
-            "App::PropertyMaterial",
+            "App::PropertyPressure",
+            "fc",
             "Concrete",
-            "Base",
             )
         
 
@@ -68,8 +62,8 @@ class Slab(ArchComponent.Component):
     def execute(self, obj):
         if hasattr(obj, "Base") and obj.Base:
             wire = obj.Base.Shape.Wires[0]
-            plane = Part.Face(wire)
-            obj.Shape = plane.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+            plan = Part.Face(wire)
+            obj.Shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
 
 class ViewProviderSlab:

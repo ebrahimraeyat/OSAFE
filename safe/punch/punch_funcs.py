@@ -63,7 +63,7 @@ def punch_null_edges(
     y = punch.by + d
     edges = punch.edges.Edges
     offset_shape = rectangle_face(punch.center_of_load, x, y)
-    foun_plan = punch.foundation.plane.copy()
+    foun_plan = punch.foundation.plan.copy()
     if punch.angle != 0:
             offset_shape.rotate(
                 punch.center_of_load,
@@ -587,12 +587,22 @@ def get_common_part_of_base_foundation(base_foundations):
                     base_name_common_shape[name].append(comm)
     return points_common_shape, base_name_common_shape
 
-def get_top_faces(shape):
+def get_top_faces(
+        shape,
+        fuse : bool = False,
+        ):
     z_max = shape.BoundBox.ZMax
     faces = []
     for f in shape.Faces:
         if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == z_max:
             faces.append(f)
+    if fuse:
+        if len(faces) > 1:
+            face = faces[0].fuse(faces[1:])
+            face = face.removeSplitter()
+        else:
+            face = faces[0]
+        return face
     return faces
 
 def get_foundation_shape_from_base_foundations(
@@ -617,6 +627,7 @@ def get_foundation_shape_from_base_foundations(
     points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
     used_commons_center_point = []
     shapes = []
+    outer_wire = None
     for base_foundation, height in zip(base_foundations, heights):
         shape = get_continuous_base_foundation_shape(
                 base_foundation,
@@ -640,29 +651,26 @@ def get_foundation_shape_from_base_foundations(
                 shape = shape.cut(commons)
         if foundation_type == 'Strip' and openings:
             shape = shape.cut(openings_shapes)
+
         shapes.append(shape)
         if foundation_type == 'Strip':
             base_foundation.plan = Part.makeCompound(get_top_faces(shape))
             if FreeCAD.GuiUp:
                 base_foundation.ViewObject.Visibility = False
         
+    if len(shapes) > 1:
+        shape = shapes[0].fuse(shapes[1:])
+        shape = shape.removeSplitter()
+    else:
+        shape = shapes[0]
+    plan_without_opening = get_top_faces(shape, fuse=True)
     if foundation_type == 'Strip':
         shape = Part.makeCompound(shapes)
     elif foundation_type == 'Mat':
-        if len(shapes) > 1:
-            shape = shapes[0].fuse(shapes[1:])
-            shape = shape.removeSplitter()
-        else:
-            shape = shapes[0]
-        plane = get_top_faces(shape)
-        if len(plane) > 1:
-            plane = plane[0].fuse(plane[1:])
-            plane = plane.removeSplitter()
-        else:
-            plane = plane[0]
-        plane = Part.Face(plane.OuterWire)
+        outer_wire = plan_without_opening.OuterWire
+        plan = Part.Face(outer_wire)
         if split_mat:
-            faces = split_face_with_scales(plane)
+            faces = split_face_with_scales(plan)
             shapes = []
             for face in faces:
                 shape = face.extrude(FreeCAD.Vector(0, 0, -height))
@@ -671,10 +679,10 @@ def get_foundation_shape_from_base_foundations(
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
         else:
-            shape = plane.extrude(FreeCAD.Vector(0, 0, -height))
+            shape = plan.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
                 shape = shape.cut(openings_shapes)
-    return shape
+    return shape, outer_wire, plan_without_opening
 
 def get_common_part_of_slabs(slabs):
     if len(slabs) < 2:
@@ -926,29 +934,29 @@ def get_common_parts_of_foundation_slabs(foundation):
         points_common_part[p] = comm
     return points_common_part
 
-def get_foundation_plane_without_openings(
+def get_foundation_plan_without_openings(
     foundation,
     ) -> Part.Face:
     slabs = foundation.tape_slabs
     points_common_part = get_common_parts_of_foundation_slabs(foundation)
     common_parts = list(points_common_part.values())
-    solids = [f.extrude(FreeCAD.Vector(0, 0, -1)) for f in [s.plane for s in slabs] + common_parts]
+    solids = [f.extrude(FreeCAD.Vector(0, 0, -1)) for f in [s.plan for s in slabs] + common_parts]
     shape = solids[0].fuse(solids[1:])
     shape = shape.removeSplitter()
     for f in shape.Faces:
         if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == foundation.level.Value:
-            foundation_plane = f
+            foundation_plan = f
             break
     if foundation.foundation_type == 'Strip':
-        plan = foundation_plane
+        plan = foundation_plan
     elif foundation.foundation_type == 'Mat':
-        plan = Part.Face(foundation_plane.OuterWire)
+        plan = Part.Face(foundation_plan.OuterWire)
     return plan
 
 def get_foundation_plan_with_openings(
     foundation,
     ) -> Part.Face:
-    plan_without_openings = get_foundation_plane_without_openings(foundation)
+    plan_without_openings = get_foundation_plan_without_openings(foundation)
     plan_with_openings = plan_without_openings.copy()
     if len(foundation.openings) > 0:
         new_shape = plan_with_openings.extrude(FreeCAD.Vector(0, 0, -1))
@@ -968,7 +976,7 @@ def get_foundation_plan_with_holes(
         cut = mat.cut([plan_with_openings])
         holes = cut.SubShapes
     elif foundation.foundation_type == 'Mat':
-        holes = [o.plane for o in foundation.openings]
+        holes = [o.plan for o in foundation.openings]
     return plan_with_openings, plan_without_openings, holes
 
 def get_points_of_foundation_plan_and_holes(
