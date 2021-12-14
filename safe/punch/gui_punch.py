@@ -30,17 +30,23 @@ class Punch:
                 'ToolTip': tool_tip}
 
     def Activated(self):
+        def is_foundation_type(obj):
+            if hasattr(obj, 'Proxy') and \
+                hasattr(obj.Proxy, 'Type') and \
+                    obj.Proxy.Type == 'Foundation':
+                    return True
+            return False
+
         doc = FreeCAD.ActiveDocument
         sel = Gui.Selection.getSelection()
         foun = None
-        if sel:
-            foun = sel[0]
-        else:
+        if sel and is_foundation_type(sel[0]):
+                foun = sel[0]
+        if foun is None:
             for o in doc.Objects:
-                if hasattr(o, 'Proxy') and \
-                    hasattr(o.Proxy, 'Type') and \
-                        o.Proxy.Type == 'Foundation':
+                if is_foundation_type(o):
                     foun = o
+                    break
         if foun is None:
             return
         punches = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Punches")
