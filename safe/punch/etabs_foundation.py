@@ -180,7 +180,7 @@ class ViewProviderFoundation:
         self.Object = vobj.Object
 
     def getIcon(self):
-        return join(dirname(abspath(__file__)), "Resources", "icons","foundation.png")
+        return join(dirname(abspath(__file__)), "Resources", "icons","foundation.svg")
 
     def __getstate__(self):
         return None
