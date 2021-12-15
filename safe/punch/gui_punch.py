@@ -84,6 +84,7 @@ class Punch:
                 punch.text = text
                 punch.id = o.Label
                 punches.addObject(punch)
+        FreeCAD.ActiveDocument.recompute()
 
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
