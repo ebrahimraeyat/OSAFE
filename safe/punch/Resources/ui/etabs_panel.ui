@@ -77,6 +77,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QDoubleSpinBox" name="foundation_level">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="suffix">
         <string> m</string>
        </property>
