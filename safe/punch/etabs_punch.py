@@ -76,6 +76,10 @@ class EtabsPunch(object):
                     "Structure",
                     ).combos_load = combos_load
             col.setEditorMode('combos_load', 2)
+            col.ViewObject.LineWidth = 1.00
+            col.ViewObject.PointSize = 1.00
+            col.ViewObject.Transparency = 30.00
+
             return col
 
         columns = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Columns")
