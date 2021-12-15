@@ -4,6 +4,7 @@ from typing import Union
 from PySide2 import QtCore
 import FreeCAD
 import Part
+import ArchComponent
 
 try:
     from safe.punch import punch_funcs
@@ -11,8 +12,10 @@ except:
     import punch_funcs
 
 
-class Foundation:
+class Foundation(ArchComponent.Component):
     def __init__(self, obj):
+        super().__init__(obj)
+        obj.IfcType = "Footing"
         obj.Proxy = self
         self.Type = "Foundation"
         self.set_properties(obj)
@@ -157,6 +160,7 @@ class Foundation:
 
     def onDocumentRestored(self, obj):
         obj.Proxy = self
+        super().onDocumentRestored(obj)
         self.set_properties(obj)
         obj.redraw = True
         
@@ -166,8 +170,10 @@ class ViewProviderFoundation:
 
         vobj.Proxy = self
         vobj.Transparency = 30
-        vobj.ShapeColor = (0.45, 0.45, 0.45)
+        # vobj.LineWidth = 1.00
+        # vobj.PointSize = 1.00
         vobj.DisplayMode = "Shaded"
+        vobj.ShapeColor = (0.5882353186607361, 0.6627451181411743, 0.729411780834198, 0.0)
 
     def attach(self, vobj):
         self.ViewObject = vobj
