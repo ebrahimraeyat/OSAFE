@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import pytest
+
 FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 
@@ -11,8 +12,10 @@ import Part
 
 filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
+filename_base_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
+document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
 
 
 punch_path = Path(__file__).absolute().parent.parent
@@ -24,25 +27,70 @@ def test_sort_vertex():
     points = punch_funcs.sort_vertex(points)
     assert points == [[0, 0], [0, 1], [1, 1], [1, 0]]
 
+def test_get_sort_points():
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(5, 0, 0)
+    v3 = FreeCAD.Vector(5, 0, 0)
+    v4 = FreeCAD.Vector(10, 0, 0)
+    l = Part.makeLine(v1, v2)
+    e1 = Part.Edge(l)
+    l = Part.makeLine(v4, v3)
+    e2 = Part.Edge(l)
+    edges = [e1, e2]
+    points = punch_funcs.get_sort_points(edges, get_last=True)
+    v11, v22, v33 = points
+    assert any([
+        all([
+            v11.isEqual(v1, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v4, True),
+            ]),
+        all([
+            v11.isEqual(v4, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v1, True),
+            ])
+    ])
+    # first edge reverse
+    l = Part.makeLine(v2, v1)
+    e1 = Part.Edge(l)
+    l = Part.makeLine(v3, v4)
+    e2 = Part.Edge(l)
+    edges = [e1, e2]
+    points = punch_funcs.get_sort_points(edges, get_last=True)
+    v11, v22, v33 = points
+    assert any([
+        all([
+            v11.isEqual(v1, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v4, True),
+            ]),
+        all([
+            v11.isEqual(v4, True),
+            v22.isEqual(v2, True),
+            v33.isEqual(v1, True),
+            ])
+    ])
+
 def test_get_obj_points_with_scales():
-    points = punch_funcs.get_obj_points_with_scales(document.Foundation.plane_without_openings)
+    points = punch_funcs.get_obj_points_with_scales(document.Foundation.plan_without_openings)
     assert len(points) == 3
     assert len(points[0]) == 21
     assert len(points[1]) == 21
     assert len(points[2]) == 21
     # face0 = Part.Face(Part.makePolygon(points[0]))
-    # plan = Part.Face(document.Foundation.plane_without_openings.OuterWire)
+    # plan = Part.Face(document.Foundation.plan_without_openings.OuterWire)
     # assert pytest.approx(face0.Area, abs=.1) == plan.Area
 
 def test_get_scale_area_points_with_scale():
-    points = punch_funcs.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
+    points = punch_funcs.get_scale_area_points_with_scale(document.Foundation.plan_without_openings)
     assert len(points) == 5
     assert len(points[-1]) == 21
     assert len(points[0]) == 22
     assert len(points[1]) == 22
 
 def test_split_face_with_scales():
-    plan = document_mat.Foundation.plane_without_openings
+    plan = document_mat.Foundation.plan_without_openings
     faces = punch_funcs.split_face_with_scales(plan)
     assert len(faces) == 5
     area = 0
@@ -51,7 +99,7 @@ def test_split_face_with_scales():
     assert pytest.approx(area, abs=.1) == plan.Area
 
 def test_get_sub_areas_points_from_face_with_scales():
-    plan = document_mat.Foundation.plane_without_openings
+    plan = document_mat.Foundation.plan_without_openings
     points = punch_funcs.get_sub_areas_points_from_face_with_scales(plan)
     assert len(points) == 5
     assert len(points[-1]) == 21
@@ -119,8 +167,8 @@ def test_get_common_parts_of_foundation_slabs():
     points_commons = punch_funcs.get_common_parts_of_foundation_slabs(document.Foundation)
     assert len(points_commons) == 11
 
-def test_get_foundation_plane_without_openings():
-    plan = punch_funcs.get_foundation_plane_without_openings(document.Foundation)
+def test_get_foundation_plan_without_openings():
+    plan = punch_funcs.get_foundation_plan_without_openings(document.Foundation)
     assert len(plan.Faces) == 1
     assert len(plan.Edges) == 30
 
@@ -160,7 +208,7 @@ def test_punch_area_edges():
     x = obj.bx + d
     y = obj.by + d
     offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
-    foun_plan = obj.foundation.plane.copy()
+    foun_plan = obj.foundation.plan.copy()
     edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
     assert len(edges) == 3
 
@@ -184,6 +232,12 @@ def test_get_continuous_edges():
     edges_numbers = punch_funcs.get_continuous_edges(edges)
     assert edges_numbers == [[6, 1, 2, 3], [11, 12, 13], [4, 5, 14], [8, 7], [10, 9], [15, 16]]
 
+def test_get_almost_direction_of_edges_list():
+    slabs = document.Foundation.tape_slabs
+    edges = [s.Shape.Edges[0] for s in slabs]
+    direction = punch_funcs.get_almost_direction_of_edges_list([edges[5], edges[0], edges[1], edges[2]])
+    assert direction == 'x'
+
 def test_get_continuous_slabs():
     slabs = document.Foundation.tape_slabs
     slab_lists = punch_funcs.get_continuous_slabs(slabs)
@@ -196,9 +250,50 @@ def test_get_continuous_slabs():
         ret.append([slabs[i - 1].Name for i in es])
     assert slab_names == ret
 
+def test_get_continuous_points_from_slabs():
+    slabs = document.Foundation.tape_slabs
+    continuous_points, _ = punch_funcs.get_continuous_points_from_slabs(slabs)
+    assert len(continuous_points) == 6
+
+def test_make_automatic_stirps_in_strip_foundation():
+    slabs = document.Foundation.tape_slabs
+    strips = punch_funcs.make_automatic_stirps_in_strip_foundation(slabs, 1200)
+    assert len(strips) == 6
+
+def test_get_points_connections_from_base_foundations():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    ret = punch_funcs.get_points_connections_from_base_foundations(bfs)
+    assert True
+
+def test_get_common_part_of_base_foundation():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    points_common_shape, base_name_common_shape = punch_funcs.get_common_part_of_base_foundation(bfs)
+    assert len(points_common_shape) == 20
+    assert len(base_name_common_shape) == len(bfs)
+
+def test_get_foundation_shape_from_base_foundations():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, continuous_layer='B')
+
+def test_get_foundation_shape_from_base_foundations_mat():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, foundation_type='Mat')
+    # assert len(edges) == 20
 
 
 
 
 if __name__ == '__main__':
-    test_get_xy_strips()
+    test_get_foundation_shape_from_base_foundations()

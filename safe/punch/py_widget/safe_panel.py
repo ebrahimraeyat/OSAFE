@@ -21,13 +21,11 @@ class Safe12TaskPanel:
 
     def fill_f2k_filename(self):
         if FreeCAD.ActiveDocument:
-            foun = FreeCAD.ActiveDocument.Foundation
-            if foun and hasattr(foun, 'F2K'):
-                self.form.input_f2k.setText(foun.F2K)
-                filename = Path(foun.F2K)
-                name = f"{filename.name.rstrip(filename.suffix)}_export{filename.suffix}"
-                filename = filename.with_name(name)
-                self.form.output_f2k.setText(str(filename))
+            safe = FreeCAD.ActiveDocument.Safe
+            if safe and hasattr(safe, 'input'):
+                self.form.input_f2k.setText(safe.input)
+            if safe and hasattr(safe, 'output'):
+                self.form.output_f2k.setText(safe.output)
 
     def openf2k(self):
         ext = '.f2k'
@@ -55,7 +53,6 @@ class Safe12TaskPanel:
 
     def export_to_safe(self):
         software = self.form.software.currentText()
-        split = self.form.split.isChecked()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
         is_openings = self.form.openings_checkbox.isChecked()
@@ -74,7 +71,6 @@ class Safe12TaskPanel:
             if is_slabs:
                 slab_names = etabs.area.export_freecad_slabs(
                     doc,
-                    split_mat = split,
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
@@ -115,7 +111,6 @@ class Safe12TaskPanel:
             rw = FRW(input_f2k_path, output_f2k_path, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(
-                    split_mat = split,
                     soil_name=soil_name,
                     soil_modulus=soil_modulus,
                 )
@@ -141,6 +136,7 @@ class Safe12TaskPanel:
                 rw.export_freecad_stiff_elements()
             if is_punches:
                 rw.export_punch_props()
+            rw.add_preferences()
             rw.safe.write()
         Gui.Control.closeDialog()
 

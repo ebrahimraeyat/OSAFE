@@ -12,7 +12,7 @@ def createPdf(doc, pdfName):
         return
     foun = doc.Foundation
     fig = plt.figure()
-    b = foun.plane.BoundBox
+    b = foun.plan.BoundBox
     XMIN, YMIN, XMAX, YMAX = b.XMin, b.YMin, b.XMax, b.YMax
     XMIN -= .2 * abs(XMIN)
     YMIN -= .2 * abs(YMIN)
@@ -26,7 +26,7 @@ def createPdf(doc, pdfName):
     ax1 = fig.add_subplot(111, aspect='equal')
     plt.axis('off')
 
-    for e in foun.plane.Edges:
+    for e in foun.plan.Edges:
         if not len(e.Vertexes) == 2:
             continue
         # if e.BoundBox.ZLength == 0 and e.Vertexes[0].Z == 0:
@@ -158,7 +158,7 @@ def to_dxf(
                 center = (b.Center.x, b.Center.y)
                 # draw foundation
                 block_foun = dwg.blocks.new(name=o.Name)
-                add_edges_to_dxf(o.plane.Edges, {'color': 4}, block_foun)
+                add_edges_to_dxf(o.plan.Edges, {'color': 4}, block_foun)
                 msp.add_blockref(o.Name, (0 , 0))
 
 

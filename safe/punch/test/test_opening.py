@@ -25,7 +25,7 @@ def test_make_opening():
             points=points,
             height = 3,
             )
-    assert obj.plane.Area == 15 * 10
+    assert obj.plan.Area == 15 * 10
 
 
 if __name__ == '__main__':

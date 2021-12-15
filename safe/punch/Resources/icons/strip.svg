@@ -9,10 +9,103 @@
    inkscape:version="1.2-dev (8a200a5f, 2021-09-02)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
-     id="defs8" />
+     id="defs8">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2918">
+      <stop
+         style="stop-color:#ffb238;stop-opacity:1;"
+         offset="0"
+         id="stop2914" />
+      <stop
+         style="stop-color:#bd4040;stop-opacity:1;"
+         offset="1"
+         id="stop2916" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2904">
+      <stop
+         style="stop-color:#ffb238;stop-opacity:1;"
+         offset="0"
+         id="stop2900" />
+      <stop
+         style="stop-color:#ac8c51;stop-opacity:1;"
+         offset="1"
+         id="stop2902" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient2863">
+      <stop
+         style="stop-color:#9d9d9d;stop-opacity:1;"
+         offset="0"
+         id="stop2859" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop2861" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient2839"
+       inkscape:swatch="gradient">
+      <stop
+         style="stop-color:#b9b9b9;stop-opacity:1;"
+         offset="0"
+         id="stop2835" />
+      <stop
+         style="stop-color:#b08080;stop-opacity:0.03351955;"
+         offset="1"
+         id="stop2837" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient849"
+       inkscape:swatch="gradient">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop845" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop847" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2863"
+       id="linearGradient2867"
+       x1="90.476418"
+       y1="262.38889"
+       x2="421.05905"
+       y2="262.38889"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2904"
+       id="radialGradient2898"
+       cx="255.76773"
+       cy="262.38889"
+       fx="255.76773"
+       fy="262.38889"
+       r="165.29132"
+       gradientTransform="matrix(1,0,0,1.3854251,0,-101.13128)"
+       gradientUnits="userSpaceOnUse" />
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2918"
+       id="radialGradient2912"
+       cx="259.12958"
+       cy="261.90689"
+       fx="259.12958"
+       fy="261.90689"
+       r="5"
+       gradientTransform="matrix(1,0,0,48.821516,0,-12524.785)"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
   <sodipodi:namedview
      id="namedview6"
      pagecolor="#ffffff"
@@ -32,11 +125,11 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg4" />
   <path
-     style="fill:none;stroke:#000000;stroke-width:35.0675;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:url(#linearGradient2867);stroke:url(#radialGradient2898);stroke-width:35.0675;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
      d="m 170.63903,50.923909 h 180.4414 l 50.25134,416.319711 -290.59851,6.17582 z"
      id="path1319" />
   <path
-     style="fill:none;stroke:#000000;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:30, 10;stroke-dashoffset:0;stroke-opacity:1"
+     style="fill:none;stroke:url(#radialGradient2912);stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:30, 10;stroke-dashoffset:0;stroke-opacity:1"
      d="M 259.12958,506.01447 V 17.799312"
      id="path884" />
 </svg>

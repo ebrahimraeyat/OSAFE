@@ -9,8 +9,10 @@ import pytest
 
 filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
+filename_kazemi = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'kazemi.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
+document_kazemi= FreeCAD.openDocument(str(filename_kazemi))
 
 punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
@@ -19,13 +21,10 @@ from safe_read_write_f2k import FreecadReadwriteModel as FRW
 from safe_read_write_f2k import Safe, Safe12
 
 def test_export_freecad_slabs():
-    input_f2k_path = Path('~\input.f2k').expanduser()
-    input_f2k_path.touch()
-    output_f2k_path = Path('~\output.f2k').expanduser()
-    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw = FRW(doc=document_kazemi)
     slabs = rw.export_freecad_slabs()
     rw.safe.write()
-    assert len(slabs) == 1
+    assert len(slabs) == 33
 
 def test_export_freecad_wall_loads():
     input_f2k_path = Path('~\input.f2k').expanduser()
@@ -72,10 +71,7 @@ def test_export_freecad_openings():
     assert len(slabs) == 1
 
 def test_export_freecad_strips():
-    input_f2k_path = Path('~\input.f2k').expanduser()
-    input_f2k_path.touch()
-    output_f2k_path = Path('~\strip.f2k').expanduser()
-    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw = FRW(doc=document_kazemi)
     rw.export_freecad_strips()
     rw.safe.write()
 
@@ -88,10 +84,7 @@ def test_add_preferences():
     rw.safe.write()
 
 def test_export_freecad_stiff_elements():
-    input_f2k_path = Path('~\input.f2k').expanduser()
-    input_f2k_path.touch()
-    output_f2k_path = Path('~\stiff.f2k').expanduser()
-    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw = FRW(doc=document_kazemi)
     rw.export_freecad_stiff_elements()
     rw.safe.write()
 

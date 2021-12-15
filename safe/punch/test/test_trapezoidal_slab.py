@@ -16,18 +16,18 @@ document= FreeCAD.newDocument()
 # 	assert True
 
 def test_make_trapezoidal_slab():
-	obj = make_trapezoidal_slab(p1=FreeCAD.Vector(0, 16400, 0),
-			   p2=FreeCAD.Vector(12210, 16400, 0),
-			   layer='A',
-			   design_type='column',
-			   swl='25 cm',
-			   swr=250,
-			   ewl=250,
-			   ewr=250,
-			   )
-	assert obj.plane.Area == 12210 * 500
-	assert obj.layer == 'A'
+    obj = make_trapezoidal_slab(p1=FreeCAD.Vector(0, 16400, 0),
+               p2=FreeCAD.Vector(12210, 16400, 0),
+               layer='A',
+               design_type='column',
+               swl='25 cm',
+               swr=250,
+               ewl=250,
+               ewr=250,
+               )
+    assert obj.plan.Area == 12210 * 500
+    assert obj.layer == 'A'
 
 
 if __name__ == '__main__':
-	test_make_trapezoidal_slab()
+    test_make_trapezoidal_slab()

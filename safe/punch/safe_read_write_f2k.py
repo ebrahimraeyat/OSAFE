@@ -264,109 +264,146 @@ class FreecadReadwriteModel():
 
     def __init__(
                 self,
-                input_f2k_path : Path,
+                input_f2k_path : Path = None,
                 output_f2k_path : Path = None,
                 doc: 'App.Document' = None,
                 ):
-        if output_f2k_path is None:
-            output_f2k_path = input_f2k_path
+        if doc is None:
+            doc = FreeCAD.ActiveDocument
+        self.doc = doc
+        if not input_f2k_path:
+            if hasattr(doc, 'Safe') and hasattr(doc.Safe, 'input'):
+                input_f2k_path = Path(doc.Safe.input)
+        if not output_f2k_path:
+            if hasattr(doc, 'Safe') and hasattr(doc.Safe, 'output'):
+                output_f2k_path = Path(doc.Safe.output)
+            else:
+                output_f2k_path = input_f2k_path
         self.safe = Safe(input_f2k_path, output_f2k_path)
         self.safe.get_tables_contents()
         self.safe.force_length_unit()
         self.force_unit = self.safe.force_unit
         self.length_unit = self.safe.length_unit
-        if doc is None:
-            doc = FreeCAD.ActiveDocument
-        self.doc = doc
         self.last_point_number = 1000
         self.last_area_number = 1000
         self.last_line_number = 1000
 
     def export_freecad_slabs(self,
-        split_mat : bool = True,
         soil_name : str = 'SOIL',
         soil_modulus : float = 2,
         slab_sec_name : Union[str, None] = None,
             ):
         
         foun = self.doc.Foundation
-        if slab_sec_name is None:
-            foun_height = foun.height.getValueAs(f'{self.length_unit}')
-            slab_sec_name = f'SLAB{foun_height}'
         # creating concrete material
         mat_name = self.create_concrete_material(foun=foun)
-        # define slab
-        self.create_solid_slab(slab_sec_name, 'Mat', mat_name, foun_height)
-        slab_names = []
+        soil_assignment_content = ''
+        all_slab_names = []
+        soil_names = []
+        names_props = []
+        slab_sec_names = []
         if foun.foundation_type == 'Strip':
-            # soil content
-            names_props = [(soil_name, soil_modulus)]
-            soil_content = self.create_soil_table(names_props)
-            points = punch_funcs.get_points_of_foundation_plan_and_holes(foun)
-            name = self.create_area_by_coord(points[0], slab_sec_name)
-            slab_names.append(name)
-            soil_assignment_content =  self.export_freecad_soil_support(
-                slab_names=slab_names,
-                soil_name=soil_name,
-                soil_modulus=None,
-            )
-            for pts in points[1:]:
-                self.create_area_by_coord(pts, is_opening=True)
+            for base_foundation in foun.base_foundations:
+                # create slab section
+                height_name = int(base_foundation.height.getValueAs('cm'))
+                height = int(base_foundation.height.getValueAs(f'{self.length_unit}'))
+                slab_sec_name = f'SLAB{height_name}'
+                if slab_sec_name not in slab_sec_names:
+                    # define slab
+                    self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
+                    slab_sec_names.append(slab_sec_name)
+                # create soil
+                ks = base_foundation.ks
+                soil_name = f'Soil_{ks}'
+                if soil_name not in soil_names:
+                    # soil content
+                    names_props.append((soil_name, ks))
+                    soil_names.append(soil_name)
+                faces = base_foundation.plan.Faces
+                slab_names = []
+                for face in faces:
+                    points = self.get_sort_points(face.Edges)
+                    name = self.create_area_by_coord(points, slab_sec_name)
+                    slab_names.append(name)
+                all_slab_names.extend(slab_names)
+                soil_assignment_content +=  self.export_freecad_soil_support(
+                    slab_names=slab_names,
+                    soil_name=soil_name,
+                    soil_modulus=None,
+                )
         
         elif foun.foundation_type == 'Mat':
-            if split_mat:
+            height_name = int(foun.height.getValueAs('cm'))
+            height = int(foun.height.getValueAs(f'{self.length_unit}'))
+            slab_sec_name = f'SLAB{height_name}'
+            if slab_sec_name not in slab_sec_names:
+                # define slab
+                self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
+                slab_sec_names.append(slab_sec_name)
+            if foun.split:
                 names_props = [
                     (soil_name, soil_modulus),
                     (f'{soil_name}_1.5', soil_modulus * 1.5),
                     (f'{soil_name}_2', soil_modulus * 2),
                 ]
-                soil_content = self.create_soil_table(names_props)
                 area_points = punch_funcs.get_sub_areas_points_from_face_with_scales(
-                    foun.plane_without_openings,
+                    foun.plan_without_openings,
                 )
                 for points in area_points:
                     name = self.create_area_by_coord(points, slab_sec_name)
-                    slab_names.append(name)
+                    all_slab_names.append(name)
                 soil_assignment_content = self.export_freecad_soil_support(
-                    slab_names=[slab_names[-1]],
+                    slab_names=[all_slab_names[-1]],
                     soil_name=soil_name,
                     soil_modulus=None,
                 )
                 soil_assignment_content += self.export_freecad_soil_support(
-                    slab_names=slab_names[:2],
+                    slab_names=all_slab_names[:2],
                     soil_name=f'{soil_name}_2',
                     soil_modulus=None,
                 )
                 soil_assignment_content += self.export_freecad_soil_support(
-                    slab_names=slab_names[2:4],
+                    slab_names=all_slab_names[2:4],
                     soil_name=f'{soil_name}_1.5',
                     soil_modulus=None,
                 )
                 
             else:
                 names_props = [(soil_name, soil_modulus)]
-                soil_content = self.create_soil_table(names_props)
-                edges = foun.plane_without_openings.Edges
+                edges = foun.outer_wire.Edges
                 points = self.get_sort_points(edges)
                 name = self.create_area_by_coord(points, slab_sec_name)
-                slab_names.append(name)
+                all_slab_names.append(name)
                 soil_assignment_content = self.export_freecad_soil_support(
-                    slab_names=slab_names,
+                    slab_names=all_slab_names,
                     soil_name=soil_name,
                     soil_modulus=None,
                 )
+        soil_content = self.create_soil_table(names_props)
         table_key = "SOIL PROPERTIES"
         self.safe.add_content_to_table(table_key, soil_content)
         table_key = "SOIL PROPERTY ASSIGNMENTS"
         self.safe.add_content_to_table(table_key, soil_assignment_content)
-        return slab_names
+        return all_slab_names
 
-    def get_sort_points(self, edges, vector=True):
+    def get_sort_points(self,
+                edges,
+                vector=True,
+                last=False,
+                sort_edges=True,
+                ):
         points = []
-        edges = Part.__sortEdges__(edges)
+        if sort_edges:
+            edges = Part.__sortEdges__(edges)
         for e in edges:
             v = e.firstVertex()
-            if vector is True:
+            if vector:
+                points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+            else:
+                points.append(v)
+        if last:
+            v = e.lastVertex()
+            if vector:
                 points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
             else:
                 points.append(v)
@@ -426,7 +463,7 @@ class FreecadReadwriteModel():
         openings = foun.openings
         names = []
         for opening in openings:
-            points = opening.points
+            points = [v.Point for v in opening.Base.Shape.Vertexes]
             name = self.create_area_by_coord(points, is_opening=True)
             names.append(name)
         return names
@@ -443,51 +480,41 @@ class FreecadReadwriteModel():
         self.create_rebar_material('AIII', 400)
         scale_factor = self.safe.length_units['mm']
         if foun.foundation_type == 'Strip':
-            slabs = foun.tape_slabs
-            continuous_slabs = punch_funcs.get_continuous_slabs(slabs)
-            i_strip = j = 0
-            for ss in continuous_slabs:
-                last = len(ss) - 1
-                for i, slab in enumerate(ss):
-                    if i == 0:
-                        p1 = slab.start_point
-                        coord1 = [coord * scale_factor for coord in (p1.x, p1.y, p1.z)]
-                        p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)
-                        if p1_name is None:
-                            points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
-                            p1_name = self.last_point_number
-                            self.last_point_number += 1
-                    p2 = slab.end_point
-                    coord2 = [coord * scale_factor for coord in (p2.x, p2.y, p2.z)]
-                    p2_name = self.safe.is_point_exist(coord2, curr_point_content + points_content)
-                    if p2_name is None:
-                        points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
-                        p2_name = self.last_point_number
+            for i, base_foundation in enumerate(foun.base_foundations):
+                layer = base_foundation.layer
+                edges = []
+                if not base_foundation.first_edge.isNull():
+                    edges.append(base_foundation.first_edge)
+                edges.extend(base_foundation.main_wire.Edges)
+                if not base_foundation.last_edge.isNull():
+                    edges.append(base_foundation.last_edge)
+                points = self.get_sort_points(edges, last=True, sort_edges=False)
+                last = len(edges)
+                strip_name = f'CS{layer}{i}'
+                if base_foundation.fix_width_from == 'Left':
+                    sl = base_foundation.left_width.Value
+                    sr = base_foundation.width.Value - sl
+                elif base_foundation.fix_width_from == 'Right':
+                    sr = base_foundation.right_width.Value
+                    sl = base_foundation.width.Value - sr
+                elif base_foundation.fix_width_from == 'center':
+                    sr = sl = base_foundation.width.Value / 2
+                swl = ewl = sl * scale_factor
+                swr = ewr = sr * scale_factor
+                for j, point in enumerate(points):
+                    coord = [coord * scale_factor for coord in (point.x, point.y, point.z)]
+                    point_name = self.safe.is_point_exist(coord, curr_point_content + points_content)
+                    if point_name is None:
+                        points_content += f"Point={self.last_point_number}   GlobalX={coord[0]}   GlobalY={coord[1]}   GlobalZ={coord[2]}   SpecialPt=No\n"
+                        point_name = self.last_point_number
                         self.last_point_number += 1
-                    swl = ewl = (slab.width.Value / 2 + slab.offset) * scale_factor
-                    swr = ewr = (slab.width.Value / 2 - slab.offset) * scale_factor
-                    if i != last:
-                        next_slab = ss[i + 1]
-                        next_swl = (next_slab.width.Value / 2 + next_slab.offset) * scale_factor
-                        next_swr = (next_slab.width.Value / 2 - next_slab.offset) * scale_factor
-                    if i == 0:
-                        dx = abs(p1.x - p2.x)
-                        dy = abs(p1.y - p2.y)
-                        if dx > dy:
-                            layer = 'A'
-                            i_strip += 1
-                            name = f'CS{layer}{i_strip}'
-                        else:
-                            layer = 'B'
-                            j += 1
-                            name = f'CS{layer}{j}'
-                    if i == 0:
-                        strip_content += f'\tStrip={name}   Point={p1_name}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
-                    if i == last: # last strip
-                        strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr}\n'
+                    if j == 0:
+                        strip_content += f'\tStrip={strip_name}   Point={point_name}   GlobalX={coord[0]}   GlobalY={coord[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
+                    elif j == last: # last strip
+                        strip_content += f'\tStrip={strip_name}   Point={point_name}   GlobalX={coord[0]}   GlobalY={coord[1]}   WBLeft={ewl}   WBRight={ewr}\n'
                     else:
-                        strip_content += f'\tStrip={name}   Point={p2_name}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   WBLeft={ewl}   WBRight={ewr} WALeft={next_swl}   WARight={next_swr} \n'
-                strip_assign_content += f'\tStrip={name}   Layer={layer}   DesignType=Column   RLLF=1   Design=Yes   IgnorePT=No   RebarMat=AIII   CoverType=Preferences\n'
+                        strip_content += f'\tStrip={strip_name}   Point={point_name}   GlobalX={coord[0]}   GlobalY={coord[1]}   WBLeft={ewl}   WBRight={ewr} WALeft={swl}   WARight={swr} \n'
+                strip_assign_content += f'\tStrip={strip_name}   Layer={layer}   DesignType=Column   RLLF=1   Design=Yes   IgnorePT=No   RebarMat=AIII   CoverType=Preferences\n'
         self.safe.add_content_to_table(point_coords_table_key, points_content)
         self.safe.add_content_to_table(strip_table_key, strip_content)
         self.safe.add_content_to_table(strip_assign_table_key, strip_assign_content)
@@ -498,12 +525,13 @@ class FreecadReadwriteModel():
         thickness = 1500 * self.safe.length_units['mm']
         self.create_solid_slab('COL_STIFF', 'Stiff', 'CONCRETE_ZERO', thickness)
         for o in self.doc.Objects:
-            if (hasattr(o, "Proxy") and 
-                hasattr(o.Proxy, "Type") and 
-                o.Proxy.Type == "Punch"
-                ):
-                points = self.get_sort_points(o.rect.Edges)
-                self.create_area_by_coord(points, prop_name='COL_STIFF')
+            if hasattr(o, "IfcType") and o.IfcType == "Column":
+                z_min = o.Shape.BoundBox.ZMin
+                for f in o.Shape.Faces:
+                    if f.BoundBox.ZLength == 0 and f.BoundBox.ZMin == z_min:
+                        points = self.get_sort_points(f.Edges)
+                        self.create_area_by_coord(points, prop_name='COL_STIFF')
+                        break
     
     def export_freecad_wall_loads(self):
         point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
@@ -702,7 +730,7 @@ if __name__ == '__main__':
     sys.path.insert(0, str(current_path))
     from etabs_obj import EtabsModel
     etabs = EtabsModel(backup=False, software='SAFE')
-    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plane_without_openings)
+    # etabs.area.get_scale_area_points_with_scale(document.Foundation.plan_without_openings)
     SapModel = etabs.SapModel
     ret = etabs.area.export_freecad_slabs(document)
     ret = etabs.area.export_freecad_openings(openings)

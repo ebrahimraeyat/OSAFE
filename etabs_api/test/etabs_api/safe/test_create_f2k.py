@@ -68,6 +68,15 @@ def test_add_loadcase_general(shayesteh):
     safe.write()
     assert  'LoadCase=DEAD' in content
 
+def test_add_modal_loadcase_definitions(shayesteh):
+    safe = CreateF2kFile(
+        Path('~\\test.f2k').expanduser(),
+        shayesteh,
+        )
+    content = safe.add_modal_loadcase_definitions()
+    safe.write()
+    assert  'LoadCase=Modal' in content
+
 def test_add_loadcase_definitions(shayesteh):
     safe = CreateF2kFile(
         Path('~\\test.f2k').expanduser(),
@@ -104,4 +113,4 @@ def test_create_f2k(shayesteh):
 
 if __name__ == '__main__':
     etabs = etabs_obj.EtabsModel(backup=False)
-    test_add_loadcase_definitions(etabs)
+    test_add_modal_loadcase_definitions(etabs)
