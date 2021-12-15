@@ -5,9 +5,9 @@ import Sketcher
 import ArchComponent
 
 try:
-    from safe.punch.punch_funcs import sort_vertex
+    from safe.punch import punch_funcs
 except:
-    from punch_funcs import sort_vertex
+    import punch_funcs
 
 
 def make_opening(points, height=2000):
@@ -17,7 +17,7 @@ def make_opening(points, height=2000):
     Opening(obj)
     sketch = doc.addObject('Sketcher::SketchObject', 'sketch')
     sketch.Placement.Base.z = z
-    points_xy = sort_vertex([[p.x, p.y] for p in points])
+    points_xy = punch_funcs.sort_vertex([[p.x, p.y] for p in points])
     points_vec = [FreeCAD.Vector(p[0], p[1], 0) for p in points_xy]
     points = points_vec + [points_vec[0]]
     sketch_lines = []
@@ -28,7 +28,9 @@ def make_opening(points, height=2000):
     sketch.addConstraint(Sketcher.Constraint('Coincident', sketch_lines[-1], 2, sketch_lines[0], 1))
     obj.Base = sketch
     # sketch.ViewObject.Visibility = False
+    obj.ViewObject.Visibility = False
     obj.height = height
+    
     if FreeCAD.GuiUp:
         _ViewProviderOpening(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -71,7 +73,17 @@ class Opening(ArchComponent.Component):
         if hasattr(obj, "Base") and obj.Base:
             wire = obj.Base.Shape.Wires[0]
             obj.plan = Part.Face(wire)
-            obj.Shape = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+            points = punch_funcs.get_sort_points(
+                wire.Edges,
+                sort_edges=True,
+            )
+            # lines = []
+            # for p1, p2 in zip(points[:-2], points[2:]):
+            #     lines.append(Part.makeLine(p1, p2))
+            
+            shape = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+            # obj.Shape = Part.makeCompound([shape] + lines)
+            obj.Shape = shape
 
 
 class _ViewProviderOpening:

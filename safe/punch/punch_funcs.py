@@ -300,13 +300,15 @@ def get_sort_points(
     edges,
     vector=True,
     get_last=False,
+    sort_edges=True,
     ):
     vectors = []
     if len(edges) == 1:
         for v in edges[0].Vertexes:
             vectors.append(FreeCAD.Vector(v.X, v.Y, v.Z))
         return vectors
-    edges = Part.__sortEdges__(edges)
+    if sort_edges:
+        edges = Part.__sortEdges__(edges)
     for e1, e2 in zip(edges[:-1], edges[1:]):
         p = get_common_vector_in_two_edges(e1, e2)
         vectors.append(p)
