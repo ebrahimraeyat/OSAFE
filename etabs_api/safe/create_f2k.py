@@ -174,6 +174,29 @@ class CreateF2kFile(Safe):
         self.tables_contents = dict()
         self.tables_contents[table_key] =  content
 
+    def add_grids(self):
+        table_key = 'Grid Definitions - Grid Lines'
+        cols = ['LineType', 'ID', 'Ordinate']
+        df = self.etabs.database.read(table_key, to_dataframe=True, cols=cols)
+        filt = df.LineType.isin(('X (Cartesian)', 'Y (Cartesian)'))
+        df = df.loc[filt]
+        replacements = {
+            'X (Cartesian)' : 'X',
+            'Y (Cartesian)' : 'Y',
+            }
+        df.replace({'LineType' : replacements}, inplace=True)
+        df.insert(loc=0, column='CoordSys', value='CoordSys=GLOBAL')
+        df['ID'] = '"' +  df['ID'] + '"'
+        d = {
+            'LineType': 'AxisDir=',
+            'ID': 'GridID=',
+            'Ordinate' : 'Ordinate='
+            }
+        content = self.add_assign_to_fields_of_dataframe(df, d)
+        table_key = "GRID LINES"
+        self.add_content_to_table(table_key, content)
+        return content
+
     def add_point_coordinates(self):
         base_name = self.etabs.story.get_base_name_and_level()[0]
         table_key = 'Objects and Elements - Joints'
@@ -352,6 +375,7 @@ class CreateF2kFile(Safe):
     def create_f2k(self):
         yield ('Write Points Coordinates ...', 5, 1)
         self.add_point_coordinates()
+        self.add_grids()
         yield ('Add Load Patterns ...', 20, 2)
         self.add_load_patterns()
         yield ('Add Load Cases ...', 30, 3)
