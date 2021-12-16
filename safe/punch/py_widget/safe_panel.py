@@ -11,47 +11,8 @@ class Safe12TaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
-        self.create_connections()
-        self.fill_f2k_filename()
 
-    def create_connections(self):
-        self.form.export_button.clicked.connect(self.export_to_safe)
-        self.form.browse_input.clicked.connect(self.openf2k)
-        self.form.browse_output.clicked.connect(self.savef2k)
-
-    def fill_f2k_filename(self):
-        if FreeCAD.ActiveDocument:
-            safe = FreeCAD.ActiveDocument.Safe
-            if safe and hasattr(safe, 'input'):
-                self.form.input_f2k.setText(safe.input)
-            if safe and hasattr(safe, 'output'):
-                self.form.output_f2k.setText(safe.output)
-
-    def openf2k(self):
-        ext = '.f2k'
-        from PySide2.QtWidgets import QFileDialog
-        filters = f"{ext[1:]} (*{ext})"
-        filename, _ = QFileDialog.getOpenFileName(None, 'select file',
-                                            None, filters)
-        if not filename:
-            return
-        if not filename.lower().endswith(ext):
-            filename += ext
-        self.form.input_f2k.setText(filename)
-    
-    def savef2k(self):
-        ext = '.f2k'
-        from PySide2.QtWidgets import QFileDialog
-        filters = f"{ext[1:]} (*{ext})"
-        filename, _ = QFileDialog.getSaveFileName(None, 'select file',
-                                            None, filters)
-        if not filename:
-            return
-        if not filename.lower().endswith(ext):
-            filename += ext
-        self.form.output_f2k.setText(filename)
-
-    def export_to_safe(self):
+    def accept(self):
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
@@ -106,8 +67,9 @@ class Safe12TaskPanel:
             etabs.SapModel.View.RefreshView()
         elif software == 'SAFE 16':
             from safe.punch.safe_read_write_f2k import FreecadReadwriteModel as FRW
-            input_f2k_path = self.form.input_f2k.text()
-            output_f2k_path = self.form.output_f2k.text()
+            f2k_file = doc.Safe
+            input_f2k_path = f2k_file.input
+            output_f2k_path = f2k_file.output
             rw = FRW(input_f2k_path, output_f2k_path, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(

@@ -23,13 +23,10 @@ class EtabsTaskPanel:
     def set_filename(self):
         filename = Path(self.etabs.SapModel.GetModelFilename()).with_suffix('.F2k')
         self.form.filename.setText(str(filename))
-        name = f"{filename.name.rstrip(filename.suffix)}_export{filename.suffix}"
-        filename = filename.with_name(name)
-        self.form.output_f2k.setText(str(filename))
+        
 
     def create_connections(self):
         self.form.browse.clicked.connect(self.browse)
-        self.form.browse_output.clicked.connect(self.browse)
 
     def set_foundation_level(self):
         self.etabs.set_current_unit('N', 'm')
@@ -86,11 +83,13 @@ class EtabsTaskPanel:
 
     def create_f2k(self):
         filename = self.form.filename.text()
-        output_filename = self.form.output_f2k.text()
+        filename_path = Path(filename)
+        name = f"{filename_path.name.rstrip(filename_path.suffix)}_export{filename_path.suffix}"
+        output_filename = str(filename_path.with_name(name))
         from etabs_api.safe import create_f2k
         from safe.punch.f2k_object import make_safe_f2k
         make_safe_f2k(filename, output_filename)
-        writer = create_f2k.CreateF2kFile(Path(filename), self.etabs)
+        writer = create_f2k.CreateF2kFile(filename_path, self.etabs)
         pixmap = QPixmap(str(punch_path / 'Resources' / 'icons' / 'tick.svg'))
         d = {
             1 : self.form.one,
