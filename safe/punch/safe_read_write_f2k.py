@@ -44,7 +44,7 @@ class Safe():
             context = ''
             table_key = None
             for line in lines:
-                if line.startswith("TABLE:"):
+                if line.startswith("TABLE:") or "END TABLE DATA" in line:
                     if table_key and context:
                         tables_contents[table_key] = context
                     context = ''
