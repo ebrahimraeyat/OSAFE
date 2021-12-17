@@ -708,7 +708,7 @@ class FreecadReadwriteModel():
         foun = self.doc.Foundation
         cover_mm = foun.cover.getValueAs('mm')
         cover = cover_mm * self.safe.length_units['mm']
-        content = f'\tCoverTop={cover}   CoverBot={cover}   BarSize=20\n'
+        content = f'\tCoverTop={cover}   CoverBot={cover}   BarSize=18  InnerLayer=B    SlabType="Two Way"\n'
         self.safe.tables_contents[table_key] = content
 
 if __name__ == '__main__':
