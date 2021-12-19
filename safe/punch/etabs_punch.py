@@ -136,7 +136,10 @@ class EtabsPunch(object):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
         self.create_slabs_plan()
-        self.create_columns()
+        try:
+            self.create_columns()
+        except TypeError:
+            pass
         # self.create_foundation()
         # self.create_punches()
         FreeCAD.ActiveDocument.recompute()
