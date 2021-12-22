@@ -1,0 +1,945 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1118</width>
+    <height>742</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>civiltools</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <item>
+     <widget class="QSplitter" name="mainSplitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QSplitter" name="splitter">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="childrenCollapsible">
+           <bool>false</bool>
+          </property>
+          <widget class="QWidget" name="layoutWidget_2">
+           <layout class="QVBoxLayout" name="mesh_and_equal_layout"/>
+          </widget>
+          <widget class="QWidget" name="layoutWidget">
+           <layout class="QGridLayout" name="drawLayout"/>
+          </widget>
+          <widget class="QWidget" name="layoutWidget">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QGroupBox" name="groupBox_2">
+                <property name="title">
+                 <string>Main section</string>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout">
+                 <item>
+                  <widget class="QComboBox" name="doubleBox">
+                   <property name="currentIndex">
+                    <number>1</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>single</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/one.svg</normaloff>:/section/images/one.svg</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>double</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/two.svg</normaloff>:/section/images/two.svg</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>souble</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/three.svg</normaloff>:/section/images/three.svg</iconset>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="sectionTypeBox">
+                   <item>
+                    <property name="text">
+                     <string>IPE</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/IPE.png</normaloff>:/section/images/IPE.png</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>CPE</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/cpe.png</normaloff>:/section/images/cpe.png</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>UNP</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/unp.png</normaloff>:/section/images/unp.png</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>UPA</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/upa.png</normaloff>:/section/images/upa.png</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>BOX</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/BOX.png</normaloff>:/section/images/BOX.png</iconset>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="sectionsBox">
+                   <property name="currentIndex">
+                    <number>-1</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_3">
+                <property name="title">
+                 <string>Plate dimentions</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="0" column="0">
+                  <widget class="QFrame" name="frame_tb">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_5">
+                    <item>
+                     <widget class="QSpinBox" name="lhSpinBox">
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="suffix">
+                       <string>  cm</string>
+                      </property>
+                      <property name="prefix">
+                       <string/>
+                      </property>
+                      <property name="minimum">
+                       <number>5</number>
+                      </property>
+                      <property name="value">
+                       <number>25</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="thSpinBox">
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="suffix">
+                       <string>  mm</string>
+                      </property>
+                      <property name="prefix">
+                       <string/>
+                      </property>
+                      <property name="minimum">
+                       <number>1</number>
+                      </property>
+                      <property name="value">
+                       <number>10</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="addTBPL">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="resource_1.qrc">
+                        <normaloff>:/section/images/plate_tb_check.svg</normaloff>:/section/images/plate_tb_check.svg</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>32</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QFrame" name="frame_web">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <item>
+                     <widget class="QSpinBox" name="lwSpinBox">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="suffix">
+                       <string>  cm</string>
+                      </property>
+                      <property name="prefix">
+                       <string/>
+                      </property>
+                      <property name="minimum">
+                       <number>5</number>
+                      </property>
+                      <property name="value">
+                       <number>14</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="twSpinBox">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="suffix">
+                       <string>  mm</string>
+                      </property>
+                      <property name="prefix">
+                       <string/>
+                      </property>
+                      <property name="minimum">
+                       <number>1</number>
+                      </property>
+                      <property name="value">
+                       <number>8</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="addWebPL">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="resource_1.qrc">
+                        <normaloff>:/section/images/plate_web_check.svg</normaloff>:/section/images/plate_web_check.svg</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>32</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QFrame" name="frame_lr">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_6">
+                    <item>
+                     <widget class="QSpinBox" name="lvSpinBox">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="suffix">
+                       <string>  cm</string>
+                      </property>
+                      <property name="prefix">
+                       <string/>
+                      </property>
+                      <property name="minimum">
+                       <number>5</number>
+                      </property>
+                      <property name="value">
+                       <number>25</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSpinBox" name="tvSpinBox">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="suffix">
+                       <string>  mm</string>
+                      </property>
+                      <property name="prefix">
+                       <string/>
+                      </property>
+                      <property name="minimum">
+                       <number>1</number>
+                      </property>
+                      <property name="value">
+                       <number>10</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="addLRPL">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="resource_1.qrc">
+                        <normaloff>:/section/images/plate_lr_check.svg</normaloff>:/section/images/plate_lr_check.svg</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>32</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="groupBox_4">
+                <property name="title">
+                 <string>Section dist.</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_3">
+                 <item>
+                  <widget class="QLabel" name="dist_label">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="resource_1.qrc">:/section/dist.svg</pixmap>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignCenter</set>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_8">
+                   <item>
+                    <widget class="QSpinBox" name="distSpinBox">
+                     <property name="suffix">
+                      <string> mm</string>
+                     </property>
+                     <property name="prefix">
+                      <string/>
+                     </property>
+                     <property name="maximum">
+                      <number>500</number>
+                     </property>
+                     <property name="singleStep">
+                      <number>1</number>
+                     </property>
+                     <property name="value">
+                      <number>80</number>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="cc_checkbox">
+                     <property name="toolTip">
+                      <string>sections center to center distance</string>
+                     </property>
+                     <property name="text">
+                      <string>CC</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="calculate_Button">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>135</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <family>Noto Sans</family>
+                     <pointsize>10</pointsize>
+                     <weight>50</weight>
+                     <italic>true</italic>
+                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="toolTip">
+                    <string>add section</string>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font: italic 10pt &quot;Noto Sans&quot;;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="resource.qrc">
+                     <normaloff>:/section/images/run.svg</normaloff>:/section/images/run.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>33</width>
+                     <height>135</height>
+                    </size>
+                   </property>
+                   <property name="shortcut">
+                    <string>Ctrl+R</string>
+                   </property>
+                   <property name="flat">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <widget class="QGroupBox" name="groupBox_5">
+                <property name="title">
+                 <string>Equivalent Section</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_3">
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Use as</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Ductility</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QListWidget" name="useAsList">
+                   <property name="verticalScrollBarPolicy">
+                    <enum>Qt::ScrollBarAsNeeded</enum>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                   </property>
+                   <property name="selectionMode">
+                    <enum>QAbstractItemView::ExtendedSelection</enum>
+                   </property>
+                   <property name="currentRow">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Beam</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/beam.svg</normaloff>:/section/images/beam.svg</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Column</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/column.svg</normaloff>:/section/images/column.svg</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Brace</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/brace.svg</normaloff>:/section/images/brace.svg</iconset>
+                    </property>
+                    <property name="flags">
+                     <set>ItemIsDragEnabled|ItemIsUserCheckable</set>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QListWidget" name="equivalent_type_list">
+                   <property name="verticalScrollBarPolicy">
+                    <enum>Qt::ScrollBarAsNeeded</enum>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                   </property>
+                   <property name="selectionMode">
+                    <enum>QAbstractItemView::ExtendedSelection</enum>
+                   </property>
+                   <property name="currentRow">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Compaction</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/compct.svg</normaloff>:/section/images/compct.svg</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Shear</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/As.svg</normaloff>:/section/images/As.svg</iconset>
+                    </property>
+                    <property name="flags">
+                     <set>ItemIsDragEnabled|ItemIsUserCheckable</set>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QLabel" name="label_5">
+                   <property name="text">
+                    <string>Convert to</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="3">
+                  <widget class="QListWidget" name="equivalent_type_list_2">
+                   <property name="verticalScrollBarPolicy">
+                    <enum>Qt::ScrollBarAsNeeded</enum>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                   </property>
+                   <property name="selectionMode">
+                    <enum>QAbstractItemView::ExtendedSelection</enum>
+                   </property>
+                   <property name="currentRow">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>IPE</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/IPE.png</normaloff>:/section/images/IPE.png</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>BOX</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/BOX.png</normaloff>:/section/images/BOX.png</iconset>
+                    </property>
+                    <property name="flags">
+                     <set>ItemIsDragEnabled|ItemIsUserCheckable</set>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2UNP</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/2UNP.svg</normaloff>:/section/images/2UNP.svg</iconset>
+                    </property>
+                    <property name="flags">
+                     <set>ItemIsDragEnabled|ItemIsUserCheckable</set>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QListWidget" name="ductilityList">
+                   <property name="verticalScrollBarPolicy">
+                    <enum>Qt::ScrollBarAsNeeded</enum>
+                   </property>
+                   <property name="sizeAdjustPolicy">
+                    <enum>QAbstractScrollArea::AdjustIgnored</enum>
+                   </property>
+                   <property name="selectionMode">
+                    <enum>QAbstractItemView::ExtendedSelection</enum>
+                   </property>
+                   <property name="currentRow">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Medium</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/r_med.svg</normaloff>:/section/images/r_med.svg</iconset>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>High</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resource_1.qrc">
+                      <normaloff>:/section/images/r_hight.svg</normaloff>:/section/images/r_hight.svg</iconset>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="label_4">
+                   <property name="text">
+                    <string>Type</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QSplitter" name="splitter2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <widget class="QTableView" name="tableView1"/>
+       <widget class="QWidget" name="gridLayoutWidget">
+        <layout class="QGridLayout" name="main_section_draw"/>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1118</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Open"/>
+    <addaction name="action_Save"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="action_Mesh_Shape"/>
+   </widget>
+   <widget class="QMenu" name="menu_Sections">
+    <property name="title">
+     <string>&amp;Sections</string>
+    </property>
+    <widget class="QMenu" name="menu_Export">
+     <property name="title">
+      <string>&amp;Export</string>
+     </property>
+     <addaction name="action_Xml"/>
+     <addaction name="action_Autocad_scr"/>
+     <addaction name="action_Excel"/>
+     <addaction name="action_ETABS"/>
+    </widget>
+    <addaction name="menu_Export"/>
+    <addaction name="action_Remove_Section"/>
+    <addaction name="action_Delete"/>
+    <addaction name="action_Shear"/>
+    <addaction name="action_multi_section"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_View"/>
+   <addaction name="menu_Sections"/>
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>36</width>
+     <height>36</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_Open"/>
+   <addaction name="action_Save"/>
+   <addaction name="separator"/>
+   <addaction name="action_ETABS"/>
+   <addaction name="action_Xml"/>
+   <addaction name="action_Excel"/>
+   <addaction name="action_Autocad_scr"/>
+   <addaction name="separator"/>
+   <addaction name="action_multi_section"/>
+   <addaction name="action_Shear"/>
+   <addaction name="action_Remove_Section"/>
+   <addaction name="action_Delete"/>
+  </widget>
+  <action name="action_Mesh_Shape">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Mesh Shape</string>
+   </property>
+  </action>
+  <action name="action_Remove_Section">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/section/images/remove.svg</normaloff>:/section/images/remove.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Remove Section</string>
+   </property>
+  </action>
+  <action name="action_Delete">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/section/images/clear.png</normaloff>:/section/images/clear.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Delete All Sections</string>
+   </property>
+  </action>
+  <action name="action_Xml">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/section/images/xml.png</normaloff>:/section/images/xml.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Xml</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="action_Autocad_scr">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/section/images/autocad.png</normaloff>:/section/images/autocad.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Autocad (.dxf)</string>
+   </property>
+   <property name="iconText">
+    <string>Autocad (.dxf)</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_Excel">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/section/images/pro.svg</normaloff>:/section/images/pro.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Proper</string>
+   </property>
+   <property name="iconText">
+    <string>proper</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="icon">
+    <iconset resource="resource_1.qrc">
+     <normaloff>:/section/images/open.png</normaloff>:/section/images/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="icon">
+    <iconset resource="resource_1.qrc">
+     <normaloff>:/section/images/save.png</normaloff>:/section/images/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_Shear">
+   <property name="icon">
+    <iconset resource="resource_1.qrc">
+     <normaloff>:/section/images/As.svg</normaloff>:/section/images/As.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Convert to Shear</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="action_multi_section">
+   <property name="icon">
+    <iconset resource="resource_1.qrc">
+     <normaloff>:/section/images/multi_section.svg</normaloff>:/section/images/multi_section.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Multi Section</string>
+   </property>
+  </action>
+  <action name="action_ETABS">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="resource_1.qrc">
+     <normaloff>:/section/images/etabs.png</normaloff>:/section/images/etabs.png</iconset>
+   </property>
+   <property name="text">
+    <string>ETABS</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="resource_1.qrc"/>
+  <include location="resource.qrc"/>
+ </resources>
+ <connections/>
+</ui>

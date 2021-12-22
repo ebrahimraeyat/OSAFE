@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 12.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 51448)  --><svg height="133.554" id="Layer_1" inkscape:version="0.42" sodipodi:docbase="F:\openclip\svg da inviare" sodipodi:docname="tasto03.svg" sodipodi:version="0.32" space="preserve" style="overflow:visible;enable-background:new 0 0 136.301 133.554;" version="1.1" viewBox="0 0 136.301 133.554" width="136.301" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg">
+  <metadata>
+    <rdf:RDF xmlns:cc="http://web.resource.org/cc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+      <cc:Work rdf:about="">
+        <dc:title>Tasto 3</dc:title>
+        <dc:description></dc:description>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>unsorted</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:publisher>
+          <cc:Agent rdf:about="http://www.openclipart.org/">
+            <dc:title>Open Clip Art Library</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Architetto Francesco Rollandin</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Architetto Francesco Rollandin</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:date></dc:date>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <cc:license rdf:resource="http://web.resource.org/cc/PublicDomain"/>
+        <dc:language>en</dc:language>
+      </cc:Work>
+      <cc:License rdf:about="http://web.resource.org/cc/PublicDomain">
+        <cc:permits rdf:resource="http://web.resource.org/cc/Reproduction"/>
+        <cc:permits rdf:resource="http://web.resource.org/cc/Distribution"/>
+        <cc:permits rdf:resource="http://web.resource.org/cc/DerivativeWorks"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <defs id="defs19"/>
+  <sodipodi:namedview bordercolor="#666666" borderopacity="1.0" id="base" inkscape:current-layer="Layer_1" inkscape:cx="68.150497" inkscape:cy="66.777000" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="510" inkscape:window-width="787" inkscape:window-x="88" inkscape:window-y="116" inkscape:zoom="2.6955389" pagecolor="#ffffff"/>
+  <g id="g3">
+    <radialGradient cx="46.064" cy="16.0752" gradientUnits="userSpaceOnUse" id="XMLID_2_" r="107.2917">
+      <stop id="stop6" offset="0" style="stop-color:#D1F593"/>
+      <stop id="stop8" offset="1" style="stop-color:#81CE09"/>
+    </radialGradient>
+    <path d="M7.729,57.055c8.684,0,17.37,0,26.055,0c0.876,0,0.414-21.411,0.414-23.408   c0.002-7.318-2.595-21.402,2.615-27.582c5.442-6.456,19.134-3.953,26.521-3.953c9.347,0,18.696,0,28.045,0   c12.553,0,11.354,12.944,11.354,21.597c0,10.592,0,21.185,0,31.776c0,2.726,2.368,1.57,4.851,1.57c5.667,0,11.331,0,16.996,0   c9.421,0,13.819,9.717,6.959,16.599c-5.921,5.941-11.844,11.883-17.766,17.824c-12.607,12.647-24.645,27.021-38.354,38.476   c-8.105,8.083-15.823-0.108-21.533-5.813c-7.777-7.771-15.557-15.543-23.334-23.315C22.907,93.19,15.264,85.552,7.62,77.916   C2.664,72.962-3.668,66.688,2.648,59.41C3.939,57.923,5.752,57.055,7.729,57.055" id="path10" style="fill:url(#XMLID_2_);"/>
+    <path d="M120.557,75.788C115.55,80.81,68.67,128.07,68.439,127.84c-9.757-9.712-19.515-19.424-29.272-29.136   c-5.813-5.785-11.627-11.57-17.439-17.355c-3.576-3.561-10.476-8.663-7.905-14.489c-4.219,0-8.437,0-12.656,0   c0.692,5.393,6.771,9.654,10.355,13.223c7.439,7.407,14.878,14.815,22.317,22.223c7.095,7.067,14.192,14.133,21.29,21.198   c3.856,3.843,7.753,9.035,13.543,9c5.558,0.066,9.166-4.654,12.851-8.35c6.91-6.932,13.819-13.862,20.729-20.797   c7.477-7.5,14.954-15,22.433-22.503c3.703-3.718,10.343-8.383,11.072-13.994c-4.247,0-8.491,0-12.738,0   C124.288,69.901,122.734,73.594,120.557,75.788" id="path12" style="fill:#67BA06;"/>
+    <path d="M127.29,56.413c-7.71,0-15.421,0-23.13,0c-0.998,0-0.465-17.219-0.465-18.938   c0-8.21,0-16.421,0-24.634c0-10.889-9.997-11.371-18.014-11.371c-10.15,0-20.302,0-30.453,0c-7.753,0-18.296-1.128-20.153,9.112   c-1.291,7.109-0.177,15.245-0.177,22.421c0.001,7.804,0.003,15.606,0.003,23.41c-8.386,0-16.771,0-25.156,0   c-3.101,0-5.961,1.312-7.487,4.099c-0.658,1.203-2.497,6.348-0.286,6.348c2.559,0,5.115,0,7.672,0c3.825,0,3.104-0.06,5.845-2.069   c3.166-2.32,9.244-1.37,12.928-1.37c5.045,0,10.092,0,15.136,0c0.263,0,0.128-23.169,0.128-24.95   c0-6.814-2.498-21.409,2.523-27.108C51.132,5.771,67.969,8.86,74.378,8.86c9.076,0,20.759-1.973,20.759,10.899   c0,9.684,0,19.371,0,29.057c0,4.845,0,9.692,0,14.538c0,0.135,15.932,0.066,17.34,0.066c2.448,0,5.307-0.303,7.611,0.638   c3.817,1.563,2.562,2.801,7.135,2.801c1.336,0,7.587,0.912,8.533,0C136.461,61.397,133.063,56.413,127.29,56.413" id="path14" style="fill:#B2ED21;"/>
+    <path d="M46.274,0.573c-13.807,0-12.011,15.303-12.011,24.606c0,10.048-0.002,20.093-0.002,30.142   c0,0.621-22.961-0.128-25.57,0.194c-8.07,0-11.073,12.074-5.88,17.262c1.504,1.503,3.007,3.006,4.512,4.509   c15.4,15.387,30.801,30.773,46.202,46.16c5.826,5.82,12.769,14.135,21.83,7.887c5.11-3.527,9.366-9.116,13.71-13.473   c14.19-14.237,28.382-28.474,42.573-42.712c6.208-6.228,7.586-19.633-4.489-19.633c-4.819,0-9.638,0-14.457,0   c-2.513,0-8.1,1.479-8.1-1.557c0-10.057,0-20.116,0-30.175c0-9.102,1.274-23.21-12.01-23.21   C77.373-0.716,61.549,0.573,46.274,0.573 M61.3,128.675c-12.837-12.824-25.672-25.649-38.509-38.474   c-5.947-5.941-11.894-11.883-17.84-17.824c-3.13-3.129-3.784-7.864-1.521-11.806c2.448-4.265,7.772-3.26,11.925-3.26   c5.475,0,10.95,0,16.427,0c3.186,0,4.275,1.01,4.275-2.173c0-10.753,0.001-21.507,0.001-32.26c0-8.321-1.292-20.509,10.757-20.509   c9.728,0,19.455,0,29.183,0c7.125,0,20.341-2.447,25.046,4.505c4.364,6.454,1.752,20.129,1.752,27.326   c0,1.606-0.123,23.112,0.114,23.112c8.344,0,18.076-1.517,26.266,0.186c12.227,2.544,3.051,14.515-1.562,19.141   c-7.611,7.638-15.223,15.274-22.837,22.912c-7.518,7.542-15.036,15.085-22.554,22.628C76.797,127.625,69.27,136.622,61.3,128.675" id="path16" style="fill:#739B07;"/>
+  </g>
+</svg>

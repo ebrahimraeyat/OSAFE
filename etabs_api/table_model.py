@@ -3,9 +3,9 @@ import sys
 from pathlib import Path
 # import comtypes.client
 import pandas as pd
-from PyQt5.QtCore import QAbstractTableModel, Qt 
-from PyQt5.QtGui import QColor
-from PyQt5 import QtCore, QtWidgets, uic
+from PySide2.QtCore import QAbstractTableModel, Qt 
+from PySide2.QtGui import QColor
+from PySide2 import QtCore, QtWidgets, uic
 import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 import matplotlib
