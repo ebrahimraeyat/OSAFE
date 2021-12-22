@@ -5,24 +5,25 @@ from pathlib import Path
 import pandas as pd
 from PySide2.QtCore import QAbstractTableModel, Qt 
 from PySide2.QtGui import QColor
-from PySide2 import QtCore, QtWidgets, uic
-import matplotlib.cm as cm
-from matplotlib.colors import Normalize
-import matplotlib
+from PySide2 import QtCore, QtWidgets
+from PySide2.QtUiTools import loadUiType
+# import matplotlib.cm as cm
+# from matplotlib.colors import Normalize
+# import matplotlib
 
-civiltools_path = Path(__file__).parent.parent
+civiltools_path = Path(__file__).parent.parent / 'civilTools'
 sys.path.insert(0, str(civiltools_path))
-result_window, result_base = uic.loadUiType(str(civiltools_path / 'widgets' / 'results.ui'))
+result_window, result_base = loadUiType(str(civiltools_path / 'widgets' / 'results.ui'))
 
 low = 'cyan'
 intermediate = 'yellow'
 high = 'red'
 
-def color_map_color(value, norm, cmap_name='rainbow'):
-    cmap = cm.get_cmap(cmap_name)  # PiYG
-    rgb = cmap(norm(abs(value)))[:3]  # will return rgba, we take only first 3 so we get rgb
-    color = matplotlib.colors.rgb2hex(rgb)
-    return color
+# def color_map_color(value, norm, cmap_name='rainbow'):
+#     cmap = cm.get_cmap(cmap_name)  # PiYG
+#     rgb = cmap(norm(abs(value)))[:3]  # will return rgba, we take only first 3 so we get rgb
+#     color = matplotlib.colors.rgb2hex(rgb)
+#     return color
 
 class ResultsModel(QAbstractTableModel):
     '''
@@ -392,7 +393,7 @@ class ResultWidget(result_base, result_window):
         # self.result_table_view.setFixedWidth(width)
 
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def on_view_horizontalHeader_sectionClicked(self, logicalIndex):
         self.logicalIndex   = logicalIndex
         self.menuValues     = QtWidgets.QMenu(self)
@@ -425,7 +426,7 @@ class ResultWidget(result_base, result_window):
 
         self.menuValues.exec_(QtCore.QPoint(posX, posY))
 
-    @QtCore.pyqtSlot()
+    @QtCore.Slot()
     def on_actionAll_triggered(self):
         filterColumn = self.logicalIndex
         filterString = QtCore.QRegExp(  "",
@@ -436,7 +437,7 @@ class ResultWidget(result_base, result_window):
         self.proxy.setFilterRegExp(filterString)
         self.proxy.setFilterKeyColumn(filterColumn)
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def on_signalMapper_mapped(self, i):
         stringAction = self.signalMapper.mapping(i).text()
         filterColumn = self.logicalIndex
@@ -448,7 +449,7 @@ class ResultWidget(result_base, result_window):
         self.proxy.setFilterRegExp(filterString)
         self.proxy.setFilterKeyColumn(filterColumn)
 
-    @QtCore.pyqtSlot(str)
+    @QtCore.Slot(str)
     def on_lineEdit_textChanged(self, text):
         search = QtCore.QRegExp(    text,
                                     QtCore.Qt.CaseInsensitive,
@@ -457,7 +458,7 @@ class ResultWidget(result_base, result_window):
 
         self.proxy.setFilterRegExp(search)
 
-    @QtCore.pyqtSlot(int)
+    @QtCore.Slot(int)
     def on_comboBox_currentIndexChanged(self, index):
         self.proxy.setFilterKeyColumn(index)
 
