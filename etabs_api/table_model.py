@@ -1,5 +1,3 @@
-import os
-import sys
 from pathlib import Path
 # import comtypes.client
 import pandas as pd
@@ -12,8 +10,6 @@ from PySide2.QtUiTools import loadUiType
 # import matplotlib
 
 civiltools_path = Path(__file__).parent.parent / 'civilTools'
-sys.path.insert(0, str(civiltools_path))
-result_window, result_base = loadUiType(str(civiltools_path / 'widgets' / 'results.ui'))
 
 low = 'cyan'
 intermediate = 'yellow'
@@ -347,7 +343,7 @@ class BeamsJModel(ResultsModel):
                 return int(Qt.AlignCenter | Qt.AlignVCenter)
 
 
-class ResultWidget(result_base, result_window):
+class ResultWidget(*loadUiType(str(civiltools_path / 'widgets' / 'results.ui'))):
     # main widget for user interface
     def __init__(self, data, headers, model, function, parent=None):
         super(ResultWidget, self).__init__(parent)
@@ -478,8 +474,25 @@ class ResultWidget(result_base, result_window):
     #     pass
 
 def show_results(data, headers, model, function=None):
-    child_results_win = ResultWidget(data, headers, model, function)
-    child_results_win.exec_()
+    win = ResultWidget(data, headers, model, function)
+    mdi = get_mdiarea()
+    if not mdi:
+        return None
+    sub = mdi.addSubWindow(win)
+    sub.show()
+
+def get_mdiarea():
+    """ Return FreeCAD MdiArea. """
+    import FreeCADGui as Gui
+    import PySide2
+    mw = Gui.getMainWindow()
+    if not mw:
+        return None
+    childs = mw.children()
+    for c in childs:
+        if isinstance(c, PySide2.QtWidgets.QMdiArea):
+            return c
+    return None
 
 
 # class EtabsModel:

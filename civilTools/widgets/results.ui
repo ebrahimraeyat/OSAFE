@@ -62,23 +62,13 @@
       </spacer>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="buttonBox">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="push_button_to_excel">
        <property name="text">
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../applications/cfactor/resource.qrc">
-         <normaloff>:/cfactor/images/xlsx.png</normaloff>:/cfactor/images/xlsx.png</iconset>
+        <iconset resource="../../civiltools.qrc">
+         <normaloff>:/civiltools/civilTools/images/xlsx.png</normaloff>:/civiltools/civilTools/images/xlsx.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -100,40 +90,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../applications/cfactor/resource.qrc"/>
+  <include location="../../civiltools.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Results</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Results</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
