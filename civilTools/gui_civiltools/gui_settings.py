@@ -51,6 +51,8 @@ class CivilSettings:
 
     def initiate(self):
         doc = FreeCAD.ActiveDocument
+        if doc is None:
+            doc = App.newDocument()
         if not hasattr(doc, 'Site'):
             import Arch
             site = Arch.makeSite([])

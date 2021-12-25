@@ -5,10 +5,7 @@ from PySide2.QtGui import QPixmap
 
 civiltools_path = Path(__file__).absolute().parent.parent
 
-# base, window = loadUiType(civiltools_path / 'widgets' / 'explode_seismic_load_patterns.ui')
 
-
-# class Form(base, window):
 class Form(*loadUiType(str(civiltools_path / 'widgets' / 'explode_seismic_load_patterns.ui'))):
     def __init__(self, etabs_model, parent=None):
         super(Form, self).__init__()
