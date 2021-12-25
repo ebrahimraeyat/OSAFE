@@ -1,14 +1,15 @@
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtGui import QPixmap
+from PySide2.QtUiTools import loadUiType
+from PySide2.QtGui import QPixmap
 
-cfactor_path = Path(__file__).absolute().parent.parent
+civiltools_path = Path(__file__).absolute().parent.parent
 
-base, window = uic.loadUiType(cfactor_path / 'widgets' / 'explode_seismic_load_patterns.ui')
+# base, window = loadUiType(civiltools_path / 'widgets' / 'explode_seismic_load_patterns.ui')
 
 
-class Form(base, window):
+# class Form(base, window):
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'explode_seismic_load_patterns.ui'))):
     def __init__(self, etabs_model, parent=None):
         super(Form, self).__init__()
         self.setupUi(self)
@@ -35,7 +36,7 @@ class Form(base, window):
         replace_ey = self.replace_ey.isChecked()
         drift_prefix = self.drift_prefix.text()
         drift_suffix = self.drift_suffix.text()
-        pixmap = QPixmap(str(cfactor_path.parent.parent / 'images' / 'tick.svg'))
+        pixmap = QPixmap(str(civiltools_path / 'images' / 'tick.svg'))
         for ret in self.etabs.database.expand_loads(
             equal_names=equal_names,
             replace_ex = replace_ex,

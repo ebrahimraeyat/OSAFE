@@ -263,7 +263,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -287,7 +287,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -318,7 +318,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -342,7 +342,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -366,7 +366,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -397,7 +397,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -442,7 +442,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -473,7 +473,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/cfactor/images/cancel.png</pixmap>
+         <pixmap resource="../../civiltools.qrc">:/civiltools/civilTools/images/cancel.svg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -506,7 +506,8 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resource.qrc"/>
+  <include location="../../civiltools.qrc"/>
+  <include location="../../civiltools.qrc"/>
  </resources>
  <connections/>
 </ui>

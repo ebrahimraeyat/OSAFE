@@ -25,7 +25,7 @@ rTable = RFactorTable()
 systemTypes = rTable.getSystemTypes()
 
 # mainwindow, _ = loadUiType(str(civiltools_path / 'widgets' / 'mainwindow.ui'))
-# serial_base, serial_window = loadUiType(str(civiltools_path / 'widgets' / 'serial.ui'))
+
 # about_window, about_base = uic.loadUiType(civiltools_path / 'widgets' / 'about.ui')
 # update_window, update_base = uic.loadUiType(civiltools_path / 'widgets' / 'update.ui')
 

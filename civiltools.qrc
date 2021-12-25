@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="civiltools">
+    <file>civilTools/images/cancel.svg</file>
+    <file>civilTools/images/Register.png</file>
+  </qresource>
+</RCC>

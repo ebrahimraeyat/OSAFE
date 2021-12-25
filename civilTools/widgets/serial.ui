@@ -70,8 +70,8 @@ p, li { white-space: pre-wrap; }
         <string>Register</string>
        </property>
        <property name="icon">
-        <iconset resource="../resource.qrc">
-         <normaloff>:/cfactor/images/Register.png</normaloff>:/cfactor/images/Register.png</iconset>
+        <iconset resource="../../civiltools.qrc">
+         <normaloff>:/civiltools/civilTools/images/Register.png</normaloff>:/civiltools/civilTools/images/Register.png</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -86,7 +86,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
-  <include location="../resource.qrc"/>
+  <include location="../../civiltools.qrc"/>
  </resources>
  <connections/>
 </ui>
