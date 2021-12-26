@@ -1,17 +1,17 @@
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtCore import Qt
+from PySide2.QtUiTools import loadUiType
+from PySide2.QtCore import Qt
 
-cfactor_path = Path(__file__).absolute().parent.parent
+civiltools_path = Path(__file__).absolute().parent.parent
 
-base, window = uic.loadUiType(cfactor_path / 'widgets' / 'torsion.ui')
 
-class Form(base, window):
-    def __init__(self, etabs_model, parent=None):
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'torsion.ui'))):
+    def __init__(self, etabs_obj):
         super(Form, self).__init__()
         self.setupUi(self)
-        self.etabs = etabs_model
+        self.form = self
+        self.etabs = etabs_obj
         self.fill_xy_loadcase_names()
 
     def fill_xy_loadcase_names(self):
@@ -34,3 +34,21 @@ class Form(base, window):
                 matching_items = self.y_loadcase_list.findItems(name, Qt.MatchExactly)
             for item in matching_items:
                 item.setCheckState(Qt.Unchecked)
+
+    def accept(self):
+        from etabs_api import table_model
+        loadcases = []
+        for lw in (self.x_loadcase_list, self.y_loadcase_list):
+            for i in range(lw.count()):
+                item = lw.item(i)
+                if item.checkState() == Qt.Checked:
+                    loadcases.append(item.text())
+        df = self.etabs.get_diaphragm_max_over_avg_drifts(loadcases=loadcases)
+        data, headers = df.values, list(df.columns)
+        table_model.show_results(data, headers, table_model.TorsionModel, self.etabs.view.show_point)
+
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()
+
+    
