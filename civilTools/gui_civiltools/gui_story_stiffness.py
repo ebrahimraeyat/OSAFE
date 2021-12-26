@@ -1,48 +1,44 @@
 
 from pathlib import Path
 
-import PySide2
 from PySide2 import QtCore
 
-
-# import FreeCAD
 import FreeCADGui as Gui
 
 
-
-class CivilExplodLoadPatterns:
+class CivilStoryStiffness:
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
-            "civil_explode",
-            "Explode Load Patterns")
+            "civil_stiffness",
+            "Story Stiffness")
         tooltip = QtCore.QT_TRANSLATE_NOOP(
-            "civil_explode",
-            "Explode Load Patterns")
+            "civil_stiffness",
+            "Get Story Stiffness")
         path = str(
-                   Path(__file__).parent.absolute().parent / "images" / "explode.svg"
+                   Path(__file__).parent.absolute().parent / "images" / "stiffness.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': menu_text,
                 'ToolTip': tooltip}
     
     def Activated(self):
+        
         from civilTools.gui_civiltools.gui_check_legal import (
                 allowed_to_continue,
                 show_warning_about_number_of_use,
                 )
         allow, check = allowed_to_continue(
-            'explode_loads.bin',
-            'https://gist.githubusercontent.com/ebrahimraeyat/f05421c70967b698ca9016a1bdb54b01/raw',
+            'stiffness.bin',
+            'https://gist.githubusercontent.com/ebrahimraeyat/e5635c17392c73540a46761a7247836e/raw',
             'cfactor',
+            n=2,
             )
         if not allow:
             return
-        from etabs_api import etabs_obj
-        from civilTools.py_widget import explode_seismic_load_patterns
-        etabs = etabs_obj.EtabsModel()
-        panel = explode_seismic_load_patterns.Form(etabs)
-        Gui.Control.showDialog(panel)
+        from civilTools.py_widget import get_siffness_story_way
+        win = get_siffness_story_way.Form()
+        Gui.Control.showDialog(win)
         show_warning_about_number_of_use(check)
         
     def IsActive(self):

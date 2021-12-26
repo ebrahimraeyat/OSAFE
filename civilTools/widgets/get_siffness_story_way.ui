@@ -70,22 +70,6 @@
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QDialogButtonBox" name="buttonBox">
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="standardButtons">
-           <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-          </property>
-          <property name="centerButtons">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </item>
@@ -145,38 +129,5 @@ p, li { white-space: pre-wrap; }
  <resources>
   <include location="../../civiltools.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>story_stiffness</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>388</x>
-     <y>775</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>811</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>story_stiffness</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>485</x>
-     <y>772</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>624</x>
-     <y>807</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
