@@ -5,14 +5,12 @@ from PySide2.QtGui import QPixmap
 
 civiltools_path = Path(__file__).absolute().parent.parent
 
-
 class Form(*loadUiType(str(civiltools_path / 'widgets' / 'explode_seismic_load_patterns.ui'))):
-    def __init__(self, etabs_model, parent=None):
+    def __init__(self, etabs_model):
         super(Form, self).__init__()
         self.setupUi(self)
+        self.form = self
         self.etabs = etabs_model
-        self.start_button.clicked.connect(self.accept)
-        self.close_button.clicked.connect(self.reject)
         
     def accept(self):
         ex = self.ex.text()
@@ -72,4 +70,6 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'explode_seismic_load_p
                 self.start_button.setEnabled(False)
             elif type(ret) == str:
                 self.result_label.setText(ret)
-
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()

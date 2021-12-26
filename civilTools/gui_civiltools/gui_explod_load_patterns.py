@@ -56,9 +56,9 @@ class CivilExplodLoadPatterns:
         from civilTools.py_widget import explode_seismic_load_patterns
         etabs = etabs_obj.EtabsModel()
         panel = explode_seismic_load_patterns.Form(etabs)
-        sub = mdi.addSubWindow(panel)
-        sub.show()
-        # Gui.Control.showDialog(self.panel)
+        Gui.Control.showDialog(panel)
+        # sub = mdi.addSubWindow(panel)
+        # sub.show()
         # Gui.Control.closeDialog()
 
         show_warning_about_number_of_use(check)
