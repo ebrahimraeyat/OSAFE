@@ -659,8 +659,8 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>:/cfactor/images/run.svg</normaloff>:/cfactor/images/run.svg</iconset>
+             <iconset resource="../../civiltools.qrc">
+              <normaloff>:/civiltools/civilTools/images/run.svg</normaloff>:/civiltools/civilTools/images/run.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -1018,6 +1018,8 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../civiltools.qrc"/>
+ </resources>
  <connections/>
 </ui>

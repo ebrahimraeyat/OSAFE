@@ -52,8 +52,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../resource.qrc">
-         <normaloff>:/cfactor/images/torsion.svg</normaloff>:/cfactor/images/torsion.svg</iconset>
+        <iconset resource="../../civiltools.qrc">
+         <normaloff>:/civiltools/civilTools/images/torsion.svg</normaloff>:/civiltools/civilTools/images/torsion.svg</iconset>
        </property>
       </widget>
      </item>
@@ -98,7 +98,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resource.qrc"/>
+  <include location="../../civiltools.qrc"/>
  </resources>
  <connections>
   <connection>

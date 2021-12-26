@@ -14,7 +14,7 @@
    <string>Restore Backup</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resource.qrc">
+   <iconset>
     <normaloff>:/cfactor/images/backup-recovery.svg</normaloff>:/cfactor/images/backup-recovery.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -63,9 +63,7 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resource.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
