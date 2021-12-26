@@ -1,18 +1,47 @@
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QFileDialog
+from PySide2.QtUiTools import loadUiType
+from PySide2.QtWidgets import QFileDialog, QMessageBox
 
-cfactor_path = Path(__file__).absolute().parent.parent
+civiltools_path = Path(__file__).absolute().parent.parent
 
-stiffness_base, stiffness_window = uic.loadUiType(cfactor_path / 'widgets' / 'show_siffness_story_way.ui')
 
-class ChooseStiffnessForm(stiffness_base, stiffness_window):
-    def __init__(self, parent=None):
-        super(ChooseStiffnessForm, self).__init__()
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'show_siffness_story_way.ui'))):
+    def __init__(self, etabs_obj):
+        super(Form, self).__init__()
         self.setupUi(self)
+        self.form = self
+        self.etabs = etabs_obj
         self.radio_button_file.toggled.connect(self.file_toggled)
         self.browse_push_button.clicked.connect(self.get_file_name)
+
+    def accept(self):
+        if self.radio_button_2800.isChecked():
+            way = '2800'
+        elif self.radio_button_modal.isChecked():
+            way = 'modal'
+        elif self.radio_button_earthquake.isChecked():
+            way = 'earthquake'
+        elif self.radio_button_file.isChecked():
+            way = 'file'
+        if way != 'file':
+            e_name = self.etabs.get_file_name_without_suffix()
+            name = f'{e_name}_story_stiffness_{way}_table.json'
+            json_file = Path(self.etabs.SapModel.GetModelFilepath()) / name
+        else:
+            json_file = self.json_line_edit.text()
+        ret = self.etabs.load_from_json(json_file)
+        if not ret:
+            err = "Can not find the results!"
+            QMessageBox.critical(self, "Error", str(err))
+            return None
+        data, headers = ret
+        from etabs_api import table_model
+        table_model.show_results(data, headers, table_model.StoryStiffnessModel)
+
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()
 
     def file_toggled(self):
         if self.radio_button_file.isChecked():
