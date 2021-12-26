@@ -1,18 +1,17 @@
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PySide2.QtUiTools import loadUiType
+from PySide2.QtWidgets import QFileDialog, QMessageBox
 
-cfactor_path = Path(__file__).absolute().parent.parent
+civiltools_path = Path(__file__).absolute().parent.parent
 
-weakness_base, weakness_window = uic.loadUiType(cfactor_path / 'widgets' / 'show_weakness.ui')
 
-class WeaknessForm(weakness_base, weakness_window):
-    def __init__(self, etabs_model, tabel_model, parent=None):
-        super(WeaknessForm, self).__init__(parent)
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'show_weakness.ui'))):
+    def __init__(self, etabs_obj):
+        super(Form, self).__init__()
         self.setupUi(self)
-        self.etabs = etabs_model
-        self.table_model = tabel_model
+        self.form = self
+        self.etabs = etabs_obj
         self.directory = str(Path(self.etabs.SapModel.GetModelFilename()).parent)
         self.set_filenames()
         self.create_connections()
@@ -25,14 +24,19 @@ class WeaknessForm(weakness_base, weakness_window):
         else:
             json_file = Path(self.etabs.SapModel.GetModelFilepath()) / f'columns_pmm_beams_rebars_{dir_}.json'
         if json_file.exists():
+            from etabs_api import table_model
             ret = self.etabs.load_from_json(json_file)
             data, headers, data2, headers2 = ret
-            self.table_model.show_results(data, headers, self.table_model.ColumnsRatioModel)
-            self.table_model.show_results(data2, headers2, self.table_model.BeamsRebarsModel)
+            table_model.show_results(data, headers, table_model.ColumnsRatioModel)
+            table_model.show_results(data2, headers2, table_model.BeamsRebarsModel)
         else:
             err = "Please first get weakness ration, then show it!"
             QMessageBox.critical(self, "Error", str(err))
             return None
+
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()
 
     def set_filenames(self):
         f = Path(self.etabs.SapModel.GetModelFilename())
