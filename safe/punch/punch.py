@@ -176,7 +176,7 @@ class Punch:
             obj.I23 = 0
         obj.Area = punch_funcs.area(faces)
         obj.center_of_punch = punch_funcs.center_of_mass(faces)
-        obj.b0 = punch_funcs.lenght_of_edges(edges)
+        obj.b0 = punch_funcs.length_of_edges(edges)
         obj.gamma_vx, obj.gamma_vy = punch_funcs.gamma_v(obj.bx, obj.by)
         obj.d = d
         obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)

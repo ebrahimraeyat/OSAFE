@@ -38,7 +38,7 @@ class Form:
                 "Download",
                 "Download takes some minutes, please be patient.",
                 )
-            g.execut(f'git clone --branch {branch} --depth 1 {self.git_url}')
+            g.execute(f'git clone --branch {branch} --depth 1 {self.git_url}')
             self.checkout(g, branch)
         Gui.Control.closeDialog()
 
