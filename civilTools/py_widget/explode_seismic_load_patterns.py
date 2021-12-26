@@ -67,7 +67,6 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'explode_seismic_load_p
             elif type(ret) == bool:
                 if not ret:
                     self.result_label.setText("Error Occurred, process did not finished.")
-                self.start_button.setEnabled(False)
             elif type(ret) == str:
                 self.result_label.setText(ret)
     def reject(self):
