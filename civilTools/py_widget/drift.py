@@ -1,28 +1,48 @@
-import sys
 from pathlib import Path
 
-from PyQt5 import QtCore
+from PySide2.QtUiTools import loadUiType
+from PySide2.QtCore import Qt
 
-from PyQt5 import uic
-from PyQt5.QtCore import Qt
+civiltools_path = Path(__file__).absolute().parent.parent
 
-cfactor_path = Path(__file__).absolute().parent.parent
-# civiltools_path = cfactor_path.parent.parent
-# sys.path.insert(0, civiltools_path)
-# from etabs_api import etabs_obj
 
-story_base, story_window = uic.loadUiType(cfactor_path / 'widgets' / 'drift.ui')
-
-class StoryForm(story_base, story_window):
-    def __init__(self, etabs_model, stories, parent=None):
-        super(StoryForm, self).__init__()
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'drift.ui'))):
+    def __init__(self, etabs_obj, stories):
+        super(Form, self).__init__()
         self.setupUi(self)
-        self.etabs = etabs_model
+        self.form = self
+        self.etabs = etabs_obj
         self.stories = stories
         self.fill_top_bot_stories()
         self.fill_height_and_no_of_stories()
         self.fill_xy_loadcase_names()
         self.create_connections()
+
+    def accept(self):
+        no_of_stories = self.no_story_x_spinbox.value()
+        height = self.height_x_spinbox.value()
+        create_t_file = self.create_t_file_box.isChecked()
+        loadcases = []
+        for lw in (self.x_loadcase_list, self.y_loadcase_list):
+            for i in range(lw.count()):
+                item = lw.item(i)
+                if item.checkState() == Qt.Checked:
+                    loadcases.append(item.text())
+        # self.storySpinBox.setValue(no_of_stories)
+        # self.HSpinBox.setValue(height)
+        if create_t_file:
+            drifts, headers = self.etabs.calculate_drifts(self, no_of_stories, loadcases=loadcases)
+        else:
+            # cdx = self.final_building.x_system.cd
+            # cdy = self.final_building.y_system.cd
+            cdx = cdy = 5
+            drifts, headers = self.etabs.get_drifts(no_of_stories, cdx, cdy, loadcases)
+        from etabs_api import table_model
+        table_model.show_results(drifts, headers, table_model.DriftModel)
+    
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()
 
     def fill_xy_loadcase_names(self):
         x_names, y_names = self.etabs.load_patterns.get_load_patterns_in_XYdirection()
