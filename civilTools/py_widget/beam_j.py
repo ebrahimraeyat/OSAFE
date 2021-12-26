@@ -1,24 +1,16 @@
-import sys
 from pathlib import Path
 
-from PySide2 import QtCore
+from PySide2.QtUiTools import loadUiType
 
-from PySide2 import uic
-from PySide2.QtCore import Qt
+civiltools_path = Path(__file__).absolute().parent.parent
 
-cfactor_path = Path(__file__).absolute().parent.parent
 
-beamj_base, beamj_window = uic.loadUiType(cfactor_path / 'widgets' / 'beam_j.ui')
-
-class BeamJForm(beamj_base, beamj_window):
-    def __init__(self,
-            etabs_model,
-            table_model,
-            parent=None):
-        super(BeamJForm, self).__init__()
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'beam_j.ui'))):
+    def __init__(self, etabs_obj):
+        super(Form, self).__init__()
         self.setupUi(self)
-        self.etabs = etabs_model
-        self.table_model = table_model
+        self.form = self
+        self.etabs = etabs_obj
         self.create_connections()
 
     def accept(self):
@@ -54,8 +46,12 @@ class BeamJForm(beamj_base, beamj_window):
             initial_j,
             decimals,
             )
-        super(BeamJForm, self).accept()
-        self.table_model.show_results(df, None, self.table_model.BeamsJModel, self.etabs.view.show_frame)
+        from etabs_api import table_model
+        table_model.show_results(df, None, table_model.BeamsJModel, self.etabs.view.show_frame)
+
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()
 
     def create_connections(self):
         self.initial_checkbox.stateChanged.connect(self.set_initial_j)
