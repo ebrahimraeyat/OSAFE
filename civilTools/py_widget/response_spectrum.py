@@ -1,17 +1,17 @@
 from pathlib import Path
 
-from PyQt5 import uic
-from PyQt5.QtWidgets import QMessageBox
+from PySide2.QtUiTools import loadUiType
+from PySide2.QtWidgets import QMessageBox
 
-cfactor_path = Path(__file__).absolute().parent.parent
+civiltools_path = Path(__file__).absolute().parent.parent
 
-rs_base, rs_window = uic.loadUiType(cfactor_path / 'widgets' / 'response_spectrum.ui')
 
-class ResponseSpectrumForm(rs_base, rs_window):
-    def __init__(self, etabs_model, parent=None):
-        super(ResponseSpectrumForm, self).__init__()
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'response_spectrum.ui'))):
+    def __init__(self, etabs_obj):
+        super(Form, self).__init__()
         self.setupUi(self)
-        self.etabs = etabs_model
+        self.form = self
+        self.etabs = etabs_obj
         self.fill_100_30_fields()
         self.select_spect_loadcases()
         self.create_connections()
@@ -73,9 +73,12 @@ class ResponseSpectrumForm(rs_base, rs_window):
                 reset,
                 analyze,
             )
-        super(ResponseSpectrumForm, self).accept()
         msg = "Done Response Spectrum Analysis."
         QMessageBox.information(None, 'Successful', str(msg))
+
+    def reject(self):
+        import FreeCADGui as Gui
+        Gui.Control.closeDialog()
 
     def select_spect_loadcases(self):
         for lw in (self.x_loadcase_list, self.y_loadcase_list):
