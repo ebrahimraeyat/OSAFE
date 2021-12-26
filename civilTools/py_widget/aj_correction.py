@@ -1,25 +1,20 @@
-import sys
 from pathlib import Path
 
 import pandas as pd
 
 from PySide2.QtCore import QAbstractTableModel, Qt, QSettings
 from PySide2.QtWidgets import QDoubleSpinBox, QItemDelegate, QComboBox, QMessageBox
-from PySide2 import uic, QtGui
 from PySide2.QtGui import QColor
+from PySide2.QtUiTools import loadUiType
 
-cfactor_path = Path(__file__).absolute().parent.parent
-civiltools_path = cfactor_path.parent.parent
-sys.path.insert(0, civiltools_path)
+civiltools_path = Path(__file__).absolute().parent.parent
 
-story_base, story_window = uic.loadUiType(cfactor_path / 'widgets' / 'aj_correction.ui')
 
-class AjForm(story_base, story_window):
-    def __init__(self, etabs_model, parent=None):
-        super().__init__()
-        self.parent_widget=parent
-        self.etabs = etabs_model
+class Form(*loadUiType(str(civiltools_path / 'widgets' / 'aj_correction.ui'))):
+    def __init__(self, etabs_obj):
+        super(Form, self).__init__()
         self.setupUi(self)
+        self.etabs = etabs_obj
         self.stories = self.etabs.SapModel.Story.GetStories()[1]
         self.fill_xy_loadpattern_names()
         self.fill_xy_loadcase_names()
@@ -56,7 +51,6 @@ class AjForm(story_base, story_window):
         self.etabs.apply_aj_df(self.aj_apply_model_static.df)
         msg = "Successfully written to Etabs."
         QMessageBox.information(None, "done", msg)
-        self.parent_widget.show_warning_about_number_of_use(self.parent_widget.check)
 
     def story_length_changed(self, index):
         row = index.row()
