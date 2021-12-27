@@ -2,7 +2,7 @@ from pathlib import Path
 
 import FreeCADGui as Gui
 
-from etabs_api import etabs_obj
+import etabs_obj
 from safe.punch.py_widget import resource_rc
 from PySide2.QtGui import QPixmap
 

@@ -26,7 +26,7 @@ class Safe12TaskPanel:
         slab_names = []
         software_name = software.split()[0]
         if software in ('SAFE 20', 'ETABS 19'):
-            from etabs_api import etabs_obj
+            import etabs_obj
             etabs = etabs_obj.EtabsModel(backup=False, software=software_name)
             etabs.unlock_model()
             if is_slabs:

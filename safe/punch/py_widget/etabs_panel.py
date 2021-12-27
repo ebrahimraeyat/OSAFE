@@ -7,7 +7,7 @@ from safe.punch.py_widget import resource_rc
 from PySide2.QtGui import QPixmap
 
 punch_path = Path(__file__).parent.parent
-from etabs_api import etabs_obj
+import etabs_obj
 
 
 class EtabsTaskPanel:

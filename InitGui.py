@@ -6,7 +6,7 @@ class CivilWorkbench(Workbench):
 
         from pathlib import Path
         import civilwelcome
-        self.__class__.Icon = str(Path(civilwelcome.__file__).parent.absolute() / 'images' / 'civil-engineering.png')
+        self.__class__.Icon = str(Path(civilwelcome.__file__).parent.absolute() / 'images' / 'safe.png')
         self.__class__.MenuText = "Civil"
         self.__class__.ToolTip = "Civil Workbench"
 
@@ -19,13 +19,11 @@ class CivilWorkbench(Workbench):
         export_list = civilGui.export_list
         draw_list = civilGui.draw_list
         assign_list = civilGui.assign_list
-        civiltools_list = civilGui.civiltools_list
 
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil tools")), command_list)
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil Export")), export_list)
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil Draw")), draw_list)
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil Assign")), assign_list)
-        self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "civiltools")), civiltools_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil")), command_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Export")), export_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Draw")), draw_list)

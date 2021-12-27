@@ -26,7 +26,7 @@ class EtabsPunch(object):
             top_of_foundation : float = 0,
             ):
         if etabs_model is None:
-            from etabs_api import etabs_obj
+            import etabs_obj
             self.etabs = etabs_obj.EtabsModel(backup=False)
         else:
             self.etabs = etabs_model
