@@ -440,30 +440,30 @@ class CivilFoundation:
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
-class CivilChangeBranch:
+# class CivilChangeBranch:
 
-    def GetResources(self):
-        MenuText = QtCore.QT_TRANSLATE_NOOP(
-            "branch",
-            "Change branch")
-        ToolTip = QtCore.QT_TRANSLATE_NOOP(
-            "civil_change branch",
-            "Change branch")
-        path = str(
-                   Path(__file__).parent.absolute() / "Resources" / "icons" / "change_branch.svg"
-                   )
-        return {'Pixmap': path,
-                'MenuText': MenuText,
-                'ToolTip': ToolTip}
+#     def GetResources(self):
+#         MenuText = QtCore.QT_TRANSLATE_NOOP(
+#             "branch",
+#             "Change branch")
+#         ToolTip = QtCore.QT_TRANSLATE_NOOP(
+#             "civil_change branch",
+#             "Change branch")
+#         path = str(
+#                    Path(__file__).parent.absolute() / "Resources" / "icons" / "change_branch.svg"
+#                    )
+#         return {'Pixmap': path,
+#                 'MenuText': MenuText,
+#                 'ToolTip': ToolTip}
     
-    def Activated(self):
-        import change_branch
-        panel = change_branch.Form()
-        Gui.Control.showDialog(panel)
-        return panel
+#     def Activated(self):
+#         import change_branch
+#         panel = change_branch.Form()
+#         Gui.Control.showDialog(panel)
+#         return panel
     
-    def IsActive(self):
-        return True
+#     def IsActive(self):
+#         return True
 
 
 class CivilHelp:
@@ -491,26 +491,26 @@ class CivilHelp:
     def IsActive(self):
         return True
 
-class CivilUpdate:
-    def GetResources(self):
-        MenuText = QtCore.QT_TRANSLATE_NOOP(
-            "Civil_update",
-            "Update")
-        ToolTip = QtCore.QT_TRANSLATE_NOOP(
-            "Civil_update",
-            "Update")
-        path = str(
-                   Path(__file__).parent.absolute() / "Resources" / "icons" / "update.png"
-                   )
-        return {'Pixmap': path,
-                'MenuText': MenuText,
-                'ToolTip': ToolTip}
-    def Activated(self):
-        import civil_update
-        civil_update.update()
+# class CivilUpdate:
+#     def GetResources(self):
+#         MenuText = QtCore.QT_TRANSLATE_NOOP(
+#             "Civil_update",
+#             "Update")
+#         ToolTip = QtCore.QT_TRANSLATE_NOOP(
+#             "Civil_update",
+#             "Update")
+#         path = str(
+#                    Path(__file__).parent.absolute() / "Resources" / "icons" / "update.png"
+#                    )
+#         return {'Pixmap': path,
+#                 'MenuText': MenuText,
+#                 'ToolTip': ToolTip}
+#     def Activated(self):
+#         import civil_update
+#         civil_update.update()
 
-    def IsActive(self):
-        return True
+#     def IsActive(self):
+#         return True
 
 def get_save_filename(ext):
     from PySide2.QtWidgets import QFileDialog
@@ -647,8 +647,8 @@ Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
 Gui.addCommand('Civil_excel', CivilExcel())
 Gui.addCommand('Civil_docx', CivilDocx())
 Gui.addCommand('Civil_help', CivilHelp())
-Gui.addCommand('Civil_update', CivilUpdate())
-Gui.addCommand('Civil_branch', CivilChangeBranch())
+# Gui.addCommand('Civil_update', CivilUpdate())
+# Gui.addCommand('Civil_branch', CivilChangeBranch())
 Gui.addCommand('Civil_dxf', CivilDxf())
 # Gui.addCommand('civil_explod_load_patterns', CivilExplodLoadPatterns())
 # Gui.addCommand('create_f2k_file', CivilCreateF2k())
@@ -668,8 +668,8 @@ command_list = [
             # 'civil_sketch',
             # "civil_explod_load_patterns",
             "Copy",
-            "Civil_update",
-            "Civil_branch",
+            # "Civil_update",
+            # "Civil_branch",
             "Civil_help",
             ]
 
