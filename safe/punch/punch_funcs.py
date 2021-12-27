@@ -106,7 +106,7 @@ def punch_faces(
         faces.append(face)
     return faces
 
-def lenght_of_edges(
+def length_of_edges(
     edges: List[Part.Edge],
     ):
     length = 0
@@ -849,7 +849,7 @@ def get_left_right_offset_wire_and_shape(wire, left_width, right_width):
 
 def get_extended_wire_first_last_edge(wire, length=4000):
     '''
-    return the first and last edges with lenght equal to length that elongation wire
+    return the first and last edges with length equal to length that elongation wire
     '''
     start_edge = wire.Edges[0]
     end_edge = wire.Edges[-1]
