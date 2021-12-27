@@ -46,7 +46,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'beam_j.ui'))):
             initial_j,
             decimals,
             )
-        from etabs_api import table_model
+        from civilTools import table_model
         table_model.show_results(df, None, table_model.BeamsJModel, self.etabs.view.show_frame)
 
     def reject(self):

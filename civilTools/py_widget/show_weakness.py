@@ -24,7 +24,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'show_weakness.ui'))):
         else:
             json_file = Path(self.etabs.SapModel.GetModelFilepath()) / f'columns_pmm_beams_rebars_{dir_}.json'
         if json_file.exists():
-            from etabs_api import table_model
+            from civilTools import table_model
             ret = self.etabs.load_from_json(json_file)
             data, headers, data2, headers2 = ret
             table_model.show_results(data, headers, table_model.ColumnsRatioModel)

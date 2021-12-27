@@ -23,7 +23,8 @@ class CivilStoryForces:
                 'ToolTip': tooltip}
     
     def Activated(self):
-        from etabs_api import etabs_obj, table_model
+        from civilTools import table_model
+        import etabs_obj
         etabs = etabs_obj.EtabsModel()
         if not etabs.success:
             from PySide2.QtWidgets import QMessageBox

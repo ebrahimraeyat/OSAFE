@@ -36,7 +36,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'show_siffness_story_wa
             QMessageBox.critical(self, "Error", str(err))
             return None
         data, headers = ret
-        from etabs_api import table_model
+        from civilTools import table_model
         table_model.show_results(data, headers, table_model.StoryStiffnessModel)
 
     def reject(self):

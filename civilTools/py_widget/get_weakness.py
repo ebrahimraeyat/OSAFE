@@ -18,7 +18,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'weakness.ui'))):
         self.create_connections()
 
     def accept(self):
-        from etabs_api import table_model
+        from civilTools import table_model
         if not self.etabs.success:
             QMessageBox.warning(None, 'ETABS', 'Please open etabs file!')
             return False

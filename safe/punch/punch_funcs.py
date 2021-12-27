@@ -5,8 +5,6 @@ import FreeCAD
 import Part
 import DraftGeomUtils
 
-from etabs_api.frame_obj import FrameObj
-
 
 def remove_obj(name: str) -> None:
     o = FreeCAD.ActiveDocument.getObject(name)
@@ -563,10 +561,28 @@ def get_offset_points(
         y2 = p2.y
         neg = False if offset >= 0 else True
         distance = abs(offset)
-        x1, y1, x2, y2 = FrameObj.offset_frame_points(x1, y1, x2, y2, distance, neg)
+        x1, y1, x2, y2 = offset_frame_points(x1, y1, x2, y2, distance, neg)
         new_start_point = FreeCAD.Vector(x1, y1, p1.z)
         new_end_point = FreeCAD.Vector(x2, y2, p2.z)
         return new_start_point, new_end_point
+
+def offset_frame_points(x1, y1, x2, y2, distance, neg:bool):
+    if x2 == x1:
+        dy = 0
+        dx = distance
+    else:
+        import math
+        m = (y2 - y1) / (x2 - x1)
+        dy = distance / math.sqrt(1 + m ** 2)
+        dx = m * dy
+    if neg:
+        dx *= -1
+        dy *= -1
+    x1_offset = x1 - dx
+    x2_offset = x2 - dx
+    y1_offset = y1 + dy
+    y2_offset = y2 + dy
+    return x1_offset, y1_offset, x2_offset, y2_offset
 
 def get_common_part_of_base_foundation(base_foundations):
     if len(base_foundations) < 2:

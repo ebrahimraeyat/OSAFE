@@ -37,7 +37,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'drift.ui'))):
             # cdy = self.final_building.y_system.cd
             cdx = cdy = 5
             drifts, headers = self.etabs.get_drifts(no_of_stories, cdx, cdy, loadcases)
-        from etabs_api import table_model
+        from civilTools import table_model
         table_model.show_results(drifts, headers, table_model.DriftModel)
     
     def reject(self):

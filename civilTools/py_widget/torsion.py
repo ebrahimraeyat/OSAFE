@@ -36,7 +36,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'torsion.ui'))):
                 item.setCheckState(Qt.Unchecked)
 
     def accept(self):
-        from etabs_api import table_model
+        from civilTools import table_model
         loadcases = []
         for lw in (self.x_loadcase_list, self.y_loadcase_list):
             for i in range(lw.count()):

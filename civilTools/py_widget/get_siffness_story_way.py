@@ -13,7 +13,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'get_siffness_story_way
         self.form = self
 
     def accept(self):
-        from etabs_api import etabs_obj, table_model
+        import etabs_obj
         etabs = etabs_obj.EtabsModel()
         if not etabs.success:
             QMessageBox.warning(None, 'ETABS', 'Please open etabs file!')
@@ -30,6 +30,7 @@ class Form(*loadUiType(str(civiltools_path / 'widgets' / 'get_siffness_story_way
             QMessageBox.critical(None, "Error", err)
             return None
         data, headers = ret
+        from civilTools import table_model
         table_model.show_results(data, headers, table_model.StoryStiffnessModel)
 
     def reject(self):
