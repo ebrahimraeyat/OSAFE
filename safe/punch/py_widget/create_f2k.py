@@ -39,7 +39,7 @@ class Form:
 
     def accept(self):
         filename = self.form.filename.text()
-        from etabs_api import create_f2k
+        import create_f2k
         writer = create_f2k.CreateF2kFile(Path(filename), self.etabs)
         
         if FreeCAD.ActiveDocument:

@@ -88,7 +88,7 @@ class EtabsTaskPanel:
         filename_path = Path(filename)
         name = f"{filename_path.name.rstrip(filename_path.suffix)}_export{filename_path.suffix}"
         output_filename = str(filename_path.with_name(name))
-        from etabs_api import create_f2k
+        import create_f2k
         from safe.punch.f2k_object import make_safe_f2k
         make_safe_f2k(filename, output_filename)
         writer = create_f2k.CreateF2kFile(filename_path, self.etabs)
