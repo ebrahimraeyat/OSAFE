@@ -286,7 +286,7 @@ class DatabaseTables:
             table_key = 'Load Combination Definitions'
             loadcombos_df = self.read(table_key, to_dataframe=True)
         self.remove_df_columns(loadcombos_df, ('GUID',))
-        # remove envelop combos, because envelopes not to be iterate, must be add
+        # remove envelop combos, because envelopes mustn't be iterated but instead must be added
         envelop_combos = list(loadcombos_df[loadcombos_df['Type'] == 'Envelope']['Name'])
         filt_envelope = loadcombos_df['Name'].isin(envelop_combos)
         new_loadcombo_df = loadcombos_df.loc[~filt_envelope]
@@ -328,7 +328,7 @@ class DatabaseTables:
             table_key = 'Load Combination Definitions'
             loadcombos_df = self.read(table_key, to_dataframe=True)
         self.remove_df_columns(loadcombos_df, ('GUID',))
-        # remove envelop combos, because envelopes not to be iterate, must be add
+        # remove envelop combos, because envelopes mustn't be iterated but instead must be added
         envelop_combos = list(loadcombos_df[loadcombos_df['Type'] == 'Envelope']['Name'])
         filt_envelope = loadcombos_df['Name'].isin(envelop_combos)
         new_loadcombo_df = loadcombos_df.loc[filt_envelope]
