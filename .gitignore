@@ -130,8 +130,8 @@ test/etabs_api/test.*
 *.FCStd1
 
 # protect from users
-civilGui.py
-!civilGui.pyc
-check_legal.py
-!check_legal.pyc
+# civilGui.py
+# !civilGui.pyc
+# check_legal.py
+# !check_legal.pyc
 
