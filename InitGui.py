@@ -7,8 +7,8 @@ class CivilWorkbench(Workbench):
         from pathlib import Path
         import civilwelcome
         self.__class__.Icon = str(Path(civilwelcome.__file__).parent.absolute() / 'images' / 'safe.png')
-        self.__class__.MenuText = "Civil"
-        self.__class__.ToolTip = "Civil Workbench"
+        self.__class__.MenuText = "OSAFE"
+        self.__class__.ToolTip = "OSafe Workbench"
 
     def Initialize(self):
         from pathlib import Path
