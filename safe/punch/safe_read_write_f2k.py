@@ -489,6 +489,11 @@ class FreecadReadwriteModel():
                 if not base_foundation.last_edge.isNull():
                     edges.append(base_foundation.last_edge)
                 points = self.get_sort_points(edges, last=True, sort_edges=False)
+                # remove 1 and -2 point index
+                if not base_foundation.first_edge.isNull():
+                    points.remove(points[1])
+                if not base_foundation.last_edge.isNull():
+                    points.remove(points[-2])
                 last = len(edges)
                 strip_name = f'CS{layer}{i}'
                 if base_foundation.fix_width_from == 'Left':
