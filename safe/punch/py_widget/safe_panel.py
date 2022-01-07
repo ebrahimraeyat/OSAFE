@@ -22,6 +22,8 @@ class Safe12TaskPanel:
         is_punches = self.form.punches.isChecked()
         soil_name = self.form.soil_name.text()
         soil_modulus = self.form.soil_modulus.value()
+        is_2d = 'Yes' if self.form.analysis_2d.isChecked() else 'No'
+        max_mesh_size = self.form.max_mesh_size.value()
         doc = FreeCAD.ActiveDocument
         slab_names = []
         software_name = software.split()[0]
@@ -87,6 +89,8 @@ class Safe12TaskPanel:
                                 )
                     except TypeError:
                         print('Can not find any loads in model')
+            rw.safe.set_analysis_type(is_2d=is_2d)
+            rw.safe.set_mesh_options(mesh_size=max_mesh_size)
             if self.form.wall_loads.isChecked():
                 rw.export_freecad_wall_loads()
             if is_openings:
