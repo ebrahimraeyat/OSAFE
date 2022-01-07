@@ -469,6 +469,7 @@ class FreecadReadwriteModel():
         return names
 
     def export_freecad_strips(self):
+        from draftgeoutils import geometry
         foun = self.doc.Foundation
         point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
         points_content = ''
@@ -488,13 +489,19 @@ class FreecadReadwriteModel():
                 edges.extend(base_foundation.main_wire.Edges)
                 if not base_foundation.last_edge.isNull():
                     edges.append(base_foundation.last_edge)
-                points = self.get_sort_points(edges, last=True, sort_edges=False)
-                # remove 1 and -2 point index
-                if not base_foundation.first_edge.isNull():
-                    points.remove(points[1])
-                if not base_foundation.last_edge.isNull():
-                    points.remove(points[-2])
-                last = len(edges)
+                if is_straight_line(edges):
+                    first_point = edges[0].firstVertex().Point
+                    last_point = edges[-1].lastVertex().Point
+                    points = [first_point, last_point]
+                    last = 1
+                else:
+                    points = self.get_sort_points(edges, last=True, sort_edges=False)
+                    # remove 1 and -2 point index
+                    if not base_foundation.first_edge.isNull():
+                        points.remove(points[1])
+                    if not base_foundation.last_edge.isNull():
+                        points.remove(points[-2])
+                    last = len(edges)
                 strip_name = f'CS{layer}{i}'
                 if base_foundation.fix_width_from == 'Left':
                     sl = base_foundation.left_width.Value
@@ -715,6 +722,16 @@ class FreecadReadwriteModel():
         cover = cover_mm * self.safe.length_units['mm']
         content = f'\tCoverTop={cover}   CoverBot={cover}   BarSize=18  InnerLayer=B    SlabType="Two Way"\n'
         self.safe.tables_contents[table_key] = content
+
+def is_straight_line(edges, tol=1e-7):
+    if len(edges) > 1:
+        start_edge = edges[0]
+        dir_start_edge = start_edge.tangentAt(start_edge.FirstParameter)
+        for edge in edges:
+            dir_edge = edge.tangentAt(edge.FirstParameter)
+            if dir_start_edge.cross(dir_edge).Length > tol:
+                return False
+    return True
 
 if __name__ == '__main__':
     import sys
