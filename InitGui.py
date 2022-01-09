@@ -39,9 +39,20 @@ class CivilWorkbench(Workbench):
             )
 
     def Activated(self):
-        if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("FirstTime", True):
-            from DraftGui import todo
-            todo.delay(Gui.runCommand, "Civil_welcome")
+        # if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("FirstTime", True):
+        #     from DraftGui import todo
+        #     todo.delay(Gui.runCommand, "Civil_welcome")
+
+        from DraftGui import todo
+        import osafe_statusbar
+        todo.delay(osafe_statusbar.setStatusIcons, True)
+
+    def Deactivated(self):
+
+        from DraftGui import todo
+        import osafe_statusbar
+
+        todo.delay(osafe_statusbar.setStatusIcons,False)
 
 
 Gui.addWorkbench(CivilWorkbench())
