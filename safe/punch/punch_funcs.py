@@ -612,7 +612,7 @@ def get_top_faces(
     z_max = shape.BoundBox.ZMax
     faces = []
     for f in shape.Faces:
-        if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == z_max:
+        if math.isclose(f.BoundBox.ZLength, 0, abs_tol=0.1) and math.isclose(f.BoundBox.ZMax, z_max, abs_tol=0.1):
             faces.append(f)
     if fuse:
         if len(faces) > 1:
