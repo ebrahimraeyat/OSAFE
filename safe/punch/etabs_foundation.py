@@ -19,9 +19,9 @@ class Foundation(ArchComponent.Component):
         obj.Proxy = self
         self.Type = "Foundation"
         self.set_properties(obj)
-        self.obj_name = obj.Name
 
     def set_properties(self, obj):
+        self.obj_name = obj.Name
 
         if not hasattr(obj, "fc"):
             obj.addProperty(
@@ -159,10 +159,10 @@ class Foundation(ArchComponent.Component):
         FreeCAD.ActiveDocument.recompute()
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         super().onDocumentRestored(obj)
+        obj.Proxy = self
         self.set_properties(obj)
-        obj.redraw = True
+        obj.redraw = False
         
 class ViewProviderFoundation:
 

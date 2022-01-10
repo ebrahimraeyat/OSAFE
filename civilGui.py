@@ -8,11 +8,14 @@ import FreeCADGui as Gui
 import DraftTools
 import civilwelcome
 
-from safe.punch import gui_punch, gui_slab
-from safe.punch import gui_beam
-from safe.punch import gui_punch
-from safe.punch import gui_base_foundation
-
+from safe.punch import (
+    gui_punch,
+    gui_slab,
+    gui_beam,
+    gui_punch,
+    gui_base_foundation,
+    gui_dxf,
+    )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
@@ -102,30 +105,6 @@ class CivilExcel:
                     punches.append(o)
         filename = get_save_filename('.xlsx')
         export.to_excel(punches, filename)
-
-    def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
-
-
-class CivilDxf:
-
-    def GetResources(self):
-        MenuText = QtCore.QT_TRANSLATE_NOOP(
-            "Civil_dxf",
-            "Export to dxf")
-        ToolTip = QtCore.QT_TRANSLATE_NOOP(
-            "Civil_dxf",
-            "export the result to dxf")
-        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "dxf.svg")
-        return {'Pixmap': path,
-                'MenuText': MenuText,
-                'ToolTip': ToolTip}
-    
-    def Activated(self):
-        from safe.punch import export
-        doc = FreeCAD.ActiveDocument
-        filename = get_save_filename('.dxf')
-        export.to_dxf(doc, filename)
 
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
@@ -649,7 +628,7 @@ Gui.addCommand('Civil_docx', CivilDocx())
 Gui.addCommand('Civil_help', CivilHelp())
 # Gui.addCommand('Civil_update', CivilUpdate())
 # Gui.addCommand('Civil_branch', CivilChangeBranch())
-Gui.addCommand('Civil_dxf', CivilDxf())
+Gui.addCommand('Civil_dxf', gui_dxf.OsafeDxf())
 # Gui.addCommand('civil_explod_load_patterns', CivilExplodLoadPatterns())
 # Gui.addCommand('create_f2k_file', CivilCreateF2k())
 Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())

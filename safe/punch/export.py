@@ -1,8 +1,8 @@
-from typing import List
+from typing import Union
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import FreeCAD as App
+import FreeCAD
 
 import safe.punch.punch_funcs as punch_funcs
 from safe.punch.punch_funcs import sort_vertex
@@ -104,13 +104,13 @@ def createPdf(doc, pdfName):
     ax1.set_ylim(YMIN, YMAX)
     ax1.set_xlim(XMIN, XMAX)
 
-    App.Console.PrintMessage("Saving pdf file...")
+    FreeCAD.Console.PrintMessage("Saving pdf file...")
     fig.savefig(pdfName, orientation='portrait', papertype='a4', bbox_inches='tight', dpi=600)
-    App.Console.PrintMessage("Pdf file saved as: " + pdfName)
+    FreeCAD.Console.PrintMessage("Pdf file saved as: " + pdfName)
     plt.close()
 
 def to_excel(
-             punches: List,
+             punches: list,
              filename: str,
              ):
     import pandas as pd
@@ -122,8 +122,10 @@ def to_excel(
     combos_ratios.to_excel(filename)
 
 def to_dxf(
-           doc: 'App.Document',
            filename: str,
+           doc: Union[FreeCAD.Document, bool] = None,
+           columns: bool = True,
+           punches: bool = True,
            )-> None:
     import ezdxf
     dwg = ezdxf.new()
@@ -131,42 +133,46 @@ def to_dxf(
     
     if not filename:
         return
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
     for o in doc.Objects:
         if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
             if o.Proxy.Type == "Punch":
                 # draw rectangle column via hatch
-                xy = [[v.X, v.Y] for v in o.rect.Vertexes]
-                points = punch_funcs.sort_vertex(xy)
-                hatch = msp.add_hatch()
-                hatch.rgb = [int(i * 255) for i in o.ViewObject.ShapeColor[0:-1]]
-                hatch.paths.add_polyline_path(points, is_closed=1)
+                if columns:
+                    xy = [[v.X, v.Y] for v in o.rect.Vertexes]
+                    points = punch_funcs.sort_vertex(xy)
+                    hatch = msp.add_hatch()
+                    hatch.rgb = [int(i * 255) for i in o.ViewObject.ShapeColor[0:-1]]
+                    hatch.paths.add_polyline_path(points, is_closed=1)
                 # draw punch face line
-                add_edges_to_dxf(o.edges.Edges, {'color': 2}, msp)
-                # add text
-                t = o.text
-                text = t.Text
-                mtext = msp.add_mtext(f"\\S{text[0]}^ {text[1]}")
-                dx, dy = t.Placement.Base.x, t.Placement.Base.y
-                align = get_alignment(o)
-                mtext.set_location(insert=(dx, dy, 0), attachment_point=align)
-                mtext.dxf.char_height = t.ViewObject.FontSize.Value
-                mtext.dxf.rotation = o.angle.Value
-                mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
-            elif o.Proxy.Type == "Foundation":
-                b = o.Shape.BoundBox
-                height = max(b.XLength, b.YLength)
-                center = (b.Center.x, b.Center.y)
-                # draw foundation
-                block_foun = dwg.blocks.new(name=o.Name)
-                add_edges_to_dxf(o.plan.Edges, {'color': 4}, block_foun)
-                msp.add_blockref(o.Name, (0 , 0))
-
+                if punches:
+                    add_edges_to_dxf(o.edges.Edges, {'color': 2}, msp)
+                    # add text
+                    t = o.text
+                    text = t.Text
+                    mtext = msp.add_mtext(f"\\S{text[0]}^ {text[1]}")
+                    dx, dy = t.Placement.Base.x, t.Placement.Base.y
+                    align = get_alignment(o)
+                    mtext.set_location(insert=(dx, dy, 0), attachment_point=align)
+                    mtext.dxf.char_height = t.ViewObject.FontSize.Value
+                    mtext.dxf.rotation = o.angle.Value
+                    mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
+        if hasattr(o, "IfcType") and o.IfcType == "Footing":
+            b = o.Shape.BoundBox
+            height = max(b.XLength, b.YLength)
+            center = (b.Center.x, b.Center.y)
+            # draw foundation
+            block_foun = dwg.blocks.new(name=o.Name)
+            add_edges_to_dxf(o.plan.Edges, {'color': 4}, block_foun)
+            msp.add_blockref(o.Name, (0 , 0))
 
     dwg.set_modelspace_vport(height=height, center=center)
     dwg.saveas(filename)
 
-    App.Console.PrintMessage("Saving dxf file...")
-    App.Console.PrintMessage("dxf file saved as: " + filename)
+    FreeCAD.Console.PrintMessage("Saving dxf file...")
+    FreeCAD.Console.PrintMessage("dxf file saved as: " + filename)
+    return True
 
 
     # for o in doc.Objects:
@@ -253,6 +259,6 @@ def get_alignment(
 
 
 if __name__ == '__main__':
-    doc = App.ActiveDocument
+    doc = FreeCAD.ActiveDocument
     createPdf(doc, "c:\\alaki\\punch.pdf")
-    to_dxf(doc, "c:\\alaki\\punch.dxf")
+    to_dxf("c:\\alaki\\punch.dxf")
