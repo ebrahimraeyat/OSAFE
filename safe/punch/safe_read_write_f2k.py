@@ -86,20 +86,26 @@ class Safe():
                 return id
         return None
                     
-    def add_content_to_table(self, table_key, content):
-        curr_content = self.tables_contents.get(table_key, '')
+    def add_content_to_table(self, table_key, content, append=True):
+        '''
+        if append is True, content add to current content
+        '''
+        if append:
+            curr_content = self.tables_contents.get(table_key, '')
+        else:
+            curr_content = ''
         self.tables_contents[table_key] = curr_content + content
         return None
 
     def set_analysis_type(self, is_2d='Yes'):
         table_key =  "ADVANCED MODELING OPTIONS"
         content = f"2DOnly={is_2d}   RigDiaTop=No   NoOffsets=Yes"
-        self.add_content_to_table(table_key, content)
+        self.add_content_to_table(table_key, content, append=False)
     
     def set_mesh_options(self, mesh_size=300):
         table_key =  "AUTOMATIC SLAB MESH OPTIONS"
         content = f"MeshOpt=Rectangular   Localize=Yes   Merge=Yes   MaxSize={mesh_size}"
-        self.add_content_to_table(table_key, content)
+        self.add_content_to_table(table_key, content, append=False)
 
     def force_length_unit(self,
         content : Union[str, bool] = None,
