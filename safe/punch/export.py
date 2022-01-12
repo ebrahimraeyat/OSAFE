@@ -38,28 +38,30 @@ def createPdf(doc, pdfName):
     for o in doc.Objects:
         if not (hasattr(o, 'ViewObject') and o.ViewObject.Visibility):
             continue
-        if 'Punch' in o.Name:
-            color = o.ViewObject.ShapeColor[:-1]
-            for e in o.edges.Edges:
-                # if f.ViewObject.isVisible():
-                xy = []
-                for v in e.Vertexes:
-                    xy.append([v.X, v.Y])
-                p = patches.Polygon(xy, edgecolor='black', linewidth=.4, linestyle='--', closed=False)
+        if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
+            if o.Proxy.Type == "Punch":
+                color = o.ViewObject.ShapeColor[:-1]
+                z_max = o.Shape.BoundBox.ZMax
+                for e in o.Shape.Edges:
+                    if e.BoundBox.ZLength == 0 and e.BoundBox.ZMax == z_max:
+                        xy = []
+                        for v in e.Vertexes:
+                            xy.append([v.X, v.Y])
+                        p = patches.Polygon(xy, edgecolor='black', linewidth=.4, linestyle='--', closed=False)
+                        ax1.add_patch(p)
+                xy = [[v.X, v.Y] for v in o.rect.Vertexes]
+                xy = punch_funcs.sort_vertex(xy)
+                p = patches.Polygon(xy, edgecolor='black', linewidth=.3, facecolor=color, closed=True)
                 ax1.add_patch(p)
-            xy = [[v.X, v.Y] for v in o.rect.Vertexes]
-            xy = punch_funcs.sort_vertex(xy)
-            p = patches.Polygon(xy, edgecolor='black', linewidth=.3, facecolor=color, closed=True)
-            ax1.add_patch(p)
 
-            c = o.text.Placement.Base
-            ha = 'right'
-            va = 'center'
-            if o.Location in ('Corner 2', 'Edge 2', 'Corner 3', 'Interior'):
-                ha = 'left'
-            if o.Location in ('Corner 3', 'Edge 3', 'Corner 4', 'Interior'):
-                va = 'bottom'
-            ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=o.angle.Value, annotation_clip=False)
+                c = o.text.Placement.Base
+                ha = 'right'
+                va = 'center'
+                if o.Location in ('Corner 2', 'Edge 2', 'Corner 3', 'Interior'):
+                    ha = 'left'
+                if o.Location in ('Corner 3', 'Edge 3', 'Corner 4', 'Interior'):
+                    va = 'bottom'
+                ax1.annotate(f'{o.Location}\n{o.Ratio}', (c.x, c.y), color=color, fontsize=4, ha=ha, va=va, rotation=o.angle.Value, annotation_clip=False)
 
         elif 'sketch' in o.Name:
             for g in o.Geometry:
