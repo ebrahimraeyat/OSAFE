@@ -94,7 +94,7 @@ class CivilExcel:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         from safe.punch import export
         doc = FreeCAD.ActiveDocument
@@ -123,7 +123,7 @@ class CivilDocx:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         allow, check = allowed_to_continue(
             'punch_docx.bin',
@@ -157,7 +157,7 @@ class CivilEtabs:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         allow, check = allowed_to_continue(
             'punch_etabs.bin',
@@ -190,7 +190,7 @@ class CivilSafe1620:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         allow, check = allowed_to_continue(
             'safe_export.bin',
@@ -224,7 +224,7 @@ class CivilForce:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         from safe.punch.py_widget import force_panel
         panel = force_panel.ForceTaskPanel()
@@ -250,7 +250,7 @@ class CivilWall:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         from safe.punch.py_widget import wall_panel
         panel = wall_panel.WallTaskPanel()
@@ -266,7 +266,7 @@ class CivilOpening:
     def GetResources(self):
         MenuText = QtCore.QT_TRANSLATE_NOOP(
             "civil",
-            "Add openning From Etabs")
+            "Add opening From Etabs")
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "civil",
             "create an opening from selected points in etabs model")
@@ -276,7 +276,7 @@ class CivilOpening:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         from safe.punch import opening
         import etabs_obj
@@ -302,7 +302,7 @@ class CivilOpening:
             opening_objs = foun.openings + [opening_obj]
             foun.openings = opening_objs
         doc.recompute()
-        
+
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
@@ -322,7 +322,7 @@ class CivilExplodLoadPatterns:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         allow, check = allowed_to_continue(
             'explode_loads.bin',
@@ -356,7 +356,7 @@ class CivilExplodLoadPatterns:
 #         return {'Pixmap': path,
 #                 'MenuText': MenuText,
 #                 'ToolTip': ToolTip}
-    
+
 #     def Activated(self):
 #         from safe.punch.py_widget import create_f2k
 #         import etabs_obj
@@ -383,7 +383,7 @@ class CivilBaseFoundation:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         from safe.punch.py_widget import base_foundation_panel
         panel = base_foundation_panel.Form()
@@ -409,13 +409,13 @@ class CivilFoundation:
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
-    
+
     def Activated(self):
         from safe.punch.py_widget import foundation_panel
         panel = foundation_panel.Form()
         Gui.Control.showDialog(panel)
         return panel
-    
+
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None
 
@@ -434,13 +434,13 @@ class CivilFoundation:
 #         return {'Pixmap': path,
 #                 'MenuText': MenuText,
 #                 'ToolTip': ToolTip}
-    
+
 #     def Activated(self):
 #         import change_branch
 #         panel = change_branch.Form()
 #         Gui.Control.showDialog(panel)
 #         return panel
-    
+
 #     def IsActive(self):
 #         return True
 
@@ -572,7 +572,7 @@ class RectangleSlab:
                 self.create_by_selection()
         else:
             self.create_by_selection()
-    
+
     def create_slab(self):
         punch1, punch2 = self.punches
         punches = []
@@ -604,7 +604,7 @@ class RectangleSlab:
             self.create_slab()
             self.punches = []
             if self.continue_mode:
-                # TODO: fix continue mode according to Draft Commandsgit 
+                # TODO: fix continue mode according to Draft Commandsgit
                 self.callback = Gui.Selection.addObserver(self)
             else:
                 self.finish()
@@ -665,7 +665,7 @@ draw_list = [
             "civil_base_foundation",
             "civil_beam",
             'civil_slab',
-            ]  
+            ]
 assign_list = [
             "Civil_force",
             "Civil_wall",
