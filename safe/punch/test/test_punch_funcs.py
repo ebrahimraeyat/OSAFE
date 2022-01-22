@@ -292,6 +292,10 @@ def test_get_foundation_shape_from_base_foundations_mat():
     shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, foundation_type='Mat')
     # assert len(edges) == 20
 
+def test_get_coordinate_and_width_between():
+    coords_width = punch_funcs.get_coordinate_and_width_between(1, 10, .7, False)
+    assert len(coords_width) == 12
+
 
 
 

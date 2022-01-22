@@ -1214,3 +1214,32 @@ def find_common_point(p1, p2, p3, p4):
     elif p2.isEqual(p4, .001):
         return p2, p1, p2, p3
 
+def get_coordinate_and_width_between(min_coord, max_coord, width, equal=True):
+    '''
+    divide space between min_coord and max_coord with distanc = width,
+    if equal, it calculate new width that divide space equally
+    '''
+    dist = max_coord - min_coord
+    n = int(dist // width)
+    if equal:
+        width = dist / n
+        remain = 0
+    else:
+        remain = dist % width
+    coords_width = dict()
+    coord = min_coord
+    for i in range(n):
+        if i == n -1:
+            coord = coord + width + remain / 2
+            coords_width[coord] = width + remain / 2
+        else:
+            coord = min_coord + (0.5 + i) * width
+            coords_width[coord] = width
+
+    return coords_width
+    #     if dir == 'x':
+    #         lines.append(Part.makeLine((xmin, y, z), (xmax, y, z)))
+    #     elif dir == 'y':
+    #         lines.append(Part.makeLine((y, xmin, z), (y, xmax, z)))
+    # return lines, widths
+
