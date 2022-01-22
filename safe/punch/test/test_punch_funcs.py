@@ -296,8 +296,11 @@ def test_get_coordinate_and_width_between():
     coords_width = punch_funcs.get_coordinate_and_width_between(1, 10, .7, False)
     assert len(coords_width) == 12
 
+def test_draw_strip_automatically_in_mat_foundation():
+    punch_funcs.draw_strip_automatically_in_mat_foundation(document_mat.Foundation)
+
 
 
 
 if __name__ == '__main__':
-    test_get_foundation_shape_from_base_foundations()
+    test_draw_strip_automatically_in_mat_foundation()

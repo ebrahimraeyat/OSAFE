@@ -1229,14 +1229,130 @@ def get_coordinate_and_width_between(min_coord, max_coord, width, equal=True):
     coords_width = dict()
     coord = min_coord
     for i in range(n):
-        if i == n -1:
+        if i == n - 1:
             coord = coord + width + remain / 2
-            coords_width[coord] = width + remain / 2
+            coords_width[coord] = width + remain
         else:
             coord = min_coord + (0.5 + i) * width
             coords_width[coord] = width
 
     return coords_width
+
+def get_get_coordinate_and_width_betweens(coords: list, width, equal=False):
+    coords_width = dict()
+    for min_coord, max_coord in zip(coords[: -1], coords[1:]):
+        coords_width.update(get_coordinate_and_width_between(min_coord, max_coord, width, equal))
+    return coords_width
+
+
+def get_xy_coords_width_in_mat_foundation(
+            foundation = None,
+            openings : Union[list, bool] = None,
+            x_width : float = 1000,
+            y_width : Union[float, bool] = None,
+            equal : bool = False,
+            ):
+    if foundation is None:
+        foundation = FreeCAD.ActiveDocument.Foundation
+    if openings is None:
+        openings = foundation.openings
+    if y_width is None:
+        y_width = x_width
+    foundation_bb = foundation.Shape.BoundBox
+    x_min_f = foundation_bb.XMin
+    y_min_f = foundation_bb.YMin
+    x_max_f = foundation_bb.XMax
+    y_max_f = foundation_bb.YMax
+    if openings:
+        opening = openings[0]
+        opening_bb = opening.Shape.BoundBox
+        x_min_o = opening_bb.XMin
+        y_min_o = opening_bb.YMin
+        x_max_o = opening_bb.XMax
+        y_max_o = opening_bb.YMax
+        x_coords = [x_min_f, x_min_o, x_max_o, x_max_f]
+        y_coords = [y_min_f, y_min_o, y_max_o, y_max_f]
+    else:
+        x_coords = [x_min_f, x_max_f]
+        y_coords = [y_min_f, y_max_f]
+
+    x_coords_width = get_get_coordinate_and_width_betweens(
+            x_coords,
+            y_width,
+            equal=equal,
+            )
+    y_coords_width = get_get_coordinate_and_width_betweens(
+            y_coords,
+            x_width,
+            equal=equal,
+            )
+    return x_coords_width, y_coords_width
+
+def draw_strip_automatically_in_mat_foundation(
+            foundation = None,
+            openings : Union[list, bool] = None,
+            x_width : float = 1000,
+            y_width : Union[float, bool] = None,
+            equal : bool = False,
+            x_layer_name = 'A',
+            y_layer_name = 'B',
+            draw_x : bool = True,
+            draw_y : bool = True,
+            ):
+    if foundation is None:
+        foundation = FreeCAD.ActiveDocument.Foundation
+    x_coords_width, y_coords_width = get_xy_coords_width_in_mat_foundation(
+            foundation,
+            openings,
+            x_width,
+            y_width,
+            equal,
+    )
+    foundation_bb = foundation.Shape.BoundBox
+    x_min_f = foundation_bb.XMin
+    y_min_f = foundation_bb.YMin
+    x_max_f = foundation_bb.XMax
+    y_max_f = foundation_bb.YMax
+    z = foundation.level.Value
+    import BOPTools.SplitAPI as sp
+    from safe.punch import strip
+    if draw_x:
+        x_lines = []
+        for x in x_coords_width.keys():
+            p1 = (x, y_min_f, z)
+            p2 = (x, y_max_f, z)
+            x_lines.append(Part.makeLine(p1, p2))
+        x_slices = sp.slice(foundation.plan, x_lines, 'Split')
+        for edge in x_slices.Edges:
+            bb = edge.BoundBox
+            if bb.XLength == 0:
+                x = bb.XMin
+                width = x_coords_width.get(x, None)
+                if width is not None:
+                    points = [v.Point for v in edge.Vertexes]
+                    strip.make_strip(points, layer=y_layer_name, width=width)
+    if draw_y:
+        y_lines = []
+        for y in y_coords_width.keys():
+            p1 = (x_min_f, y, z)
+            p2 = (x_max_f, y, z)
+            y_lines.append(Part.makeLine(p1, p2))
+        y_slices = sp.slice(foundation.plan, y_lines, 'Split')
+        for edge in y_slices.Edges:
+            bb = edge.BoundBox
+            if bb.YLength == 0:
+                y = bb.YMin
+                width = y_coords_width.get(y, None)
+                if width is not None:
+                    points = [v.Point for v in edge.Vertexes]
+                    strip.make_strip(points, layer=x_layer_name, width=width)
+
+draw_strip_automatically_in_mat_foundation()
+
+
+
+
+
     #     if dir == 'x':
     #         lines.append(Part.makeLine((xmin, y, z), (xmax, y, z)))
     #     elif dir == 'y':
