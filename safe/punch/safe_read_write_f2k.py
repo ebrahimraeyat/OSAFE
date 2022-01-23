@@ -486,7 +486,6 @@ class FreecadReadwriteModel():
         return names
 
     def export_freecad_strips(self):
-        from draftgeoutils import geometry
         foun = self.doc.Foundation
         point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
         points_content = ''
@@ -544,6 +543,32 @@ class FreecadReadwriteModel():
                     else:
                         strip_content += f'\tStrip={strip_name}   Point={point_name}   GlobalX={coord[0]}   GlobalY={coord[1]}   WBLeft={ewl}   WBRight={ewr} WALeft={swl}   WARight={swr} \n'
                 strip_assign_content += f'\tStrip={strip_name}   Layer={layer}   DesignType=Column   RLLF=1   Design=Yes   IgnorePT=No   RebarMat=AIII   CoverType=Preferences\n'
+        elif foun.foundation_type == 'Mat':
+            i = 0
+            for o in self.doc.Objects:
+                if hasattr(o, 'Proxy') and \
+                    hasattr(o.Proxy, 'Type') and \
+                        o.Proxy.Type == 'Strip':
+                    layer = o.layer
+                    i += 1
+                    strip_name = f'CS{layer}{i}'
+                    points = o.points
+                    sl = o.left_width.Value
+                    sr = o.right_width.Value
+                    swl = ewl = sl * scale_factor
+                    swr = ewr = sr * scale_factor
+                    for j, point in enumerate(points):
+                        coord = [coord * scale_factor for coord in (point.x, point.y, point.z)]
+                        point_name = self.safe.is_point_exist(coord, curr_point_content + points_content)
+                        if point_name is None:
+                            points_content += f"Point={self.last_point_number}   GlobalX={coord[0]}   GlobalY={coord[1]}   GlobalZ={coord[2]}   SpecialPt=No\n"
+                            point_name = self.last_point_number
+                            self.last_point_number += 1
+                        if j == 0:
+                            strip_content += f'\tStrip={strip_name}   Point={point_name}   GlobalX={coord[0]}   GlobalY={coord[1]}   WALeft={swl}   WARight={swr}   AutoWiden=No\n'
+                        elif j == 1: # last strip
+                            strip_content += f'\tStrip={strip_name}   Point={point_name}   GlobalX={coord[0]}   GlobalY={coord[1]}   WBLeft={ewl}   WBRight={ewr}\n'
+                    strip_assign_content += f'\tStrip={strip_name}   Layer={layer}   DesignType=Column   RLLF=1   Design=Yes   IgnorePT=No   RebarMat=AIII   CoverType=Preferences\n'
         self.safe.add_content_to_table(point_coords_table_key, points_content)
         self.safe.add_content_to_table(strip_table_key, strip_content)
         self.safe.add_content_to_table(strip_assign_table_key, strip_assign_content)

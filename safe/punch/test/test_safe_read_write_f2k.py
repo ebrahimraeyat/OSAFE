@@ -75,6 +75,11 @@ def test_export_freecad_strips():
     rw.export_freecad_strips()
     rw.safe.write()
 
+def test_export_freecad_mat_strips():
+    rw = FRW(doc=document)
+    rw.export_freecad_strips()
+    rw.safe.write()
+
 def test_add_preferences():
     input_f2k_path = Path('~\input.f2k').expanduser()
     input_f2k_path.touch()
@@ -169,4 +174,4 @@ def test_is_point_exist12():
     assert not id
 
 if __name__ == '__main__':
-    test_export_freecad_strips()
+    test_export_freecad_mat_strips()

@@ -96,8 +96,7 @@ class Safe12TaskPanel:
             if is_openings:
                 rw.export_freecad_openings(doc)
             if is_strips:
-                if doc.Foundation.foundation_type == 'Strip':
-                    rw.export_freecad_strips()
+                rw.export_freecad_strips()
             if is_stiffs:
                 rw.export_freecad_stiff_elements()
             if is_punches:
