@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../Resources/icons/strip.svg</file>
     <file>../Resources/icons/punch.svg</file>
     <file>../Resources/icons/dxf.svg</file>
     <file>../Resources/icons/cancel.png</file>

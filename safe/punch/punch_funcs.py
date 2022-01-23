@@ -1317,21 +1317,7 @@ def draw_strip_automatically_in_mat_foundation(
     import BOPTools.SplitAPI as sp
     from safe.punch import strip
     if draw_x:
-        x_lines = []
-        for x in x_coords_width.keys():
-            p1 = (x, y_min_f, z)
-            p2 = (x, y_max_f, z)
-            x_lines.append(Part.makeLine(p1, p2))
-        x_slices = sp.slice(foundation.plan, x_lines, 'Split')
-        for edge in x_slices.Edges:
-            bb = edge.BoundBox
-            if bb.XLength == 0:
-                x = bb.XMin
-                width = x_coords_width.get(x, None)
-                if width is not None:
-                    points = [v.Point for v in edge.Vertexes]
-                    strip.make_strip(points, layer=y_layer_name, width=width)
-    if draw_y:
+        x_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","x_strips")
         y_lines = []
         for y in y_coords_width.keys():
             p1 = (x_min_f, y, z)
@@ -1345,17 +1331,24 @@ def draw_strip_automatically_in_mat_foundation(
                 width = y_coords_width.get(y, None)
                 if width is not None:
                     points = [v.Point for v in edge.Vertexes]
-                    strip.make_strip(points, layer=x_layer_name, width=width)
+                    s = strip.make_strip(points, layer=x_layer_name, width=width)
+                    x_strips.addObject(s)
+    if draw_y:
+        y_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","y_strips")
+        x_lines = []
+        for x in x_coords_width.keys():
+            p1 = (x, y_min_f, z)
+            p2 = (x, y_max_f, z)
+            x_lines.append(Part.makeLine(p1, p2))
+        x_slices = sp.slice(foundation.plan, x_lines, 'Split')
+        for edge in x_slices.Edges:
+            bb = edge.BoundBox
+            if bb.XLength == 0:
+                x = bb.XMin
+                width = x_coords_width.get(x, None)
+                if width is not None:
+                    points = [v.Point for v in edge.Vertexes]
+                    s = strip.make_strip(points, layer=y_layer_name, width=width)
+                    y_strips.addObject(s)
 
-draw_strip_automatically_in_mat_foundation()
-
-
-
-
-
-    #     if dir == 'x':
-    #         lines.append(Part.makeLine((xmin, y, z), (xmax, y, z)))
-    #     elif dir == 'y':
-    #         lines.append(Part.makeLine((y, xmin, z), (y, xmax, z)))
-    # return lines, widths
 
