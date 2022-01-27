@@ -1316,6 +1316,7 @@ def draw_strip_automatically_in_mat_foundation(
     z = foundation.level.Value
     import BOPTools.SplitAPI as sp
     from safe.punch import strip
+    i = j = 0
     if draw_x:
         x_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","x_strips")
         y_lines = []
@@ -1330,8 +1331,10 @@ def draw_strip_automatically_in_mat_foundation(
                 y = bb.YMin
                 width = y_coords_width.get(y, None)
                 if width is not None:
+                    i += 1
                     points = [v.Point for v in edge.Vertexes]
                     s = strip.make_strip(points, layer=x_layer_name, width=width)
+                    s.Label = f'CS{x_layer_name}{i}'
                     x_strips.addObject(s)
     if draw_y:
         y_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","y_strips")
@@ -1347,8 +1350,10 @@ def draw_strip_automatically_in_mat_foundation(
                 x = bb.XMin
                 width = x_coords_width.get(x, None)
                 if width is not None:
+                    j += 1
                     points = [v.Point for v in edge.Vertexes]
                     s = strip.make_strip(points, layer=y_layer_name, width=width)
+                    s.Label = f'CS{y_layer_name}{j}'
                     y_strips.addObject(s)
 
 def draw_strip_automatically_in_strip_foundation(
