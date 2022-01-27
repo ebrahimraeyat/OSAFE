@@ -1,5 +1,8 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../Resources/icons/import.svg</file>
+    <file>../Resources/icons/etabs.png</file>
+    <file>../Resources/icons/help.png</file>
     <file>../Resources/icons/strip.svg</file>
     <file>../Resources/icons/punch.svg</file>
     <file>../Resources/icons/dxf.svg</file>

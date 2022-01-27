@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>388</width>
-    <height>504</height>
+    <width>369</width>
+    <height>543</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Import Information From ETABS</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../py_widget/resource.qrc">
+    <normaloff>:/safe/Resources/icons/etabs.png</normaloff>:/safe/Resources/icons/etabs.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -140,9 +144,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2"/>
       </item>
       <item>
        <widget class="QProgressBar" name="progressbar">
@@ -325,21 +326,50 @@
         </layout>
        </widget>
       </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>1</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="import_data">
+       <property name="text">
+        <string>Import</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/import.svg</normaloff>:/safe/Resources/icons/import.svg</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="help">
+       <property name="text">
+        <string>Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/help.png</normaloff>:/safe/Resources/icons/help.png</iconset>
+       </property>
+       <property name="shortcut">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>1</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

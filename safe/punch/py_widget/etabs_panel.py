@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import PySide2
+
 import FreeCAD
 import FreeCADGui as Gui
 
@@ -27,6 +29,8 @@ class EtabsTaskPanel:
 
     def create_connections(self):
         self.form.browse.clicked.connect(self.browse)
+        self.form.import_data.clicked.connect(self.import_data)
+        self.form.help.clicked.connect(self.show_help)
 
     def set_foundation_level(self):
         self.etabs.set_current_unit('N', 'm')
@@ -50,11 +54,14 @@ class EtabsTaskPanel:
             filename += ext
         self.form.filename.setText(filename)
 
-    def accept(self):
+    def import_data(self):
         if self.form.beams_group.isChecked():
             self.import_beams_columns()
         if self.form.f2k_groupbox.isChecked():
             self.create_f2k()
+        self.accept()
+
+    def accept(self):
         Gui.Control.closeDialog()
 
     def import_beams_columns(self):
@@ -114,6 +121,22 @@ class EtabsTaskPanel:
                 self.form.start_button.setEnabled(False)
             elif type(ret) == str:
                 self.form.result_label.setText(ret)
+
+    def show_help(self):
+        try:
+            import Help
+        except ModuleNotFoundError:
+            from PySide2.QtWidgets import QMessageBox
+            if (QMessageBox.question(
+                    None,
+                    "Install Help",
+                    "You must install Help WB to view the manual, do you want to install it?",
+                             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.No):
+                return
+            Gui.runCommand('Std_AddonMgr',0)
+            return
+        help_path = punch_path.parent.parent / 'help' / 'import_model.html'
+        Help.show(str(help_path))
  
 if __name__ == '__main__':
     panel = EtabsTaskPanel()
