@@ -20,6 +20,7 @@ class Form:
         self.form.draw_button.clicked.connect(self.draw)
         self.form.mat_foundation.clicked.connect(self.uncheck_strip)
         self.form.strip_foundation.clicked.connect(self.uncheck_mat)
+        self.form.help.clicked.connect(self.show_help)
 
     def uncheck_strip(self, state):
         # if state == Qt.Checked:
@@ -52,6 +53,10 @@ class Form:
             )
         else:
             punch_funcs.draw_strip_automatically_in_strip_foundation()
+
+    def show_help(self):
+        from help.show_help import show
+        show('make_auto_strip.html')
     
     def accept(self):
         Gui.Control.closeDialog()
