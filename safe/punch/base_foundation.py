@@ -98,12 +98,12 @@ class BaseFoundation:
                 "height",
                 "Slab",
                 ).height = '1 m'
-        if not hasattr(obj, "fix_width_from"):
+        if not hasattr(obj, "align"):
             obj.addProperty(
                 "App::PropertyEnumeration",
-                "fix_width_from",
+                "align",
                 "Geometry",
-                ).fix_width_from = ['center', 'Left', 'Right']
+                ).align = ['Center', 'Left', 'Right']
         if not hasattr(obj, "main_wire"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -185,13 +185,13 @@ class BaseFoundation:
             obj.ViewObject.ShapeColor = (0.20,0.00,1.00)
         elif obj.layer == 'other':
             obj.ViewObject.ShapeColor = (0.20,1.00,0.00)
-        if obj.fix_width_from == 'Left':
+        if obj.align == 'Left':
             sl = obj.left_width.Value
             sr = obj.width.Value - sl
-        elif obj.fix_width_from == 'Right':
+        elif obj.align == 'Right':
             sr = obj.right_width.Value
             sl = obj.width.Value - sr
-        elif obj.fix_width_from == 'center':
+        elif obj.align == 'Center':
             sr = sl = obj.width.Value / 2
         shape, main_wire, _, _ = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
         extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)

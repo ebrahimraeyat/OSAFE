@@ -11,8 +11,9 @@ def make_strip(
         layer : str = 'A',
         design_type : str = 'column',
         width : float = 1000,
-        left_width : Union[float, bool] = None,
-        right_width : Union[float, bool] = None,
+        left_width : float = 0,
+        right_width : float = 0,
+        align : str = 'Center',
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
     Strip(obj)
@@ -20,14 +21,9 @@ def make_strip(
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
-    if left_width:
-        obj.left_width = left_width
-        obj.right_width = width - left_width
-    elif right_width:
-        obj.right_width = right_width
-        obj.left_width = width - right_width
-    else:
-        obj.left_width = obj.right_width = obj.width / 2
+    obj.left_width = left_width
+    obj.right_width = right_width
+    obj.align = align
     if FreeCAD.GuiUp:
         ViewProviderStrip(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -82,7 +78,7 @@ class Strip:
                 "App::PropertyEnumeration",
                 "align",
                 "Geometry",
-                ).align = ['center', 'Left', 'Right']
+                ).align = ['Center', 'Left', 'Right']
         if not hasattr(obj, "main_wire"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -114,11 +110,15 @@ class Strip:
         if obj.align == 'Left':
             sl = obj.left_width.Value
             sr = obj.width.Value - sl
+            obj.right_width.Value = sr
         elif obj.align == 'Right':
             sr = obj.right_width.Value
             sl = obj.width.Value - sr
-        elif obj.align == 'center':
+            obj.left_width.Value = sl
+        elif obj.align == 'Center':
             sr = sl = obj.width.Value / 2
+            obj.left_width.Value = sl
+            obj.right_width.Value = sr
         wire = Part.makePolygon(obj.points)
         if obj.show_width:
             shape, left_wire, right_wire = punch_funcs.get_left_right_offset_wire_and_shape(wire, sl, sr)

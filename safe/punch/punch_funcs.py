@@ -1351,4 +1351,86 @@ def draw_strip_automatically_in_mat_foundation(
                     s = strip.make_strip(points, layer=y_layer_name, width=width)
                     y_strips.addObject(s)
 
+def draw_strip_automatically_in_strip_foundation(
+            foundation = None,
+            # openings : Union[list, bool] = None,
+            # y_width : Union[float, bool] = None,
+            # equal : bool = False,
+            # x_layer_name = 'A',
+            # draw_x : bool = True,
+            ):
+    if foundation is None:
+        foundation = FreeCAD.ActiveDocument.Foundation
+    from safe.punch import strip
+    a_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","A_strips")
+    b_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","B_strips")
+    i = j = 0
+    for base_foundation in foundation.base_foundations:
+        layer = base_foundation.layer
+        edges = []
+        if not base_foundation.first_edge.isNull():
+            edges.append(base_foundation.first_edge)
+        edges.extend(base_foundation.main_wire.Edges)
+        if not base_foundation.last_edge.isNull():
+            edges.append(base_foundation.last_edge)
+        if is_straight_line(edges):
+            first_point = edges[0].firstVertex().Point
+            last_point = edges[-1].lastVertex().Point
+            points = [first_point, last_point]
+        else:
+            points = get_sorted_points(edges, last=True, sort_edges=False)
+            # remove 1 and -2 point index
+            if not base_foundation.first_edge.isNull():
+                points.remove(points[1])
+            if not base_foundation.last_edge.isNull():
+                points.remove(points[-2])
+        s = strip.make_strip(
+                            points,
+                            layer=layer, 
+                            width=base_foundation.width.Value,
+                            left_width=base_foundation.left_width.Value,
+                            right_width=base_foundation.right_width.Value,
+                            align = base_foundation.align,
+                            )
+        if layer == 'A':
+            i += 1
+            strip_name = f'CS{layer}{i}'
+            a_strips.addObject(s)
+        else:
+            j += 1
+            strip_name = f'CS{layer}{j}'
+            b_strips.addObject(s)
+        s.Label = strip_name
 
+def is_straight_line(edges, tol=1e-7):
+    if len(edges) > 1:
+        start_edge = edges[0]
+        dir_start_edge = start_edge.tangentAt(start_edge.FirstParameter)
+        for edge in edges:
+            dir_edge = edge.tangentAt(edge.FirstParameter)
+            if dir_start_edge.cross(dir_edge).Length > tol:
+                return False
+    return True
+
+def get_sorted_points(
+            edges,
+            vector=True,
+            last=False,
+            sort_edges=True,
+            ):
+    points = []
+    if sort_edges:
+        edges = Part.__sortEdges__(edges)
+    for e in edges:
+        v = e.firstVertex()
+        if vector:
+            points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+        else:
+            points.append(v)
+    if last:
+        v = e.lastVertex()
+        if vector:
+            points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
+        else:
+            points.append(v)
+    return points

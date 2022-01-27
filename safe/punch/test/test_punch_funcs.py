@@ -11,11 +11,13 @@ import FreeCAD
 import Part
 
 filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
+filename_strip_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip_foundation.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_base_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
+document_strip_foundation = FreeCAD.openDocument(str(filename_strip_foundation))
 
 
 punch_path = Path(__file__).absolute().parent.parent
@@ -299,8 +301,11 @@ def test_get_coordinate_and_width_between():
 def test_draw_strip_automatically_in_mat_foundation():
     punch_funcs.draw_strip_automatically_in_mat_foundation(document_mat.Foundation)
 
+def test_draw_strip_automatically_in_strip_foundation():
+    punch_funcs.draw_strip_automatically_in_strip_foundation(document_strip_foundation.Foundation)
+
 
 
 
 if __name__ == '__main__':
-    test_draw_strip_automatically_in_mat_foundation()
+    test_draw_strip_automatically_in_strip_foundation()
