@@ -1214,13 +1214,16 @@ def find_common_point(p1, p2, p3, p4):
     elif p2.isEqual(p4, .001):
         return p2, p1, p2, p3
 
-def get_coordinate_and_width_between(min_coord, max_coord, width, equal=True):
+def get_coordinate_and_width_between(min_coord, max_coord, width, equal=True) -> dict:
     '''
     divide space between min_coord and max_coord with distanc = width,
     if equal, it calculate new width that divide space equally
     '''
     dist = max_coord - min_coord
     n = int(dist // width)
+    # if n == 0:
+    #     coord = (max_coord + min_coord) / 2
+    #     return {coord : dist}
     if equal:
         width = dist / n
         remain = 0
@@ -1238,7 +1241,7 @@ def get_coordinate_and_width_between(min_coord, max_coord, width, equal=True):
 
     return coords_width
 
-def get_get_coordinate_and_width_betweens(coords: list, width, equal=False):
+def get_coordinate_and_width_betweens(coords: list, width, equal=False):
     coords_width = dict()
     for min_coord, max_coord in zip(coords[: -1], coords[1:]):
         coords_width.update(get_coordinate_and_width_between(min_coord, max_coord, width, equal))
@@ -1276,12 +1279,12 @@ def get_xy_coords_width_in_mat_foundation(
         x_coords = [x_min_f, x_max_f]
         y_coords = [y_min_f, y_max_f]
 
-    x_coords_width = get_get_coordinate_and_width_betweens(
+    x_coords_width = get_coordinate_and_width_betweens(
             x_coords,
             y_width,
             equal=equal,
             )
-    y_coords_width = get_get_coordinate_and_width_betweens(
+    y_coords_width = get_coordinate_and_width_betweens(
             y_coords,
             x_width,
             equal=equal,
