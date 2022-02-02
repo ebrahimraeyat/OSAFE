@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>313</width>
-    <height>398</height>
+    <width>308</width>
+    <height>312</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,11 +20,14 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGroupBox" name="strip_foundation">
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
-     </property>
      <property name="title">
       <string>Strip Foundation</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -33,6 +36,12 @@
       <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>7</number>
+      </property>
+      <property name="leftMargin">
+       <number>23</number>
+      </property>
       <item>
        <widget class="QCheckBox" name="checkBox">
         <property name="enabled">
@@ -48,11 +57,11 @@
    </item>
    <item>
     <widget class="QGroupBox" name="mat_foundation">
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(170, 255, 255);</string>
-     </property>
      <property name="title">
       <string>Mat Foundation</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <property name="flat">
       <bool>false</bool>
@@ -63,7 +72,10 @@
      <property name="checked">
       <bool>false</bool>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <property name="leftMargin">
+       <number>23</number>
+      </property>
       <item>
        <widget class="QCheckBox" name="equal">
         <property name="text">
@@ -85,147 +97,156 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="x_strips">
-        <property name="title">
-         <string>X</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Width</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="x_width">
-           <property name="suffix">
-            <string> Cm</string>
-           </property>
-           <property name="decimals">
-            <number>0</number>
-           </property>
-           <property name="minimum">
-            <double>50.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1000.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>10.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>100.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Layer</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="x_layer_name">
-           <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="topMargin">
+           <number>24</number>
+          </property>
+          <property name="bottomMargin">
+           <number>9</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>A</string>
+             <string>Width</string>
             </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Layer</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="x_strips">
+          <property name="title">
+           <string>X</string>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QDoubleSpinBox" name="x_width">
+             <property name="suffix">
+              <string> Cm</string>
+             </property>
+             <property name="decimals">
+              <number>0</number>
+             </property>
+             <property name="minimum">
+              <double>50.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>10.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>100.000000000000000</double>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>B</string>
-            </property>
+            <widget class="QComboBox" name="x_layer_name">
+             <item>
+              <property name="text">
+               <string>A</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>B</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Other</string>
+              </property>
+             </item>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>Other</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="y_strips">
-        <property name="title">
-         <string>Y</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Width</string>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="y_strips">
+          <property name="title">
+           <string>Y</string>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="leftMargin">
+            <number>24</number>
            </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="y_width">
-           <property name="suffix">
-            <string> Cm</string>
+           <property name="topMargin">
+            <number>2</number>
            </property>
-           <property name="decimals">
-            <number>0</number>
-           </property>
-           <property name="minimum">
-            <double>50.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1000.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>10.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>100.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Layer</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="y_layer_name">
-           <property name="currentIndex">
-            <number>1</number>
+           <property name="bottomMargin">
+            <number>6</number>
            </property>
            <item>
-            <property name="text">
-             <string>A</string>
-            </property>
+            <widget class="QDoubleSpinBox" name="y_width">
+             <property name="suffix">
+              <string> Cm</string>
+             </property>
+             <property name="decimals">
+              <number>0</number>
+             </property>
+             <property name="minimum">
+              <double>50.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>1000.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>10.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>100.000000000000000</double>
+             </property>
+            </widget>
            </item>
            <item>
-            <property name="text">
-             <string>B</string>
-            </property>
+            <widget class="QComboBox" name="y_layer_name">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>A</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>B</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Other</string>
+              </property>
+             </item>
+            </widget>
            </item>
-           <item>
-            <property name="text">
-             <string>Other</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
