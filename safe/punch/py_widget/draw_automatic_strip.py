@@ -41,6 +41,7 @@ class Form:
             x_layer_name = self.form.x_layer_name.currentText()
             y_layer_name = self.form.y_layer_name.currentText()
             equal = self.form.equal.isChecked()
+            consider_openings = self.form.consider_openings.isChecked()
             punch_funcs.draw_strip_automatically_in_mat_foundation(
                 # foundation=self.foundation,
                 x_width=x_width * 10,
@@ -50,6 +51,7 @@ class Form:
                 draw_x=draw_x,
                 draw_y=draw_y,
                 equal=equal,
+                consider_openings=consider_openings,
             )
         else:
             punch_funcs.draw_strip_automatically_in_strip_foundation()

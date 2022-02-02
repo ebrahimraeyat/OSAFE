@@ -1254,11 +1254,14 @@ def get_xy_coords_width_in_mat_foundation(
             x_width : float = 1000,
             y_width : Union[float, bool] = None,
             equal : bool = False,
+            consider_openings: bool = True,
             ):
     if foundation is None:
         foundation = FreeCAD.ActiveDocument.Foundation
     if openings is None:
         openings = foundation.openings
+    if not consider_openings:
+        openings = None
     if y_width is None:
         y_width = x_width
     foundation_bb = foundation.Shape.BoundBox
@@ -1301,6 +1304,7 @@ def draw_strip_automatically_in_mat_foundation(
             y_layer_name = 'B',
             draw_x : bool = True,
             draw_y : bool = True,
+            consider_openings : bool = True,
             ):
     if foundation is None:
         foundation = FreeCAD.ActiveDocument.Foundation
@@ -1310,6 +1314,7 @@ def draw_strip_automatically_in_mat_foundation(
             x_width,
             y_width,
             equal,
+            consider_openings=consider_openings,
     )
     foundation_bb = foundation.Shape.BoundBox
     x_min_f = foundation_bb.XMin
