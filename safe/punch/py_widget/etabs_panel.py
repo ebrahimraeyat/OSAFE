@@ -17,7 +17,7 @@ class EtabsTaskPanel:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'etabs_panel.ui'))
         self.etabs = etabs_obj.EtabsModel(backup=False)
-        self.set_foundation_level()
+        # self.set_foundation_level()
         self.set_story()
         self.set_filename()
         self.create_connections()
