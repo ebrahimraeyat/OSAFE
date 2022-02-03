@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import PySide2
 
 import FreeCAD
 import FreeCADGui as Gui
@@ -18,9 +17,14 @@ class EtabsTaskPanel:
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'etabs_panel.ui'))
         self.etabs = etabs_obj.EtabsModel(backup=False)
         # self.set_foundation_level()
+        self.set_load_cases()
         self.set_story()
         self.set_filename()
         self.create_connections()
+
+    def set_load_cases(self):
+        FreeCAD.load_cases = self.etabs.load_cases.get_load_cases()
+        FreeCAD.dead = self.etabs.load_patterns.get_special_load_pattern_names(1)
 
     def set_filename(self):
         filename = Path(self.etabs.SapModel.GetModelFilename()).with_suffix('.F2k')

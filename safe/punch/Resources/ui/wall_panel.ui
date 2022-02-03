@@ -91,7 +91,11 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QComboBox" name="loadpat"/>
+    <widget class="QComboBox" name="loadpat">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

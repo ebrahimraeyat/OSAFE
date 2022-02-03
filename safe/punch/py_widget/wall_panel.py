@@ -11,9 +11,14 @@ class WallTaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'wall_panel.ui'))
-        foun = FreeCAD.ActiveDocument.Foundation
-        self.form.loadpat.addItems(foun.loadcases)
+        self.fill_load_patterns()
         self.create_connections()
+
+    def fill_load_patterns(self):
+        if hasattr(FreeCAD, 'load_cases'):
+            self.form.loadpat.addItems(FreeCAD.load_cases)
+        else:
+            pass
 
     def create_connections(self):
         self.form.create_button.clicked.connect(self.create_wall)
@@ -22,7 +27,10 @@ class WallTaskPanel:
         sel = Gui.Selection.getSelection()
         slabs = []
         for s in sel:
-            if s.Proxy.Type in ("tape_slab", "trapezoidal_slab"):
+            if (hasattr(s, "Proxy") and
+                hasattr(s.Proxy, "Type") and
+                s.Proxy.Type == "Beam"
+                ):
                 slabs.append(s)
         if not slabs:
             return None
@@ -45,6 +53,7 @@ class WallTaskPanel:
             wall.weight = weight
             wall.Base.ViewObject.Visibility = True
             wall.Material = mat
+            wall.Width = 300
             if create_blocks:
                 wall.MakeBlocks = True
                 wall.BlockHeight = 400
