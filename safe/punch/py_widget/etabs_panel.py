@@ -59,6 +59,7 @@ class EtabsTaskPanel:
         self.form.filename.setText(filename)
 
     def import_data(self):
+        self.top_of_foundation = self.form.foundation_level.value() * 1000
         if self.form.beams_group.isChecked():
             self.import_beams_columns()
         if self.form.f2k_groupbox.isChecked():
@@ -70,7 +71,7 @@ class EtabsTaskPanel:
 
     def import_beams_columns(self):
         from safe.punch import etabs_punch
-        foundation_level = self.form.foundation_level.value() * 1000
+        
         story = self.form.story.currentText()
         selected_beams = self.form.selected_beams.isChecked()
         exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
@@ -90,7 +91,7 @@ class EtabsTaskPanel:
         punch = etabs_punch.EtabsPunch(
                 etabs_model = self.etabs,
                 beam_names = beams_names,
-                top_of_foundation=foundation_level,
+                top_of_foundation=self.top_of_foundation,
             )
         punch.import_data()
 
@@ -102,7 +103,11 @@ class EtabsTaskPanel:
         import create_f2k
         from safe.punch.f2k_object import make_safe_f2k
         make_safe_f2k(filename, output_filename)
-        writer = create_f2k.CreateF2kFile(filename_path, self.etabs)
+        writer = create_f2k.CreateF2kFile(
+                filename_path,
+                self.etabs,
+                model_datum=self.top_of_foundation,
+                )
         pixmap = QPixmap(str(punch_path / 'Resources' / 'icons' / 'tick.svg'))
         d = {
             1 : self.form.one,
