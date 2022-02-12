@@ -12,7 +12,6 @@ from safe.punch import (
     gui_punch,
     gui_slab,
     gui_beam,
-    gui_punch,
     gui_base_foundation,
     gui_dxf,
     gui_automatic_strip,
@@ -160,17 +159,9 @@ class CivilEtabs:
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        allow, check = allowed_to_continue(
-            'punch_etabs.bin',
-            'https://gist.githubusercontent.com/ebrahimraeyat/9f32da1884e7b3f1a605e12d292c4fd0/raw',
-            'punch'
-            )
-        if not allow:
-            return
         from safe.punch.py_widget import etabs_panel
         panel = etabs_panel.EtabsTaskPanel()
         Gui.Control.showDialog(panel)
-        show_warning_about_number_of_use(check)
         return panel
 
     def IsActive(self):
