@@ -1,0 +1,18 @@
+<package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
+  <name>OSAFE</name>
+  <description>This is a workbench for FreeCAD that creates foundation model from CSI ETABS model results.</description>
+  <version>2022.02</version>
+  <maintainer email="your_address@null.com">Yorik van Havre</maintainer>
+  <license file="LICENSE">LGPLv2.1</license>
+  <url type="repository" branch="master">https://github.com/ebrahimraeyat/OSAFE</url>
+  <url type="website">https://github.com/ebrahimraeyat/OSAFE/wiki</url>
+  <icon>images/safe.png</icon>
+
+  <content>
+    <workbench>
+      <classname>OSAFE</classname>
+      <subdirectory>./</subdirectory>
+    </workbench>
+  </content>
+
+</package>
