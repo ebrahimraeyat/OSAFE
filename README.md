@@ -1,15 +1,20 @@
 ## FreeCAD Shear Punching Engineering Workbench
-A Workbench in [FreeCAD](https://freecadweb.org) for calculating shear punching of foundation that have been modeled in [CSI SAFE](https://www.csiamerica.com/products/safe)
+A Workbench in [FreeCAD](https://freecadweb.org) for creating foundation model in [CSI SAFE](https://www.csiamerica.com/products/safe) from [CSI ETABS](https://www.csiamerica.com/products/etabs) Model. It also can Import [CSI SAFE](https://www.csiamerica.com/products/safe) model into FreeCAD and calculate Shear punching of columns according to ACI 318-19.
 
-![punch](https://user-images.githubusercontent.com/8196112/103041595-11204e80-458c-11eb-9cab-460a1963c802.gif)
-
-
-### Shear Punching
-This reads an excel output from the [CSI SAFE](https://www.csiamerica.com/products/safe) software and calculates shear punching ratio.
-
+![3](https://user-images.githubusercontent.com/8196112/155970780-e83b9fe9-5e46-4b75-82b6-860aa44f9ee7.jpg)
 
 
 ## Installation
+
+## Windows
+You can download FreeCAD from below links and install it in windows. After installation, you must clear Civil folder in FreeCAD installation folder (ec. C:\Program Files\FreeCAD 0.19\Mod\Civil) and then install this two repositories via addon manager in FreeCAD.
+
+https://github.com/ebrahimraeyat/OSAFE.git  
+https://github.com/ebrahimraeyat/etabs_api.git
+
+[link1](https://github.com/ebrahimraeyat/OSAFE/releases/tag/v0.9)  
+[link2](https://mega.nz/file/sUlAQaoA#SvTKQu_HswPNQxW9wT8PlCxLGXBZbBH_F-xp6A_bsps)
+
 ### Debian 10 (Buster)
 
 ```bash
