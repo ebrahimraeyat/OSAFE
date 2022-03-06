@@ -207,7 +207,7 @@ def make_foundation(
         obj.ViewObject.LineWidth = 1.00
         obj.ViewObject.PointSize = 1.00
         obj.ViewObject.DisplayMode = "Flat Lines"
-        obj.ViewObject.ShapeColor = (0.0, 1., 1.)
+        obj.ViewObject.ShapeColor = (1.00,0.67,0.50)
         obj.ViewObject.LineColor = (0.28,0.28,0.28)
         obj.ViewObject.PointColor = (0.28,0.28,0.28)
         FreeCADGui.activeDocument().activeView().viewIsometric()

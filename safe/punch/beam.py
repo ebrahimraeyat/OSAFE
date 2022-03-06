@@ -1,4 +1,6 @@
 from pathlib import Path
+
+from numpy import void
 import Part
 import FreeCAD
 
@@ -9,9 +11,12 @@ def make_beam(p1, p2):
     obj.start_point = p1
     obj.end_point = p2
     if FreeCAD.GuiUp:
-        ViewProviderBeam(obj.ViewObject)
-        obj.ViewObject.LineWidth = 3
-        obj.ViewObject.PointSize = 6
+        vobj = obj.ViewObject
+        ViewProviderBeam(vobj)
+        vobj.LineWidth = 3
+        vobj.PointSize = 6
+        vobj.LineColor = (1., 1., 0.)
+        vobj.PointColor = (1., 1., 0.)
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -45,10 +50,6 @@ class Beam:
 class ViewProviderBeam:
     def __init__(self, vobj):
         vobj.Proxy = self
-        vobj.LineColor = (1., 0., 0.)
-        vobj.LineWidth = 1.
-        vobj.PointSize = 1.00
-        vobj.PointColor = (1., 0., 0.)
 
     def attach(self, vobj):
         self.ViewObject = vobj
