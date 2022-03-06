@@ -6,7 +6,7 @@ FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 import FreeCAD
 
-punch_path = Path(__file__).absolute().parent.parent.parent
+punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
 import etabs_punch
 document= FreeCAD.newDocument()
@@ -38,6 +38,8 @@ def test_create_punches():
     assert type(p1.combos_load) == dict
     assert len(p1.combos_load.keys()) == 35
 
+def test_create_columns():
+    etabs.create_columns()
 
 if __name__ == '__main__':
     test_create_segments()

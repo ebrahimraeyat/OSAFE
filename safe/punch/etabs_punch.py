@@ -15,6 +15,7 @@ import Draft
 import FreeCAD
 import FreeCADGui as Gui
 import Arch
+import DraftVecUtils
 import math
 from typing import Union
 
@@ -47,14 +48,113 @@ class EtabsPunch(object):
             slabs[slab_name] = beam.make_beam(v1, v2)
         return slabs
 
-    # def create_foundation(self,
-    #     ):
-    #     self.create_slabs_plan()
-    #     Load_cases = self.etabs.load_cases.get_loadcase_withtype(1)
-    #     self.foundation = etabs_foundation.make_foundation(
-    #         self.cover, self.fc, self.height, self.foundation_type, Load_cases, self.top_of_foundation)
-
     def create_columns(self):
+        # joint_design_reactions = self.etabs.database.get_joint_design_reactions()
+        # basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
+        #         joint_design_reactions
+        #     )
+
+        columns = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Columns")
+        beams = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Beams")
+        profiles = {}
+        frame_props = self.etabs.SapModel.PropFrame.GetAllFrameProperties()
+        section_types_map = {
+            1 : ['H', 'IPE'],
+            2 : ['U', 'UNP'],
+            6 : ['RH', 'BOX'],
+            8 : ['R', 'REC'],
+            9 : ['C', 'CIRCLE'],
+        }
+        frames = self.etabs.SapModel.FrameObj.GetAllFrames()
+        progressbar = FreeCAD.Base.ProgressIndicator()
+        frames_count = frames[0]
+        progressbar.start("Importing "+str(frames_count)+" Frame Elements...", frames_count)
+        color = (.0, 1.0, 0.0, 0.0)
+        for i in range(frames_count):
+            progressbar.next(True)
+            frame_name = frames[1][i]
+            if self.etabs.frame_obj.is_beam(frame_name):
+                if frame_name not in self.beam_names:
+                    continue
+                v1 = FreeCAD.Vector(frames[6][i], frames[7][i], self.top_of_foundation)
+                v2 = FreeCAD.Vector(frames[9][i], frames[10][i], self.top_of_foundation)
+                beam_name = beam.make_beam(v1, v2)
+                beams.addObject(beam_name)
+            elif self.etabs.frame_obj.is_column(frame_name):
+                p1_name = frames[4][i]
+                p2_name = frames[5][i]
+                point_name_restraint = self.is_restraint([p1_name, p2_name])
+                if not point_name_restraint:
+                    continue
+                dz = self.top_of_foundation + abs(frames[11][i] - frames[8][i])
+                v1 = FreeCAD.Vector(frames[6][i], frames[7][i], self.top_of_foundation)
+                v2 = FreeCAD.Vector(frames[9][i], frames[10][i], dz)
+                if DraftVecUtils.equals(v1, v2):
+                    continue
+                label, story, _ = self.etabs.SapModel.FrameObj.GetLabelFromName(frame_name)
+                line = Draft.make_line(v1, v2)
+                line.Label = f'{label}_{story}_CenterLine'
+                line.Label2 = frame_name
+                line.recompute()
+                section_name = frames[2][i]
+                if section_name:
+                    section_index = frame_props[1].index(section_name)
+                    section_type_num = frame_props[2][section_index]
+                    section_type, category = section_types_map.get(section_type_num, ('G', 'Genaral'))
+                else:
+                    section_type, category = 'None', 'None'
+                width = frame_props[4][section_index]
+                height = frame_props[3][section_index]
+                profile = profiles.get(section_name, None)
+                if profile is None:
+                    profile = Arch.makeProfile(
+                        profile=[
+                                0,
+                                category,
+                                section_name,
+                                section_type,
+                                width, # T3
+                                height, # height
+                                frame_props[6][section_index], # TW
+                                frame_props[5][section_index], # TF
+                                # frame_props[7][section_index], # heightB
+                                # frame_props[8][section_index], # TFB
+                                ])
+                    profiles[section_name] = profile
+                    profile.Label = section_name
+                structure = Arch.makeStructure(profile)
+                structure.IfcType = 'Column'
+                structure.PredefinedType = 'COLUMN'
+                structure.Label = f'{label}_{story}'
+                structure.Label2 = frame_name
+                place_the_beam(structure, line)
+                columns.addObject(structure)
+                # view property of structure
+                if FreeCAD.GuiUp:
+                    structure.ViewObject.LineWidth = 1
+                    structure.ViewObject.PointSize = 1
+                    structure.ViewObject.Transparency = 20
+                    structure.ViewObject.ShapeColor = color
+                    structure.ViewObject.LineColor = color
+                    structure.ViewObject.PointColor = color
+                    structure.ViewObject.DisplayMode = 'Wireframe'
+                    line.ViewObject.LineColor = color
+                    line.ViewObject.PointColor = color
+                    if section_type not in ('G', 'None'):
+                        line.ViewObject.hide()
+                    line.ViewObject.LineWidth = 1
+                
+                rotation = self.etabs.SapModel.FrameObj.GetLocalAxes(frame_name)[0]
+                insertion = self.etabs.SapModel.FrameObj.GetInsertionPoint(frame_name)
+                x, y = get_xy_cardinal_point(insertion[0], width, height)
+                rotation += 90
+                structure.AttachmentOffset = FreeCAD.Placement(
+                    FreeCAD.Vector(x, y, 0),
+                    FreeCAD.Rotation(FreeCAD.Vector(0,0,1),rotation))
+                structure.Nodes = [v1, v2]
+        progressbar.stop()
+
+    def create_columns_previos(self):
         joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
                 joint_design_reactions
@@ -115,9 +215,12 @@ class EtabsPunch(object):
             columns.addObject(col)
         return columns
     
-    
-    
-    
+    def is_restraint(self, points : list):
+        for p in points:
+            restraint = self.etabs.SapModel.PointObj.GetRestraint(p)[0]
+            if restraint[0:3] == (True, True, True):
+                return p
+        return False 
     
     def grid_lines(self):
         if not FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
@@ -135,7 +238,7 @@ class EtabsPunch(object):
     def import_data(self):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
-        self.create_slabs_plan()
+        # self.create_slabs_plan()
         try:
             self.create_columns()
         except TypeError:
@@ -150,3 +253,33 @@ class EtabsPunch(object):
             FreeCAD.Vector(0, 0, 1),
             self.top_of_foundation)
 
+
+def place_the_beam(beam, line):
+    '''arg1= beam, arg2= edge: lay down the selected beam on the selected edge'''
+    edge = line.Shape.Edges[0]
+    vect=edge.tangentAt(0)
+    beam.Placement.Rotation=FreeCAD.Rotation(0,0,0,1)
+    rot=FreeCAD.Rotation(beam.Placement.Rotation.Axis,vect)
+    beam.Placement.Rotation=rot.multiply(beam.Placement.Rotation)
+    beam.Placement.Base=edge.valueAt(0)
+    beam.addExtension("Part::AttachExtensionPython")
+    beam.Support=[(line, 'Edge1')]
+    beam.MapMode='NormalToEdge'
+    beam.MapReversed=True
+    beam.Height=edge.Length
+
+def get_xy_cardinal_point(
+        cardinal : int,
+        width : float,
+        height : float,
+        ):
+    x = y = 0
+    if cardinal in (1, 4, 7):
+        x = width / 2
+    elif cardinal in (3, 6, 9):
+        x = - width / 2
+    if cardinal in (7, 8, 9):
+        y = - height / 2
+    elif cardinal in (1, 2, 3):
+        y = height / 2
+    return x, y
