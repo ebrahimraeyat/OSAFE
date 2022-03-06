@@ -18,6 +18,8 @@ def make_base_foundation(
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BaseFoundation")
     BaseFoundation(obj)
     obj.beams = beams
+    for b in beams:
+        b.ViewObject.hide()
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
