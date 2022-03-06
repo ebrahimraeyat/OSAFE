@@ -10,6 +10,8 @@ def make_beam(p1, p2):
     obj.end_point = p2
     if FreeCAD.GuiUp:
         ViewProviderBeam(obj.ViewObject)
+        obj.ViewObject.LineWidth = 3
+        obj.ViewObject.PointSize = 6
     FreeCAD.ActiveDocument.recompute()
     return obj
 

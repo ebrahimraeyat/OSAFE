@@ -169,11 +169,8 @@ class ViewProviderFoundation:
     def __init__(self, vobj):
 
         vobj.Proxy = self
-        vobj.Transparency = 30
-        # vobj.LineWidth = 1.00
-        # vobj.PointSize = 1.00
-        vobj.DisplayMode = "Shaded"
-        vobj.ShapeColor = (0.5882353186607361, 0.6627451181411743, 0.729411780834198, 0.0)
+        # vobj.Transparency = 30
+        
 
     def attach(self, vobj):
         self.ViewObject = vobj
@@ -205,7 +202,16 @@ def make_foundation(
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
     Foundation(obj)
     if FreeCAD.GuiUp:
+        import FreeCADGui
         ViewProviderFoundation(obj.ViewObject)
+        obj.ViewObject.LineWidth = 1.00
+        obj.ViewObject.PointSize = 1.00
+        obj.ViewObject.DisplayMode = "Flat Lines"
+        obj.ViewObject.ShapeColor = (0.0, 1., 1.)
+        obj.ViewObject.LineColor = (0.28,0.28,0.28)
+        obj.ViewObject.PointColor = (0.28,0.28,0.28)
+        FreeCADGui.activeDocument().activeView().viewIsometric()
+        FreeCADGui.SendMsgToActiveView("ViewFit")
     obj.cover = cover
     obj.fc = f"{fc} MPa"
     obj.height = height
