@@ -71,10 +71,7 @@ class ViewProviderBasePlate:
     def __init__(self, vobj):
 
         vobj.Proxy = self
-        vobj.Transparency = 40
-        vobj.DisplayMode = "Flat Lines"
-
-
+        
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
@@ -107,6 +104,12 @@ def make_base_plate(
     BasePlate(obj)
     if FreeCAD.GuiUp:
         ViewProviderBasePlate(obj.ViewObject)
+        obj.ViewObject.PointSize = 1.00
+        obj.ViewObject.LineWidth = 1.00
+        obj.ViewObject.Transparency = 40
+        obj.ViewObject.DisplayMode = "Flat Lines"
+        obj.ViewObject.ShapeColor = (0.33,0.67,1.00)
+        
     obj.Bx = bx
     obj.By = by
     obj.Thickness = thickness
@@ -173,6 +176,14 @@ class CommandBasePlate:
         self.tracker.on()
         title=translate("OSAFE","Insertion point of base plate")+":"
         FreeCADGui.Snapper.getPoint(callback=self.getPoint,movecallback=self.update,extradlg=[self.taskbox()],title=title)
+        columns = []
+        if hasattr(FreeCAD.ActiveDocument, 'Columns'):
+            columns = FreeCAD.ActiveDocument.Columns.Group
+        else:
+            for obj in FreeCAD.ActiveDocument.Objects:
+                if hasattr(obj, 'IfcType') and obj.IfcType == 'Column':
+                    columns.append(obj)
+        self.columns = columns
 
     def getPoint(self,point=None,obj=None):
 
@@ -203,9 +214,15 @@ class CommandBasePlate:
         # calculate rotation
         FreeCADGui.doCommand('bp.Placement.Base = '+DraftVecUtils.toString(point))
         FreeCADGui.doCommand('bp.Placement.Rotation = bp.Placement.Rotation.multiply(FreeCAD.DraftWorkingPlane.getRotation().Rotation)')
+        # set column for baseplate
+        if self.columns:
+            FreeCADGui.doCommand('bpbb = bp.Shape.BoundBox')
+            for col in self.columns:
+                v = col.Shape.BoundBox.Center
+                v.z = 0
+                FreeCADGui.doCommand(f'if bpbb.isInside({DraftVecUtils.toString(v)}):bp.Column = FreeCAD.ActiveDocument.getObject("{col.Name}")')
         FreeCAD.ActiveDocument.commitTransaction()
         FreeCAD.ActiveDocument.recompute()
-        # if self.continueCmd:
         self.Activated()
 
 

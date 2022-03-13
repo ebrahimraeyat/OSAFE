@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../Resources/icons/base_plate.svg</file>
     <file>../Resources/icons/import.svg</file>
     <file>../Resources/icons/etabs.png</file>
     <file>../Resources/icons/help.png</file>

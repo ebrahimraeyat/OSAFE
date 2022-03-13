@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>290</width>
+    <width>348</width>
     <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Create Base Plate</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../py_widget/resource.qrc">
+    <normaloff>:/safe/Resources/icons/base_plate.svg</normaloff>:/safe/Resources/icons/base_plate.svg</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0">
@@ -221,6 +225,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../py_widget/resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
