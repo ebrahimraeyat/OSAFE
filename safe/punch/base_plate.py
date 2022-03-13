@@ -111,7 +111,7 @@ def make_base_plate(
     obj.By = by
     obj.Thickness = thickness
     if column:
-        obj.column = column
+        obj.Column = column
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -144,6 +144,7 @@ class CommandBasePlate:
         self.thickness = p.GetFloat("baseplate_thickness",10)
         self.x_offset = p.GetFloat("baseplate_x_offset",0)
         self.y_offset = p.GetFloat("baseplate_y_offset",0)
+        self.cardinal_point = p.GetFloat("baseplate_cardinal_point", 5)
         # self.continueCmsd = False
         self.bpoint = None
         sel = FreeCADGui.Selection.getSelection()
@@ -186,9 +187,13 @@ class CommandBasePlate:
         #     return
         self.tracker.finalize()
         FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Plate"))
-        dx = float(self.x_offset_input.text().split()[0])
-        dy = float(self.y_offset_input.text().split()[0])
-        delta = FreeCAD.Vector(dx-self.bx/2,dy-self.by/2,0)
+        dx = self.x_offset_input.value() * 10
+        dy = self.y_offset_input.value() * 10
+        cardinal_dx, cardinal_dy = self.get_xy_cardinal_point(self.cardinal_point)
+        delta = FreeCAD.Vector(
+                    dx + cardinal_dx - self.bx / 2,
+                    dy + cardinal_dy - self.by / 2,
+                    0)
         if hasattr(FreeCAD,"DraftWorkingPlane"):
             delta = FreeCAD.DraftWorkingPlane.getRotation().multVec(delta)
         point = point.add(delta)
@@ -207,55 +212,50 @@ class CommandBasePlate:
     def taskbox(self):
 
         "sets up a taskbox widget"
+        punch_path = Path(__file__).parent
+        w = FreeCADGui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'base_plate.ui'))
     
-        w = QtGui.QWidget()
-        ui = FreeCADGui.UiLoader()
-        w.setWindowTitle(translate("Arch","BasePlate Dimentions"))
-        grid = QtGui.QGridLayout(w)
+        self.bx_spin = w.bx_spin
+        self.by_spin = w.by_spin
+        self.thickness_spin = w.thickness_spin
+        self.x_offset_input = w.x_offset_combo
+        self.y_offset_input = w.y_offset_combo
+        # self.cardinal_point_combo = w.cardinal_point_combo
+        self.cardinal_1 = w.cardinal_1
+        self.cardinal_2 = w.cardinal_2
+        self.cardinal_3 = w.cardinal_3
+        self.cardinal_4 = w.cardinal_4
+        self.cardinal_5 = w.cardinal_5
+        self.cardinal_6 = w.cardinal_6
+        self.cardinal_7 = w.cardinal_7
+        self.cardinal_8 = w.cardinal_8
+        self.cardinal_9 = w.cardinal_9
+        self.bx_spin.setValue(int(self.bx / 10))
+        self.by_spin.setValue(int(self.by / 10))
+        self.thickness_spin.setValue(self.thickness)
+        self.x_offset_input.setValue(int(self.x_offset / 10))
+        self.y_offset_input.setValue(int(self.y_offset / 10))
+        for radio in (
+            self.cardinal_1,
+            self.cardinal_2,
+            self.cardinal_3,
+            self.cardinal_4,
+            self.cardinal_5,
+            self.cardinal_6,
+            self.cardinal_7,
+            self.cardinal_8,
+            self.cardinal_9,
+            ):
+            if str(int(self.cardinal_point)) in radio.objectName():
+                radio.setChecked(True)
+            else:
+                radio.setChecked(False) 
+            radio.clicked.connect(self.set_cardinal_point)
 
-
-        # bx
-        label1 = QtGui.QLabel(translate("OSAFE","Bx"))
-        self.vLength = ui.createWidget("Gui::InputField")
-        self.vLength.setText(FreeCAD.Units.Quantity(self.bx,FreeCAD.Units.Length).UserString)
-        grid.addWidget(label1,0,0,1,1)
-        grid.addWidget(self.vLength,0,1,1,1)
-
-        # by
-        label2 = QtGui.QLabel(translate("OSAFE","By"))
-        self.vWidth = ui.createWidget("Gui::InputField")
-        self.vWidth.setText(FreeCAD.Units.Quantity(self.by,FreeCAD.Units.Length).UserString)
-        grid.addWidget(label2,1,0,1,1)
-        grid.addWidget(self.vWidth,1,1,1,1)
-
-        # thickness
-        label3 = QtGui.QLabel(translate("OSAFE","Thickness"))
-        self.vHeight = ui.createWidget("Gui::InputField")
-        self.vHeight.setText(FreeCAD.Units.Quantity(self.thickness,FreeCAD.Units.Length).UserString)
-        grid.addWidget(label3,2,0,1,1)
-        grid.addWidget(self.vHeight,2,1,1,1)
-        # offset x
-        label4 = QtGui.QLabel(translate("OSAFE","X Offset"))
-        self.x_offset_input = ui.createWidget("Gui::InputField")
-        self.x_offset_input.setText(FreeCAD.Units.Quantity(self.x_offset,FreeCAD.Units.Length).UserString)
-        grid.addWidget(label4,3,0,1,1)
-        grid.addWidget(self.x_offset_input,3,1,1,1)
-        # offset x
-        label5 = QtGui.QLabel(translate("OSAFE","Y Offset"))
-        self.y_offset_input = ui.createWidget("Gui::InputField")
-        self.y_offset_input.setText(FreeCAD.Units.Quantity(self.y_offset,FreeCAD.Units.Length).UserString)
-        grid.addWidget(label5,4,0,1,1)
-        grid.addWidget(self.y_offset_input,4,1,1,1)
-
-        # connect slots
-        QtCore.QObject.connect(self.vLength,QtCore.SIGNAL("valueChanged(double)"),self.set_bx)
-        QtCore.QObject.connect(self.vWidth,QtCore.SIGNAL("valueChanged(double)"),self.set_by)
-        QtCore.QObject.connect(self.vHeight,QtCore.SIGNAL("valueChanged(double)"),self.set_thickness)
-        # QtCore.QObject.connect(self.x_offset_input,QtCore.SIGNAL("valueChanged(double)"),self.set_pos)
-        # QtCore.QObject.connect(self.y_offset_input,QtCore.SIGNAL("valueChanged(double)"),self.set_pos)
-        # QtCore.QObject.connect(value4,QtCore.SIGNAL("stateChanged(int)"),self.setContinue)
-
-        # restore preset
+        # connect slotsx
+        self.bx_spin.valueChanged.connect(self.set_bx)
+        self.by_spin.valueChanged.connect(self.set_by)
+        self.thickness_spin.valueChanged.connect(self.set_thickness)
         return w
 
     def update(self,point,info):
@@ -263,37 +263,77 @@ class CommandBasePlate:
         "this function is called by the Snapper when the mouse is moved"
 
         if FreeCADGui.Control.activeDialog():
-            dx = float(self.x_offset_input.text().split()[0])
-            dy = float(self.y_offset_input.text().split()[0])
-            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_x_offset",dx)
-            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_y_offset",dy)
+            dx = self.x_offset_input.value() * 10
+            dy = self.y_offset_input.value() * 10
+            # cardinal_point = self.cardinal_point_combo.currentIndex() + 1
+            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_x_offset", dx)
+            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_y_offset", dy)
+            # FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_cardinal_point", cardinal_point)
             self.x_offset = dx
             self.y_offset = dy
-            delta = Vector(dx, dy, self.thickness/2)
+            # self.cardinal_point = cardinal_point
+            cardinal_dx, cardinal_dy = self.get_xy_cardinal_point(self.cardinal_point)
+            delta = Vector(dx + cardinal_dx, dy + cardinal_dy, self.thickness/2)
             if hasattr(FreeCAD,"DraftWorkingPlane"):
                 delta = FreeCAD.DraftWorkingPlane.getRotation().multVec(delta)
             self.tracker.pos(point.add(delta))
             self.tracker.on()
 
     def set_bx(self,d):
-        self.bx = d
-        self.tracker.length(d)
-        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_bx",d)
+        self.bx = d * 10
+        self.tracker.length(self.bx)
+        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_bx",self.bx)
+
+    def set_by(self,d):
+        self.by = d * 10
+        self.tracker.width(self.by)
+        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_by",self.by)
 
     def set_thickness(self,d):
         self.thickness = d
-        self.tracker.height(d)
-        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_thickness",d)
+        self.tracker.height(self.thickness)
+        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_thickness",self.thickness)
 
-    def set_by(self,d):
-        self.by = d
-        self.tracker.width(d)
-        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_by",d)
+    def set_cardinal_point(self):
+        if self.cardinal_1.isChecked():
+            self.cardinal_point = 1
+        elif self.cardinal_2.isChecked():
+            self.cardinal_point = 2
+        elif self.cardinal_3.isChecked():
+            self.cardinal_point = 3
+        elif self.cardinal_4.isChecked():
+            self.cardinal_point = 4
+        elif self.cardinal_5.isChecked():
+            self.cardinal_point = 5
+        elif self.cardinal_6.isChecked():
+            self.cardinal_point = 6
+        elif self.cardinal_7.isChecked():
+            self.cardinal_point = 7
+        elif self.cardinal_8.isChecked():
+            self.cardinal_point = 8
+        elif self.cardinal_9.isChecked():
+            self.cardinal_point = 9
+        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_cardinal_point", self.cardinal_point)
+
 
     # def setContinue(self,i):
     #     self.continueCmd = bool(i)
     #     if hasattr(FreeCADGui,"draftToolBar"):
     #         FreeCADGui.draftToolBar.continueMode = bool(i)
+
+    def get_xy_cardinal_point(self,
+        cardinal : int,
+        ):
+        x = y = 0
+        if cardinal in (1, 4, 7):
+            x = self.bx / 2
+        elif cardinal in (3, 6, 9):
+            x = - self.bx / 2
+        if cardinal in (7, 8, 9):
+            y = - self.by / 2
+        elif cardinal in (1, 2, 3):
+            y = self.by / 2
+        return x, y
 
 if FreeCAD.GuiUp:
     FreeCADGui.addCommand('civil_base_plate',CommandBasePlate())
