@@ -275,15 +275,23 @@ def create_punches_report(
                     document,
                     filename: str,
                     doc: 'docx.Document' = None,
-):
+    ):
     if not doc:
         doc = create_doc()
+    punches = []
     for o in document.Objects:
-        if 'Punch' in o.Name:
-            doc = create_report(o, doc=doc)
-            doc.add_page_break()
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Punch':
+            punches.append(o)
+    progressbar = FreeCAD.Base.ProgressIndicator()
+    n = len(punches)
+    progressbar.start("export "+str(n)+" Punches to Word Document ...", n)
+    for p in punches:
+        doc = create_report(p, doc=doc)
+        doc.add_page_break()
+        progressbar.next(True)
     if filename:
         doc.save(filename)
+    progressbar.stop()
     return doc
 
 
