@@ -51,10 +51,13 @@ class Punch:
         for o in doc.Objects:
             if hasattr(o, 'IfcType') and \
                 o.IfcType == 'Column' and \
-                    hasattr(o, 'combos_load'):
-                
-                bx = o.Length.Value
-                by = o.Width.Value
+                    hasattr(o, 'combos_load') and \
+                        hasattr(o, 'Base'):
+                bx = by = 0
+                if hasattr(o.Base, 'Width'):
+                    bx = o.Base.Width.Value
+                if hasattr(o.Base, 'Height'):
+                    by = o.Base.Height.Value
                 if (not bx > 0) or (not by > 0):
                     continue
                 center_of_load = o.Placement.Base

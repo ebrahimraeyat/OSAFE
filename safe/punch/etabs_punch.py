@@ -153,36 +153,63 @@ class EtabsPunch(object):
                     FreeCAD.Rotation(FreeCAD.Vector(0,0,1),rotation))
                 structure.Nodes = [v1, v2]
         progressbar.stop()
+        return columns
+
+    def import_load_combos(self,
+        columns : Union[FreeCAD.DocumentObjectGroup, bool, list] = None,
+        types : list = ['concrete', 'steel'],
+        ):
+        type_combos = self.etabs.database.select_design_load_combinations(types=types)
+        joint_design_reactions = self.etabs.database.get_joint_design_reactions(
+            types=[],
+            select_combos=False,
+            )
+        doc = FreeCAD.ActiveDocument
+        if columns is None:
+            if hasattr(doc, 'Columns') and hasattr(doc.Columns, 'Group'):
+                columns = doc.Columns.Group
+            else:
+                columns = []
+                for obj in doc.Objects:
+                    if hasattr(obj, 'IfcType') and obj.IfcType == 'Column':
+                        columns.append(obj)
+        elif isinstance(columns, FreeCAD.DocumentObjectGroup):
+            columns = columns.Group
+        for col in columns:
+            label, story = col.Label.split('_')
+            name = self.etabs.SapModel.FrameObj.GetNameFromLabel(label, story)[0]
+            type_ = self.etabs.frame_obj.get_design_procedure(name)
+            points = self.etabs.SapModel.FrameObj.GetPoints(name)[:-1]
+            point_reaction = self.is_restraint(points)
+            if point_reaction is None:
+                continue
+            if type_ in ('concrete', 'steel'):
+                combos = type_combos[type_]
+                # TODO
+                # combos name, modified in get_join_design_reaction, thus can not filter according to concrete or steel combos
+                filt = (joint_design_reactions['UniqueName'] == point_reaction) # & (joint_design_reactions['OutputCase'].isin(combos))
+                d = {}
+                df = joint_design_reactions.loc[filt]
+                for _, row2 in df.iterrows():
+                    combo = row2['OutputCase']
+                    F = row2['FZ']
+                    mx = row2['MX']
+                    my = row2['MY']
+                    d[combo] = f"{F}, {mx}, {my}"
+                if not hasattr(col, "combos_load"):
+                    col.addProperty(
+                        "App::PropertyMap",
+                        "combos_load",
+                        "Structure",
+                        ).combos_load = d
+                col.setEditorMode('combos_load', 2)
+                col.recompute() 
 
     def create_columns_previos(self):
         joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
                 joint_design_reactions
             )
-        def make_column(
-            bx : float,
-            by : float,
-            center : FreeCAD.Vector,
-            angle : float,
-            combos_load : dict,
-            ):
-            col = Arch.makeStructure(length=bx,width=by,height=4000)
-            col.Placement.Base = center
-            col.Placement.Rotation.Angle = math.radians(angle)
-            if not hasattr(col, "combos_load"):
-                col.addProperty(
-                    "App::PropertyMap",
-                    "combos_load",
-                    "Structure",
-                    ).combos_load = combos_load
-            col.setEditorMode('combos_load', 2)
-            col.recompute()
-            col.ViewObject.LineWidth = 1.00
-            col.ViewObject.PointSize = 1.00
-            col.ViewObject.Transparency = 30
-
-            return col
-
         columns = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Columns")
         for _, row in basepoints_coord_and_dims.iterrows():
             name = row['UniqueName']
@@ -235,24 +262,52 @@ class EtabsPunch(object):
         create_grids(x_grids, b, 'x')
         create_grids(y_grids, b, 'y')
 
-    def import_data(self):
+    def import_data(
+            self,
+            import_load_combos : bool = True,
+        ):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
         # self.create_slabs_plan()
         try:
-            self.create_columns()
+            columns = self.create_columns()
         except TypeError:
             pass
-        # self.create_foundation()
-        # self.create_punches()
+        if FreeCAD.GuiUp:
+            Gui.SendMsgToActiveView("ViewFit")
+            Gui.activeDocument().activeView().viewTop()
+        if hasattr(FreeCAD, 'DraftWorkingPlane'):
+            FreeCAD.DraftWorkingPlane.alignToPointAndAxis(
+                FreeCAD.Vector(0.0, 0.0, 0.0),
+                FreeCAD.Vector(0, 0, 1),
+                self.top_of_foundation)
+        if import_load_combos:
+            self.import_load_combos()
         FreeCAD.ActiveDocument.recompute()
-        Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewTop()
-        FreeCAD.DraftWorkingPlane.alignToPointAndAxis(
-            FreeCAD.Vector(0.0, 0.0, 0.0),
-            FreeCAD.Vector(0, 0, 1),
-            self.top_of_foundation)
 
+def make_column(
+    bx : float,
+    by : float,
+    center : FreeCAD.Vector,
+    angle : float,
+    combos_load : dict,
+    ):
+    col = Arch.makeStructure(length=bx,width=by,height=4000)
+    col.Placement.Base = center
+    col.Placement.Rotation.Angle = math.radians(angle)
+    if not hasattr(col, "combos_load"):
+        col.addProperty(
+            "App::PropertyMap",
+            "combos_load",
+            "Structure",
+            ).combos_load = combos_load
+    col.setEditorMode('combos_load', 2)
+    col.recompute()
+    if FreeCAD.GuiUp:
+        col.ViewObject.LineWidth = 1.00
+        col.ViewObject.PointSize = 1.00
+        col.ViewObject.Transparency = 30
+    return col
 
 def place_the_beam(beam, line):
     '''arg1= beam, arg2= edge: lay down the selected beam on the selected edge'''
