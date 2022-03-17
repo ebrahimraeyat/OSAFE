@@ -15,6 +15,7 @@ from safe.punch import (
     gui_base_foundation,
     gui_dxf,
     gui_automatic_strip,
+    base_plate,
     )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -659,6 +660,7 @@ draw_list = [
             "civil_base_foundation",
             "civil_beam",
             'civil_slab',
+            'civil_base_plate',
             ]
 assign_list = [
             "Civil_force",

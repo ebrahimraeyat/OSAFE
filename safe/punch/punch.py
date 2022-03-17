@@ -1,3 +1,4 @@
+from lib2to3.pytree import BasePattern
 import math
 from pathlib import Path
 from typing import Union
@@ -31,10 +32,6 @@ class Punch:
             obj.addProperty("App::PropertyFloat", "Area", "Punch")
         if not hasattr(obj, "fc"):
             obj.addProperty("App::PropertyPressure", "fc", "Punch", "", 1, True)
-        if not hasattr(obj, "bx"):
-            obj.addProperty("App::PropertyFloat", "bx", "Column")
-        if not hasattr(obj, "by"):
-            obj.addProperty("App::PropertyFloat", "by", "Column")
         if not hasattr(obj, "id"):
             obj.addProperty("App::PropertyString", "id", "Column", "", 1, True)
         if not hasattr(obj, "I22"):
@@ -97,11 +94,23 @@ class Punch:
                 "foundation",
                 "Foundation",
                 )
+        if not hasattr(obj, "column"):
+            obj.addProperty(
+                "App::PropertyLink",
+                "column",
+                "Column",
+                )
 
         if not hasattr(obj, "center_of_load"):
             obj.addProperty(
                 "App::PropertyVector",
                 "center_of_load",
+                "Column",
+                )
+        if not hasattr(obj, "center_of_column"):
+            obj.addProperty(
+                "App::PropertyVector",
+                "center_of_column",
                 "Column",
                 )
 
@@ -138,6 +147,18 @@ class Punch:
             "angle",
             "Column",
             )
+        if not hasattr(obj, "bx"):
+            obj.addProperty(
+            "App::PropertyFloat",
+            "bx",
+            "Column",
+            )
+        if not hasattr(obj, "by"):
+            obj.addProperty(
+            "App::PropertyFloat",
+            "by",
+            "Column",
+            )
 
         #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
         #obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
@@ -155,13 +176,35 @@ class Punch:
     def execute(self, obj):
         d = obj.foundation.d.Value
         obj.fc = obj.foundation.fc
+        # try to find base plate if column is steel
+        obj.angle = math.degrees(obj.column.Placement.Rotation.Angle) - 90
+        base_plate = None
+        inlist = obj.column.InList
+        if inlist:
+            for o in inlist:
+                if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BasePlate':
+                    base_plate = o
+                    break
+        colbb = obj.column.Shape.BoundBox
+        if base_plate:
+            bpbb = base_plate.Shape.BoundBox
+            center = bpbb.Center.add(colbb.Center) / 2
+            obj.bx = (base_plate.Bx + obj.column.Base.Height).Value / 2
+            obj.by = (base_plate.By + obj.column.Base.Width).Value / 2
+        else:
+            center = colbb.Center
+            obj.bx = obj.column.Base.Height.Value
+            obj.by = obj.column.Base.Width.Value
+        load_center = colbb.Center
+        obj.center_of_load = FreeCAD.Vector(load_center.x, load_center.y, colbb.ZMin)
+        obj.center_of_column = FreeCAD.Vector(center.x, center.y, colbb.ZMin)
         x = obj.bx + d
         y = obj.by + d
-        offset_shape = punch_funcs.rectangle_face(obj.center_of_load, x, y)
+        offset_shape = punch_funcs.rectangle_face(obj.center_of_column, x, y)
         foun_plan = obj.foundation.plan.copy()
         if obj.angle != 0:
             foun_plan.rotate(
-                obj.center_of_load,
+                obj.center_of_column,
                 FreeCAD.Vector(0, 0, 1),
                 -obj.angle.Value,
                 )
@@ -181,16 +224,17 @@ class Punch:
         obj.d = d
         obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
         edges = Part.makeCompound(edges)
-        obj.edges = edges.rotate(
-            obj.center_of_load,
-            FreeCAD.Vector(0, 0, 1),
-            obj.angle.Value,
-            )
+        if obj.angle != 0:
+            obj.edges = edges.rotate(
+                obj.center_of_column,
+                FreeCAD.Vector(0, 0, 1),
+                obj.angle.Value,
+                )
         # faces = Part.makeCompound(faces)
-        rect = punch_funcs.rectangle_face(obj.center_of_load, obj.bx, obj.by)
+        rect = punch_funcs.rectangle_face(obj.center_of_column, obj.bx, obj.by)
         if obj.angle.Value != 0:
             rect.rotate(
-                obj.center_of_load,
+                obj.center_of_column,
                 FreeCAD.Vector(0, 0, 1),
                 obj.angle.Value,
             )
@@ -198,11 +242,11 @@ class Punch:
         obj.faces = Part.makeCompound(faces)
         if obj.angle.Value != 0:
             faces = [f.rotate(
-                    obj.center_of_load,
+                    obj.center_of_column,
                     FreeCAD.Vector(0, 0, 1),
                     obj.angle.Value,
                 ) for f in faces]
-        comp = Part.makeCompound(faces)
+        comp = Part.makeCompound(faces + [obj.rect])
         obj.Shape = comp
         self.punch_ratios(obj)
 
@@ -238,7 +282,7 @@ class Punch:
         x1, y1, _ = obj.center_of_load
         x3, y3, _ = obj.center_of_punch
         combos_Vu = dict()
-        for combo, forces in obj.combos_load.items():
+        for combo, forces in obj.column.combos_load.items():
             faces_ratio = []
             for f in obj.faces.Faces:
                 x4 = f.CenterOfMass.x
@@ -462,12 +506,8 @@ def get_color(pref_intity, color=16711935):
 def make_punch(
     # foundation_plan: Part.Face,
     foun_obj,
-    bx: Union[float, int],
-    by: Union[float, int],
-    center: FreeCAD.Vector,
-    combos_load: dict,
+    column,
     location: str = 'Corner 1',
-    angle : float = 0,
     ):
 
     p = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Punch")
@@ -476,14 +516,16 @@ def make_punch(
         ViewProviderPunch(p.ViewObject)
     # p.foundation_plan = foundation_plan
     p.foundation = foun_obj
-    p.bx = bx
-    p.by = by
-    p.center_of_load = center
+    p.column = column
     p.fc = foun_obj.fc
-    p.combos_load = combos_load
     p.Location = location
-    p.angle = angle
     FreeCAD.ActiveDocument.recompute()
 
     return p
+
+if __name__ == '__main__':
+    doc = FreeCAD.ActiveDocument
+    foun = doc.Foundation
+    col = Gui.Selection.getSelection()[0]
+    make_punch(foun_obj=foun, column=col)
 
