@@ -53,26 +53,12 @@ class Punch:
                 o.IfcType == 'Column' and \
                     hasattr(o, 'combos_load') and \
                         hasattr(o, 'Base'):
-                bx = by = 0
-                if hasattr(o.Base, 'Width'):
-                    bx = o.Base.Width.Value
-                if hasattr(o.Base, 'Height'):
-                    by = o.Base.Height.Value
-                if (not bx > 0) or (not by > 0):
-                    continue
-                center_of_load = o.Placement.Base
-                combos_load = o.combos_load
-                angle = math.degrees(o.Placement.Rotation.Angle)
                 punch = make_punch(
                     foun,
-                    bx,
-                    by,
-                    center_of_load,
-                    combos_load,
-                    angle=angle,
+                    o,
                     )
                 l = punch.Location
-                pl = FreeCAD.Vector(0, 0, center_of_load.z + 4100)
+                pl = FreeCAD.Vector(0, 0, o.Shape.BoundBox.ZMax)
                 t = '0.0'
                 version = FreeCAD.Version()[1]
                 if int(version) < 19:

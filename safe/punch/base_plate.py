@@ -1,15 +1,13 @@
-from os.path import join, dirname, abspath
+import math
 from typing import Union
 from pathlib import Path
 
 import FreeCAD
 from FreeCAD import Vector
 import Part
-import DraftVecUtils
 
 if FreeCAD.GuiUp:
     import FreeCADGui
-    from PySide import QtCore, QtGui
     from DraftTools import translate
     from PySide2.QtCore import QT_TRANSLATE_NOOP
     import draftguitools.gui_trackers as DraftTrackers
@@ -86,7 +84,6 @@ class ViewProviderBasePlate:
         return None
 
 
-
 def make_base_plate(
     bx: Union[float, str] = '500 mm',
     by: Union[float, str] = '500 mm',
@@ -119,10 +116,6 @@ def make_base_plate(
     return obj
 
 
-
-
-
-
 class CommandBasePlate:
 
     "Baseplate command definition"
@@ -148,20 +141,8 @@ class CommandBasePlate:
         self.x_offset = p.GetFloat("baseplate_x_offset",0)
         self.y_offset = p.GetFloat("baseplate_y_offset",0)
         self.cardinal_point = p.GetFloat("baseplate_cardinal_point", 5)
-        # self.continueCmsd = False
         self.bpoint = None
-        sel = FreeCADGui.Selection.getSelection()
-        # if sel:
-        #     FreeCAD.ActiveDocument.openTransaction(translate("civiltools","Create Base Plate"))
-        #     FreeCADGui.addModule("Arc")
-        #     for obj in sel:
-        #         FreeCADGui.doCommand("obj = Arch.makeStructure(FreeCAD.ActiveDocument." + obj.Name + ")")
-        #         FreeCADGui.addModule("Draft")
-        #         FreeCADGui.doCommand("Draft.autogroup(obj)")
-        #     FreeCAD.ActiveDocument.commitTransaction()
-        #     FreeCAD.ActiveDocument.recompute()
-        #     return
-
+        self.column = None
         # interactive mode
         if hasattr(FreeCAD,"DraftWorkingPlane"):
             direction = FreeCAD.Vector(0, 0, 1)
@@ -184,6 +165,9 @@ class CommandBasePlate:
                 if hasattr(obj, 'IfcType') and obj.IfcType == 'Column':
                     columns.append(obj)
         self.columns = columns
+        self.centers = [col.Shape.BoundBox.Center for col in self.columns]
+        for v in self.centers:
+            v.z = 0
 
     def getPoint(self,point=None,obj=None):
 
@@ -192,35 +176,30 @@ class CommandBasePlate:
         if point is None:
             self.tracker.finalize()
             return
-        # if self.bpoint is None:
-        #     self.bpoint = point
-        #     FreeCADGui.Snapper.getPoint(last=point,callback=self.getPoint,movecallback=self.update,extradlg=[self.taskbox(),self.precast.form,self.dents.form],title=translate("Arch","Next point")+":",mode="line")
-        #     return
         self.tracker.finalize()
         FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Plate"))
         dx = self.x_offset_input.value() * 10
         dy = self.y_offset_input.value() * 10
         cardinal_dx, cardinal_dy = self.get_xy_cardinal_point(self.cardinal_point)
-        delta = FreeCAD.Vector(
-                    dx + cardinal_dx - self.bx / 2,
-                    dy + cardinal_dy - self.by / 2,
-                    0)
-        if hasattr(FreeCAD,"DraftWorkingPlane"):
-            delta = FreeCAD.DraftWorkingPlane.getRotation().multVec(delta)
-        point = point.add(delta)
         FreeCADGui.doCommand('from safe.punch import base_plate')
         FreeCADGui.doCommand(f'bp = base_plate.make_base_plate(bx={self.bx}, by={self.by}, thickness={self.thickness})')
 
         # calculate rotation
-        FreeCADGui.doCommand('bp.Placement.Base = '+DraftVecUtils.toString(point))
-        FreeCADGui.doCommand('bp.Placement.Rotation = bp.Placement.Rotation.multiply(FreeCAD.DraftWorkingPlane.getRotation().Rotation)')
-        # set column for baseplate
-        if self.columns:
-            FreeCADGui.doCommand('bpbb = bp.Shape.BoundBox')
-            for col in self.columns:
-                v = col.Shape.BoundBox.Center
-                v.z = 0
-                FreeCADGui.doCommand(f'if bpbb.isInside({DraftVecUtils.toString(v)}):bp.Column = FreeCAD.ActiveDocument.getObject("{col.Name}")')
+        rot = FreeCAD.Rotation()
+        if self.column:
+            rot.Angle = self.column.Placement.Rotation.Angle - math.radians(90)
+        delta = FreeCAD.Vector(
+                    dx + cardinal_dx - self.bx / 2,
+                    dy + cardinal_dy - self.by / 2,
+                    0)
+        # if hasattr(FreeCAD,"DraftWorkingPlane"):
+        #     delta = FreeCAD.DraftWorkingPlane.getRotation().multVec(delta)
+        delta = rot.multVec(delta)
+        point = point.add(delta)
+
+        FreeCADGui.doCommand(f'bp.Placement.Base = FreeCAD.{point}')
+        FreeCADGui.doCommand(f'bp.Placement.Rotation = FreeCAD.{rot}')
+        FreeCADGui.doCommand(f'bp.Column = FreeCAD.ActiveDocument.{self.column.Name}')
         FreeCAD.ActiveDocument.commitTransaction()
         FreeCAD.ActiveDocument.recompute()
         self.Activated()
@@ -237,7 +216,6 @@ class CommandBasePlate:
         self.thickness_spin = w.thickness_spin
         self.x_offset_input = w.x_offset_combo
         self.y_offset_input = w.y_offset_combo
-        # self.cardinal_point_combo = w.cardinal_point_combo
         self.cardinal_1 = w.cardinal_1
         self.cardinal_2 = w.cardinal_2
         self.cardinal_3 = w.cardinal_3
@@ -282,18 +260,30 @@ class CommandBasePlate:
         if FreeCADGui.Control.activeDialog():
             dx = self.x_offset_input.value() * 10
             dy = self.y_offset_input.value() * 10
-            # cardinal_point = self.cardinal_point_combo.currentIndex() + 1
             FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_x_offset", dx)
             FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_y_offset", dy)
-            # FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("baseplate_cardinal_point", cardinal_point)
             self.x_offset = dx
             self.y_offset = dy
-            # self.cardinal_point = cardinal_point
             cardinal_dx, cardinal_dy = self.get_xy_cardinal_point(self.cardinal_point)
             delta = Vector(dx + cardinal_dx, dy + cardinal_dy, self.thickness/2)
             if hasattr(FreeCAD,"DraftWorkingPlane"):
                 delta = FreeCAD.DraftWorkingPlane.getRotation().multVec(delta)
-            self.tracker.pos(point.add(delta))
+            rot = FreeCAD.Rotation()
+            pos = point.add(delta)
+            self.column = None
+            if self.columns:
+                dists = [v.sub(point).Length for v in self.centers]
+                dist = min(dists)
+                tol = math.sqrt(self.bx ** 2 + self.by ** 2)
+                if dist <= tol:
+                    i = dists.index(dist)
+                    col = self.columns[i]
+                    rot.Angle = col.Placement.Rotation.Angle - math.radians(90)
+                    delta = rot.multVec(delta)
+                    pos = point.add(delta)
+                    self.column = col
+            self.tracker.setRotation(rot)
+            self.tracker.pos(pos)
             self.tracker.on()
 
     def set_bx(self,d):
