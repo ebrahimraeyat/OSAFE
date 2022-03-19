@@ -190,11 +190,16 @@ class BaseFoundation:
         if obj.align == 'Left':
             sl = obj.left_width.Value
             sr = obj.width.Value - sl
+            obj.right_width = sr
         elif obj.align == 'Right':
             sr = obj.right_width.Value
             sl = obj.width.Value - sr
+            obj.left_width = sl
         elif obj.align == 'Center':
             sr = sl = obj.width.Value / 2
+            obj.right_width = sr
+            obj.left_width = sl
+
         shape, main_wire, _, _ = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
         extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)
         obj.extended_first_edge = e1
