@@ -68,8 +68,8 @@ class BSpline(gui_lines.Line):
         Activate the specific BSpline tracker.
         """
         super(BSpline, self).Activated(name=translate("draft", "BSpline"))
-        if self.doc:
-            self.bsplinetrack = trackers.bsplineTracker()
+        # if self.doc:
+        #     self.linetrack = trackers.lineTracker()
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         self.bf_width = p.GetFloat("base_foundation_width",1000)
         self.bf_height = p.GetFloat("base_foundation_height",1000)
@@ -94,9 +94,7 @@ class BSpline(gui_lines.Line):
                 self.finish()
         elif arg["Type"] == "SoLocation2Event":  # mouse movement detection
             (self.point,
-             ctrlPoint, info) = gui_tool_utils.getPoint(self, arg,
-                                                        noTracker=True)
-            self.bsplinetrack.update(self.node + [self.point])
+             ctrlPoint, info) = gui_tool_utils.getPoint(self, arg)
             gui_tool_utils.redraw3DView()
         elif (arg["Type"] == "SoMouseButtonEvent"
               and arg["State"] == "DOWN"
@@ -132,7 +130,7 @@ class BSpline(gui_lines.Line):
         import Part
         if len(self.node) > 1:
             self.node.pop()
-            self.bsplinetrack.update(self.node)
+            # self.linetrack.update(self.node)
             spline = Part.BSplineCurve()
             spline.interpolate(self.node, False)
             self.obj.Shape = spline.toShape()
@@ -142,10 +140,10 @@ class BSpline(gui_lines.Line):
         """Draw and update to the spline."""
         print('draw update')
         import Part
+        if self.planetrack and self.node:
+            self.planetrack.set(self.node[-1])
         if len(self.node) == 1:
-            self.bsplinetrack.on()
-            if self.planetrack:
-                self.planetrack.set(self.node[0])
+            # self.linetrack.on()
             _msg(translate("draft", "Pick next point"))
         else:
             spline = Part.BSplineCurve()
@@ -163,8 +161,8 @@ class BSpline(gui_lines.Line):
         closed: bool, optional
             Close the line if `True`.
         """
-        if self.ui:
-            self.bsplinetrack.finalize()
+        # if self.ui:
+            # self.linetrack.finalize()
         if not utils.getParam("UiMode", 1):
             Gui.Control.closeDialog()
         if self.obj:
