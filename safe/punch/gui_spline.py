@@ -140,6 +140,7 @@ class BSpline(gui_lines.Line):
 
     def drawUpdate(self, point):
         """Draw and update to the spline."""
+        print('draw update')
         import Part
         if len(self.node) == 1:
             self.bsplinetrack.on()
@@ -202,6 +203,20 @@ class BSpline(gui_lines.Line):
         gui_base_original.Creator.finish(self)
         if self.ui and self.ui.continueMode:
             self.Activated()
+
+    def numericInput(self, numx, numy, numz):
+        """Validate the entry fields in the user interface.
+
+        This function is called by the toolbar or taskpanel interface
+        when valid x, y, and z have been entered in the input fields.
+        """
+        print(f'numeric ({numx}, {numy}, {numz})')
+        self.point = FreeCAD.Vector(numx, numy, numz)
+        self.node.append(self.point)
+        self.drawUpdate(self.point)
+        if not self.isWire and len(self.node) == 2:
+            self.finish(False, cont=True)
+        self.ui.setNextFocus()
 
     def taskbox(self):
 
