@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>297</width>
-    <height>206</height>
+    <height>264</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="strip_layer_2">
+      <widget class="QComboBox" name="align">
        <item>
         <property name="text">
          <string>Center</string>
@@ -76,6 +76,25 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_3">
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="right_width_spinbox">
+       <property name="suffix">
+        <string> cm</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
+       <property name="value">
+        <number>50</number>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
@@ -102,14 +121,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Height</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
+     <item row="3" column="1">
       <widget class="QSpinBox" name="height_spinbox">
        <property name="suffix">
         <string> cm</string>
@@ -125,6 +137,46 @@
        </property>
        <property name="value">
         <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Height</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Left Width</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Right Width</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSpinBox" name="left_width_spinbox">
+       <property name="suffix">
+        <string> cm</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>1000</number>
+       </property>
+       <property name="singleStep">
+        <number>5</number>
+       </property>
+       <property name="value">
+        <number>50</number>
        </property>
       </widget>
      </item>

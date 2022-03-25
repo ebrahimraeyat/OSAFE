@@ -16,7 +16,6 @@ from safe.punch import (
     gui_dxf,
     gui_automatic_strip,
     base_plate,
-    gui_spline,
     )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -629,7 +628,7 @@ Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())
 Gui.addCommand('create_foundation', CivilFoundation())
 Gui.addCommand('civil_slab', gui_slab.Slab())
 Gui.addCommand('civil_beam', gui_beam.Beam())
-Gui.addCommand('civil_base_foundation', gui_base_foundation.BaseFoundation())
+# Gui.addCommand('civil_base_foundation', gui_base_foundation.BaseFoundation())
 Gui.addCommand('civil_punch', gui_punch.Punch())
 Gui.addCommand('osafe_automatic_strip', gui_automatic_strip.OsafeAutomaticStrip())
 
@@ -659,11 +658,10 @@ export_list = [
             ]
 
 draw_list = [
-            "civil_base_foundation",
+            "osafe_base_foundation",
             "civil_beam",
             'civil_slab',
             'civil_base_plate',
-            'OSAFE_BSpline',
             ]
 assign_list = [
             "Civil_force",

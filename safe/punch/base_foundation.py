@@ -8,12 +8,13 @@ from safe.punch import punch_funcs
 def make_base_foundation(
         beams : list,
         layer : str = 'A',
-        design_type : str = 'column',
         width : float = 1000,
         height : float = 1000,
         soil_modulus : float =2,
+        align : str = 'Center',
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
+        design_type : str = 'column',
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BaseFoundation")
     BaseFoundation(obj)
@@ -23,14 +24,15 @@ def make_base_foundation(
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
-    if left_width:
+    if align == 'Left':
         obj.left_width = left_width
         obj.right_width = width - left_width
-    elif right_width:
+    elif align == 'Right':
         obj.right_width = right_width
         obj.left_width = width - right_width
-    else:
+    elif align == 'Center':
         obj.left_width = obj.right_width = obj.width / 2
+    obj.align = align
     obj.height = height
     obj.ks = soil_modulus
     if FreeCAD.GuiUp:
