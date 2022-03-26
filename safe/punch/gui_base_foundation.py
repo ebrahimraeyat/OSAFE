@@ -122,7 +122,7 @@ class BaseFoundation(gui_lines.Line):
                 return
             wire = Part.makePolygon(self.node + [point])
             shape = punch_funcs.get_left_right_offset_wire_and_shape(wire, self.bf_left_width, self.bf_right_width)[0]
-            self.obj.Shape = shape
+            self.obj.Shape = Part.makeCompound([shape, wire])
             # _msg(translate("draft",
             #                 "Pick next point, "
             #                 "or finish (A) or close (O)"))

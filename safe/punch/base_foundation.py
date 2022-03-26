@@ -15,12 +15,14 @@ def make_base_foundation(
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
         design_type : str = 'column',
+        hide_beams : bool = True,
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BaseFoundation")
     BaseFoundation(obj)
     obj.beams = beams
-    for b in beams:
-        b.ViewObject.hide()
+    if hide_beams:
+        for b in beams:
+            b.ViewObject.hide()
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
