@@ -52,6 +52,7 @@ class BaseFoundation(gui_lines.Line):
         self.base_foundation_ui = self.taskbox()
         self.ui.layout.insertWidget(0, self.base_foundation_ui)
         self.set_layer()
+        self.update_gui()
 
     def action(self, arg):
         """
@@ -225,11 +226,24 @@ class BaseFoundation(gui_lines.Line):
         self.right_width_spinbox.valueChanged.connect(self.set_width)
         self.height_spinbox.valueChanged.connect(self.set_height)
         self.align_box.currentIndexChanged.connect(self.set_width)
+        self.align_box.currentIndexChanged.connect(self.update_gui)
         self.layer_box.currentIndexChanged.connect(self.set_layer)
 
         # self.height_spin.valueChanged.connect(self.set_height)
         # self.soil_modulus_spin.valueChanged.connect(self.set_soil_modulus)
         return w
+
+    def update_gui(self):
+        align = self.align_box.currentText()
+        if align == 'Left':
+            self.left_width_spinbox.setEnabled(True)
+            self.right_width_spinbox.setEnabled(False)
+        elif align == 'Right':
+            self.right_width_spinbox.setEnabled(True)
+            self.left_width_spinbox.setEnabled(False)
+        elif align == 'Center':
+            self.right_width_spinbox.setEnabled(False)
+            self.left_width_spinbox.setEnabled(False)
 
     def set_width(self):
         self.bf_width = self.width_spinbox.value() * 10
