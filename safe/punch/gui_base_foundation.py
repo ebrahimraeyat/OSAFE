@@ -48,6 +48,7 @@ class BaseFoundation(gui_lines.Line):
         self.bf_height = p.GetFloat("base_foundation_height",1000)
         self.bf_soil_modulus = p.GetFloat("base_foundation_soil_modulus",2)
         self.layer = p.GetString("base_foundation_layer","A")
+        self.hide_beams = p.GetBool("base_foundation_hide_beams", True)
         self.base_foundation_ui = self.taskbox()
         self.ui.layout.insertWidget(0, self.base_foundation_ui)
         self.set_layer()
@@ -147,7 +148,7 @@ class BaseFoundation(gui_lines.Line):
             # The command to run is built as a series of text strings
             # to be committed through the `draftutils.todo.ToDo` class.
             try:
-                rot, sup, pts, fil = self.getStrings()
+                # rot, sup, pts, fil = self.getStrings()
 
                 cmd_list = [
                     'from FreeCAD import Vector',
@@ -160,9 +161,11 @@ class BaseFoundation(gui_lines.Line):
                 for p1, p2 in zip(self.node[:-1], self.node[1:]):
                     cmd_list.append(f'beam = make_beam({p1}, {p2})')
                     cmd_list.append(f'beams.append(beam)')
-                cmd_list.append(f'make_base_foundation(beams, "{self.layer}", {self.bf_width}, {self.bf_height}, {self.bf_soil_modulus}, "{self.bf_align}", {self.bf_left_width}, {self.bf_right_width} )')
+                hide_beams = self.hide_beams_checkbox.isChecked()
+                cmd_list.append(f'make_base_foundation(beams, "{self.layer}", {self.bf_width}, {self.bf_height}, {self.bf_soil_modulus}, "{self.bf_align}", {self.bf_left_width}, {self.bf_right_width}, {hide_beams} )')
                 self.commit(translate("civil", "Create Base Foundation"),
                             cmd_list)
+                FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetBool("base_foundation_hide_beams", hide_beams)
             except Exception:
                 _err("Draft: error delaying commit")
 
@@ -203,6 +206,7 @@ class BaseFoundation(gui_lines.Line):
         self.height_spinbox = w.height_spinbox
         self.align_box = w.align
         self.soil_modulus_spin = w.soil_modulus
+        self.hide_beams_checkbox = w.hide_beams_checkbox
         # self.layer_box.setValue(self.bx / 10))
         self.width_spinbox.setValue(int(self.bf_width / 10))
         self.left_width_spinbox.setValue(int(self.bf_left_width / 10))
@@ -213,6 +217,7 @@ class BaseFoundation(gui_lines.Line):
         self.align_box.setCurrentIndex(i)
         i = self.layer_box.findText(self.layer)
         self.layer_box.setCurrentIndex(i)
+        self.hide_beams_checkbox.setChecked(self.hide_beams)
 
         # connect slotsx
         self.width_spinbox.valueChanged.connect(self.set_width)

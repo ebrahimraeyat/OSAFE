@@ -14,8 +14,8 @@ def make_base_foundation(
         align : str = 'Center',
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
-        design_type : str = 'column',
         hide_beams : bool = True,
+        design_type : str = 'column',
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BaseFoundation")
     BaseFoundation(obj)

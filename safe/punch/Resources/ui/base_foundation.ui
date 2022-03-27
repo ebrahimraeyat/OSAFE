@@ -223,6 +223,16 @@
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QCheckBox" name="hide_beams_checkbox">
+     <property name="text">
+      <string>Hide Beams</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
