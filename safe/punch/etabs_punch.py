@@ -48,7 +48,9 @@ class EtabsPunch(object):
             slabs[slab_name] = beam.make_beam(v1, v2)
         return slabs
 
-    def create_columns(self):
+    def create_columns(self,
+            import_beams : bool = True,
+            ):
         # joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         # basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
         #         joint_design_reactions
@@ -73,9 +75,7 @@ class EtabsPunch(object):
         for i in range(frames_count):
             progressbar.next(True)
             frame_name = frames[1][i]
-            if self.etabs.frame_obj.is_beam(frame_name):
-                if frame_name not in self.beam_names:
-                    continue
+            if import_beams and frame_name in self.beam_names:
                 v1 = FreeCAD.Vector(frames[6][i], frames[7][i], self.top_of_foundation)
                 v2 = FreeCAD.Vector(frames[9][i], frames[10][i], self.top_of_foundation)
                 beam_name = beam.make_beam(v1, v2)
@@ -140,9 +140,12 @@ class EtabsPunch(object):
                     structure.ViewObject.DisplayMode = 'Wireframe'
                     line.ViewObject.LineColor = color
                     line.ViewObject.PointColor = color
-                    if section_type not in ('G', 'None'):
-                        line.ViewObject.hide()
+                    line.ViewObject.PointSize = 6
                     line.ViewObject.LineWidth = 1
+                    if section_type not in ('G', 'None') and import_beams:
+                        line.ViewObject.hide()
+                    if not import_beams:
+                        structure.ViewObject.hide()
                 
                 rotation = self.etabs.SapModel.FrameObj.GetLocalAxes(frame_name)[0]
                 insertion = self.etabs.SapModel.FrameObj.GetInsertionPoint(frame_name)
@@ -205,43 +208,6 @@ class EtabsPunch(object):
                 col.setEditorMode('combos_load', 2)
                 col.recompute() 
 
-    def create_columns_previos(self):
-        joint_design_reactions = self.etabs.database.get_joint_design_reactions()
-        basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
-                joint_design_reactions
-            )
-        columns = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Columns")
-        for _, row in basepoints_coord_and_dims.iterrows():
-            name = row['UniqueName']
-            bx = float(row['t3'])
-            by = float(row['t2'])
-            if (not bx > 0) or (not by > 0):
-                continue
-            angle = float(row['AxisAngle'])
-            x = row['x']
-            y = row['y']
-            # z = row['z']
-            d = {}
-            df = joint_design_reactions[joint_design_reactions['UniqueName'] == name]
-            for _, row2 in df.iterrows():
-                combo = row2['OutputCase']
-                F = row2['FZ']
-                mx = row2['MX']
-                my = row2['MY']
-                d[combo] = f"{F}, {mx}, {my}"
-            center_of_load = FreeCAD.Vector(x, y, self.top_of_foundation)
-            col = make_column(
-                bx,
-                by,
-                center_of_load,
-                angle,
-                d,
-                )
-            col.Label = name
-            
-            columns.addObject(col)
-        return columns
-    
     def is_restraint(self, points : list):
         for p in points:
             restraint = self.etabs.SapModel.PointObj.GetRestraint(p)[0]
@@ -265,12 +231,13 @@ class EtabsPunch(object):
     def import_data(
             self,
             import_load_combos : bool = True,
+            import_beams : bool = True,
         ):
         name = self.etabs.get_file_name_without_suffix()
         FreeCAD.newDocument(name)
         # self.create_slabs_plan()
         try:
-            columns = self.create_columns()
+            columns = self.create_columns(import_beams)
         except TypeError:
             pass
         if FreeCAD.GuiUp:

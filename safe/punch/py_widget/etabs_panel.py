@@ -60,8 +60,7 @@ class EtabsTaskPanel:
 
     def import_data(self):
         self.top_of_foundation = self.form.foundation_level.value() * 1000
-        if self.form.beams_group.isChecked():
-            self.import_beams_columns()
+        self.import_beams_columns()
         if self.form.f2k_groupbox.isChecked():
             self.create_f2k()
         self.accept()
@@ -71,29 +70,30 @@ class EtabsTaskPanel:
 
     def import_beams_columns(self):
         from safe.punch import etabs_punch
-        
-        story = self.form.story.currentText()
-        selected_beams = self.form.selected_beams.isChecked()
-        exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
+        import_beams = self.form.beams_group.isChecked()
         beams_names = None
-        conc_beams, _  = self.etabs.frame_obj.get_beams_columns(story=story)
-        steel_beams, _  = self.etabs.frame_obj.get_beams_columns(story=story, type_=1)
-        beams = steel_beams + conc_beams
-        if (selected_beams or exclude_selected_beams):
-            names = self.etabs.select_obj.get_selected_obj_type(2)
-            names = [name for name in names if self.etabs.frame_obj.is_beam(name)]
-            if selected_beams:
-                beams_names = set(names).intersection(beams)
-            elif exclude_selected_beams:
-                beams_names = set(beams).difference(names)
-        elif self.form.all_beams.isChecked():
-            beams_names = beams
+        if import_beams:
+            story = self.form.story.currentText()
+            selected_beams = self.form.selected_beams.isChecked()
+            exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
+            conc_beams, _  = self.etabs.frame_obj.get_beams_columns(story=story)
+            steel_beams, _  = self.etabs.frame_obj.get_beams_columns(story=story, type_=1)
+            beams = steel_beams + conc_beams
+            if (selected_beams or exclude_selected_beams):
+                names = self.etabs.select_obj.get_selected_obj_type(2)
+                names = [name for name in names if self.etabs.frame_obj.is_beam(name)]
+                if selected_beams:
+                    beams_names = set(names).intersection(beams)
+                elif exclude_selected_beams:
+                    beams_names = set(beams).difference(names)
+            elif self.form.all_beams.isChecked():
+                beams_names = beams
         punch = etabs_punch.EtabsPunch(
                 etabs_model = self.etabs,
                 beam_names = beams_names,
                 top_of_foundation=self.top_of_foundation,
             )
-        punch.import_data()
+        punch.import_data(import_beams=import_beams)
 
     def create_f2k(self):
         filename = self.form.filename.text()
