@@ -622,6 +622,7 @@ Gui.addCommand('Civil_help', CivilHelp())
 # Gui.addCommand('Civil_update', CivilUpdate())
 # Gui.addCommand('Civil_branch', CivilChangeBranch())
 Gui.addCommand('Civil_dxf', gui_dxf.OsafeDxf())
+Gui.addCommand('osafe_import_dxf', gui_dxf.OsafeImportDxf())
 # Gui.addCommand('civil_explod_load_patterns', CivilExplodLoadPatterns())
 # Gui.addCommand('create_f2k_file', CivilCreateF2k())
 Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())
@@ -655,6 +656,7 @@ export_list = [
             "Civil_excel",
             "Civil_docx",
             "Civil_dxf",
+            "osafe_import_dxf",
             ]
 
 draw_list = [
