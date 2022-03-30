@@ -940,7 +940,7 @@ def make_automatic_base_foundation(
             layer = x_stirp_name
         else:
             layer = y_stirp_name
-        strip = make_base_foundation(beams, layer, 'column', width, height, soil_modulus)
+        strip = make_base_foundation(beams, layer, width, height, soil_modulus)
         strips.append(strip)
     return strips
 
