@@ -26,7 +26,7 @@ def create_x_grid(sketch, xcoord, text, i, YMIN, YMAX, y1, y2, y3, y4, yc):
     g3 = sketch.addGeometry(Part.LineSegment(FreeCAD.Vector(xcoord, y3, 0), FreeCAD.Vector(xcoord, y4, 0)))
     g4 = sketch.addGeometry(Part.Circle(FreeCAD.Vector(xcoord, yc, 0), FreeCAD.Vector(0, 0, 1), r), False)
 
-    t = Draft.makeText(text, FreeCAD.Vector(xcoord, yc, 0))
+    t = Draft.make_text(text, FreeCAD.Vector(xcoord, yc, 0))
     t.ViewObject.FontSize = font_size
     t.ViewObject.Justification = 'Center'
 
@@ -66,7 +66,7 @@ def create_y_grid(sketch, ycoord, text, i, XMIN, XMAX, x1, x2, x3, x4, xc):
     g3 = sketch.addGeometry(Part.LineSegment(FreeCAD.Vector(x3, ycoord, 0), FreeCAD.Vector(x4, ycoord, 0)))
     g4 = sketch.addGeometry(Part.Circle(FreeCAD.Vector(xc, ycoord, 0), FreeCAD.Vector(0, 0, 1), r), False)
 
-    t = Draft.makeText(text, FreeCAD.Vector(xc, ycoord, 0))
+    t = Draft.make_text(text, FreeCAD.Vector(xc, ycoord, 0))
     t.ViewObject.FontSize = font_size
     t.ViewObject.Justification = 'Center'
 

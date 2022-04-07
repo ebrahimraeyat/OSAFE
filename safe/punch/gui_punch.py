@@ -60,11 +60,7 @@ class Punch:
                 l = punch.Location
                 pl = FreeCAD.Vector(0, 0, o.Shape.BoundBox.ZMax)
                 t = '0.0'
-                version = FreeCAD.Version()[1]
-                if int(version) < 19:
-                    text = Draft.makeText([t, l], point=pl)
-                else:
-                    text = Draft.make_text([t, l], placement=pl)
+                text = Draft.make_text([t, l], placement=pl)
                 punch.Ratio = t
                 if FreeCAD.GuiUp:
                     text.ViewObject.FontSize = 200
