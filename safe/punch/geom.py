@@ -5,11 +5,16 @@ import Part
 import FreeCAD as App
 import FreeCADGui as Gui
 import pandas as pd
-from safe.punch import safe
-from safe.punch.axis import create_grids
-from safe.punch.punch_funcs import remove_obj
-from safe.punch import foundation
-from safe.punch.punch import make_punch
+try:
+    from safe.punch import safe
+    from safe.punch.axis import create_grids
+    from safe.punch import foundation
+    from safe.punch.punch import make_punch
+except:
+    import safe
+    from axis import create_grids
+    import foundation
+    from punch import make_punch
 
 
 class Geom(object):
@@ -86,7 +91,6 @@ class Geom(object):
         h = d + cover
         fc = self._safe.fc
         foun_obj = foundation.make_foundation(foundation_plan, height=h, cover=cover, fc=fc)
-
         for key in self.columns_id:
             value = self._safe.point_loads[key]
             bx = value['xdim']
@@ -101,12 +105,10 @@ class Geom(object):
                 d[combo] = f"{F}, {Mx}, {My}"
             point = self._safe.obj_geom_points[key]
             center_of_load = App.Vector(point.x, point.y, 0)
+            column = make_column(bx, by, center_of_load, d)
             p = make_punch(
                 foun_obj,
-                bx,
-                by,
-                center_of_load,
-                d,
+                column,
                 )
             # App.ActiveDocument.recompute()
             l = p.Location
@@ -151,6 +153,64 @@ class Geom(object):
         Gui.activeDocument().activeView().viewAxonometric()
         # self.bar_label.setText("")
 
+def make_column(
+    bx : float,
+    by : float,
+    center : App.Vector,
+    combos_load : dict,
+    ):
+    dz = 4000
+    v2 = App.Vector(center.x, center.y, dz)
+    line = Draft.make_line(center, v2)
+    line.recompute()
+    section_name = f'BOX{bx}X{by}'
+    # profile = get_profile(section_name, None)
+    # if profile is None:
+    profile = Arch.makeProfile(
+        profile=[
+                0,
+                'REC',
+                section_name,
+                'R',
+                bx, # T3
+                by, # height
+                ])
+    col = Arch.makeStructure(profile)
+    col.Nodes = [center, v2]
+    place_the_beam(col, line)
+    rotation = 90
+    col.AttachmentOffset = App.Placement(
+            App.Vector(0, 0, 0),
+            App.Rotation(App.Vector(0,0,1),rotation))
+    if not hasattr(col, "combos_load"):
+        col.addProperty(
+            "App::PropertyMap",
+            "combos_load",
+            "Structure",
+            ).combos_load = combos_load
+    col.setEditorMode('combos_load', 2)
+    col.IfcType = 'Column'
+    col.PredefinedType = 'COLUMN'
+    col.recompute()
+    if App.GuiUp:
+        col.ViewObject.LineWidth = 1.00
+        col.ViewObject.PointSize = 1.00
+        col.ViewObject.Transparency = 30
+    return col
+
+def place_the_beam(beam, line):
+    '''arg1= beam, arg2= edge: lay down the selected beam on the selected edge'''
+    edge = line.Shape.Edges[0]
+    vect=edge.tangentAt(0)
+    beam.Placement.Rotation=App.Rotation(0,0,0,1)
+    rot=App.Rotation(beam.Placement.Rotation.Axis,vect)
+    beam.Placement.Rotation=rot.multiply(beam.Placement.Rotation)
+    beam.Placement.Base=edge.valueAt(0)
+    beam.addExtension("Part::AttachExtensionPython")
+    beam.Support=[(line, 'Edge1')]
+    beam.MapMode='NormalToEdge'
+    beam.MapReversed=True
+    beam.Height=edge.Length
 
 def open(filename):
     import os
