@@ -13,6 +13,7 @@ from safe.punch import (
     gui_slab,
     gui_beam,
     gui_base_foundation,
+    gui_rectangular_slab,
     gui_dxf,
     gui_automatic_strip,
     base_plate,
@@ -661,6 +662,7 @@ export_list = [
 
 draw_list = [
             "osafe_base_foundation",
+            "osafe_rectangular_slab",
             "civil_beam",
             'civil_slab',
             'civil_base_plate',
