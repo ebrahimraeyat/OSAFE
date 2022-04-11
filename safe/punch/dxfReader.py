@@ -1,6 +1,6 @@
 """This module provides a function for reading dxf files and parsing them into a useful tree of objects and data.
 
-	The convert function is called by the readDXF fuction to convert dxf strings into the correct data based
+	The convert function is called by the readDXF function to convert dxf strings into the correct data based
 	on their type code.  readDXF expects a (full path) file name as input.
 """
 
@@ -159,7 +159,7 @@ def convert(code, value):
 
 
 def findObject(infile, kind=''):
-	"""Finds the next occurance of an object."""
+	"""Finds the next occurrence of an object."""
 	obj = False
 	while 1:
 		line = infile.readline()

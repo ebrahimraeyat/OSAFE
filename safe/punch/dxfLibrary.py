@@ -100,7 +100,7 @@ except:
 
 import math
 
-####1) Private (only for developpers)
+####1) Private (only for developers)
 _HEADER_POINTS=['insbase','extmin','extmax']
 
 #---helper functions-----------------------------------

@@ -929,11 +929,11 @@ class Block:
         else:
             self.path = ''
             
-        self.discription = obj.get_type(4)
-        if self.discription:
-            self.discription = self.discription[0]
+        self.description = obj.get_type(4)
+        if self.description:
+            self.description = self.description[0]
         else:
-            self.discription = ''
+            self.description = ''
             
         discard, self.layer, discard_index = get_layer(obj.data)
         del obj.data[discard_index]
@@ -960,7 +960,7 @@ class Block:
     
     
     def __repr__(self):
-        return "%s: name - %s, description - %s, xref-path - %s" %(self.__class__.__name__, self.name, self.discription, self.path)
+        return "%s: name - %s, description - %s, xref-path - %s" %(self.__class__.__name__, self.name, self.description, self.path)
     
 
 
@@ -1311,7 +1311,7 @@ def objectify(data):
     while index < len(data):
         item = data[index]
         if type(item) != list and item.type in known_types:
-            # proccess the object and append the resulting object
+            # process the object and append the resulting object
             objects.append(type_map[item.type](item))
         elif type(item) != list and item.type == 'table':
             item.data = objectify(item.data) # tables have sub-objects
