@@ -52,7 +52,7 @@ class ExplodeFoundation():
             FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Explode Foundation"))
             for bf in foun.base_foundations:
                 make_rectangular_slab(bf.beams, bf.layer, bf.width, bf.height, bf.ks, bf.align, bf.left_width, bf.right_width, hide_beams)
-            
+            remove_obj(foun.Name)
             FreeCAD.ActiveDocument.commitTransaction()
         except Exception:
             _err("Draft: error delaying commit")
