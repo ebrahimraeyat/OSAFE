@@ -45,7 +45,7 @@ class Form:
     def checkout(self, g, branch):
         try:
             g.execute(f'git checkout {branch}')
-            msg = f'You have successfully move to {branch}'
+            msg = f'You have successfully moved to {branch}'
             QMessageBox.information(None, 'Change Branch', str(msg))
             return True
         except:
