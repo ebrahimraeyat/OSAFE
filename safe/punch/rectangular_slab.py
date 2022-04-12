@@ -120,6 +120,13 @@ class RectangularSlab:
                 "main_wire",
                 "Geometry",
                 )
+        if not hasattr(obj, "fem_shape"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "fem_shape",
+                "Geometry",
+                )
+        
         # if not hasattr(obj, "extended_shape"):
         #     obj.addProperty(
         #         "Part::PropertyPartShape",
@@ -208,15 +215,15 @@ class RectangularSlab:
             obj.right_width = sr
             obj.left_width = sl
 
-        shape, main_wire, _, _ = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
-        shape = shape.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+        obj.fem_shape, obj.main_wire, _, _ = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
+        shape = obj.fem_shape.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
         # extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)
         # obj.extended_first_edge = e1
         # obj.extended_last_edge = e2
         # obj.main_wire_first_point = p1
         # obj.main_wire_last_point = p2
         # obj.extended_shape, *_ = punch_funcs.get_left_right_offset_wire_and_shape(extended_main_wire, sl, sr)
-        obj.main_wire = main_wire
+        # obj.main_wire = main_wire
         obj.Shape = shape
 
 
