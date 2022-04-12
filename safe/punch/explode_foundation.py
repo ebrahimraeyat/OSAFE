@@ -1,5 +1,6 @@
 from pathlib import Path
 from PySide2 import QtCore
+from PySide2.QtWidgets import  QMessageBox
 from PySide2.QtCore import QT_TRANSLATE_NOOP
 import FreeCAD
 
@@ -38,6 +39,7 @@ class ExplodeFoundation():
         # to be committed through the `draftutils.todo.ToDo` class.
         sel = Gui.Selection.getSelection()
         if not sel:
+            show_warning()
             return
         foun = None
         for o in sel:
@@ -45,6 +47,7 @@ class ExplodeFoundation():
                 foun = o
                 break
         if foun is None:
+            show_warning()
             return
         try:
             # rot, sup, pts, fil = self.getStrings()
@@ -65,6 +68,9 @@ def remove_obj(name: str) -> None:
     if hasattr(o, "Base") and o.Base:
         remove_obj(o.Base.Name)
     FreeCAD.ActiveDocument.removeObject(name)
+
+def show_warning():
+    QMessageBox.warning(None, 'Selection', 'Please select the foundation!')
 
 Gui.addCommand('osafe_explode_foundation', ExplodeFoundation())
 
