@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Union
 from PySide2 import QtCore
 import FreeCAD
+import ArchComponent
 
 try:
     from safe.punch import punch_funcs
@@ -10,7 +11,7 @@ except:
 
 
 def make_rectangular_slab(
-        beams : list,
+        base,
         layer : str = 'A',
         width : float = 1000,
         height : float = 1000,
@@ -18,12 +19,11 @@ def make_rectangular_slab(
         align : str = 'Center',
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
-        hide_beams : bool = True,
         design_type : str = 'column',
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "RectangularSlab")
     RectangularSlab(obj)
-    obj.beams = beams
+    obj.Base = base
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
@@ -39,33 +39,20 @@ def make_rectangular_slab(
     obj.height = height
     obj.ks = soil_modulus
     if FreeCAD.GuiUp:
-        if hide_beams:
-            for b in beams:
-                b.ViewObject.hide()
         ViewProviderRectangularSlab(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return obj
 
 
-class RectangularSlab:
+class RectangularSlab(ArchComponent.Component):
     def __init__(self, obj):
-        obj.Proxy = self
+        super().__init__(obj)
+        obj.IfcType = "Footing"
         self.Type = "RectangularSlab"
         self.set_properties(obj)
+        obj.Proxy = self
 
     def set_properties(self, obj):
-        if not hasattr(obj, "points"):
-            obj.addProperty(
-                "App::PropertyVectorList",
-                "points",
-                "Geometry",
-                )
-        if not hasattr(obj, "beams"):
-            obj.addProperty(
-                "App::PropertyLinkList",
-                "beams",
-                "base_foundation",
-                )
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -114,84 +101,18 @@ class RectangularSlab:
                 "align",
                 "Geometry",
                 ).align = ['Center', 'Left', 'Right']
-        if not hasattr(obj, "main_wire"):
-            obj.addProperty(
-                "Part::PropertyPartShape",
-                "main_wire",
-                "Geometry",
-                )
         if not hasattr(obj, "fem_shape"):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "fem_shape",
                 "Geometry",
                 )
-        
-        # if not hasattr(obj, "extended_shape"):
-        #     obj.addProperty(
-        #         "Part::PropertyPartShape",
-        #         "extended_shape",
-        #         "Geometry",
-        #         )
-        # if not hasattr(obj, "extended_first_edge"):
-        #     obj.addProperty(
-        #         "Part::PropertyPartShape",
-        #         "extended_first_edge",
-        #         "Geometry",
-        #         )
-        # if not hasattr(obj, "extended_last_edge"):
-        #     obj.addProperty(
-        #         "Part::PropertyPartShape",
-        #         "extended_last_edge",
-        #         "Geometry",
-        #         )
-        # if not hasattr(obj, "first_edge"):
-        #     obj.addProperty(
-        #         "Part::PropertyPartShape",
-        #         "first_edge",
-        #         "Geometry",
-        #         )
-        # if not hasattr(obj, "last_edge"):
-        #     obj.addProperty(
-        #         "Part::PropertyPartShape",
-        #         "last_edge",
-        #         "Geometry",
-        #         )
         if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
                 "plan",
                 "Geometry",
                 )
-        if not hasattr(obj, "main_wire_first_point"):
-            obj.addProperty(
-                "App::PropertyVector",
-                "main_wire_first_point",
-                "Geometry",
-                )
-        if not hasattr(obj, "main_wire_last_point"):
-            obj.addProperty(
-                "App::PropertyVector",
-                "main_wire_last_point",
-                "Geometry",
-                )
-        # if not hasattr(obj, "final_wire_first_point"):
-        #     obj.addProperty(
-        #         "App::PropertyVector",
-        #         "final_wire_first_point",
-        #         "Geometry",
-        #         )
-        # if not hasattr(obj, "final_wire_last_point"):
-        #     obj.addProperty(
-        #         "App::PropertyVector",
-        #         "final_wire_last_point",
-        #         "Geometry",
-        #         )
-        obj.setEditorMode('points', 2)
-        obj.setEditorMode('main_wire_first_point', 2)
-        obj.setEditorMode('main_wire_last_point', 2)
-        # obj.setEditorMode('final_wire_first_point', 2)
-        # obj.setEditorMode('final_wire_last_point', 2)
 
     def execute(self, obj):
         if obj.width.Value == 0:
@@ -214,31 +135,23 @@ class RectangularSlab:
             sr = sl = obj.width.Value / 2
             obj.right_width = sr
             obj.left_width = sl
-
-        obj.fem_shape, obj.main_wire, _, _ = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
-        shape = obj.fem_shape.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
-        # extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)
-        # obj.extended_first_edge = e1
-        # obj.extended_last_edge = e2
-        # obj.main_wire_first_point = p1
-        # obj.main_wire_last_point = p2
-        # obj.extended_shape, *_ = punch_funcs.get_left_right_offset_wire_and_shape(extended_main_wire, sl, sr)
-        # obj.main_wire = main_wire
+        obj.plan, _, _ = punch_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, sl, sr)
+        shape = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
         obj.Shape = shape
 
 
 class ViewProviderRectangularSlab:
     def __init__(self, vobj):
         vobj.Proxy = self
-        vobj.Transparency = 80
-        vobj.DisplayMode = "Shaded"
+        vobj.Transparency = 20
+        vobj.DisplayMode = "Flat Lines"
 
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
 
     def claimChildren(self):
-        children = [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.beams]
+        children = [FreeCAD.ActiveDocument.getObject(self.Object.Base.Name)]
         return children
 
     def getIcon(self):
@@ -250,15 +163,15 @@ class ViewProviderRectangularSlab:
     def __setstate__(self, state):
         return None
 
-    def onDelete(self, vobj, subelements):
-        for o in FreeCAD.ActiveDocument.Objects:
-            if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Foundation':
-                base_names = [b.Name for b in o.base_foundations]
-                if self.Object.Name in base_names:
-                    base_names.remove(self.Object.Name)
-                    base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
-                    o.base_foundations = base_foundations
-        return True
+    # def onDelete(self, vobj, subelements):
+    #     for o in FreeCAD.ActiveDocument.Objects:
+    #         if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Foundation':
+    #             base_names = [b.Name for b in o.base_foundations]
+    #             if self.Object.Name in base_names:
+    #                 base_names.remove(self.Object.Name)
+    #                 base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
+    #                 o.base_foundations = base_foundations
+    #     return True
         
 
 if __name__ == "__main__":
@@ -266,10 +179,10 @@ if __name__ == "__main__":
     p1 = FreeCAD.Vector(0, 0, 0)
     p2 = FreeCAD.Vector(1000, 0, 0)
     p3 = FreeCAD.Vector(3000, 2000, 0)
-    b1 = make_beam(p1, p2)
-    b2 = make_beam(p2, p3)
+    import Draft
+    wire = Draft.make_wire([p1, p2, p3])
     make_rectangular_slab(
-            beams=[b1, b2],
+            base=wire,
             layer='other',
             design_type='column',
             )
