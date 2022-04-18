@@ -16,6 +16,7 @@ def make_rectangular_slab(
         width : float = 1000,
         height : float = 1000,
         soil_modulus : float =2,
+        fc : Union[float, str] = '25 MPa',
         align : str = 'Center',
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
@@ -38,6 +39,7 @@ def make_rectangular_slab(
     obj.align = align
     obj.height = height
     obj.ks = soil_modulus
+    obj.fc = fc
     if FreeCAD.GuiUp:
         ViewProviderRectangularSlab(obj.ViewObject)
     FreeCAD.ActiveDocument.recompute()
@@ -113,6 +115,12 @@ class RectangularSlab(ArchComponent.Component):
                 "plan",
                 "Geometry",
                 )
+        if not hasattr(obj, "fc"):
+            obj.addProperty(
+            "App::PropertyPressure",
+            "fc",
+            "Concrete",
+            )
 
     def execute(self, obj):
         if obj.width.Value == 0:
