@@ -166,10 +166,7 @@ class Foundation(ArchComponent.Component):
 class ViewProviderFoundation:
 
     def __init__(self, vobj):
-
         vobj.Proxy = self
-        # vobj.Transparency = 30
-        
 
     def attach(self, vobj):
         self.ViewObject = vobj
@@ -221,14 +218,14 @@ def make_foundation(
         for o in FreeCAD.ActiveDocument.Objects:
             if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                 base_foundations.append(o)
-    level = base_foundations[0].beams[0].start_point.z
-    obj.level = level
+    obj.level = base_foundations[0].Base.Placement.Base.z
     obj.base_foundations = base_foundations
     obj.continuous_layer = continuous_layer
     FreeCAD.ActiveDocument.recompute()
     return obj
 
 
-
+if __name__ == '__main__':
+    make_foundation()
 
         
