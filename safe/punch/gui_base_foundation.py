@@ -2,6 +2,7 @@ from pathlib import Path
 from PySide2 import QtCore
 from PySide2.QtCore import QT_TRANSLATE_NOOP
 import FreeCAD
+import Draft
 
 import FreeCADGui as Gui
 import draftutils.utils as utils
@@ -14,6 +15,7 @@ from draftutils.messages import _msg, _err
 from draftutils.translate import translate
 
 from safe.punch import punch_funcs
+from safe.punch.base_foundation import make_base_foundation
 
 class BaseFoundation(gui_lines.Line):
     """Gui command for the Base Foundation tool."""
@@ -47,8 +49,8 @@ class BaseFoundation(gui_lines.Line):
         self.bf_align = p.GetString("base_foundation_align",'Center')
         self.bf_height = p.GetFloat("base_foundation_height",1000)
         self.bf_soil_modulus = p.GetFloat("base_foundation_soil_modulus",2)
+        self.fc = p.GetFloat("foundation_fc", 25)
         self.layer = p.GetString("base_foundation_layer","A")
-        self.hide_beams = p.GetBool("base_foundation_hide_beams", True)
         self.base_foundation_ui = self.taskbox()
         self.ui.layout.insertWidget(0, self.base_foundation_ui)
         self.set_layer()
@@ -124,7 +126,7 @@ class BaseFoundation(gui_lines.Line):
                 return
             wire = Part.makePolygon(self.node + [point])
             shape = punch_funcs.get_left_right_offset_wire_and_shape(wire, self.bf_left_width, self.bf_right_width)[0]
-            self.obj.Shape = Part.makeCompound([shape, wire])
+            self.obj.Shape = Part.makeCompound([wire, shape])
             # _msg(translate("draft",
             #                 "Pick next point, "
             #                 "or finish (A) or close (O)"))
@@ -137,6 +139,11 @@ class BaseFoundation(gui_lines.Line):
         closed: bool, optional
             Close the line if `True`.
         """
+        p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
+        fc = self.fc_spin.value()
+        soil_modulus = self.soil_modulus_spin.value()
+        p.SetFloat("foundation_fc",fc)
+        p.SetFloat("base_foundation_soil_modulus",soil_modulus)
         # if self.ui:
             # self.linetrack.finalize()
         if not utils.getParam("UiMode", 1):
@@ -149,24 +156,10 @@ class BaseFoundation(gui_lines.Line):
             # The command to run is built as a series of text strings
             # to be committed through the `draftutils.todo.ToDo` class.
             try:
-                # rot, sup, pts, fil = self.getStrings()
-
-                cmd_list = [
-                    'from FreeCAD import Vector',
-                    'from safe.punch.beam import make_beam',
-                    'from safe.punch.base_foundation import make_base_foundation',
-                    'beams = []',
-                    ]
-                
-                
-                for p1, p2 in zip(self.node[:-1], self.node[1:]):
-                    cmd_list.append(f'beam = make_beam({p1}, {p2})')
-                    cmd_list.append(f'beams.append(beam)')
-                hide_beams = self.hide_beams_checkbox.isChecked()
-                cmd_list.append(f'make_base_foundation(beams, "{self.layer}", {self.bf_width}, {self.bf_height}, {self.bf_soil_modulus}, "{self.bf_align}", {self.bf_left_width}, {self.bf_right_width}, {hide_beams} )')
-                self.commit(translate("civil", "Create Base Foundation"),
-                            cmd_list)
-                FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetBool("base_foundation_hide_beams", hide_beams)
+                FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Foundation"))
+                wire = Draft.make_wire(self.node)              
+                make_base_foundation(wire, self.layer, self.bf_width, self.bf_height, soil_modulus, f'{fc} MPa', self.bf_align, self.bf_left_width, self.bf_right_width)
+                FreeCAD.ActiveDocument.commitTransaction()
             except Exception:
                 _err("Draft: error delaying commit")
 
@@ -207,18 +200,18 @@ class BaseFoundation(gui_lines.Line):
         self.height_spinbox = w.height_spinbox
         self.align_box = w.align
         self.soil_modulus_spin = w.soil_modulus
-        self.hide_beams_checkbox = w.hide_beams_checkbox
+        self.fc_spin = w.fc
         # self.layer_box.setValue(self.bx / 10))
         self.width_spinbox.setValue(int(self.bf_width / 10))
         self.left_width_spinbox.setValue(int(self.bf_left_width / 10))
         self.right_width_spinbox.setValue(int(self.bf_right_width / 10))
         self.height_spinbox.setValue(int(self.bf_height / 10))
         self.soil_modulus_spin.setValue(self.bf_soil_modulus)
+        self.fc_spin.setValue(self.fc)
         i = self.align_box.findText(self.bf_align)
         self.align_box.setCurrentIndex(i)
         i = self.layer_box.findText(self.layer)
         self.layer_box.setCurrentIndex(i)
-        self.hide_beams_checkbox.setChecked(self.hide_beams)
 
         # connect slotsx
         self.width_spinbox.valueChanged.connect(self.set_width)

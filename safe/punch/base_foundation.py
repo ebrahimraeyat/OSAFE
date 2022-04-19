@@ -2,27 +2,26 @@ from pathlib import Path
 from typing import Union
 from PySide2 import QtCore
 import FreeCAD
+import ArchComponent
+
 from safe.punch import punch_funcs
 
 
 def make_base_foundation(
-        beams : list,
+        base,
         layer : str = 'A',
         width : float = 1000,
         height : float = 1000,
         soil_modulus : float =2,
+        fc : Union[float, str] = '25 MPa',
         align : str = 'Center',
         left_width : Union[float, bool] = None,
         right_width : Union[float, bool] = None,
-        hide_beams : bool = True,
         design_type : str = 'column',
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "BaseFoundation")
     BaseFoundation(obj)
-    obj.beams = beams
-    if hide_beams:
-        for b in beams:
-            b.ViewObject.hide()
+    obj.Base = base
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
@@ -37,31 +36,24 @@ def make_base_foundation(
     obj.align = align
     obj.height = height
     obj.ks = soil_modulus
+    obj.fc = fc
     if FreeCAD.GuiUp:
-        ViewProviderBaseFoundation(obj.ViewObject)
+        vobj = obj.ViewObject
+        ViewProviderBaseFoundation(vobj)
+        vobj.Transparency = 80
+        vobj.DisplayMode = "Flat Lines"
     FreeCAD.ActiveDocument.recompute()
     return obj
 
 
-class BaseFoundation:
+class BaseFoundation(ArchComponent.Component):
     def __init__(self, obj):
-        obj.Proxy = self
+        super().__init__(obj)
         self.Type = "BaseFoundation"
         self.set_properties(obj)
+        obj.Proxy = self
 
     def set_properties(self, obj):
-        if not hasattr(obj, "points"):
-            obj.addProperty(
-                "App::PropertyVectorList",
-                "points",
-                "Geometry",
-                )
-        if not hasattr(obj, "beams"):
-            obj.addProperty(
-                "App::PropertyLinkList",
-                "beams",
-                "base_foundation",
-                )
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -110,12 +102,6 @@ class BaseFoundation:
                 "align",
                 "Geometry",
                 ).align = ['Center', 'Left', 'Right']
-        if not hasattr(obj, "main_wire"):
-            obj.addProperty(
-                "Part::PropertyPartShape",
-                "main_wire",
-                "Geometry",
-                )
         if not hasattr(obj, "extended_shape"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -176,7 +162,12 @@ class BaseFoundation:
                 "final_wire_last_point",
                 "Geometry",
                 )
-        obj.setEditorMode('points', 2)
+        if not hasattr(obj, "fc"):
+            obj.addProperty(
+            "App::PropertyPressure",
+            "fc",
+            "Concrete",
+            )
         obj.setEditorMode('main_wire_first_point', 2)
         obj.setEditorMode('main_wire_last_point', 2)
         obj.setEditorMode('final_wire_first_point', 2)
@@ -186,11 +177,15 @@ class BaseFoundation:
         if obj.width.Value == 0:
             return
         if obj.layer == 'A':
-            obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
+            color = (1.00,0.00,0.20)
         elif obj.layer == 'B':
-            obj.ViewObject.ShapeColor = (0.20,0.00,1.00)
+            color = (0.20,0.00,1.00)
         elif obj.layer == 'other':
-            obj.ViewObject.ShapeColor = (0.20,1.00,0.00)
+            color = (0.20,1.00,0.00)
+        obj.ViewObject.ShapeColor = color
+        obj.ViewObject.LineColor = color
+        obj.ViewObject.PointColor = color
+        obj.ViewObject.LineWidth = 1.00
         if obj.align == 'Left':
             sl = obj.left_width.Value
             sr = obj.width.Value - sl
@@ -204,29 +199,27 @@ class BaseFoundation:
             obj.right_width = sr
             obj.left_width = sl
 
-        shape, main_wire, _, _ = punch_funcs.make_base_foundation_shape_from_beams(obj.beams, sl, sr)
-        extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(main_wire)
+        obj.plan, _, _ = punch_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, sl, sr)
+        obj.Shape = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+        extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(obj.Base.Shape.Wires[0])
         obj.extended_first_edge = e1
         obj.extended_last_edge = e2
         obj.main_wire_first_point = p1
         obj.main_wire_last_point = p2
         obj.extended_shape, *_ = punch_funcs.get_left_right_offset_wire_and_shape(extended_main_wire, sl, sr)
-        obj.main_wire = main_wire
-        obj.Shape = shape
 
 
 class ViewProviderBaseFoundation:
     def __init__(self, vobj):
         vobj.Proxy = self
-        vobj.Transparency = 80
-        vobj.DisplayMode = "Shaded"
+        
 
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
 
     def claimChildren(self):
-        children = [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.beams]
+        children = [FreeCAD.ActiveDocument.getObject(self.Object.Base.Name)]
         return children
 
     def getIcon(self):
@@ -238,26 +231,25 @@ class ViewProviderBaseFoundation:
     def __setstate__(self, state):
         return None
 
-    def onDelete(self, vobj, subelements):
-        for o in FreeCAD.ActiveDocument.Objects:
-            if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Foundation':
-                base_names = [b.Name for b in o.base_foundations]
-                if self.Object.Name in base_names:
-                    base_names.remove(self.Object.Name)
-                    base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
-                    o.base_foundations = base_foundations
-        return True
+    # def onDelete(self, vobj, subelements):
+    #     for o in FreeCAD.ActiveDocument.Objects:
+    #         if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Foundation':
+    #             base_names = [b.Name for b in o.base_foundations]
+    #             if self.Object.Name in base_names:
+    #                 base_names.remove(self.Object.Name)
+    #                 base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
+    #                 o.base_foundations = base_foundations
+    #     return True
         
 
 if __name__ == "__main__":
-    from safe.punch.rectangle_slab import make_beam
     p1 = FreeCAD.Vector(0, 0, 0)
     p2 = FreeCAD.Vector(1000, 0, 0)
     p3 = FreeCAD.Vector(3000, 2000, 0)
-    b1 = make_beam(p1, p2)
-    b2 = make_beam(p2, p3)
+    import Draft
+    wire = Draft.make_wire([p1, p2, p3])
     make_base_foundation(
-            beams=[b1, b2],
+            base=wire,
             layer='other',
             design_type='column',
             )
