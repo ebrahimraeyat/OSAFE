@@ -872,7 +872,7 @@ def get_extended_wire_first_last_edge(wire, length=4000):
         _, p22 = extend_two_points(p3, p4, length)
     e1 = Part.makeLine(p11, p1)
     e2 = Part.makeLine(p4, p22)
-    return e1, e2, p1, p4
+    return e1, e2
 
 def get_extended_wire(wire, length=2000):
     e1, e2 = get_extended_wire_first_last_edge(wire, length)
