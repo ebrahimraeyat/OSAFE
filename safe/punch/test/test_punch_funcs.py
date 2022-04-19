@@ -308,4 +308,4 @@ def test_draw_strip_automatically_in_strip_foundation():
 
 
 if __name__ == '__main__':
-    test_draw_strip_automatically_in_strip_foundation()
+    test_get_common_part_of_base_foundation()

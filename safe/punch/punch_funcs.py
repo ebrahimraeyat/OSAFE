@@ -451,7 +451,7 @@ def get_points_inside_base_foundations(
     get base foundation objects and return the dictionary of points as key and
     base foundation name that point is inside them as values
     '''
-    points = get_all_beam_points()
+    points = get_bf_points(base_foundations)
     d = {key: set() for key in points}
     for p in points:
         point = FreeCAD.Vector(p)
@@ -460,12 +460,11 @@ def get_points_inside_base_foundations(
                 d[p].add(base.Name)
     return d
 
-def get_all_beam_points():
+def get_bf_points(bfs):
     points = set()
-    for o in FreeCAD.ActiveDocument.Objects:
-        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Beam':
-            points.add(tuple(o.start_point))
-            points.add(tuple(o.end_point))
+    for bf in bfs:
+        for point in bf.Base.Points:
+            points.add(tuple(point))
     return points
 
 def get_line_equation(p1, p2):
