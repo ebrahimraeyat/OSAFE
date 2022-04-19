@@ -138,18 +138,6 @@ class BaseFoundation(ArchComponent.Component):
                 "plan",
                 "Geometry",
                 )
-        if not hasattr(obj, "main_wire_first_point"):
-            obj.addProperty(
-                "App::PropertyVector",
-                "main_wire_first_point",
-                "Geometry",
-                )
-        if not hasattr(obj, "main_wire_last_point"):
-            obj.addProperty(
-                "App::PropertyVector",
-                "main_wire_last_point",
-                "Geometry",
-                )
         if not hasattr(obj, "final_wire_first_point"):
             obj.addProperty(
                 "App::PropertyVector",
@@ -168,8 +156,6 @@ class BaseFoundation(ArchComponent.Component):
             "fc",
             "Concrete",
             )
-        obj.setEditorMode('main_wire_first_point', 2)
-        obj.setEditorMode('main_wire_last_point', 2)
         obj.setEditorMode('final_wire_first_point', 2)
         obj.setEditorMode('final_wire_last_point', 2)
 
@@ -209,11 +195,9 @@ class BaseFoundation(ArchComponent.Component):
 
         obj.plan, _, _ = punch_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, sl, sr)
         obj.Shape = obj.plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
-        extended_main_wire, e1, e2, p1, p2 = punch_funcs.get_extended_wire(obj.Base.Shape.Wires[0])
+        extended_main_wire, e1, e2 = punch_funcs.get_extended_wire(obj.Base.Shape.Wires[0])
         obj.extended_first_edge = e1
         obj.extended_last_edge = e2
-        obj.main_wire_first_point = p1
-        obj.main_wire_last_point = p2
         obj.extended_shape, *_ = punch_funcs.get_left_right_offset_wire_and_shape(extended_main_wire, sl, sr)
 
 

@@ -743,8 +743,8 @@ def get_continuous_base_foundation_shape(
     shapes = []
     cut_shape = []
     
-    first_point = tuple(base_foundation.main_wire_first_point)
-    last_point = tuple(base_foundation.main_wire_last_point)
+    first_point = tuple(base_foundation.Base.Start)
+    last_point = tuple(base_foundation.Base.End)
     comm = points_common_shape.get(first_point, None)
     if comm is not None:
         shapes.append(comm)
@@ -875,10 +875,10 @@ def get_extended_wire_first_last_edge(wire, length=4000):
     return e1, e2, p1, p4
 
 def get_extended_wire(wire, length=2000):
-    e1, e2, start_point, end_point = get_extended_wire_first_last_edge(wire, length)
+    e1, e2 = get_extended_wire_first_last_edge(wire, length)
     edges = [e1] + wire.Edges + [e2]
     wire = Part.Wire(edges)
-    return wire, e1, e2, start_point, end_point
+    return wire, e1, e2
     
 
 def remove_null_edges_from_wire(w):
@@ -1387,7 +1387,7 @@ def draw_strip_automatically_in_strip_foundation(
         edges = []
         if not base_foundation.first_edge.isNull():
             edges.append(base_foundation.first_edge)
-        edges.extend(base_foundation.main_wire.Edges)
+        edges.extend(base_foundation.Base.Shape.Edges)
         if not base_foundation.last_edge.isNull():
             edges.append(base_foundation.last_edge)
         if is_straight_line(edges):

@@ -79,12 +79,6 @@ class Strip:
                 "align",
                 "Geometry",
                 ).align = ['Center', 'Left', 'Right']
-        if not hasattr(obj, "main_wire"):
-            obj.addProperty(
-                "Part::PropertyPartShape",
-                "main_wire",
-                "Geometry",
-                )
         if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
