@@ -49,11 +49,11 @@ def make_base_foundation(
 class BaseFoundation(ArchComponent.Component):
     def __init__(self, obj):
         super().__init__(obj)
-        self.Type = "BaseFoundation"
         self.set_properties(obj)
-        obj.Proxy = self
 
     def set_properties(self, obj):
+        self.Type = "BaseFoundation"
+        obj.Proxy = self
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -172,6 +172,10 @@ class BaseFoundation(ArchComponent.Component):
         obj.setEditorMode('main_wire_last_point', 2)
         obj.setEditorMode('final_wire_first_point', 2)
         obj.setEditorMode('final_wire_last_point', 2)
+
+    def onDocumentRestored(self, obj):
+        super().onDocumentRestored(obj)
+        self.set_properties(obj)
 
     def execute(self, obj):
         if obj.width.Value == 0:

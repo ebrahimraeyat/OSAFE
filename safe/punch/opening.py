@@ -42,9 +42,9 @@ class Opening(ArchComponent.Component):
         super().__init__(obj)
         obj.IfcType = "Opening Element"
         self.set_properties(obj)
-        obj.Proxy = self
 
     def set_properties(self, obj):
+        obj.Proxy = self
         if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -65,7 +65,6 @@ class Opening(ArchComponent.Component):
             )
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         super().onDocumentRestored(obj)
         self.set_properties(obj)
 

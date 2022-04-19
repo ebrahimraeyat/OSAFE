@@ -8,11 +8,11 @@ import Part
 
 class Foundation:
     def __init__(self, obj):
-        obj.Proxy = self
-        self.Type = "Foundation"
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        self.Type = "Foundation"
+        obj.Proxy = self
 
         if not hasattr(obj, "fc"):
             obj.addProperty(
@@ -52,7 +52,6 @@ class Foundation:
         obj.setEditorMode("d", 2)
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         self.set_properties(obj)
 
     def execute(self, obj):

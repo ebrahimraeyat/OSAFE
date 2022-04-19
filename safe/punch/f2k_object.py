@@ -6,11 +6,11 @@ import FreeCAD
 
 class SafeF2k:
     def __init__(self, obj):
-        obj.Proxy = self
-        self.Type = "f2k"
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        self.Type = "f2k"
+        obj.Proxy = self
 
         if not hasattr(obj, "input"):
             obj.addProperty(
@@ -26,7 +26,6 @@ class SafeF2k:
                 )
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         self.set_properties(obj)
 
 class ViewProviderF2k:

@@ -16,11 +16,11 @@ class Foundation(ArchComponent.Component):
     def __init__(self, obj):
         super().__init__(obj)
         obj.IfcType = "Footing"
-        obj.Proxy = self
-        self.Type = "Foundation"
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        self.Type = "Foundation"
+        obj.Proxy = self
         self.obj_name = obj.Name
 
         if not hasattr(obj, "fc"):
@@ -160,7 +160,6 @@ class Foundation(ArchComponent.Component):
 
     def onDocumentRestored(self, obj):
         super().onDocumentRestored(obj)
-        obj.Proxy = self
         self.set_properties(obj)
         obj.redraw = False
         

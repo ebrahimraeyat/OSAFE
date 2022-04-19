@@ -21,11 +21,11 @@ else:
 
 class BasePlate:
     def __init__(self, obj):
-        obj.Proxy = self
-        self.Type = "BasePlate"
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        self.Type = "BasePlate"
+        obj.Proxy = self
 
         if not hasattr(obj, "Thickness"):
             obj.addProperty(
@@ -56,7 +56,6 @@ class BasePlate:
                 )
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         self.set_properties(obj)
 
     def execute(self, obj):

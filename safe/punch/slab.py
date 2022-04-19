@@ -31,9 +31,9 @@ class Slab(ArchComponent.Component):
         super().__init__(obj)
         obj.IfcType = "Footing"
         self.set_properties(obj)
-        obj.Proxy = self
 
     def set_properties(self, obj):
+        obj.Proxy = self
         if not hasattr(obj, "height"):
             obj.addProperty(
             "App::PropertyLength",
@@ -55,7 +55,6 @@ class Slab(ArchComponent.Component):
         
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         super().onDocumentRestored(obj)
         self.set_properties(obj)
 

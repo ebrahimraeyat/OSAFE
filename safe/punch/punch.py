@@ -15,13 +15,13 @@ except:
 
 class Punch:
     def __init__(self, obj):
-        obj.Proxy = self
-        self.Type = "Punch"
         self.set_properties(obj)
         obj.Location = ['Corner 1', 'Corner 2', 'Corner 3', 'Corner 4',
                         'Edge 1', 'Edge 2', 'Edge 3', 'Edge 4', 'Interior']
 
     def set_properties(self, obj):
+        self.Type = "Punch"
+        obj.Proxy = self
         if not hasattr(obj, "text"):
             obj.addProperty("App::PropertyLink", "text", "Punch")
         if not hasattr(obj, "faces"):
@@ -170,7 +170,6 @@ class Punch:
         obj.setEditorMode("faces", 2)
 
     def onDocumentRestored(self, obj):
-        obj.Proxy = self
         self.set_properties(obj)
 
     def execute(self, obj):
