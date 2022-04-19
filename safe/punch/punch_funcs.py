@@ -3,6 +3,7 @@ import math
 
 import FreeCAD
 import Part
+import Draft
 import DraftGeomUtils
 
 
@@ -933,15 +934,19 @@ def make_automatic_base_foundation(
     from safe.punch.base_foundation import make_base_foundation
     continuous_slabs = get_continuous_slabs(beams, angle)
     strips = []
-    for beams in continuous_slabs:
-        edges = [slab.Shape.Edges[0] for slab in beams]
+    for slabs in continuous_slabs:
+        edges = [slab.Shape.Edges[0] for slab in slabs]
         strip_direction = get_almost_direction_of_edges_list(edges)
         if strip_direction == 'x':
             layer = x_stirp_name
         else:
             layer = y_stirp_name
-        strip = make_base_foundation(beams, layer, width, height, soil_modulus)
+        points = get_sort_points(edges, get_last=True, sort_edges=False)
+        wire = Draft.make_wire(points)
+        strip = make_base_foundation(wire, layer, width, height, soil_modulus)
         strips.append(strip)
+    for beam in beams:
+        FreeCAD.ActiveDocument.removeObject(beam.Name)
     return strips
 
 def get_common_parts_of_foundation_slabs(foundation):

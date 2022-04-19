@@ -186,6 +186,10 @@ class BaseFoundation(ArchComponent.Component):
         obj.ViewObject.LineColor = color
         obj.ViewObject.PointColor = color
         obj.ViewObject.LineWidth = 1.00
+        obj.ViewObject.PointSize = 1.00
+        obj.Base.ViewObject.LineColor = color
+        obj.Base.ViewObject.PointColor = color
+        obj.Base.ViewObject.LineWidth = 3.00
         if obj.align == 'Left':
             sl = obj.left_width.Value
             sr = obj.width.Value - sl
