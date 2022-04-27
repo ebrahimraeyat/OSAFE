@@ -11,7 +11,6 @@ import civilwelcome
 from safe.punch import (
     gui_punch,
     gui_slab,
-    gui_beam,
     gui_base_foundation,
     gui_rectangular_slab,
     explode_foundation,
@@ -23,17 +22,17 @@ from safe.punch import (
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
 
-class Copy(DraftTools.Move):
+# class Copy(DraftTools.Move):
 
-    def __init__(self):
-        DraftTools.Move.__init__(self)
+#     def __init__(self):
+#         DraftTools.Move.__init__(self)
 
-    def GetResources(self):
+#     def GetResources(self):
 
-        return {'Pixmap': os.path.join(os.path.dirname(__file__), "images", "copy.svg"),
-                'MenuText': QtCore.QT_TRANSLATE_NOOP("Copy", "Copy"),
-                'ToolTip': QtCore.QT_TRANSLATE_NOOP("TogglePanels", "Copies selected objects to another location"),
-                'Accel': 'C,P'}
+#         return {'Pixmap': os.path.join(os.path.dirname(__file__), "images", "copy.svg"),
+#                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Copy", "Copy"),
+#                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("TogglePanels", "Copies selected objects to another location"),
+#                 'Accel': 'C,P'}
 
 
 class CivilPdf:
@@ -614,7 +613,7 @@ Gui.addCommand('Civil_opening_etabs', CivilOpening())
 Gui.addCommand('Civil_force', CivilForce())
 Gui.addCommand('Civil_wall', CivilWall())
 Gui.addCommand('civil_safe', CivilSafe1620())
-Gui.addCommand('Copy', Copy())
+# Gui.addCommand('Copy', Copy())
 Gui.addCommand('Civil_pdf', CivilPdf())
 Gui.addCommand('Civil_pic', CivilPictur())
 Gui.addCommand('Civil_welcome', civilwelcome.CivilWelcome())
@@ -630,7 +629,7 @@ Gui.addCommand('osafe_import_dxf', gui_dxf.OsafeImportDxf())
 Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())
 Gui.addCommand('create_foundation', CivilFoundation())
 Gui.addCommand('civil_slab', gui_slab.Slab())
-Gui.addCommand('civil_beam', gui_beam.Beam())
+# Gui.addCommand('civil_beam', gui_beam.Beam())
 # Gui.addCommand('civil_base_foundation', gui_base_foundation.BaseFoundation())
 Gui.addCommand('civil_punch', gui_punch.Punch())
 Gui.addCommand('osafe_automatic_strip', gui_automatic_strip.OsafeAutomaticStrip())
@@ -646,7 +645,6 @@ command_list = [
             'civil_punch',
             # 'civil_sketch',
             # "civil_explod_load_patterns",
-            "Copy",
             # "Civil_update",
             # "Civil_branch",
             "Civil_help",
@@ -663,15 +661,28 @@ export_list = [
             ]
 
 draw_list = [
+            "Draft_Wire",
             "osafe_base_foundation",
             "osafe_rectangular_slab",
-            "civil_beam",
             'civil_slab',
             'civil_base_plate',
             ]
 assign_list = [
             "Civil_force",
             "Civil_wall",
+            ]
+edit_list = [
+            "Draft_Move",
+            "Draft_Edit",
+            # "Draft_Trimex",
+            # "Draft_Join",
+            # "Draft_Split",
+            # "Draft_Scale",
+            "Draft_Stretch",
+            "Draft_Rotate",
+            "Draft_Offset",
+            # "Draft_Mirror",
+            # "Draft_Draft2Sketch",
             ]
 
 # draw_command_list = [
