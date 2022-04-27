@@ -456,7 +456,7 @@ def get_points_inside_base_foundations(
     for p in points:
         point = FreeCAD.Vector(p)
         for base in base_foundations:
-            if base.Shape.isInside(point, 1, True):
+            if base.plan.isInside(point, 1, True):
                 d[p].add(base.Name)
     return d
 
@@ -748,7 +748,7 @@ def get_continuous_base_foundation_shape(
     comm = points_common_shape.get(first_point, None)
     if comm is not None:
         shapes.append(comm)
-        faces = get_cut_faces(base_foundation.Shape, comm)
+        faces = get_cut_faces(base_foundation.plan, comm)
         if faces is not None:
             cut_shape.extend(faces)
         for e in comm.Edges:
@@ -764,7 +764,7 @@ def get_continuous_base_foundation_shape(
     comm = points_common_shape.get(last_point, None)
     if comm is not None:
         shapes.append(comm)
-        faces = get_cut_faces(base_foundation.Shape, comm)
+        faces = get_cut_faces(base_foundation.plan, comm)
         if faces is not None:
             cut_shape.extend(faces)
         for e in comm.Edges:
@@ -778,7 +778,7 @@ def get_continuous_base_foundation_shape(
                         FreeCAD.Vector(*last_point), intersection[0]
                             )
                 break
-    shapes.append(base_foundation.Shape)
+    shapes.append(base_foundation.plan)
     shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
     if len(shapes) > 1:
         shape = shapes[0].fuse(shapes[1:])
