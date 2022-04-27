@@ -11,6 +11,7 @@ import civilwelcome
 from safe.punch import (
     gui_punch,
     gui_slab,
+    gui_beam,
     gui_base_foundation,
     gui_rectangular_slab,
     explode_foundation,
@@ -629,7 +630,7 @@ Gui.addCommand('osafe_import_dxf', gui_dxf.OsafeImportDxf())
 Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())
 Gui.addCommand('create_foundation', CivilFoundation())
 Gui.addCommand('civil_slab', gui_slab.Slab())
-# Gui.addCommand('civil_beam', gui_beam.Beam())
+Gui.addCommand('civil_beam', gui_beam.Beam())
 # Gui.addCommand('civil_base_foundation', gui_base_foundation.BaseFoundation())
 Gui.addCommand('civil_punch', gui_punch.Punch())
 Gui.addCommand('osafe_automatic_strip', gui_automatic_strip.OsafeAutomaticStrip())
@@ -661,11 +662,12 @@ export_list = [
             ]
 
 draw_list = [
-            "Draft_Wire",
+            "civil_beam",
             "osafe_base_foundation",
             "osafe_rectangular_slab",
             'civil_slab',
             'civil_base_plate',
+            "Draft_Wire",
             ]
 assign_list = [
             "Civil_force",

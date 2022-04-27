@@ -321,12 +321,12 @@ def get_sort_points(
         p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
     vectors.insert(0, p1)
     if get_last:
-        last_edges = edges[-1]
-        v2 = last_edges.lastVertex()
+        e = edges[-1]
+        v2 = e.lastVertex()
         p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
         p = vectors[-1]
         if p.isEqual(p2, True):
-            v2 = e.firsVertex()
+            v2 = e.firstVertex()
             p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
         vectors.append(p2)
 
