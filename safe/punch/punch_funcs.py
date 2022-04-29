@@ -631,6 +631,7 @@ def get_foundation_shape_from_base_foundations(
         openings : list = [],
         split_mat : bool = True,
         ):
+    from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
     '''
     Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
     used to create foundation shape
@@ -670,12 +671,13 @@ def get_foundation_shape_from_base_foundations(
                 shape = shape.cut(commons)
         if foundation_type == 'Strip' and openings:
             shape = shape.cut(openings_shapes)
-
+        strip_plan = get_top_faces(shape, fuse=True)
+        make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
         shapes.append(shape)
-        if foundation_type == 'Strip':
-            base_foundation.plan = Part.makeCompound(get_top_faces(shape))
-            if FreeCAD.GuiUp:
-                base_foundation.ViewObject.Visibility = False
+        # if foundation_type == 'Strip':
+        #     base_foundation.plan = Part.makeCompound(get_top_faces(shape))
+        #     if FreeCAD.GuiUp:
+        #         base_foundation.ViewObject.Visibility = False
         
     if len(shapes) > 1:
         strip_shape = shapes[0].fuse(shapes[1:])
@@ -702,6 +704,9 @@ def get_foundation_shape_from_base_foundations(
             if openings:
                 shape = shape.cut(openings_shapes)
         plan = get_top_faces(shape, fuse=True)
+    for bf in base_foundations:
+        FreeCAD.ActiveDocument.removeObject(bf.Name)
+
     return shape, outer_wire, plan, plan_without_openings
 
 def get_common_part_of_slabs(slabs):

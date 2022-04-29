@@ -56,6 +56,36 @@ def make_rectangular_slab(
     FreeCAD.ActiveDocument.recompute()
     return obj
 
+def make_rectangular_slab_from_base_foundation(base_foundation, plan=None):
+    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "RectangularSlab")
+    RectangularSlab(obj)
+    obj.Base = base_foundation.Base
+    obj.layer = base_foundation.layer
+    obj.design_type = base_foundation.design_type
+    obj.width = base_foundation.width
+    obj.left_width = base_foundation.left_width
+    obj.right_width = base_foundation.right_width
+    if plan is None:
+        plan, _, _ = punch_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, obj.left_width, obj.right_width)
+    points = punch_funcs.get_sort_points(plan.Edges)
+    plan = Draft.make_wire(points, closed=True)
+        # FreeCAD.ActiveDocument.recompute()
+    obj.plan = plan
+    obj.align = base_foundation.align
+    obj.height = base_foundation.height
+    obj.ks = base_foundation.ks
+    obj.fc = base_foundation.fc
+    if FreeCAD.GuiUp:
+        ViewProviderRectangularSlab(obj.ViewObject)
+        if obj.Base:
+            obj.Base.ViewObject.LineWidth = 3.00
+        if obj.plan:
+            obj.plan.ViewObject.LineWidth = 3.00
+        obj.ViewObject.Transparency = 20
+        obj.ViewObject.DisplayMode = "Flat Lines"
+    FreeCAD.ActiveDocument.recompute()
+    return obj
+
 
 class RectangularSlab(ArchComponent.Component):
     def __init__(self, obj):
@@ -217,4 +247,7 @@ if __name__ == "__main__":
     make_rectangular_slab(
             base=wire,
             )
-2
+
+    from safe.punch.base_foundation import make_base_foundation
+    bf = make_base_foundation(base=wire)
+    make_rectangular_slab_from_base_foundation(bf)

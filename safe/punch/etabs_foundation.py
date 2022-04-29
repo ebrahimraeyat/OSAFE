@@ -134,14 +134,14 @@ class Foundation(ArchComponent.Component):
             FreeCAD.ActiveDocument.recompute()
             return
         obj.redraw = True
-        obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
-                obj.base_foundations,
-                height = obj.height.Value,
-                foundation_type = obj.foundation_type,
-                continuous_layer = obj.continuous_layer,
-                openings=obj.openings,
-                split_mat=obj.split,
-                )
+        # obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
+        #         obj.base_foundations,
+        #         height = obj.height.Value,
+        #         foundation_type = obj.foundation_type,
+        #         continuous_layer = obj.continuous_layer,
+        #         openings=obj.openings,
+        #         split_mat=obj.split,
+        #         )
             
         
         # obj.plan, obj.plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
@@ -182,8 +182,9 @@ class ViewProviderFoundation:
         return None
 
     def claimChildren(self):
-        children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.base_foundations] + \
-                [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
+        children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
+                
+        # [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.base_foundations] + \
         return children
 
 def make_foundation(
@@ -193,7 +194,7 @@ def make_foundation(
     foundation_type : str = 'Strip',
     # load_cases : list = [],
     base_foundations : Union[list, None] = None,
-    continuous_layer : str = 'A',
+    continuous_layer : str = 'AB',
     ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
     Foundation(obj)
@@ -221,6 +222,14 @@ def make_foundation(
     obj.level = base_foundations[0].Base.Placement.Base.z
     obj.base_foundations = base_foundations
     obj.continuous_layer = continuous_layer
+    obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
+                obj.base_foundations,
+                height = obj.height.Value,
+                foundation_type = obj.foundation_type,
+                continuous_layer = obj.continuous_layer,
+                openings=obj.openings,
+                split_mat=obj.split,
+                )
     FreeCAD.ActiveDocument.recompute()
     return obj
 
