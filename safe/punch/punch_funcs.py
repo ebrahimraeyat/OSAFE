@@ -648,6 +648,7 @@ def get_foundation_shape_from_base_foundations(
     shapes = []
     outer_wire = Part.Shape()
     plan_without_openings = Part.Shape()
+    slabs = []
     for base_foundation, height in zip(base_foundations, heights):
         shape = get_continuous_base_foundation_shape(
                 base_foundation,
@@ -672,7 +673,8 @@ def get_foundation_shape_from_base_foundations(
         if foundation_type == 'Strip' and openings:
             shape = shape.cut(openings_shapes)
         strip_plan = get_top_faces(shape, fuse=True)
-        make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
+        slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
+        slabs.append(slab)
         shapes.append(shape)
         # if foundation_type == 'Strip':
         #     base_foundation.plan = Part.makeCompound(get_top_faces(shape))
@@ -707,7 +709,7 @@ def get_foundation_shape_from_base_foundations(
     for bf in base_foundations:
         FreeCAD.ActiveDocument.removeObject(bf.Name)
 
-    return shape, outer_wire, plan, plan_without_openings
+    return slabs, outer_wire, plan, plan_without_openings
 
 def get_common_part_of_slabs(slabs):
     if len(slabs) < 2:
