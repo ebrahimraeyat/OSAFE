@@ -50,12 +50,12 @@ class Foundation(ArchComponent.Component):
                 "Geometry",
                 )
 
-        if not hasattr(obj, "base_foundations"):
-            obj.addProperty(
-                "App::PropertyLinkList",
-                "base_foundations",
-                "Foundation",
-                )
+        # if not hasattr(obj, "base_foundations"):
+        #     obj.addProperty(
+        #         "App::PropertyLinkList",
+        #         "base_foundations",
+        #         "Foundation",
+        #         )
 
         if not hasattr(obj, "plan"):
             obj.addProperty(
@@ -220,10 +220,10 @@ def make_foundation(
             if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                 base_foundations.append(o)
     obj.level = base_foundations[0].Base.Placement.Base.z
-    obj.base_foundations = base_foundations
+    # obj.base_foundations = base_foundations
     obj.continuous_layer = continuous_layer
     obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
-                obj.base_foundations,
+                base_foundations,
                 height = obj.height.Value,
                 foundation_type = obj.foundation_type,
                 continuous_layer = obj.continuous_layer,
