@@ -96,7 +96,9 @@ class Foundation:
                 "App::PropertyEnumeration",
                 "continuous_layer",
                 "Strip",
-                ).continuous_layer = ['A', 'B', 'AB']
+                "",
+                8,
+                ).continuous_layer = ['AB', 'A', 'B']
         # if not hasattr(obj, "loadcases"):
         # 	obj.addProperty(
         # 		"App::PropertyStringList",

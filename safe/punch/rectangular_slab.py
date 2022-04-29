@@ -101,8 +101,8 @@ class RectangularSlab(ArchComponent.Component):
                 "App::PropertyEnumeration",
                 "layer",
                 "Strip",
-                "",
-                8,
+                # "",
+                # 8,
                 ).layer = ['A', 'B', 'other']
         if not hasattr(obj, "design_type"):
             obj.addProperty(
@@ -200,6 +200,24 @@ class RectangularSlab(ArchComponent.Component):
             obj.plan.Points = points
         if obj.plan:
             obj.Shape = obj.plan.Shape.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+        if FreeCAD.GuiUp:
+            if obj.layer == 'A':
+                color = (1.00,0.0,0.50)
+            elif obj.layer == 'B':
+                color = (0.0,0.67,1.00)
+            elif obj.layer == 'other':
+                color = (0.00,1.00,0.00)
+            if obj.Base:
+                obj.Base.ViewObject.LineColor = color
+                obj.Base.ViewObject.PointColor = color
+            if obj.plan:
+                obj.plan.ViewObject.LineColor = color
+                obj.plan.ViewObject.PointColor = color
+            obj.ViewObject.ShapeColor = color
+            obj.ViewObject.LineColor = color
+            obj.ViewObject.PointColor = color
+            obj.ViewObject.LineWidth = 1.00
+            obj.ViewObject.PointSize = 1.00
 
 class ViewProviderRectangularSlab:
     def __init__(self, vobj):
