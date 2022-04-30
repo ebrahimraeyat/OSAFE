@@ -677,14 +677,16 @@ edit_list = [
             "Draft_Move",
             "Draft_Edit",
             # "Draft_Trimex",
-            # "Draft_Join",
-            # "Draft_Split",
+            "Draft_Join",
+            "Draft_Split",
             # "Draft_Scale",
             "Draft_Stretch",
             "Draft_Rotate",
             "Draft_Offset",
             # "Draft_Mirror",
             # "Draft_Draft2Sketch",
+            "Draft_Upgrade",
+            "Draft_Downgrade",
             ]
 
 # draw_command_list = [
