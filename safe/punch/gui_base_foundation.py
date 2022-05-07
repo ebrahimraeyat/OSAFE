@@ -2,6 +2,8 @@ from pathlib import Path
 from PySide2 import QtCore
 from PySide2.QtCore import QT_TRANSLATE_NOOP
 import FreeCAD
+import Part
+from FreeCAD import Vector
 import Draft
 
 import FreeCADGui as Gui
@@ -17,12 +19,11 @@ from draftutils.translate import translate
 from safe.punch import punch_funcs
 from safe.punch.base_foundation import make_base_foundation
 
+
 class BaseFoundation(gui_lines.Line):
     """Gui command for the Base Foundation tool."""
 
     def __init__(self):
-        self.wire = None
-        self.obj = None
         super(BaseFoundation, self).__init__(wiremode=True)
 
     def GetResources(self):
@@ -43,6 +44,7 @@ class BaseFoundation(gui_lines.Line):
         """
         Execute when the command is called.
         """
+        super(BaseFoundation, self).Activated(name=translate("OSAFE", "BaseFoundation"))
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         self.bf_width = p.GetFloat("base_foundation_width",1000)
         self.bf_left_width = p.GetFloat("base_foundation_left_width",500)
@@ -56,12 +58,12 @@ class BaseFoundation(gui_lines.Line):
         selections = Gui.Selection.getSelection()
         if selections:
             wire = selections[0]
-            if wire.Proxy.Type == 'Wire':
-                self.wire = wire
-                # Gui.Control.showDialog(self.base_foundation_ui)
-                # self.
-            
-        super(BaseFoundation, self).Activated(name=translate("OSAFE", "BaseFoundation"))
+            if hasattr(wire, 'Proxy') and hasattr(wire.Proxy, 'Type')  and wire.Proxy.Type == 'Wire':
+                self.node = wire.Points
+                FreeCAD.ActiveDocument.removeObject(wire.Name)
+                wire = Part.makePolygon(self.node)
+                shape = punch_funcs.get_left_right_offset_wire_and_shape(wire, self.bf_left_width, self.bf_right_width)[0]
+                self.obj.Shape = Part.makeCompound([wire, shape])
         self.ui.layout.insertWidget(0, self.base_foundation_ui)
         self.set_layer()
         self.update_gui()
@@ -113,7 +115,6 @@ class BaseFoundation(gui_lines.Line):
 
     def undolast(self):
         """Undo last line segment."""
-        import Part
         if len(self.node) > 1:
             self.node.pop()
             # self.linetrack.update(self.node)
@@ -162,15 +163,12 @@ class BaseFoundation(gui_lines.Line):
             # Remove temporary object, if any
             old = self.obj.Name
             todo.ToDo.delay(self.doc.removeObject, old)
-        if len(self.node) > 1 or self.wire is not None:
+        if len(self.node) > 1:
             # The command to run is built as a series of text strings
             # to be committed through the `draftutils.todo.ToDo` class.
             try:
                 FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Foundation"))
-                if self.wire is None:
-                    wire = Draft.make_wire(self.node)              
-                else:
-                    wire = self.wire
+                wire = Draft.make_wire(self.node)
                 make_base_foundation(wire, self.layer, self.bf_width, self.bf_height, soil_modulus, f'{fc} MPa', self.bf_align, self.bf_left_width, self.bf_right_width)
                 FreeCAD.ActiveDocument.commitTransaction()
             except Exception:
@@ -278,8 +276,6 @@ class BaseFoundation(gui_lines.Line):
         FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("base_foundation_height",self.bf_height)
 
     def set_layer(self):
-        if self.obj is None:
-            return
         self.layer = self.base_foundation_ui.strip_layer.currentText()
         if self.layer == 'A':
             self.obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
