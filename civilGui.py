@@ -685,8 +685,8 @@ edit_list = [
             "Draft_Offset",
             # "Draft_Mirror",
             # "Draft_Draft2Sketch",
-            "Draft_Upgrade",
-            "Draft_Downgrade",
+            # "Draft_Upgrade",
+            # "Draft_Downgrade",
             ]
 
 # draw_command_list = [
