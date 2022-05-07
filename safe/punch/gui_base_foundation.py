@@ -21,6 +21,8 @@ class BaseFoundation(gui_lines.Line):
     """Gui command for the Base Foundation tool."""
 
     def __init__(self):
+        self.wire = None
+        self.obj = None
         super(BaseFoundation, self).__init__(wiremode=True)
 
     def GetResources(self):
@@ -41,7 +43,6 @@ class BaseFoundation(gui_lines.Line):
         """
         Execute when the command is called.
         """
-        super(BaseFoundation, self).Activated(name=translate("OSAFE", "BaseFoundation"))
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         self.bf_width = p.GetFloat("base_foundation_width",1000)
         self.bf_left_width = p.GetFloat("base_foundation_left_width",500)
@@ -52,6 +53,15 @@ class BaseFoundation(gui_lines.Line):
         self.fc = p.GetFloat("foundation_fc", 25)
         self.layer = p.GetString("base_foundation_layer","A")
         self.base_foundation_ui = self.taskbox()
+        selections = Gui.Selection.getSelection()
+        if selections:
+            wire = selections[0]
+            if wire.Proxy.Type == 'Wire':
+                self.wire = wire
+                # Gui.Control.showDialog(self.base_foundation_ui)
+                # self.
+            
+        super(BaseFoundation, self).Activated(name=translate("OSAFE", "BaseFoundation"))
         self.ui.layout.insertWidget(0, self.base_foundation_ui)
         self.set_layer()
         self.update_gui()
@@ -152,12 +162,15 @@ class BaseFoundation(gui_lines.Line):
             # Remove temporary object, if any
             old = self.obj.Name
             todo.ToDo.delay(self.doc.removeObject, old)
-        if len(self.node) > 1:
+        if len(self.node) > 1 or self.wire is not None:
             # The command to run is built as a series of text strings
             # to be committed through the `draftutils.todo.ToDo` class.
             try:
                 FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Foundation"))
-                wire = Draft.make_wire(self.node)              
+                if self.wire is None:
+                    wire = Draft.make_wire(self.node)              
+                else:
+                    wire = self.wire
                 make_base_foundation(wire, self.layer, self.bf_width, self.bf_height, soil_modulus, f'{fc} MPa', self.bf_align, self.bf_left_width, self.bf_right_width)
                 FreeCAD.ActiveDocument.commitTransaction()
             except Exception:
@@ -179,7 +192,6 @@ class BaseFoundation(gui_lines.Line):
         This function is called by the toolbar or taskpanel interface
         when valid x, y, and z have been entered in the input fields.
         """
-        print(f'numeric ({numx}, {numy}, {numz})')
         self.point = FreeCAD.Vector(numx, numy, numz)
         self.node.append(self.point)
         self.drawUpdate(self.point)
@@ -266,6 +278,8 @@ class BaseFoundation(gui_lines.Line):
         FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetFloat("base_foundation_height",self.bf_height)
 
     def set_layer(self):
+        if self.obj is None:
+            return
         self.layer = self.base_foundation_ui.strip_layer.currentText()
         if self.layer == 'A':
             self.obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
