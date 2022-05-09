@@ -1,7 +1,8 @@
 from pathlib import Path
 import Part
 import FreeCAD
-import Sketcher
+import Draft
+# import Sketcher
 import ArchComponent
 
 from safe.punch import punch_funcs
@@ -17,8 +18,8 @@ def make_slab(
     obj = doc.addObject("Part::FeaturePython", "Slab")
     Slab(obj)
     if isinstance(base, Part.Shape):
-        points = punch_funcs.get_sort_points(base.Edges, get_last=True)
-        base = Draft.make_wire(points)
+        points = punch_funcs.get_sort_points(base.Edges)
+        base = Draft.make_wire(points, closed=True)
     obj.Base = base
     obj.height = height
     if ks is not None:
@@ -39,6 +40,7 @@ class Slab(ArchComponent.Component):
 
     def set_properties(self, obj):
         obj.Proxy = self
+        self.Type = "Slab"
         if not hasattr(obj, "height"):
             obj.addProperty(
             "App::PropertyLength",

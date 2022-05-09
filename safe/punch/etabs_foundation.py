@@ -232,6 +232,9 @@ def make_foundation(
                 split_mat=obj.split,
                 )
     obj.Group = obj.Slabs
+    for slab in obj.Slabs:
+        if slab.Proxy.Type == "Slab":
+            slab.fc = obj.fc
     FreeCAD.ActiveDocument.commitTransaction()
     FreeCAD.ActiveDocument.recompute()
     return obj

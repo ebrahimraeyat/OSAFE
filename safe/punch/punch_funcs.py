@@ -632,6 +632,7 @@ def get_foundation_shape_from_base_foundations(
         split_mat : bool = True,
         ):
     from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
+    from safe.punch.slab import make_slab
     '''
     Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
     used to create foundation shape
@@ -700,12 +701,18 @@ def get_foundation_shape_from_base_foundations(
                 shape = face.extrude(FreeCAD.Vector(0, 0, -height))
                 if openings:
                     shape = shape.cut(openings_shapes)
+                top_face = get_top_faces(shape, fuse=True)
+                slab = make_slab(top_face, height=height)
+                slabs.append(slab)
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
         else:
             shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
                 shape = shape.cut(openings_shapes)
+            top_face = get_top_faces(shape, fuse=True)
+            slab = make_slab(shape, height=height)
+            slabs.append(slab)
         plan = get_top_faces(shape, fuse=True)
     
     if FreeCAD.GuiUp:
