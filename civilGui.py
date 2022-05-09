@@ -18,6 +18,7 @@ from safe.punch import (
     gui_dxf,
     gui_automatic_strip,
     base_plate,
+    osafe_views,
     )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -687,6 +688,11 @@ edit_list = [
             # "Draft_Draft2Sketch",
             # "Draft_Upgrade",
             # "Draft_Downgrade",
+            ]
+
+view_list = [
+            "Separator",
+            "osafe_wireframe_views",
             ]
 
 # draw_command_list = [
