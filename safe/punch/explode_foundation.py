@@ -9,7 +9,7 @@ import FreeCADGui as Gui
 from draftutils.messages import _msg, _err
 from draftutils.translate import translate
 
-from safe.punch.rectangular_slab import make_rectangular_slab
+from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
 
 
 class ExplodeFoundation():
@@ -50,11 +50,9 @@ class ExplodeFoundation():
             show_warning()
             return
         try:
-            # rot, sup, pts, fil = self.getStrings()
-            hide_beams = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("base_foundation_hide_beams", True)
             FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Explode Foundation"))
             for bf in foun.base_foundations:
-                make_rectangular_slab(bf.beams, bf.layer, bf.width, bf.height, bf.ks, bf.align, bf.left_width, bf.right_width, hide_beams)
+                make_rectangular_slab_from_base_foundation(bf)
             remove_obj(foun.Name)
             FreeCAD.ActiveDocument.commitTransaction()
         except Exception:

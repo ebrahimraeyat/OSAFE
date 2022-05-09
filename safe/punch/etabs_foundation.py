@@ -3,23 +3,24 @@ from typing import Union
 
 from PySide2 import QtCore
 import FreeCAD
-import Part
+# import Part
+import ArchComponent
 
 try:
     from safe.punch import punch_funcs
 except:
     import punch_funcs
 
-class Foundation:
+class Foundation(ArchComponent.Component):
 
     def __init__(self, obj):
-        # super().__init__(obj)
-        # obj.IfcType = "Footing"
+        super().__init__(obj)
+        obj.IfcType = "Footing"
         self.set_properties(obj)
 
     def set_properties(self, obj):
         self.Type = "Foundation"
-        # obj.Proxy = self
+        obj.Proxy = self
         self.obj_name = obj.Name
 
         if not hasattr(obj, "fc"):
@@ -48,13 +49,19 @@ class Foundation:
                 "d",
                 "Geometry",
                 )
-
-        if not hasattr(obj, "Slabs"):
+        if not hasattr(obj, "base_foundations"):
             obj.addProperty(
                 "App::PropertyLinkList",
-                "Slabs",
+                "base_foundations",
                 "Foundation",
                 )
+
+        # if not hasattr(obj, "Slabs"):
+        #     obj.addProperty(
+        #         "App::PropertyLinkList",
+        #         "Slabs",
+        #         "Foundation",
+        #         )
         if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -98,7 +105,7 @@ class Foundation:
                 "Strip",
                 "",
                 8,
-                ).continuous_layer = ['AB', 'A', 'B']
+                ).continuous_layer = ['A', 'B', 'AB']
         # if not hasattr(obj, "loadcases"):
         # 	obj.addProperty(
         # 		"App::PropertyStringList",
@@ -134,14 +141,14 @@ class Foundation:
             FreeCAD.ActiveDocument.recompute()
             return
         obj.redraw = True
-        # obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
-        #         obj.base_foundations,
-        #         height = obj.height.Value,
-        #         foundation_type = obj.foundation_type,
-        #         continuous_layer = obj.continuous_layer,
-        #         openings=obj.openings,
-        #         split_mat=obj.split,
-        #         )
+        obj.Shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
+                obj.base_foundations,
+                height = obj.height.Value,
+                foundation_type = obj.foundation_type,
+                continuous_layer = obj.continuous_layer,
+                openings=obj.openings,
+                split_mat=obj.split,
+                )
             
         
         # obj.plan, obj.plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
@@ -182,8 +189,9 @@ class ViewProviderFoundation:
         return None
 
     def claimChildren(self):
-        children=[FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.slabs] + \
-        [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
+        children=[
+                FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.base_foundations] + \
+                [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
         return children
 
 def make_foundation(
@@ -197,17 +205,18 @@ def make_foundation(
     ):
     from draftutils.translate import translate
     FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Make Foundation"))
-    obj = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup", "Foundation")
+    obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Foundation")
+    # obj = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup", "Foundation")
     Foundation(obj)
     if FreeCAD.GuiUp:
         import FreeCADGui
-        # ViewProviderFoundation(obj.ViewObject)
-        # obj.ViewObject.LineWidth = 1.00
-        # obj.ViewObject.PointSize = 1.00
-        # obj.ViewObject.DisplayMode = "Flat Lines"
-        # obj.ViewObject.ShapeColor = (1.00,0.67,0.50)
-        # obj.ViewObject.LineColor = (0.28,0.28,0.28)
-        # obj.ViewObject.PointColor = (0.28,0.28,0.28)
+        ViewProviderFoundation(obj.ViewObject)
+        obj.ViewObject.LineWidth = 1.00
+        obj.ViewObject.PointSize = 1.00
+        obj.ViewObject.DisplayMode = "Flat Lines"
+        obj.ViewObject.ShapeColor = (1.00,0.67,0.50)
+        obj.ViewObject.LineColor = (0.28,0.28,0.28)
+        obj.ViewObject.PointColor = (0.28,0.28,0.28)
         FreeCADGui.activeDocument().activeView().viewIsometric()
         FreeCADGui.SendMsgToActiveView("ViewFit")
     obj.cover = cover
@@ -221,20 +230,20 @@ def make_foundation(
             if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                 base_foundations.append(o)
     obj.level = base_foundations[0].Base.Placement.Base.z
-    # obj.base_foundations = base_foundations
+    obj.base_foundations = base_foundations
     obj.continuous_layer = continuous_layer
-    obj.Slabs, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
-                base_foundations,
-                height = obj.height.Value,
-                foundation_type = obj.foundation_type,
-                continuous_layer = obj.continuous_layer,
-                openings=obj.openings,
-                split_mat=obj.split,
-                )
-    obj.Group = obj.Slabs
-    for slab in obj.Slabs:
-        if slab.Proxy.Type == "Slab":
-            slab.fc = obj.fc
+    # obj.shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
+    #             base_foundations,
+    #             height = obj.height.Value,
+    #             foundation_type = obj.foundation_type,
+    #             continuous_layer = obj.continuous_layer,
+    #             openings=obj.openings,
+    #             split_mat=obj.split,
+    #             )
+    # obj.Group = obj.Slabs
+    # for slab in obj.Slabs:
+    #     if slab.Proxy.Type == "Slab":
+    #         slab.fc = obj.fc
     FreeCAD.ActiveDocument.commitTransaction()
     FreeCAD.ActiveDocument.recompute()
     return obj

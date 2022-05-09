@@ -631,8 +631,8 @@ def get_foundation_shape_from_base_foundations(
         openings : list = [],
         split_mat : bool = True,
         ):
-    from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
-    from safe.punch.slab import make_slab
+    # from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
+    # from safe.punch.slab import make_slab
     '''
     Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
     used to create foundation shape
@@ -649,7 +649,7 @@ def get_foundation_shape_from_base_foundations(
     shapes = []
     outer_wire = Part.Shape()
     plan_without_openings = Part.Shape()
-    slabs = []
+    # slabs = []
     for base_foundation, height in zip(base_foundations, heights):
         shape = get_continuous_base_foundation_shape(
                 base_foundation,
@@ -673,15 +673,15 @@ def get_foundation_shape_from_base_foundations(
                 shape = shape.cut(commons)
         if foundation_type == 'Strip' and openings:
             shape = shape.cut(openings_shapes)
-        strip_plan = get_top_faces(shape, fuse=True)
-        if foundation_type == 'Strip':
-            slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
-            slabs.append(slab)
+        # strip_plan = get_top_faces(shape, fuse=True)
         shapes.append(shape)
         # if foundation_type == 'Strip':
-        #     base_foundation.plan = Part.makeCompound(get_top_faces(shape))
-        #     if FreeCAD.GuiUp:
-        #         base_foundation.ViewObject.Visibility = False
+        #     slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
+        #     slabs.append(slab)
+        if foundation_type == 'Strip':
+            base_foundation.plan = Part.makeCompound(get_top_faces(shape))
+            # if FreeCAD.GuiUp:
+            #     base_foundation.ViewObject.Visibility = False
         
     if len(shapes) > 1:
         strip_shape = shapes[0].fuse(shapes[1:])
@@ -701,18 +701,18 @@ def get_foundation_shape_from_base_foundations(
                 shape = face.extrude(FreeCAD.Vector(0, 0, -height))
                 if openings:
                     shape = shape.cut(openings_shapes)
-                top_face = get_top_faces(shape, fuse=True)
-                slab = make_slab(top_face, height=height)
-                slabs.append(slab)
+                # top_face = get_top_faces(shape, fuse=True)
+                # slab = make_slab(top_face, height=height)
+                # slabs.append(slab)
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
         else:
             shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
                 shape = shape.cut(openings_shapes)
-            top_face = get_top_faces(shape, fuse=True)
-            slab = make_slab(shape, height=height)
-            slabs.append(slab)
+            # top_face = get_top_faces(shape, fuse=True)
+            # slab = make_slab(shape, height=height)
+            # slabs.append(slab)
         plan = get_top_faces(shape, fuse=True)
     
     if FreeCAD.GuiUp:
@@ -721,7 +721,7 @@ def get_foundation_shape_from_base_foundations(
             # show_object(bf.Base, False)
         # FreeCAD.ActiveDocument.removeObject(bf.Name)
 
-    return slabs, outer_wire, plan, plan_without_openings
+    return shape, outer_wire, plan, plan_without_openings
 
 def show_object(obj, show : bool):
     if show:
