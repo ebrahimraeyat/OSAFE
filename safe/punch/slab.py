@@ -4,6 +4,8 @@ import FreeCAD
 import Sketcher
 import ArchComponent
 
+from safe.punch import punch_funcs
+
 
 def make_slab(
         base,
@@ -14,6 +16,9 @@ def make_slab(
     doc = FreeCAD.ActiveDocument
     obj = doc.addObject("Part::FeaturePython", "Slab")
     Slab(obj)
+    if isinstance(base, Part.Shape):
+        points = punch_funcs.get_sort_points(base.Edges, get_last=True)
+        base = Draft.make_wire(points)
     obj.Base = base
     obj.height = height
     if ks is not None:
@@ -108,5 +113,7 @@ if __name__ == "__main__":
         points = [p1, p2, p3, p4, p1]
         import Draft
         wire = Draft.make_wire(points)
+        FreeCAD.ActiveDocument.recompute()
     make_slab(base=wire,
                )
+    make_slab(base=wire.Shape)

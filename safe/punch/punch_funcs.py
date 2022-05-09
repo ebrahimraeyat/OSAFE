@@ -673,8 +673,9 @@ def get_foundation_shape_from_base_foundations(
         if foundation_type == 'Strip' and openings:
             shape = shape.cut(openings_shapes)
         strip_plan = get_top_faces(shape, fuse=True)
-        slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
-        slabs.append(slab)
+        if foundation_type == 'Strip':
+            slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
+            slabs.append(slab)
         shapes.append(shape)
         # if foundation_type == 'Strip':
         #     base_foundation.plan = Part.makeCompound(get_top_faces(shape))
