@@ -74,7 +74,10 @@ class WireFrameView:
                 elif obj.Label.startswith('C'):
                     show_obj = show_column and wireframe
             if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type") and obj.Proxy.Type == 'BaseFoundation':
-                show_obj = not wireframe
+                if len(obj.Base.InList) > 1:
+                    show_obj = False
+                else:
+                    show_obj = not wireframe
             show_object(obj, show_obj)
         FreeCAD.ActiveDocument.recompute()
 
