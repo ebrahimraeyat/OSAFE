@@ -5,7 +5,8 @@ from PySide2 import QtCore
 from PySide2.QtWidgets import QMessageBox
 import FreeCAD
 import FreeCADGui as Gui
-import DraftTools
+# import DraftTools
+from draftutils.translate import translate
 import civilwelcome
 
 from safe.punch import (
@@ -293,10 +294,12 @@ class CivilOpening:
                 z = doc.Beam.start_point.z
         points_vec = [FreeCAD.Vector(p[0], p[1], z) for p in points_xyz]
         # wire = Draft.make_wire(points_vec)
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Make Opening"))
         opening_obj = opening.make_opening(points_vec, height=height)
         if foun is not None:
             opening_objs = foun.openings + [opening_obj]
             foun.openings = opening_objs
+        FreeCAD.ActiveDocument.commitTransaction()
         doc.recompute()
 
     def IsActive(self):
