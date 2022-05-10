@@ -138,6 +138,12 @@ class BaseFoundation(ArchComponent.Component):
                 "plan",
                 "Geometry",
                 )
+        if not hasattr(obj, "extended_plan"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "extended_plan",
+                "Geometry",
+                )
         if not hasattr(obj, "final_wire_first_point"):
             obj.addProperty(
                 "App::PropertyVector",

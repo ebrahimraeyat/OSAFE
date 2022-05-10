@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Union
-from PySide2 import QtCore
+# from PySide2 import QtCore
 import FreeCAD, Draft
 import ArchComponent
 
@@ -67,9 +67,17 @@ def make_rectangular_slab_from_base_foundation(base_foundation, plan=None):
     obj.right_width = base_foundation.right_width
     if plan is None:
         plan, _, _ = punch_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, obj.left_width, obj.right_width)
-    points = punch_funcs.get_sort_points(plan.Edges)
-    plan = Draft.make_wire(points, closed=True)
+    elif plan == 'Auto':
+        plan = base_foundation.extended_plan
+    if len(plan.Wires) == 1:
+        points = punch_funcs.get_sort_points(plan.Edges)
+        plan = Draft.make_wire(points, closed=True)
         # FreeCAD.ActiveDocument.recompute()
+    else:
+        temp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Base")
+        temp.Shape = plan
+        plan = temp
+        
     obj.plan = plan
     obj.align = base_foundation.align
     obj.height = base_foundation.height

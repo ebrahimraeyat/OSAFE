@@ -55,7 +55,7 @@ class ExplodeFoundation():
             FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Explode Foundation"))
             if foun.foundation_type == 'Strip':
                 for bf in foun.base_foundations:
-                    make_rectangular_slab_from_base_foundation(bf)
+                    make_rectangular_slab_from_base_foundation(bf, plan='Auto')
             elif foun.foundation_type == 'Mat':
                 height = foun.height
                 if foun.split:

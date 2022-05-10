@@ -66,12 +66,12 @@ class Foundation(ArchComponent.Component):
                 "Foundation",
                 )
 
-        # if not hasattr(obj, "Slabs"):
-        #     obj.addProperty(
-        #         "App::PropertyLinkList",
-        #         "Slabs",
-        #         "Foundation",
-        #         )
+        if not hasattr(obj, "Slabs"):
+            obj.addProperty(
+                "App::PropertyLinkList",
+                "Slabs",
+                "Foundation",
+                )
         if not hasattr(obj, "plan"):
             obj.addProperty(
                 "Part::PropertyPartShape",
@@ -156,6 +156,7 @@ class Foundation(ArchComponent.Component):
                 continuous_layer = obj.continuous_layer,
                 openings=obj.openings,
                 split_mat=obj.split,
+                slabs=obj.Slabs,
                 )
             
         
@@ -199,6 +200,7 @@ class ViewProviderFoundation:
     def claimChildren(self):
         children=[
                 FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.base_foundations] + \
+                [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.Slabs] + \
                 [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
         return children
 

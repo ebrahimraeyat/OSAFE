@@ -630,6 +630,7 @@ def get_foundation_shape_from_base_foundations(
         continuous_layer : str = 'A',
         openings : list = [],
         split_mat : bool = True,
+        slabs : list = [],
         ):
     # from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
     # from safe.punch.slab import make_slab
@@ -679,10 +680,18 @@ def get_foundation_shape_from_base_foundations(
         #     slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
         #     slabs.append(slab)
         if foundation_type == 'Strip':
-            base_foundation.plan = Part.makeCompound(get_top_faces(shape))
+            base_foundation.extended_plan = Part.makeCompound(get_top_faces(shape))
             # if FreeCAD.GuiUp:
             #     base_foundation.ViewObject.Visibility = False
-        
+    if foundation_type == 'Strip' and slabs:
+        current_shape = Part.makeCompound(shapes)
+        for slab in slabs:
+            if continuous_layer != 'AB' and slab.layer != continuous_layer:
+                comm = slab.Shape.common(current_shape)
+                sh = slab.Shape.cut(comm)
+                shapes.append(sh)
+            else:
+                shapes.append(slab.Shape)
     if len(shapes) > 1:
         strip_shape = shapes[0].fuse(shapes[1:])
         strip_shape = strip_shape.removeSplitter()
@@ -706,6 +715,9 @@ def get_foundation_shape_from_base_foundations(
                 # slabs.append(slab)
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
+            # if slabs:
+            #     for slab in slabs:
+            #         shape = slab.Shape.cut()
         else:
             shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
