@@ -28,6 +28,16 @@ class Foundation(ArchComponent.Component):
                 "App::PropertyPressure",
                 "fc",
                 "Foundation",
+                "",
+                8,
+                )
+        if not hasattr(obj, "ks"):
+            obj.addProperty(
+                "App::PropertyFloat",
+                "ks",
+                "Soil",
+                "",
+                8,
                 )
 
         if not hasattr(obj, "height"):
@@ -87,11 +97,11 @@ class Foundation(ArchComponent.Component):
                 "Foundation",
                 )
         if not hasattr(obj, "split"):
-        	obj.addProperty(
-        		"App::PropertyBool",
-        		"split",
-        		"Mat",
-        		).split = True
+            obj.addProperty(
+                "App::PropertyBool",
+                "split",
+                "Mat",
+                ).split = True
         if not hasattr(obj, "foundation_type"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -202,6 +212,7 @@ def make_foundation(
     # load_cases : list = [],
     base_foundations : Union[list, None] = None,
     continuous_layer : str = 'AB',
+    ks : float = 2,
     ):
     from draftutils.translate import translate
     FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Make Foundation"))
@@ -221,6 +232,7 @@ def make_foundation(
         FreeCADGui.SendMsgToActiveView("ViewFit")
     obj.cover = cover
     obj.fc = f"{fc} MPa"
+    obj.ks = ks
     obj.height = height
     obj.d = height - cover
     obj.foundation_type = foundation_type

@@ -27,6 +27,7 @@ class Form:
     def accept(self):
         cover = self.form.cover.value() * 10
         fc = self.form.fc.value()
+        ks = self.form.ks.value()
         height = self.form.height_spinbox.value() * 10
         continuous_layer = self.form.continuous_layer.currentText()
         if self.form.mat.isChecked():
@@ -52,6 +53,7 @@ class Form:
             foundation_type=foundation_type,
             continuous_layer=continuous_layer,
             base_foundations=base_foundations,
+            ks=ks,
             )
         # Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
         Gui.Control.closeDialog()
