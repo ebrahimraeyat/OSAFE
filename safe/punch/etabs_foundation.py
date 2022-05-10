@@ -113,8 +113,6 @@ class Foundation(ArchComponent.Component):
                 "App::PropertyEnumeration",
                 "continuous_layer",
                 "Strip",
-                "",
-                8,
                 ).continuous_layer = ['A', 'B', 'AB']
         # if not hasattr(obj, "loadcases"):
         # 	obj.addProperty(
