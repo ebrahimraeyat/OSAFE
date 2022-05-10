@@ -714,20 +714,7 @@ def get_foundation_shape_from_base_foundations(
             # slab = make_slab(shape, height=height)
             # slabs.append(slab)
         plan = get_top_faces(shape, fuse=True)
-    
-    if FreeCAD.GuiUp:
-        for bf in base_foundations:
-            show_object(bf, False)
-            # show_object(bf.Base, False)
-        # FreeCAD.ActiveDocument.removeObject(bf.Name)
-
     return shape, outer_wire, plan, plan_without_openings
-
-def show_object(obj, show : bool):
-    if show:
-        obj.ViewObject.show()
-    else:
-        obj.ViewObject.hide()
 
 def get_common_part_of_slabs(slabs):
     if len(slabs) < 2:

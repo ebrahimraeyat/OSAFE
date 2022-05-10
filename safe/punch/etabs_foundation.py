@@ -254,9 +254,18 @@ def make_foundation(
     # for slab in obj.Slabs:
     #     if slab.Proxy.Type == "Slab":
     #         slab.fc = obj.fc
+    if FreeCAD.GuiUp:
+        for bf in base_foundations:
+            show_object(bf, False)
     FreeCAD.ActiveDocument.commitTransaction()
     FreeCAD.ActiveDocument.recompute()
     return obj
+
+def show_object(obj, show : bool = True):
+    if show:
+        obj.ViewObject.show()
+    else:
+        obj.ViewObject.hide()
 
 
 if __name__ == '__main__':
