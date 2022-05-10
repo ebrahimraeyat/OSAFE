@@ -8,8 +8,10 @@ import FreeCADGui as Gui
 
 from draftutils.messages import _msg, _err
 from draftutils.translate import translate
+from safe.punch import punch_funcs
 
 from safe.punch.rectangular_slab import make_rectangular_slab_from_base_foundation
+from safe.punch.slab import make_slab
 
 
 class ExplodeFoundation():
@@ -51,8 +53,26 @@ class ExplodeFoundation():
             return
         try:
             FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Explode Foundation"))
-            for bf in foun.base_foundations:
-                make_rectangular_slab_from_base_foundation(bf)
+            if foun.foundation_type == 'Strip':
+                for bf in foun.base_foundations:
+                    make_rectangular_slab_from_base_foundation(bf)
+            elif foun.foundation_type == 'Mat':
+                height = foun.height
+                if foun.split:
+                    solids = foun.Shape.Solids
+                    assert len(solids) == 5
+                    p0 = punch_funcs.get_top_faces(solids[0], fuse=True)
+                    p1 = punch_funcs.get_top_faces(solids[1], fuse=True)
+                    p2 = punch_funcs.get_top_faces(solids[2], fuse=True)
+                    p3 = punch_funcs.get_top_faces(solids[3], fuse=True)
+                    p4 = punch_funcs.get_top_faces(solids[4], fuse=True)
+                    make_slab(p0, height=height,fc=foun.fc, ks= 2 * foun.ks)
+                    make_slab(p1, height=height,fc=foun.fc, ks= 2 * foun.ks)
+                    make_slab(p2, height=height,fc=foun.fc, ks= 1.5 * foun.ks)
+                    make_slab(p3, height=height,fc=foun.fc, ks= 1.5 * foun.ks)
+                    make_slab(p4, height=height,fc=foun.fc, ks= foun.ks)
+                else:
+                    make_slab(foun.plan, height=height, fc=foun.fc, ks=foun.ks)
             remove_obj(foun.Name)
             FreeCAD.ActiveDocument.commitTransaction()
         except Exception:

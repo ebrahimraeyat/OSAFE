@@ -18,8 +18,13 @@ def make_slab(
     obj = doc.addObject("Part::FeaturePython", "Slab")
     Slab(obj)
     if isinstance(base, Part.Shape):
-        points = punch_funcs.get_sort_points(base.Edges)
-        base = Draft.make_wire(points, closed=True)
+        if len(base.Wires) == 1:
+            points = punch_funcs.get_sort_points(base.Edges)
+            base = Draft.make_wire(points, closed=True)
+        else:
+            base_obj = doc.addObject("Part::FeaturePython", "Base")
+            base_obj.Shape = base
+            base = base_obj
     obj.Base = base
     obj.height = height
     if ks is not None:
@@ -67,9 +72,7 @@ class Slab(ArchComponent.Component):
 
     def execute(self, obj):
         if hasattr(obj, "Base") and obj.Base:
-            wire = obj.Base.Shape.Wires[0]
-            plan = Part.Face(wire)
-            obj.Shape = plan.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
+            obj.Shape = obj.Base.Shape.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
 
 
 class ViewProviderSlab:
