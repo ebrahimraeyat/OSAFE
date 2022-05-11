@@ -12,7 +12,21 @@ class Form:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'foundation_panel.ui'))
+        self.create_connections()
         self.fill_height()
+        self.update_gui()
+
+    def create_connections(self):
+        self.form.strip.clicked.connect(self.update_gui)
+        self.form.mat.clicked.connect(self.update_gui)
+
+    def update_gui(self):
+        if self.form.strip.isChecked():
+            self.form.ks.setEnabled(False)
+            self.form.continuous_layer.setEnabled(True)
+        elif self.form.mat.isChecked():
+            self.form.ks.setEnabled(True)
+            self.form.continuous_layer.setEnabled(False)
 
     def fill_height(self):
         try:
