@@ -640,58 +640,59 @@ def get_foundation_shape_from_base_foundations(
     continuoues_dir : in Strip foundation, the strips with layer name equals to continuoues_dir get
         continuoes and other side cut with this shapes
     '''
-    if height == 0:
-        heights = [base_foundation.height.Value for base_foundation in base_foundations]
-    else:
-        heights = [height] * len(base_foundations)
-    openings_shapes = [o.Shape for o in openings]
-    points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
-    used_commons_center_point = []
     shapes = []
     outer_wire = Part.Shape()
     plan_without_openings = Part.Shape()
-    # slabs = []
-    for base_foundation, height in zip(base_foundations, heights):
-        shape = get_continuous_base_foundation_shape(
-                base_foundation,
-                points_common_shape,
-                height,
-                )
-        if foundation_type == 'Strip' and \
-            continuous_layer != 'AB' and \
-            base_foundation.layer != continuous_layer:
-            commons = base_name_common_shape.get(base_foundation.Name, None)
-            unused_common = []
-            if commons:
-                for comm in commons:
-                    for p in used_commons_center_point:
-                        if comm.BoundBox.Center.isEqual(p, 1):
-                            break
-                    else:
-                        used_commons_center_point.append(comm.BoundBox.Center)
-                        unused_common.append(comm)
-                commons = [comm.extrude(FreeCAD.Vector(0, 0, -height)) for comm in unused_common]
-                shape = shape.cut(commons)
-        if foundation_type == 'Strip' and openings:
-            shape = shape.cut(openings_shapes)
-        # strip_plan = get_top_faces(shape, fuse=True)
-        shapes.append(shape)
-        # if foundation_type == 'Strip':
-        #     slab = make_rectangular_slab_from_base_foundation(base_foundation, strip_plan)
-        #     slabs.append(slab)
-        if foundation_type == 'Strip':
-            base_foundation.extended_plan = Part.makeCompound(get_top_faces(shape))
-            # if FreeCAD.GuiUp:
-            #     base_foundation.ViewObject.Visibility = False
+    if base_foundations:
+        if height == 0:
+            heights = [base_foundation.height.Value for base_foundation in base_foundations]
+        else:
+            heights = [height] * len(base_foundations)
+        openings_shapes = [o.Shape for o in openings]
+        points_common_shape, base_name_common_shape = get_common_part_of_base_foundation(base_foundations)
+        used_commons_center_point = []
+        for base_foundation, height in zip(base_foundations, heights):
+            shape = get_continuous_base_foundation_shape(
+                    base_foundation,
+                    points_common_shape,
+                    height,
+                    )
+            if foundation_type == 'Strip' and \
+                continuous_layer != 'AB' and \
+                base_foundation.layer != continuous_layer:
+                commons = base_name_common_shape.get(base_foundation.Name, None)
+                unused_common = []
+                if commons:
+                    for comm in commons:
+                        for p in used_commons_center_point:
+                            if comm.BoundBox.Center.isEqual(p, 1):
+                                break
+                        else:
+                            used_commons_center_point.append(comm.BoundBox.Center)
+                            unused_common.append(comm)
+                    commons = [comm.extrude(FreeCAD.Vector(0, 0, -height)) for comm in unused_common]
+                    shape = shape.cut(commons)
+            if foundation_type == 'Strip' and openings:
+                shape = shape.cut(openings_shapes)
+            shapes.append(shape)
+            if foundation_type == 'Strip':
+                base_foundation.extended_plan = Part.makeCompound(get_top_faces(shape))
     if foundation_type == 'Strip' and slabs:
-        current_shape = Part.makeCompound(shapes)
-        for slab in slabs:
-            if continuous_layer != 'AB' and slab.layer != continuous_layer:
-                comm = slab.Shape.common(current_shape)
-                sh = slab.Shape.cut(comm)
-                shapes.append(sh)
-            else:
-                shapes.append(slab.Shape)
+        slabs_a = [slab.Shape for slab in slabs if slab.layer == 'A']
+        slabs_b = [slab.Shape for slab in slabs if slab.layer == 'B']
+        comp_a = Part.makeCompound(slabs_a)
+        comp_b = Part.makeCompound(slabs_b)
+        if continuous_layer != 'AB' and slabs_a and slabs_b:
+            if continuous_layer == 'A':
+                diff = comp_b.cut(comp_a)
+                shape = Part.makeCompound([comp_a, diff])
+            elif continuous_layer == 'B':
+                diff = comp_a.cut(comp_b)
+                shape = Part.makeCompound([comp_b, diff])
+            shapes.append(shape)
+        else:
+            shapes.append(comp_a)
+            shapes.append(comp_b)
     if len(shapes) > 1:
         strip_shape = shapes[0].fuse(shapes[1:])
         strip_shape = strip_shape.removeSplitter()
@@ -710,22 +711,18 @@ def get_foundation_shape_from_base_foundations(
                 shape = face.extrude(FreeCAD.Vector(0, 0, -height))
                 if openings:
                     shape = shape.cut(openings_shapes)
-                # top_face = get_top_faces(shape, fuse=True)
-                # slab = make_slab(top_face, height=height)
-                # slabs.append(slab)
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
-            # if slabs:
-            #     for slab in slabs:
-            #         shape = slab.Shape.cut()
         else:
             shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
                 shape = shape.cut(openings_shapes)
-            # top_face = get_top_faces(shape, fuse=True)
-            # slab = make_slab(shape, height=height)
-            # slabs.append(slab)
         plan = get_top_faces(shape, fuse=True)
+    if slabs:
+        mat_slabs_shapes = [slab.Shape for slab in slabs if not hasattr(slab, 'layer')]
+        if mat_slabs_shapes:
+            shape = shape.fuse(mat_slabs_shapes)
+            shape = shape.removeSplitter()
     return shape, outer_wire, plan, plan_without_openings
 
 def get_common_part_of_slabs(slabs):

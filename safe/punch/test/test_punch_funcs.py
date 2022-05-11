@@ -294,6 +294,17 @@ def test_get_foundation_shape_from_base_foundations_mat():
     shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, foundation_type='Mat')
     # assert len(edges) == 20
 
+def test_get_foundation_shape_from_base_foundations_with_slabs():
+    bfs = []
+    slabs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type'):
+            if o.Proxy.Type == 'BaseFoundation':
+                bfs.append(o)
+            if o.Proxy.Type == 'RectangularSlab':
+                slabs.append(o)
+    shape = punch_funcs.get_foundation_shape_from_base_foundations(bfs, slabs=slabs)
+
 def test_get_coordinate_and_width_between():
     coords_width = punch_funcs.get_coordinate_and_width_between(1, 10, .7, False)
     assert len(coords_width) == 12
