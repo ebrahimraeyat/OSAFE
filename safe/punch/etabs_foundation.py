@@ -213,6 +213,7 @@ def make_foundation(
     base_foundations : Union[list, None] = None,
     continuous_layer : str = 'AB',
     ks : float = 2,
+    openings : list = [],
     ):
     from draftutils.translate import translate
     FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Make Foundation"))
@@ -244,6 +245,7 @@ def make_foundation(
     obj.level = base_foundations[0].Base.Placement.Base.z
     obj.base_foundations = base_foundations
     obj.continuous_layer = continuous_layer
+    obj.openings = openings
     # obj.shape, obj.outer_wire, obj.plan, obj.plan_without_openings = punch_funcs.get_foundation_shape_from_base_foundations(
     #             base_foundations,
     #             height = obj.height.Value,

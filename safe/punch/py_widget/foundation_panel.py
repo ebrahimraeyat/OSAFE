@@ -49,16 +49,21 @@ class Form:
         elif self.form.strip.isChecked():
             foundation_type = 'Strip'
         base_foundations = []
+        openings = []
         if self.form.selection_only.isChecked():
             sel = Gui.Selection.getSelection()
             if sel:
                 for o in sel:
                     if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                         base_foundations.append(o)
+                    elif hasattr(o, "IfcType") and o.IfcType == "Opening Element":
+                        openings.append(o)
         if not base_foundations:
             for o in FreeCAD.ActiveDocument.Objects:
                 if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                     base_foundations.append(o)
+                elif hasattr(o, "IfcType") and o.IfcType == "Opening Element":
+                    openings.append(o)
         from safe.punch.etabs_foundation import make_foundation
         make_foundation(
             cover=cover,
@@ -68,6 +73,7 @@ class Form:
             continuous_layer=continuous_layer,
             base_foundations=base_foundations,
             ks=ks,
+            openings=openings,
             )
         # Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
         Gui.Control.closeDialog()
