@@ -48,7 +48,7 @@ def make_safe_f2k(
     obj = FreeCAD.ActiveDocument.addObject("App::FeaturePython", "Safe")
     SafeF2k(obj)
     obj.input = input
-    if not output is None:
+    if output is not None:
         obj.output = output
     if FreeCAD.GuiUp:
         ViewProviderF2k(obj.ViewObject)
