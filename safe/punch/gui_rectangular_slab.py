@@ -158,7 +158,7 @@ class RectangularSlab(gui_lines.Line):
             # to be committed through the `draftutils.todo.ToDo` class.
             try:
                 FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Rectangular Slab"))
-                wire = Draft.make_wire(self.node)
+                wire = Draft.make_wire(self.node, face=False)
                 FreeCAD.ActiveDocument.recompute()
                 make_rectangular_slab(wire, self.layer, self.rec_width, self.rec_height, soil_modulus, f'{fc} MPa', self.rec_align, self.rec_left_width, self.rec_right_width)
                 FreeCAD.ActiveDocument.commitTransaction()
