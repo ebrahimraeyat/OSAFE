@@ -31,7 +31,7 @@ class Punch:
 
     def Activated(self):
         def is_foundation_type(obj):
-            if hasattr(obj, 'IfcType') and obj.IfcType == 'Footing':
+            if hasattr(obj, 'Proxy') and hasattr(obj.Proxy, 'Type') and obj.Proxy.Type == 'Foundation':
                 return True
             return False
 
