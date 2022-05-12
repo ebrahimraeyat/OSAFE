@@ -66,8 +66,8 @@ class WireFrameView:
                     show_obj = show_arch_wall
                 elif obj.IfcType == 'Footing':
                     show_obj = not wireframe
-            elif obj.Label.startswith('W') and hasattr(obj,'MakeFace'):
-                show_obj = show_face
+            # elif obj.Label.startswith('W') and hasattr(obj,'MakeFace'):
+            #     show_obj = show_face
             elif obj.Label.endswith('CenterLine'):
                 if obj.Label.startswith('B'):
                     show_obj = show_beam and wireframe
@@ -81,6 +81,11 @@ class WireFrameView:
                     show_obj = not wireframe
                 elif obj.Proxy.Type == 'Beam':
                     show_obj = True
+                elif obj.Proxy.Type == 'Wire':
+                    if hasattr(obj, 'MakeFace') and obj.MakeFace == True:
+                        show_obj = True
+                    else:
+                        show_obj = wireframe
             show_object(obj, show_obj)
         FreeCAD.ActiveDocument.recompute()
 

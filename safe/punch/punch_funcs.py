@@ -962,7 +962,7 @@ def make_automatic_base_foundation(
         else:
             layer = y_stirp_name
         points = get_sort_points(edges, get_last=True, sort_edges=False)
-        wire = Draft.make_wire(points)
+        wire = Draft.make_wire(points, face=False)
         strip = make_base_foundation(wire, layer, width, height, soil_modulus)
         strips.append(strip)
     for beam in beams:

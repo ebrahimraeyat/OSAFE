@@ -680,7 +680,7 @@ assign_list = [
 edit_list = [
             "Draft_Move",
             "Draft_Edit",
-            # "Draft_Trimex",
+            "Draft_Trimex",
             "Draft_Join",
             "Draft_Split",
             # "Draft_Scale",
