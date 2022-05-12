@@ -49,6 +49,7 @@ def make_base_foundation(
 class BaseFoundation(ArchComponent.Component):
     def __init__(self, obj):
         super().__init__(obj)
+        obj.IfcType = "Footing"
         self.set_properties(obj)
 
     def set_properties(self, obj):

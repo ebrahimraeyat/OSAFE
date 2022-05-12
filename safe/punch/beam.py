@@ -23,11 +23,11 @@ def make_beam(p1, p2):
 
 class Beam:
     def __init__(self, obj):
-        obj.Proxy = self
-        self.Type = "Beam"
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        obj.Proxy = self
+        self.Type = "Beam"
         if not hasattr(obj, "start_point"):
             obj.addProperty(
             "App::PropertyVector",
