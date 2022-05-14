@@ -695,7 +695,8 @@ edit_list = [
 
 view_list = [
             "Separator",
-            "osafe_wireframe_views",
+            # "osafe_wireframe_views",
+            "OSAFE_view_group",
             ]
 
 # draw_command_list = [

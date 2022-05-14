@@ -32,11 +32,11 @@ def make_strip(
 
 class Strip:
     def __init__(self, obj):
-        obj.Proxy = self
-        self.Type = "Strip"
         self.set_properties(obj)
 
     def set_properties(self, obj):
+        obj.Proxy = self
+        self.Type = "Strip"
         if not hasattr(obj, "points"):
             obj.addProperty(
                 "App::PropertyVectorList",
@@ -119,6 +119,11 @@ class Strip:
             obj.Shape = Part.makeCompound([shape, wire])
         else:
             obj.Shape = wire
+
+    def onDocumentRestored(self, obj):
+        # super().onDocumentRestored(obj)
+        self.set_properties(obj)
+
 
 
 class ViewProviderStrip:

@@ -102,8 +102,8 @@ class RectangularSlab(ArchComponent.Component):
         self.set_properties(obj)
 
     def set_properties(self, obj):
-        self.Type = "RectangularSlab"
         obj.Proxy = self
+        self.Type = "RectangularSlab"
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -226,6 +226,10 @@ class RectangularSlab(ArchComponent.Component):
             obj.ViewObject.PointColor = color
             obj.ViewObject.LineWidth = 1.00
             obj.ViewObject.PointSize = 1.00
+
+    def onDocumentRestored(self, obj):
+        super().onDocumentRestored(obj)
+        self.set_properties(obj)
 
 class ViewProviderRectangularSlab:
     def __init__(self, vobj):
