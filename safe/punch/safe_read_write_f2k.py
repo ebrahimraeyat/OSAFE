@@ -79,13 +79,13 @@ class Safe():
     def is_point_exist(self,
             coordinate : list,
             content : Union[str, bool] = None,
-            points_coordiantes : Union[bool, dict] = None,
+            points_coordinates : Union[bool, dict] = None,
             ):
-        if points_coordiantes is None:
+        if points_coordinates is None:
             points_coordinates = self.get_points_coordinates(content)
-        for id, coord in points_coordinates.items():
+        for _id, coord in points_coordinates.items():
             if coord == coordinate:
-                return id
+                return _id
         return None
                     
     def add_content_to_table(self, table_key, content, append=True):
@@ -658,9 +658,9 @@ class FreecadReadwriteModel():
             point = punch.center_of_load
             coord = [coord * scale_factor for coord in (point.x, point.y, point.z)]
             point_name = self.safe.is_point_exist(
-                coordinates=coord,
+                coordinate=coord,
                 content=None,
-                points_coordiantes=points_coordinates,
+                points_coordinates=points_coordinates,
                 )
             if point_name is None:
                 continue
