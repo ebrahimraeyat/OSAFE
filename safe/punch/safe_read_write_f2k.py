@@ -79,8 +79,10 @@ class Safe():
     def is_point_exist(self,
             coordinate : list,
             content : Union[str, bool] = None,
+            points_coordiantes : Union[bool, dict] = None,
             ):
-        points_coordinates = self.get_points_coordinates(content)
+        if points_coordiantes is None:
+            points_coordinates = self.get_points_coordinates(content)
         for id, coord in points_coordinates.items():
             if coord == coordinate:
                 return id
@@ -313,6 +315,7 @@ class FreecadReadwriteModel():
         foun = self.doc.Foundation
         # creating concrete material
         mat_name = self.create_concrete_material(foun=foun)
+        mat_names = [mat_name]
         soil_assignment_content = ''
         all_slab_names = []
         soil_names = []
@@ -396,6 +399,45 @@ class FreecadReadwriteModel():
                     soil_name=soil_name,
                     soil_modulus=None,
                 )
+        for slab in foun.Slabs:
+            # create concrete
+            fc_mpa = int(slab.fc.getValueAs("MPa"))
+            mat_name = f'C{fc_mpa}'
+            if mat_name not in mat_names:
+                self.create_concrete_material(mat_name=mat_name, fc_mpa=fc_mpa)
+                mat_names.append(mat_name)
+            # create slab section
+            height_name = int(slab.height.getValueAs('cm'))
+            height = int(slab.height.getValueAs(f'{self.length_unit}'))
+            slab_sec_name = f'SLAB{height_name}'
+            if slab_sec_name not in slab_sec_names:
+                # define slab
+                self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
+                slab_sec_names.append(slab_sec_name)
+            # create soil
+            ks_name = f"{slab.ks:.2f}"
+            ks = slab.ks
+            soil_name = f'Soil_{ks_name}'
+            if soil_name not in soil_names:
+                # soil content
+                names_props.append((soil_name, ks))
+                soil_names.append(soil_name)
+            if hasattr(slab, 'plan'):
+                faces = slab.plan.Shape.Faces
+            elif hasattr(slab, 'Base'):
+                faces = slab.Base.Shape.Faces
+            slab_names = []
+            for face in faces:
+                points = self.get_sort_points(face.Edges)
+                name = self.create_area_by_coord(points, slab_sec_name)
+                slab_names.append(name)
+            all_slab_names.extend(slab_names)
+            soil_assignment_content +=  self.export_freecad_soil_support(
+                slab_names=slab_names,
+                soil_name=soil_name,
+                soil_modulus=None,
+            )
+
         soil_content = self.create_soil_table(names_props)
         table_key = "SOIL PROPERTIES"
         self.safe.add_content_to_table(table_key, soil_content)
@@ -608,15 +650,27 @@ class FreecadReadwriteModel():
         punch_general_content = ''
         punch_perimeter_content = ''
         scale = self.safe.length_units['mm']
+        point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
+        curr_point_content = self.safe.tables_contents.get(point_coords_table_key, '')
+        points_coordinates = self.safe.get_points_coordinates(curr_point_content)
+        scale_factor = self.safe.length_units['mm']
         for punch in punches:
-            id_ = punch.id
+            point = punch.center_of_load
+            coord = [coord * scale_factor for coord in (point.x, point.y, point.z)]
+            point_name = self.safe.is_point_exist(
+                coordinates=coord,
+                content=None,
+                points_coordiantes=points_coordinates,
+                )
+            if point_name is None:
+                continue
             loc = punch.Location
             depth = punch.d * scale
-            punch_general_content += f'\tPoint={id_}   Check="Program Determined"   LocType="{loc}"   Perimeter="User Perimeter"   EffDepth=User   UserDepth={depth}   Openings=User   ReinfType=None\n'
+            punch_general_content += f'\tPoint={point_name}   Check="Program Determined"   LocType="{loc}"   Perimeter="User Perimeter"   EffDepth=User   UserDepth={depth}   Openings=User   ReinfType=None\n'
             nulls, null_points = punch_funcs.punch_null_points(punch)
             for i, (point, is_null) in enumerate(zip(null_points, nulls), start=1):
                 x, y = point.x * scale, point.y * scale
-                punch_perimeter_content += f'\tPoint={id_}   PointNum={i}   X={x}   Y={y}   Radius=0   IsNull={is_null}\n'
+                punch_perimeter_content += f'\tPoint={point_name}   PointNum={i}   X={x}   Y={y}   Radius=0   IsNull={is_null}\n'
 
         punch_general_table_key = "PUNCHING SHEAR DESIGN OVERWRITES 01 - GENERAL"
         punch_perimeter_table_key = "PUNCHING SHEAR DESIGN OVERWRITES 02 - USER PERIMETER"
