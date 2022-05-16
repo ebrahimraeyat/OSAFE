@@ -267,6 +267,21 @@ class OSAFEViewGroupCommand:
                                 plan = obj.plan
                                 show_object(plan, (show_slab and wireframe))
                                 reviwed_object.append(plan.Name)
+                elif (
+                    hasattr(obj, 'Proxy') and 
+                    hasattr(obj.Proxy, 'Type') and
+                    obj.Proxy.Type == "Strip"
+                    ):
+                    if obj.layer == "A":
+                        show_obj = show_design_layer_a and not wireframe
+                        base = obj.Base
+                        show_object(base, (show_design_layer_a and wireframe))
+                        reviwed_object.append(base.Name)
+                    elif obj.layer == "B":
+                        show_obj = show_design_layer_b and not wireframe
+                        base = obj.Base
+                        show_object(base, (show_design_layer_b and wireframe))
+                        reviwed_object.append(base.Name)
                     # else:
                     #     show_obj = show_slab and not wireframe
             elif obj.Label.endswith("CenterLine"):
@@ -287,11 +302,11 @@ class OSAFEViewGroupCommand:
                     for c in obj.ViewObject.claimChildren():
                         show_object(c, show_punch)
                         reviwed_object.append(c.Name)
-                elif obj.Proxy.Type == "Strip":
-                    if obj.layer == "A":
-                        show_obj = show_design_layer_a
-                    elif obj.layer == "B":
-                        show_obj = show_design_layer_b
+                # elif obj.Proxy.Type == "Strip":
+                #     if obj.layer == "A":
+                #         show_obj = show_design_layer_a
+                #     elif obj.layer == "B":
+                #         show_obj = show_design_layer_b
 
             show_object(obj, show_obj)
 

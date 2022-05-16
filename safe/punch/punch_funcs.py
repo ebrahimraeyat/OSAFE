@@ -1366,7 +1366,8 @@ def draw_strip_automatically_in_mat_foundation(
                 if width is not None:
                     i += 1
                     points = [v.Point for v in edge.Vertexes]
-                    s = strip.make_strip(points, layer=x_layer_name, width=width)
+                    wire = Draft.make_wire(points, face=False)
+                    s = strip.make_strip(wire, layer=x_layer_name, width=width)
                     s.Label = f'CS{x_layer_name}{i}'
                     x_strips.addObject(s)
     if draw_y:
@@ -1385,7 +1386,8 @@ def draw_strip_automatically_in_mat_foundation(
                 if width is not None:
                     j += 1
                     points = [v.Point for v in edge.Vertexes]
-                    s = strip.make_strip(points, layer=y_layer_name, width=width)
+                    wire = Draft.make_wire(points, face=False)
+                    s = strip.make_strip(wire, layer=y_layer_name, width=width)
                     s.Label = f'CS{y_layer_name}{j}'
                     y_strips.addObject(s)
 
@@ -1422,8 +1424,9 @@ def draw_strip_automatically_in_strip_foundation(
                 points.remove(points[1])
             if not base_foundation.last_edge.isNull():
                 points.remove(points[-2])
+        wire = Draft.make_wire(points, face=False)
         s = strip.make_strip(
-                            points,
+                            wire,
                             layer=layer, 
                             width=base_foundation.width.Value,
                             left_width=base_foundation.left_width.Value,

@@ -339,7 +339,7 @@ class FreecadReadwriteModel():
                     # soil content
                     names_props.append((soil_name, ks))
                     soil_names.append(soil_name)
-                faces = base_foundation.plan.Faces
+                faces = base_foundation.extended_plan.Faces
                 slab_names = []
                 for face in faces:
                     points = self.get_sort_points(face.Edges)
@@ -543,7 +543,7 @@ class FreecadReadwriteModel():
                     o.Proxy.Type == 'Strip':
                 layer = o.layer
                 strip_name = o.Label
-                points = o.points
+                points = o.Base.Points
                 sl = o.left_width.Value
                 sr = o.right_width.Value
                 swl = ewl = sl * scale_factor

@@ -1,13 +1,14 @@
 from pathlib import Path
-from typing import Union
-from PySide2 import QtCore
+# from typing import Union
+# from PySide2 import QtCore
 import FreeCAD
 import Part
+import ArchComponent
 from safe.punch import punch_funcs
 
 
 def make_strip(
-        points : list,
+        base,
         layer : str = 'A',
         design_type : str = 'column',
         width : float = 1000,
@@ -17,32 +18,42 @@ def make_strip(
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
     Strip(obj)
-    obj.points = points
+    obj.Base = base
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
-    obj.left_width = left_width
-    obj.right_width = right_width
+    if align == 'Left':
+        obj.left_width = left_width
+        obj.right_width = width - left_width
+    elif align == 'Right':
+        obj.right_width = right_width
+        obj.left_width = width - right_width
+    elif align == 'Center':
+        obj.left_width = obj.right_width = obj.width / 2
     obj.align = align
     if FreeCAD.GuiUp:
-        ViewProviderStrip(obj.ViewObject)
+        vobj = obj.ViewObject
+        ViewProviderStrip(vobj)
+        vobj.Transparency = 80
+        vobj.DisplayMode = "Flat Lines"
     FreeCAD.ActiveDocument.recompute()
     return obj
 
 
-class Strip:
+class Strip(ArchComponent.Component):
     def __init__(self, obj):
+        super().__init__(obj)
         self.set_properties(obj)
 
     def set_properties(self, obj):
         obj.Proxy = self
         self.Type = "Strip"
-        if not hasattr(obj, "points"):
-            obj.addProperty(
-                "App::PropertyVectorList",
-                "points",
-                "Strip",
-                )
+        # if not hasattr(obj, "points"):
+        #     obj.addProperty(
+        #         "App::PropertyVectorList",
+        #         "points",
+        #         "Strip",
+        #         )
         if not hasattr(obj, "layer"):
             obj.addProperty(
                 "App::PropertyEnumeration",
@@ -85,43 +96,34 @@ class Strip:
                 "plan",
                 "Geometry",
                 )
-        if not hasattr(obj, 'show_width'):
-            obj.addProperty(
-                "App::PropertyBool",
-                'show_width',
-                'Strip',
-            ).show_width = True
 
     def execute(self, obj):
         if obj.width.Value == 0:
             return
-        if obj.layer == 'A':
-            obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (1.00,0.00,0.20)
-        elif obj.layer == 'B':
-            obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (0.20,0.00,1.00)
-        elif obj.layer == 'other':
-            obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (0.20,1.00,0.00)
         if obj.align == 'Left':
             sl = obj.left_width.Value
             sr = obj.width.Value - sl
-            obj.right_width.Value = sr
+            obj.right_width = sr
         elif obj.align == 'Right':
             sr = obj.right_width.Value
             sl = obj.width.Value - sr
-            obj.left_width.Value = sl
+            obj.left_width = sl
         elif obj.align == 'Center':
             sr = sl = obj.width.Value / 2
-            obj.left_width.Value = sl
-            obj.right_width.Value = sr
-        wire = Part.makePolygon(obj.points)
-        if obj.show_width:
-            shape, left_wire, right_wire = punch_funcs.get_left_right_offset_wire_and_shape(wire, sl, sr)
-            obj.Shape = Part.makeCompound([shape, wire])
-        else:
-            obj.Shape = wire
+            obj.left_width = sl
+            obj.right_width = sr
+        shape, _, _ = punch_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, sl, sr)
+        obj.Shape = shape
+        if FreeCAD.GuiUp:
+            if obj.layer == 'A':
+                obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (1.00,0.00,0.20)
+            elif obj.layer == 'B':
+                obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (0.20,0.00,1.00)
+            elif obj.layer == 'other':
+                obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (0.20,1.00,0.00)
 
     def onDocumentRestored(self, obj):
-        # super().onDocumentRestored(obj)
+        super().onDocumentRestored(obj)
         self.set_properties(obj)
 
 
@@ -129,8 +131,6 @@ class Strip:
 class ViewProviderStrip:
     def __init__(self, vobj):
         vobj.Proxy = self
-        vobj.Transparency = 80
-        vobj.DisplayMode = "Flat Lines"
 
     def attach(self, vobj):
         self.ViewObject = vobj
@@ -144,6 +144,9 @@ class ViewProviderStrip:
 
     def __setstate__(self, state):
         return None
+
+    def claimChildren(self):
+        return [FreeCAD.ActiveDocument.getObject(self.Object.Base.Name)]
 
     # def onDelete(self, vobj, subelements):
     #     for o in FreeCAD.ActiveDocument.Objects:
@@ -160,10 +163,11 @@ if __name__ == "__main__":
     p1 = FreeCAD.Vector(0, 0, 0)
     p2 = FreeCAD.Vector(1000, 0, 0)
     p3 = FreeCAD.Vector(3000, 2000, 0)
+    import Draft
+    wire = Draft.make_wire([p1, p2, p3])
+    FreeCAD.ActiveDocument.recompute()
     # b1 = make_beam(p1, p2)
     # b2 = make_beam(p2, p3)
     make_strip(
-            points=[p1, p2, p3],
-            layer='other',
-            design_type='column',
+            wire,
             )
