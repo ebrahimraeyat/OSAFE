@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from numpy import void
 import Part
 import FreeCAD
+from safe.punch import punch_funcs
 
 
 def make_beam(p1, p2):
@@ -11,12 +11,16 @@ def make_beam(p1, p2):
     obj.start_point = p1
     obj.end_point = p2
     if FreeCAD.GuiUp:
-        vobj = obj.ViewObject
-        ViewProviderBeam(vobj)
-        vobj.LineWidth = 3
-        vobj.PointSize = 6
-        vobj.LineColor = (1., 1., 0.)
-        vobj.PointColor = (1., 1., 0.)
+        ViewProviderBeam(obj.ViewObject)
+        punch_funcs.format_view_object(
+            obj=obj,
+            shape_color_entity="beam_shape_color",
+            line_width_entity="beam_line_width",
+            transparency_entity="beam_transparency",
+            display_mode_entity="beam_display_mode",
+            line_color_entity="beam_line_color",
+            )
+        obj.ViewObject.PointSize = 6
     FreeCAD.ActiveDocument.recompute()
     return obj
 

@@ -1,0 +1,1509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Gui::Dialog::DlgSettingsOSAFE</class>
+ <widget class="QWidget" name="Gui::Dialog::DlgSettingsOSAFE">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>654</width>
+    <height>715</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Settings</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_7">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Display</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="beam_line_width">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>beam_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_24">
+         <property name="text">
+          <string>Shape</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="beam_transparency">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>beam_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="5">
+        <widget class="QLabel" name="label_47">
+         <property name="text">
+          <string>Display Mode</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="Gui::PrefColorButton" name="column_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>0</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>column_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3" rowspan="2" colspan="2">
+        <widget class="QLabel" name="label_38">
+         <property name="text">
+          <string>Line Width</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="Gui::PrefColorButton" name="beam_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>255</green>
+           <blue>0</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>beam_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="Gui::PrefColorButton" name="column_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>0</red>
+           <green>255</green>
+           <blue>0</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>column_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="column_transparency">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>20.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>column_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="5">
+        <widget class="Gui::PrefComboBox" name="column_display_mode">
+         <property name="currentIndex">
+          <number>2</number>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>column_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QLabel" name="label_46">
+         <property name="text">
+          <string>Line</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Beam</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="Gui::PrefColorButton" name="beam_shape_color">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>beam_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>Column</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4">
+        <widget class="QLabel" name="label_25">
+         <property name="text">
+          <string>Transparency</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="column_line_width">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>column_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5">
+        <widget class="Gui::PrefComboBox" name="beam_display_mode">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>beam_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="7" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="slab_a_line_width">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>2.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_a_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="Gui::PrefColorButton" name="foundation_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>foundation_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_27">
+         <property name="text">
+          <string>Slab B</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="Gui::PrefColorButton" name="slab_b_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>0</red>
+           <green>175</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_b_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="slab_b_transparency">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_b_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="Gui::PrefColorButton" name="base_foundation_b_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>50</red>
+           <green>0</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_b_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="Gui::PrefColorButton" name="slab_a_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>125</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_a_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="Gui::PrefColorButton" name="base_foundation_a_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>50</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_a_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="Gui::PrefColorButton" name="base_foundation_b_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>50</red>
+           <green>0</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_b_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="slab_a_transparency">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_a_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="5">
+        <widget class="Gui::PrefComboBox" name="slab_b_display_mode">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_b_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_28">
+         <property name="text">
+          <string>Design Layer A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="base_foundation_b_line_width">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>2.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_b_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="Gui::PrefColorButton" name="slab_b_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>0</red>
+           <green>175</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_b_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="Gui::PrefColorButton" name="design_layer_a_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>50</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_a_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Base Foundation A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="foundation_line_width">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>foundation_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="Gui::PrefColorButton" name="base_foundation_a_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>50</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_a_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="base_foundation_a_transparency">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>80.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_a_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="base_foundation_b_transparency">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_b_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="Gui::PrefColorButton" name="foundation_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>34</red>
+           <green>255</green>
+           <blue>126</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>foundation_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="base_foundation_a_line_width">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_a_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="5">
+        <widget class="Gui::PrefComboBox" name="foundation_display_mode">
+         <property name="prefEntry" stdset="0">
+          <cstring>foundation_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>Base Foundation B</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
+          <string>Foundation</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_26">
+         <property name="text">
+          <string>Slab A</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="5">
+        <widget class="Gui::PrefComboBox" name="base_foundation_b_display_mode">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_b_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="Gui::PrefColorButton" name="slab_a_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>125</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_a_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="5">
+        <widget class="Gui::PrefComboBox" name="slab_a_display_mode">
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_a_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="8" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="slab_b_line_width">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>2.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>slab_b_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="5">
+        <widget class="Gui::PrefComboBox" name="base_foundation_a_display_mode">
+         <property name="prefEntry" stdset="0">
+          <cstring>base_foundation_a_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="6" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="foundation_transparency">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>20.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>foundation_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="design_layer_b_transparency">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_b_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="4">
+        <widget class="Gui::PrefDoubleSpinBox" name="design_layer_a_transparency">
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>80.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_a_transparency</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="5">
+        <widget class="Gui::PrefComboBox" name="design_layer_b_display_mode">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_b_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="10" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="design_layer_b_line_width">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>2.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_b_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="2">
+        <widget class="Gui::PrefColorButton" name="design_layer_a_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>255</red>
+           <green>0</green>
+           <blue>50</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_a_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="Gui::PrefColorButton" name="design_layer_b_shape_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>50</red>
+           <green>0</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_b_shape_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="5">
+        <widget class="Gui::PrefComboBox" name="design_layer_a_display_mode">
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_a_display_mode</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+         <item>
+          <property name="text">
+           <string>Flat Lines</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Shaded</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Wireframe</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_29">
+         <property name="text">
+          <string>Design Layer B</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="3">
+        <widget class="Gui::PrefDoubleSpinBox" name="design_layer_a_line_width">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>7.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="value">
+          <double>2.000000000000000</double>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_a_line_width</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2">
+        <widget class="Gui::PrefColorButton" name="design_layer_b_line_color">
+         <property name="color" stdset="0">
+          <color>
+           <red>50</red>
+           <green>0</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>design_layer_b_line_color</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/OSAFE</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="1">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Punch</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="Gui::PrefCheckBox" name="checkBox_2">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Apply ACI 2019</string>
+         </property>
+         <property name="prefEntry" stdset="0">
+          <cstring>apply_aci2019</cstring>
+         </property>
+         <property name="prefPath" stdset="0">
+          <cstring>Mod/Civil</cstring>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Export picture extension</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="Gui::PrefComboBox" name="picture_ext">
+           <property name="prefEntry" stdset="0">
+            <cstring>picture_ext</cstring>
+           </property>
+           <property name="prefPath" stdset="0">
+            <cstring>Mod/Civil</cstring>
+           </property>
+           <item>
+            <property name="text">
+             <string>png</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>jpg</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>pdf</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Grid Lines</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="Gui::PrefCheckBox" name="checkBox">
+            <property name="text">
+             <string>Draw Grids</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="prefEntry" stdset="0">
+             <cstring>draw_grid</cstring>
+            </property>
+            <property name="prefPath" stdset="0">
+             <cstring>Mod/Civil</cstring>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="Gui::PrefCheckBox" name="extend_grid">
+            <property name="text">
+             <string>extended Grid lines</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="prefEntry" stdset="0">
+             <cstring>extend_grid</cstring>
+            </property>
+            <property name="prefPath" stdset="0">
+             <cstring>Mod/Civil</cstring>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Punch</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Ratio Tolerance</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="Gui::PrefDoubleSpinBox" name="doubleSpinBox">
+              <property name="maximum">
+               <double>20.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="prefEntry" stdset="0">
+               <cstring>RatioTolerance</cstring>
+              </property>
+              <property name="prefPath" stdset="0">
+               <cstring>Mod/Civil</cstring>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>color above Ratio Tolerance</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="Gui::PrefColorButton" name="above_ration_color">
+              <property name="color" stdset="0">
+               <color>
+                <red>255</red>
+                <green>0</green>
+                <blue>0</blue>
+               </color>
+              </property>
+              <property name="prefEntry" stdset="0">
+               <cstring>Ratio_above_color</cstring>
+              </property>
+              <property name="prefPath" stdset="0">
+               <cstring>Mod/Civil</cstring>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_4">
+              <property name="text">
+               <string>color below Ratio Tolerance</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="Gui::PrefColorButton" name="below_ration_color">
+              <property name="color" stdset="0">
+               <color>
+                <red>0</red>
+                <green>255</green>
+                <blue>0</blue>
+               </color>
+              </property>
+              <property name="prefEntry" stdset="0">
+               <cstring>Ratio_below_color</cstring>
+              </property>
+              <property name="prefPath" stdset="0">
+               <cstring>Mod/Civil</cstring>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="Gui::PrefCheckBox" name="is_text_color">
+              <property name="text">
+               <string>Text color</string>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="prefEntry" stdset="0">
+               <cstring>is_text_color</cstring>
+              </property>
+              <property name="prefPath" stdset="0">
+               <cstring>Mod/Civil</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="Gui::PrefColorButton" name="text_color">
+              <property name="color" stdset="0">
+               <color>
+                <red>0</red>
+                <green>0</green>
+                <blue>0</blue>
+               </color>
+              </property>
+              <property name="prefEntry" stdset="0">
+               <cstring>text_color</cstring>
+              </property>
+              <property name="prefPath" stdset="0">
+               <cstring>Mod/Civil</cstring>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="Gui::PrefCheckBox" name="show_at_startup">
+     <property name="text">
+      <string>Show at Startup</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="prefEntry" stdset="0">
+      <cstring>show_at_startup</cstring>
+     </property>
+     <property name="prefPath" stdset="0">
+      <cstring>Mod/OSAFE</cstring>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>Gui::ColorButton</class>
+   <extends>QPushButton</extends>
+   <header>Gui/Widgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Gui::PrefColorButton</class>
+   <extends>Gui::ColorButton</extends>
+   <header>Gui/PrefWidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Gui::PrefCheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>Gui/PrefWidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Gui::PrefComboBox</class>
+   <extends>QComboBox</extends>
+   <header>Gui/PrefWidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>Gui::PrefDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>Gui/PrefWidgets.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

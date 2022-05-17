@@ -1475,3 +1475,64 @@ def get_sorted_points(
         else:
             points.append(v)
     return points
+
+def get_color(param, pref_intity, color=674321151):
+    c = param.GetUnsigned(pref_intity, color)
+    r = float((c >> 24) & 0xFF) / 255.0
+    g = float((c >> 16) & 0xFF) / 255.0
+    b = float((c >> 8) & 0xFF) / 255.0
+    return (r, g, b)
+
+def get_display_mode(param, pref_intity, number=0):
+    n = param.GetInt(pref_intity, number)
+    return {
+        0: 'Flat Lines',
+        1: 'Shaded',
+        2: 'Wireframe',
+        }[n]
+
+def format_view_object(
+    obj,
+    shape_color_entity: str,
+    line_width_entity: str = 'aaaaa',
+    transparency_entity: str = 'aaaaa',
+    display_mode_entity: str = 'aaaaa',
+    point_size_entity: str = 'aaaaa',
+    line_color_entity: Union[bool, str] = None,
+    point_color_entity: Union[bool, str] = None,
+    ):
+    if FreeCAD.GuiUp:
+        param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
+        shape_color = get_color(
+            param=param,
+            pref_intity=shape_color_entity,
+            )
+        display_mode = get_display_mode(
+            param=param,
+            pref_intity=display_mode_entity,
+            )
+        line_width = param.GetFloat(line_width_entity, 1.0)
+        point_size = param.GetFloat(point_size_entity, 1.0)
+        transparency = int(param.GetFloat(transparency_entity, 0))
+        if line_color_entity is None:
+            line_color = shape_color
+        else:
+            line_color = get_color(
+                param=param,
+                pref_intity=line_color_entity,
+                )
+        if point_color_entity is None:
+            point_color = line_color
+        else:
+            point_color = get_color(
+                param=param,
+                pref_intity=point_color_entity,
+                )
+
+        obj.ViewObject.LineWidth = line_width
+        obj.ViewObject.PointSize = point_size
+        obj.ViewObject.DisplayMode = display_mode
+        obj.ViewObject.ShapeColor = shape_color
+        obj.ViewObject.LineColor = line_color
+        obj.ViewObject.PointColor = point_color
+        obj.ViewObject.Transparency = transparency

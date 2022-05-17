@@ -35,8 +35,8 @@ class CivilWorkbench(Workbench):
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Edit")), edit_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&View")), view_list)
 
-        pref_visual_ui_abs_path = str(Path(civilGui.__file__).parent.absolute() / 'ui' / 'preferences-punch_visual.ui')
-        Gui.addPreferencePage(pref_visual_ui_abs_path, "punch")
+        pref_visual_ui_abs_path = str(Path(civilGui.__file__).parent.absolute() / 'ui' / 'preferences-OSAFE_visual.ui')
+        Gui.addPreferencePage(pref_visual_ui_abs_path, "OSAFE")
         Gui.addIconPath(
             str(
                 Path(civilGui.__file__).parent.absolute()
@@ -45,13 +45,15 @@ class CivilWorkbench(Workbench):
             )
 
     def Activated(self):
-        # if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("FirstTime", True):
         #     from DraftGui import todo
         #     todo.delay(Gui.runCommand, "Civil_welcome")
 
         from DraftGui import todo
         import osafe_statusbar
         todo.delay(osafe_statusbar.setStatusIcons, True)
+
+        if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("show_at_startup", True):
+            Gui.showPreferences("OSAFE", 0)
 
     def Deactivated(self):
 

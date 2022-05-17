@@ -40,8 +40,6 @@ def make_base_foundation(
     if FreeCAD.GuiUp:
         vobj = obj.ViewObject
         ViewProviderBaseFoundation(vobj)
-        vobj.Transparency = 80
-        vobj.DisplayMode = "Flat Lines"
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -174,18 +172,36 @@ class BaseFoundation(ArchComponent.Component):
         if obj.width.Value == 0:
             return
         if obj.layer == 'A':
-            color = (1.00,0.00,0.20)
+            punch_funcs.format_view_object(
+            obj=obj,
+            shape_color_entity="base_foundation_a_shape_color",
+            line_width_entity="base_foundation_a_line_width",
+            transparency_entity="base_foundation_a_transparency",
+            display_mode_entity="base_foundation_a_display_mode",
+            line_color_entity="base_foundation_a_line_color",
+            )
         elif obj.layer == 'B':
-            color = (0.20,0.00,1.00)
+            punch_funcs.format_view_object(
+            obj=obj,
+            shape_color_entity="base_foundation_b_shape_color",
+            line_width_entity="base_foundation_a_line_width",
+            transparency_entity="base_foundation_a_transparency",
+            display_mode_entity="base_foundation_a_display_mode",
+            line_color_entity="base_foundation_b_line_color",
+            )
         elif obj.layer == 'other':
+            punch_funcs.format_view_object(
+            obj=obj,
+            shape_color_entity="base_foundation_b_shape_color",
+            line_width_entity="base_foundation_a_line_width",
+            transparency_entity="base_foundation_a_transparency",
+            display_mode_entity="base_foundation_a_display_mode",
+            line_color_entity="base_foundation_b_line_color",
+            )
             color = (0.20,1.00,0.00)
-        obj.ViewObject.ShapeColor = color
-        obj.ViewObject.LineColor = color
-        obj.ViewObject.PointColor = color
-        obj.ViewObject.LineWidth = 1.00
-        obj.ViewObject.PointSize = 1.00
-        obj.Base.ViewObject.LineColor = color
-        obj.Base.ViewObject.PointColor = color
+            obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = color
+        obj.Base.ViewObject.LineColor = obj.ViewObject.LineColor
+        obj.Base.ViewObject.PointColor = obj.ViewObject.PointColor
         obj.Base.ViewObject.LineWidth = 3.00
         if obj.align == 'Left':
             sl = obj.left_width.Value

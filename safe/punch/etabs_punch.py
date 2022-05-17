@@ -19,6 +19,8 @@ import DraftVecUtils
 import math
 from typing import Union
 
+from safe.punch import punch_funcs
+
 
 class EtabsPunch(object):
     def __init__(self,
@@ -71,7 +73,6 @@ class EtabsPunch(object):
         progressbar = FreeCAD.Base.ProgressIndicator()
         frames_count = frames[0]
         progressbar.start("Importing "+str(frames_count)+" Frame Elements...", frames_count)
-        color = (.0, 1.0, 0.0, 0.0)
         for i in range(frames_count):
             progressbar.next(True)
             frame_name = frames[1][i]
@@ -131,17 +132,23 @@ class EtabsPunch(object):
                 columns.addObject(structure)
                 # view property of structure
                 if FreeCAD.GuiUp:
-                    structure.ViewObject.LineWidth = 1
-                    structure.ViewObject.PointSize = 1
-                    structure.ViewObject.Transparency = 20
-                    structure.ViewObject.ShapeColor = color
-                    structure.ViewObject.LineColor = color
-                    structure.ViewObject.PointColor = color
-                    structure.ViewObject.DisplayMode = 'Wireframe'
-                    line.ViewObject.LineColor = color
-                    line.ViewObject.PointColor = color
+                    punch_funcs.format_view_object(
+                    obj=structure,
+                    shape_color_entity="column_shape_color",
+                    line_width_entity="column_line_width",
+                    transparency_entity="column_transparency",
+                    display_mode_entity="column_display_mode",
+                    line_color_entity="column_line_color",
+                    )
+                    punch_funcs.format_view_object(
+                    obj=line,
+                    shape_color_entity="column_shape_color",
+                    line_width_entity="column_line_width",
+                    transparency_entity="column_transparency",
+                    display_mode_entity="column_display_mode",
+                    line_color_entity="column_line_color",
+                    )
                     line.ViewObject.PointSize = 6
-                    line.ViewObject.LineWidth = 1
                     if section_type not in ('G', 'None') and import_beams:
                         line.ViewObject.hide()
                     if not import_beams:

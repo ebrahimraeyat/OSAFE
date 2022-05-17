@@ -51,8 +51,6 @@ def make_rectangular_slab(
             obj.Base.ViewObject.LineWidth = 3.00
         if obj.plan:
             obj.plan.ViewObject.LineWidth = 3.00
-        obj.ViewObject.Transparency = 20
-        obj.ViewObject.DisplayMode = "Flat Lines"
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -89,8 +87,6 @@ def make_rectangular_slab_from_base_foundation(base_foundation, plan=None):
             obj.Base.ViewObject.LineWidth = 3.00
         if obj.plan:
             obj.plan.ViewObject.LineWidth = 3.00
-        obj.ViewObject.Transparency = 20
-        obj.ViewObject.DisplayMode = "Flat Lines"
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -210,22 +206,40 @@ class RectangularSlab(ArchComponent.Component):
             obj.Shape = obj.plan.Shape.extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
         if FreeCAD.GuiUp:
             if obj.layer == 'A':
-                color = (1.00,0.0,0.50)
+                punch_funcs.format_view_object(
+                obj=obj,
+                shape_color_entity="slab_a_shape_color",
+                line_width_entity="slab_a_line_width",
+                transparency_entity="slab_a_transparency",
+                display_mode_entity="slab_a_display_mode",
+                line_color_entity="slab_a_line_color",
+                )
             elif obj.layer == 'B':
-                color = (0.0,0.67,1.00)
+                punch_funcs.format_view_object(
+                obj=obj,
+                shape_color_entity="slab_b_shape_color",
+                line_width_entity="slab_a_line_width",
+                transparency_entity="slab_a_transparency",
+                display_mode_entity="slab_a_display_mode",
+                line_color_entity="slab_b_line_color",
+                )
             elif obj.layer == 'other':
+                punch_funcs.format_view_object(
+                obj=obj,
+                shape_color_entity="slab_b_shape_color",
+                line_width_entity="slab_a_line_width",
+                transparency_entity="slab_a_transparency",
+                display_mode_entity="slab_a_display_mode",
+                line_color_entity="slab_b_line_color",
+                )
                 color = (0.00,1.00,0.00)
+                obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = color
             if obj.Base:
-                obj.Base.ViewObject.LineColor = color
-                obj.Base.ViewObject.PointColor = color
+                obj.Base.ViewObject.LineColor = obj.ViewObject.LineColor
+                obj.Base.ViewObject.PointColor = obj.ViewObject.PointColor
             if obj.plan:
-                obj.plan.ViewObject.LineColor = color
-                obj.plan.ViewObject.PointColor = color
-            obj.ViewObject.ShapeColor = color
-            obj.ViewObject.LineColor = color
-            obj.ViewObject.PointColor = color
-            obj.ViewObject.LineWidth = 1.00
-            obj.ViewObject.PointSize = 1.00
+                obj.plan.ViewObject.LineColor = obj.ViewObject.LineColor
+                obj.plan.ViewObject.PointColor = obj.ViewObject.PointColor
 
     def onDocumentRestored(self, obj):
         super().onDocumentRestored(obj)

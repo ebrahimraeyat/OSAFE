@@ -223,12 +223,14 @@ def make_foundation(
     if FreeCAD.GuiUp:
         import FreeCADGui
         ViewProviderFoundation(obj.ViewObject)
-        obj.ViewObject.LineWidth = 1.00
-        obj.ViewObject.PointSize = 1.00
-        obj.ViewObject.DisplayMode = "Flat Lines"
-        obj.ViewObject.ShapeColor = (1.00,0.67,0.50)
-        obj.ViewObject.LineColor = (0.28,0.28,0.28)
-        obj.ViewObject.PointColor = (0.28,0.28,0.28)
+        punch_funcs.format_view_object(
+            obj=obj,
+            shape_color_entity="foundation_shape_color",
+            line_width_entity="foundation_line_width",
+            transparency_entity="foundation_transparency",
+            display_mode_entity="foundation_display_mode",
+            line_color_entity="foundation_line_color",
+            )
         FreeCADGui.activeDocument().activeView().viewIsometric()
         FreeCADGui.SendMsgToActiveView("ViewFit")
     obj.cover = cover

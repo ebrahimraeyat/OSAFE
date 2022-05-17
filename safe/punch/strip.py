@@ -34,8 +34,6 @@ def make_strip(
     if FreeCAD.GuiUp:
         vobj = obj.ViewObject
         ViewProviderStrip(vobj)
-        vobj.Transparency = 80
-        vobj.DisplayMode = "Flat Lines"
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -116,12 +114,33 @@ class Strip(ArchComponent.Component):
         obj.Shape = shape
         if FreeCAD.GuiUp:
             if obj.layer == 'A':
-                obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (1.00,0.00,0.20)
+                punch_funcs.format_view_object(
+                obj=obj,
+                shape_color_entity="design_layer_a_shape_color",
+                line_width_entity="design_layer_a_line_width",
+                transparency_entity="design_layer_a_transparency",
+                display_mode_entity="design_layer_a_display_mode",
+                line_color_entity="design_layer_a_line_color",
+                )
             elif obj.layer == 'B':
-                obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (0.20,0.00,1.00)
+                punch_funcs.format_view_object(
+                obj=obj,
+                shape_color_entity="design_layer_b_shape_color",
+                line_width_entity="design_layer_a_line_width",
+                transparency_entity="design_layer_a_transparency",
+                display_mode_entity="design_layer_a_display_mode",
+                line_color_entity="design_layer_b_line_color",
+                )
             elif obj.layer == 'other':
+                punch_funcs.format_view_object(
+                obj=obj,
+                shape_color_entity="design_layer_b_shape_color",
+                line_width_entity="design_layer_a_line_width",
+                transparency_entity="design_layer_a_transparency",
+                display_mode_entity="design_layer_a_display_mode",
+                line_color_entity="design_layer_b_line_color",
+                )
                 obj.ViewObject.ShapeColor = obj.ViewObject.LineColor = (0.20,1.00,0.00)
-
     def onDocumentRestored(self, obj):
         super().onDocumentRestored(obj)
         self.set_properties(obj)
