@@ -15,6 +15,8 @@ class CivilWorkbench(Workbench):
         from PySide2 import QtCore
         import civilGui
 
+        # check user splash screen
+        self.splash()
         command_list = civilGui.command_list
         export_list = civilGui.export_list
         draw_list = civilGui.draw_list
@@ -47,7 +49,6 @@ class CivilWorkbench(Workbench):
     def Activated(self):
         #     from DraftGui import todo
         #     todo.delay(Gui.runCommand, "Civil_welcome")
-
         from DraftGui import todo
         import osafe_statusbar
         todo.delay(osafe_statusbar.setStatusIcons, True)
@@ -62,5 +63,38 @@ class CivilWorkbench(Workbench):
 
         todo.delay(osafe_statusbar.setStatusIcons,False)
 
+    def splash(self):
+        from pathlib import Path
+        import shutil
+        # param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Draft")
+        # image = Path(param.GetString('splash_screen'))
+        user_path = Path(FreeCAD.getUserAppDataDir())   
+        # if not image.exists():
+        image = user_path / 'Mod' / 'OSAFE' / 'images' / 'splash.png'
+        if not image.exists():
+            return
+        splash_path = (user_path / 'Gui' / 'images')
+        try:
+            splash_path.mkdir(parents=True)
+        except FileExistsError:
+            pass
+        suffix = image.suffix
+        splash_image_path = splash_path / f'splash_image{suffix}'
+        splashes = [i for i in splash_path.glob("splash_image.*")]
+        # check if splash image folder is empty
+        if not splashes:
+            shutil.copy(image, splash_image_path)
+            return
+        # import hashlib
+        # image_md5 = hashlib.md5(open(image, 'rb').read()).hexdigest()
+        # exists = False
+        # for si_path in splashes:
+        #     splash_md5 =  hashlib.md5(open(si_path, 'rb').read()).hexdigest()
+        #     if image_md5 == splash_md5:
+        #         exists = True
+        #     else:
+        #         si_path.unlink()
+        # if not exists:
+        #     shutil.copy(image, splash_image_path)
 
 Gui.addWorkbench(CivilWorkbench())
