@@ -340,32 +340,32 @@ class CivilExplodLoadPatterns:
         return True
 
 
-# class CivilCreateF2k:
+class CivilCreateF2k:
 
-#     def GetResources(self):
-#         MenuText = QtCore.QT_TRANSLATE_NOOP(
-#             "civil_create_f2k",
-#             "Create F2k File")
-#         ToolTip = QtCore.QT_TRANSLATE_NOOP(
-#             "civil_create_f2k",
-#             "Create F2k File")
-#         path = str(
-#                    Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "f2k.svg"
-#                    )
-#         return {'Pixmap': path,
-#                 'MenuText': MenuText,
-#                 'ToolTip': ToolTip}
+    def GetResources(self):
+        MenuText = QtCore.QT_TRANSLATE_NOOP(
+            "civil_create_f2k",
+            "Create F2k File")
+        ToolTip = QtCore.QT_TRANSLATE_NOOP(
+            "civil_create_f2k",
+            "Create F2k File")
+        path = str(
+                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "f2k.svg"
+                   )
+        return {'Pixmap': path,
+                'MenuText': MenuText,
+                'ToolTip': ToolTip}
 
-#     def Activated(self):
-#         from safe.punch.py_widget import create_f2k
-#         import etabs_obj
-#         etabs = etabs_obj.EtabsModel(backup=False)
-#         panel = create_f2k.Form(etabs)
-#         Gui.Control.showDialog(panel)
-#         return panel
+    def Activated(self):
+        from safe.punch.py_widget import create_f2k_command
+        import etabs_obj
+        etabs = etabs_obj.EtabsModel(backup=False)
+        panel = create_f2k_command.Form(etabs)
+        Gui.Control.showDialog(panel)
+        return panel
 
-#     def IsActive(self):
-#         return not FreeCAD.ActiveDocument is None
+    def IsActive(self):
+        return not FreeCAD.ActiveDocument is None
 
 class CivilBaseFoundation:
 
@@ -630,7 +630,7 @@ Gui.addCommand('Civil_help', CivilHelp())
 Gui.addCommand('Civil_dxf', gui_dxf.OsafeDxf())
 Gui.addCommand('osafe_import_dxf', gui_dxf.OsafeImportDxf())
 # Gui.addCommand('civil_explod_load_patterns', CivilExplodLoadPatterns())
-# Gui.addCommand('create_f2k_file', CivilCreateF2k())
+Gui.addCommand('create_f2k_file', CivilCreateF2k())
 Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())
 Gui.addCommand('create_foundation', CivilFoundation())
 Gui.addCommand('civil_slab', gui_slab.Slab())
@@ -652,6 +652,7 @@ command_list = [
             # "civil_explod_load_patterns",
             # "Civil_update",
             # "Civil_branch",
+            "create_f2k_file",
             "Civil_help",
             ]
 

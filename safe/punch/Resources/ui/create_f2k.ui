@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>491</width>
-    <height>441</height>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,10 +39,35 @@
     </layout>
    </item>
    <item>
-    <widget class="QProgressBar" name="progressbar">
-     <property name="value">
-      <number>0</number>
+    <widget class="QGroupBox" name="load_combinations">
+     <property name="title">
+      <string>Add Load Combinations Only</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="envelope">
+        <property name="text">
+         <string>Envelope</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="linear_add">
+        <property name="text">
+         <string>Linear Add</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -235,6 +260,13 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QProgressBar" name="progressbar">
+     <property name="value">
+      <number>0</number>
+     </property>
     </widget>
    </item>
    <item>
