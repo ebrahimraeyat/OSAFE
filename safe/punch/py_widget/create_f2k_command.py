@@ -48,7 +48,7 @@ class Form:
             load_cases=[],
             case_types=[],
             model_datum=0,
-            over_writes=False,
+            append=True,
             )
         if self.form.load_combinations.isChecked():
             types = []

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../Resources/icons/referesh.svg</file>
     <file>../Resources/icons/import_dxf.svg</file>
     <file>../Resources/icons/base_plate.svg</file>
     <file>../Resources/icons/import.svg</file>

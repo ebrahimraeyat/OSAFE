@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Svg Vector Icons : http://www.onlinewebfonts.com/icon -->
+
+<svg
+   version="1.1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 1000 1000"
+   enable-background="new 0 0 1000 1000"
+   xml:space="preserve"
+   id="svg10"
+   sodipodi:docname="referesh.svg"
+   inkscape:version="1.2-dev (8a200a5f, 2021-09-02)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs14"><linearGradient
+     inkscape:collect="always"
+     id="linearGradient1108"><stop
+       style="stop-color:#d410d2;stop-opacity:0;"
+       offset="0"
+       id="stop1104" /><stop
+       style="stop-color:#831775;stop-opacity:1;"
+       offset="0.994012"
+       id="stop1106" /></linearGradient><linearGradient
+     inkscape:collect="always"
+     id="linearGradient1054"><stop
+       style="stop-color:#d410d2;stop-opacity:0;"
+       offset="0"
+       id="stop1052" /><stop
+       style="stop-color:#831775;stop-opacity:1;"
+       offset="1"
+       id="stop1050" /></linearGradient><linearGradient
+     inkscape:collect="always"
+     xlink:href="#linearGradient1108"
+     id="linearGradient1056"
+     x1="49.1"
+     y1="225.67289"
+     x2="931.81548"
+     y2="225.67289"
+     gradientUnits="userSpaceOnUse" /><linearGradient
+     inkscape:collect="always"
+     xlink:href="#linearGradient1054"
+     id="linearGradient1110"
+     gradientUnits="userSpaceOnUse"
+     gradientTransform="rotate(180,490.45774,493.7169)"
+     x1="49.1"
+     y1="225.67289"
+     x2="931.81548"
+     y2="225.67289" /></defs><sodipodi:namedview
+   id="namedview12"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:pageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   showgrid="false"
+   inkscape:zoom="0.409"
+   inkscape:cx="356.96821"
+   inkscape:cy="441.32029"
+   inkscape:window-width="1920"
+   inkscape:window-height="1001"
+   inkscape:window-x="-9"
+   inkscape:window-y="-9"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg10" />
+<metadata
+   id="metadata2"> Svg Vector Icons : http://www.onlinewebfonts.com/icon </metadata>
+<path
+   d="m 49.1,441.3 c 0,0 132.4,-306.7 536.6,-146.5 l -33.3,75.6 c 0,0 -29.6,74.2 66.8,58.7 l 271.3,-64.8 c 0,0 61.7,-16.9 34.3,-71.2 L 777.3,27.4 c 0,0 -45.7,-44.1 -76.6,8.3 l -32.8,75.9 c 0,0 -499.9,-204.5 -618.8,329.7 z"
+   id="path6"
+   style="fill:url(#linearGradient1056);fill-opacity:1.0" /><path
+   d="m 931.81548,546.1338 c 0,0 -132.4,306.7 -536.6,146.5 l 33.3,-75.6 c 0,0 29.6,-74.2 -66.8,-58.7 l -271.3,64.8 c 0,0 -61.7,16.9 -34.3,71.2 l 147.5,265.7 c 0,0 45.7,44.1 76.6,-8.3 l 32.8,-75.9 c 0,0 499.9,204.5 618.8,-329.7 z"
+   id="path6-8"
+   style="fill:url(#linearGradient1110);fill-opacity:1" />
+</svg>

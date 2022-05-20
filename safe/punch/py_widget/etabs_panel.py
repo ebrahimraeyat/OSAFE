@@ -17,10 +17,18 @@ class EtabsTaskPanel:
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'etabs_panel.ui'))
         self.etabs = etabs_obj.EtabsModel(backup=False)
         # self.set_foundation_level()
-        self.set_load_cases()
-        self.set_story()
-        self.set_filename()
+        self.update_gui()
         self.create_connections()
+
+    def set_etabs_exe(self):
+        if (
+            self.form.use_etabs.isChecked() and
+            not self.form.etabs_exe_path.text()
+        ):
+            param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Draft")
+            etabs_exe = param.GetString('etabs_exe_path', '')
+            if etabs_exe and Path(etabs_exe).exists:
+                self.form.etabs_exe_path.setText(etabs_exe)
 
     def set_load_cases(self):
         FreeCAD.load_cases = self.etabs.load_cases.get_load_cases()
@@ -33,8 +41,34 @@ class EtabsTaskPanel:
 
     def create_connections(self):
         self.form.browse.clicked.connect(self.browse)
+        self.form.browse_etabs_exe.clicked.connect(self.browse_etabs_exe)
+        self.form.browse_etabs_edb.clicked.connect(self.browse_etabs_edb)
         self.form.import_data.clicked.connect(self.import_data)
         self.form.help.clicked.connect(self.show_help)
+        self.form.referesh.clicked.connect(self.update_gui)
+        self.form.use_etabs.clicked.connect(self.set_etabs_exe)
+
+    def update_gui(self):
+        if not self.etabs.success:
+            etabs_exe = self.form.etabs_exe_path.text()
+            etabs_edb = self.form.etabs_edb_path.text()
+            if (
+                etabs_exe and
+                Path(etabs_exe).exists and
+                etabs_edb and
+                Path(etabs_edb).exists
+                ):
+                self.etabs = etabs_obj.EtabsModel(
+                attach_to_instance=False,
+                backup = False,
+                model_path = Path(etabs_edb),
+                software_exe_path=etabs_exe,
+            )
+        if self.etabs.success:
+            self.set_load_cases()
+            self.set_story()
+            self.set_filename()
+
 
     def set_foundation_level(self):
         self.etabs.set_current_unit('N', 'm')
@@ -43,6 +77,7 @@ class EtabsTaskPanel:
 
     def set_story(self):
         stories = self.etabs.SapModel.Story.GetNameList()[1]
+        self.form.story.clear()
         self.form.story.addItems(stories)
         self.form.story.setCurrentIndex(len(stories) - 1)
 
@@ -57,6 +92,30 @@ class EtabsTaskPanel:
         if not filename.lower().endswith(ext):
             filename += ext
         self.form.filename.setText(filename)
+    
+    def browse_etabs_exe(self):
+        ext = '.exe'
+        from PySide2.QtWidgets import QFileDialog
+        filters = f"{ext[1:]} (*{ext})"
+        filename, _ = QFileDialog.getOpenFileName(None, 'select ETABS.exe',
+                                                None, filters)
+        if not filename:
+            return
+        if not filename.lower().endswith(ext):
+            filename += ext
+        self.form.etabs_exe_path.setText(filename)
+    
+    def browse_etabs_edb(self):
+        ext = '.EDB'
+        from PySide2.QtWidgets import QFileDialog
+        filters = f"{ext[1:]} (*{ext})"
+        filename, _ = QFileDialog.getOpenFileName(None, 'select *.EDB File',
+                                                None, filters)
+        if not filename:
+            return
+        if not filename.endswith(ext):
+            filename += ext
+        self.form.etabs_edb_path.setText(filename)
 
     def import_data(self):
         self.top_of_foundation = self.form.foundation_level.value() * 1000
