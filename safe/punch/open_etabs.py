@@ -32,7 +32,7 @@ def insert(filename):
                 model_path = Path(filename),
                 software_exe_path=software_exe_path,
             )
-    FreeCAD.etabs = etabs
+    FreeCAD.Base.etabs = etabs
 
 def find_etabs(run=False):
     '''
