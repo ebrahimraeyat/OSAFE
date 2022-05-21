@@ -20,6 +20,7 @@ from safe.punch import (
     gui_automatic_strip,
     base_plate,
     osafe_views,
+    open_etabs,
     )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -164,8 +165,14 @@ class CivilEtabs:
                 'ToolTip': ToolTip}
 
     def Activated(self):
+        etabs, filename = open_etabs.find_etabs(run=True)
+        if (
+            etabs is None or
+            filename is None
+            ):
+            return
         from safe.punch.py_widget import etabs_panel
-        panel = etabs_panel.EtabsTaskPanel()
+        panel = etabs_panel.EtabsTaskPanel(etabs=etabs)
         Gui.Control.showDialog(panel)
         return panel
 
