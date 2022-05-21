@@ -16,7 +16,7 @@ def open(filename):
 
 
 def insert(filename):
-    param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Draft")
+    param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
     use_etabs = param.GetBool('use_etabs', False)
     software_exe_path = param.GetString('etabs_exe_path', '')
     if (
@@ -34,7 +34,10 @@ def insert(filename):
             )
     FreeCAD.Base.etabs = etabs
 
-def find_etabs(run=False):
+def find_etabs(
+    run=False,
+    backup=False,
+    ):
     '''
     try to find etabs in this manner:
     1- FreeCAD.etabs if FreeCAD.etabs.success
@@ -42,6 +45,7 @@ def find_etabs(run=False):
     3- try to open etabs if user set the etabs_exe_path
 
     run : if True it runs the model
+    backup: if True it backup from the main file
     '''
     etabs = None
     filename = None
@@ -55,7 +59,7 @@ def find_etabs(run=False):
     else:
         etabs = etabs_obj.EtabsModel(backup=False)
         if not etabs.success:
-            param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Draft")
+            param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
             etabs_exe = param.GetString('etabs_exe_path', '')
             if Path(etabs_exe).exists():
                 etabs = etabs_obj.EtabsModel(
@@ -72,6 +76,8 @@ def find_etabs(run=False):
         try:
             etabs.SapModel.Story
             filename = etabs.SapModel.GetModelFilename()
+            if type(filename) == str:
+                filename = Path(filename)
         except _ctypes.COMError:
             QMessageBox.warning(None, 'ETABS', 'Please Close ETABS and FreeCAD and try again.')
             com_error = True
@@ -90,7 +96,7 @@ Do you want to specify ETABS.exe path?''',
             ) == QMessageBox.Yes
             ):
             import FreeCADGui
-            FreeCADGui.runCommand('Std_DlgPreferences',0)
+            FreeCADGui.showPreferences("OSAFE", 0)
     elif filename is None and not com_error:
         QMessageBox.warning(None, 'ETABS', 'Please Open ETABS Model and Run this command again.')
     if (
@@ -115,4 +121,6 @@ Do you want to specify ETABS.exe path?''',
         not FreeCAD.Base.etabs.success
         ):
         FreeCAD.Base.etabs = etabs
+        if backup:
+            FreeCAD.Base.etabs.backup_model()
     return FreeCAD.Base.etabs, filename

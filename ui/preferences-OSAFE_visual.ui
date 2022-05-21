@@ -54,7 +54,7 @@
             <cstring>etabs_exe_path</cstring>
            </property>
            <property name="prefPath" stdset="0">
-            <cstring>Mod/Draft</cstring>
+            <cstring>Mod/OSAFE</cstring>
            </property>
           </widget>
          </item>
@@ -70,7 +70,7 @@
             <cstring>use_etabs</cstring>
            </property>
            <property name="prefPath" stdset="0">
-            <cstring>Mod/Draft</cstring>
+            <cstring>Mod/OSAFE</cstring>
            </property>
           </widget>
          </item>
