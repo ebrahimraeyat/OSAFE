@@ -34,6 +34,19 @@ def insert(filename):
             )
     FreeCAD.Base.etabs = etabs
 
+def open_browse(
+        ext: str = '.EDB',
+        ):
+    from PySide2.QtWidgets import QFileDialog
+    filters = f"{ext[1:]} (*{ext})"
+    filename, _ = QFileDialog.getOpenFileName(None, 'select file',
+                                            None, filters)
+    if not filename:
+        return None
+    if not filename.upper().endswith(ext):
+        filename += ext
+    return filename
+
 def find_etabs(
     run=False,
     backup=False,
@@ -76,8 +89,6 @@ def find_etabs(
         try:
             etabs.SapModel.Story
             filename = etabs.SapModel.GetModelFilename()
-            if type(filename) == str:
-                filename = Path(filename)
         except _ctypes.COMError:
             QMessageBox.warning(None, 'ETABS', 'Please Close ETABS and FreeCAD and try again.')
             com_error = True
@@ -98,7 +109,11 @@ Do you want to specify ETABS.exe path?''',
             import FreeCADGui
             FreeCADGui.showPreferences("OSAFE", 0)
     elif filename is None and not com_error:
-        QMessageBox.warning(None, 'ETABS', 'Please Open ETABS Model and Run this command again.')
+        filename = open_browse()
+        if filename is None:
+            QMessageBox.warning(None, 'ETABS', 'Please Open ETABS Model and Run this command again.')
+        elif hasattr(etabs, 'success') and etabs.success:
+            etabs.SapModel.File.OpenFile(str(filename))
     if (
         run and
         etabs is not None and
@@ -123,4 +138,6 @@ Do you want to specify ETABS.exe path?''',
         FreeCAD.Base.etabs = etabs
         if backup:
             FreeCAD.Base.etabs.backup_model()
+    if type(filename) == str and Path(filename).exists():
+        filename = Path(filename)
     return FreeCAD.Base.etabs, filename
