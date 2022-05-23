@@ -55,6 +55,7 @@ class CivilWorkbench(Workbench):
 
         if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("show_at_startup", True):
             Gui.showPreferences("OSAFE", 0)
+        FreeCAD.addImportType("CSI ETABS (*.edb *.EDB)", "safe.punch.open_etabs")
 
     def Deactivated(self):
 

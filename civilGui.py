@@ -20,7 +20,6 @@ from safe.punch import (
     gui_automatic_strip,
     base_plate,
     osafe_views,
-    open_etabs,
     )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -165,7 +164,11 @@ class CivilEtabs:
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        etabs, filename = open_etabs.find_etabs(run=True)
+        import find_etabs
+        etabs, filename = find_etabs.find_etabs(
+            run=True,
+            software='OSAFE',
+            )
         if (
             etabs is None or
             filename is None
