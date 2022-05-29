@@ -192,8 +192,11 @@ class Punch:
             obj.by = (base_plate.By + obj.column.Base.Width).Value / 2
         else:
             center = colbb.Center
-            obj.bx = obj.column.Base.Height.Value
-            obj.by = obj.column.Base.Width.Value
+            if hasattr(obj.column.Base, 'Radius'):
+                obj.bx = obj.by = math.sqrt(obj.column.Base.Area.Value)
+            else:
+                obj.bx = obj.column.Base.Height.Value
+                obj.by = obj.column.Base.Width.Value
         load_center = colbb.Center
         obj.center_of_load = FreeCAD.Vector(load_center.x, load_center.y, colbb.ZMin)
         obj.center_of_column = FreeCAD.Vector(center.x, center.y, colbb.ZMin)
