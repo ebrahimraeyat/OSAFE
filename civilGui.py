@@ -445,7 +445,7 @@ class CivilFoundation:
 #                 'ToolTip': ToolTip}
 
 #     def Activated(self):
-#         import change_branch
+#         from safe import change_branch
 #         panel = change_branch.Form()
 #         Gui.Control.showDialog(panel)
 #         return panel
