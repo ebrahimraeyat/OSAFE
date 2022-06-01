@@ -1,6 +1,6 @@
 
 
-class CivilWorkbench(Workbench):
+class OSAFEWorkbench(Workbench):
 
     def __init__(self):
 
@@ -98,4 +98,4 @@ class CivilWorkbench(Workbench):
         # if not exists:
         #     shutil.copy(image, splash_image_path)
 
-Gui.addWorkbench(CivilWorkbench())
+Gui.addWorkbench(OSAFEWorkbench())
