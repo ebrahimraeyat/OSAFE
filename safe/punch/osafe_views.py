@@ -268,7 +268,7 @@ class OSAFEViewGroupCommand:
                                 show_object(plan, (show_slab and wireframe))
                                 reviwed_object.append(plan.Name)
                 elif (
-                    hasattr(obj, 'Proxy') and 
+                    hasattr(obj, 'Proxy') and
                     hasattr(obj.Proxy, 'Type') and
                     obj.Proxy.Type == "Strip"
                     ):
@@ -315,8 +315,8 @@ class OSAFEViewGroupCommand:
 
     def GetResources(self):
         return {
-            "MenuText": "Screw diamter matching mode",
-            "ToolTip": "Screw diamter matching mode (by inner or outer thread diameter)",
+            "MenuText": "Screw diameter matching mode",
+            "ToolTip": "Screw diameter matching mode (by inner or outer thread diameter)",
             "DropDownMenu": False,
             "Exclusive": False,
         }

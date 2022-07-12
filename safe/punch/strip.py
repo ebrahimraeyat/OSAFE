@@ -176,7 +176,7 @@ class ViewProviderStrip:
     #                 base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
     #                 o.base_foundations = base_foundations
     #     return True
-        
+
 
 if __name__ == "__main__":
     p1 = FreeCAD.Vector(0, 0, 0)
