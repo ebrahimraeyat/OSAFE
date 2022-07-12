@@ -548,8 +548,9 @@ class FreecadReadwriteModel():
                 sr = o.right_width.Value
                 swl = ewl = sl * scale_factor
                 swr = ewr = sr * scale_factor
+                placement = o.Placement.Base + o.Base.Placement.Base
                 for j, point in enumerate(points):
-                    coord = [coord * scale_factor for coord in (point.x, point.y, point.z)]
+                    coord = [coord * scale_factor for coord in (point.x + placement.x, point.y + placement.y, point.z)]
                     point_name = self.safe.is_point_exist(coord, curr_point_content + points_content)
                     if point_name is None:
                         points_content += f"Point={self.last_point_number}   GlobalX={coord[0]}   GlobalY={coord[1]}   GlobalZ={coord[2]}   SpecialPt=No\n"
