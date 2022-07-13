@@ -106,7 +106,7 @@ class Safe():
     
     def set_mesh_options(self, mesh_size=300):
         table_key =  "AUTOMATIC SLAB MESH OPTIONS"
-        content = f"MeshOpt=Rectangular   Localize=Yes   Merge=Yes   MaxSize={mesh_size}"
+        content = f"MeshOpt=Rectangular   Localize=Yes   Merge=Yes   MaxSize={mesh_size * self.length_units.get('mm')}"
         self.add_content_to_table(table_key, content, append=False)
 
     def force_length_unit(self,
@@ -727,9 +727,10 @@ class FreecadReadwriteModel():
         A = 9.9E-06
         unit_weight = weight * self.safe.force_units['Kgf'] / self.safe.length_units['m'] ** 3
         if weight == 0:
-            Ec = .043 * 2400 ** 1.5 * math.sqrt(fc_mpa)
+            Ec_mpa = .043 * 2400 ** 1.5 * math.sqrt(fc_mpa)
         else:
-            Ec = .043 * weight ** 1.5 * math.sqrt(fc_mpa)
+            Ec_mpa = .043 * weight ** 1.5 * math.sqrt(fc_mpa)
+        Ec = Ec_mpa * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
         mat_prop_content = f'Material={mat_name}   E={Ec}   U=0.2   A={A}   UnitWt={unit_weight}   Fc={fc}   LtWtConc=No   UserModRup=No\n'
         self.safe.add_content_to_table(table_key, mat_prop_content)
         return mat_name
