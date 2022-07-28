@@ -32,6 +32,25 @@ class Form:
         self.form.strip_foundation.setChecked(True)
 
     def draw(self):
+        doc = FreeCAD.ActiveDocument
+        strips = []
+        for obj in doc.Objects:
+            if (
+                isinstance(obj, FreeCAD.DocumentObjectGroup) and
+                'strips' in obj.Label
+            ):
+                strips.append(obj)
+        if strips and QMessageBox.question(
+            None,
+            'Remove Strips',
+            'There is ' + ' and '.join([s.Label for s in strips]) + ' exists in Model, Do you want to remove those?',
+            ) == QMessageBox.Yes:
+            for strip in strips:
+                for o in strip.Group:
+                    FreeCAD.ActiveDocument.removeObject(o.Base.Name)
+                    FreeCAD.ActiveDocument.removeObject(o.Name)
+                FreeCAD.ActiveDocument.removeObject(strip.Name)
+
         from safe.punch import punch_funcs
         if self.form.mat_foundation.isChecked():
             draw_x = self.form.x_strips.isChecked()
