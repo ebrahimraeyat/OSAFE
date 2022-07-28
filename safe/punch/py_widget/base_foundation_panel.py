@@ -24,7 +24,11 @@ class Form:
         angle = self.form.angle_spinbox.value()
         doc = FreeCAD.ActiveDocument
         beams = []
-        for o in doc.Objects:
+        sel = Gui.Selection.getSelection()
+        if not sel:
+            sel = doc.Objects
+
+        for o in sel:
             if (
                 hasattr(o, "Proxy") and
                 hasattr(o.Proxy, "Type") and
