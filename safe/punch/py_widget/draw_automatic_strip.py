@@ -74,6 +74,7 @@ class Form:
             )
         else:
             punch_funcs.draw_strip_automatically_in_strip_foundation()
+        self.accept()
 
     def show_help(self):
         from help.show_help import show
