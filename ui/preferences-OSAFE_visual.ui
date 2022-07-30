@@ -282,7 +282,7 @@
        <item row="3" column="5">
         <widget class="Gui::PrefComboBox" name="column_display_mode">
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <property name="prefEntry" stdset="0">
           <cstring>column_display_mode</cstring>
