@@ -25,6 +25,12 @@ class SafeF2k:
                 "Safe",
                 )
 
+    def execute(self, obj):
+        input = obj.input
+        obj.input = input.replace('/', '\\')
+        output = obj.output
+        obj.output = output.replace('/', '\\')
+
     def onDocumentRestored(self, obj):
         self.set_properties(obj)
 
