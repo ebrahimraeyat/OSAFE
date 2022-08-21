@@ -1222,7 +1222,12 @@ def angle_between_two_edges(
     dot_prod = dot(vector_a, vector_b)
     magnitudes_a = dot(vector_a, vector_a) ** 0.5
     magnitudes_b = dot(vector_b, vector_b) ** 0.5
-    angle = math.acos(dot_prod / magnitudes_b / magnitudes_a)
+    cosine = dot_prod / magnitudes_b / magnitudes_a
+    if cosine > 1:
+        cosine = 1
+    if cosine < -1:
+        cosine = -1
+    angle = math.acos(cosine)
     ang_deg = math.degrees(angle)%360
     if ang_deg-180>=0:
         return 360 - ang_deg
