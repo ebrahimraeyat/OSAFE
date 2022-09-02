@@ -181,6 +181,7 @@ class BaseFoundation(gui_lines.Line):
         # another method that performs cleanup (superfinish)
         # that is not re-implemented by any of the child classes.
         gui_base_original.Creator.finish(self)
+        Gui.Selection.clearSelection()
         if self.ui and self.ui.continueMode:
             self.Activated()
 

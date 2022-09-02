@@ -261,6 +261,7 @@ class EtabsPunch(object):
         if import_load_combos:
             self.import_load_combos()
         FreeCAD.ActiveDocument.recompute()
+        Gui.Selection.clearSelection()
 
 def make_column(
     bx : float,

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from PySide2.QtWidgets import QMessageBox
+from PySide2 import QtWidgets
 
 import FreeCAD
 import FreeCADGui as Gui
@@ -75,6 +76,7 @@ class Form:
         else:
             punch_funcs.draw_strip_automatically_in_strip_foundation()
         self.accept()
+        Gui.Selection.clearSelection()
 
     def show_help(self):
         from help.show_help import show
@@ -82,3 +84,6 @@ class Form:
     
     def accept(self):
         Gui.Control.closeDialog()
+
+    def getStandardButtons(self):
+        return int(QtWidgets.QDialogButtonBox.Cancel)

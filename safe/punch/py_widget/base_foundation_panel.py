@@ -39,3 +39,4 @@ class Form:
         punch_funcs.make_automatic_base_foundation(beams, width, north_dist, south_dist,
                 east_dist, west_dist, x_stirp_name, y_stirp_name, angle, height, soil_modulus)
         Gui.Control.closeDialog()
+        Gui.Selection.clearSelection()

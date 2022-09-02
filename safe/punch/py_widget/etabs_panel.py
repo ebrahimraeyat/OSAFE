@@ -6,6 +6,7 @@ import FreeCADGui as Gui
 
 from safe.punch.py_widget import resource_rc
 from PySide2.QtGui import QPixmap
+from PySide2 import QtWidgets
 
 punch_path = Path(__file__).parent.parent
 
@@ -77,6 +78,10 @@ class EtabsTaskPanel:
         self.import_beams_columns()
         self.create_f2k()
         Gui.Control.closeDialog()
+        Gui.Selection.clearSelection()
+
+    def getStandardButtons(self):
+        return int(QtWidgets.QDialogButtonBox.Cancel)
 
     def accept(self):
         Gui.Control.closeDialog()

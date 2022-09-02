@@ -59,6 +59,6 @@ class Beam(Line):
             self.commit(translate("civil", "Create beam"),
                         cmd_list)
         super(Line, self).finish()
-        
+        Gui.Selection.clearSelection()
         if self.ui and self.ui.continueMode:
             self.Activated()
