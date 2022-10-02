@@ -128,7 +128,7 @@ def to_dxf(
            doc: Union[FreeCAD.Document, bool] = None,
            columns: bool = True,
            punches: bool = True,
-           )-> None:
+           )-> bool:
     import ezdxf
     dwg = ezdxf.new()
     msp = dwg.modelspace()
@@ -137,6 +137,9 @@ def to_dxf(
         return
     if doc is None:
         doc = FreeCAD.ActiveDocument
+    height = 500
+    center = (0, 0)
+    found = None
     for o in doc.Objects:
         if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
             if o.Proxy.Type == "Punch":
@@ -161,13 +164,29 @@ def to_dxf(
                     mtext.dxf.rotation = o.angle.Value
                     mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
         if hasattr(o, "IfcType") and o.IfcType == "Footing":
-            b = o.Shape.BoundBox
-            height = max(b.XLength, b.YLength)
-            center = (b.Center.x, b.Center.y)
-            # draw foundation
-            block_foun = dwg.blocks.new(name=o.Name)
-            add_edges_to_dxf(o.plan.Edges, {'color': 4}, block_foun)
-            msp.add_blockref(o.Name, (0 , 0))
+            found = o
+        # if 'Text' in o.Name:
+        #     if len(o.Text) > 1:
+        #         continue
+        #     v = o.Placement.Base
+        #     x, y = v.x, v.y
+            # ax1.annotate(o.Text[0], (x, y), color='black', fontsize=6, ha='center', va='center', rotation=0, annotation_clip=False)
+
+    if found is None:
+        for o in doc.Objects:
+            if hasattr(o, 'fc') and o.Label == 'Foundation':
+                found = o
+                break
+    if found is None:
+        return False
+
+    b = found.Shape.BoundBox
+    height = max(b.XLength, b.YLength)
+    center = (b.Center.x, b.Center.y)
+    # draw foundation
+    block_foun = dwg.blocks.new(name=found.Name)
+    add_edges_to_dxf(o.plan.Edges, {'color': 4}, block_foun)
+    msp.add_blockref(found.Name, (0 , 0))
 
     dwg.set_modelspace_vport(height=height, center=center)
     dwg.saveas(filename)
@@ -210,12 +229,6 @@ def to_dxf(
     #         p = patches.Polygon(xy, edgecolor='grey', facecolor='white', linewidth=.2, linestyle='-.', closed=False)
     #         ax1.add_patch(p)
 
-    #     elif 'Text' in o.Name:
-    #         if len(o.Text) > 1:
-    #             continue
-    #         v = o.Placement.Base
-    #         x, y = v.x, v.y
-    #         ax1.annotate(o.Text[0], (x, y), color='black', fontsize=6, ha='center', va='center', rotation=0, annotation_clip=False)
     # XMIN = min(x_min) - bbbox
     # XMAX = max(x_max) + bbbox
     # YMIN = min(y_min) - bbbox
