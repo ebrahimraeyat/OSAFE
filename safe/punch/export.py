@@ -185,7 +185,7 @@ def to_dxf(
     center = (b.Center.x, b.Center.y)
     # draw foundation
     block_foun = dwg.blocks.new(name=found.Name)
-    add_edges_to_dxf(o.plan.Edges, {'color': 4}, block_foun)
+    add_edges_to_dxf(found.plan.Edges, {'color': 4}, block_foun)
     msp.add_blockref(found.Name, (0 , 0))
 
     dwg.set_modelspace_vport(height=height, center=center)
