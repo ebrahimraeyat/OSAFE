@@ -240,7 +240,7 @@ class OSAFEViewGroupCommand:
                 and obj.Proxy.Type == "Profile"
             ):
                 continue
-            show_obj = False
+            show_obj = None
 
             if hasattr(obj, "IfcType"):
                 if obj.IfcType == "Beam":
@@ -308,7 +308,8 @@ class OSAFEViewGroupCommand:
                 #     elif obj.layer == "B":
                 #         show_obj = show_design_layer_b
 
-            show_object(obj, show_obj)
+            if show_obj is not None:
+                show_object(obj, show_obj)
 
     def GetDefaultCommand(self):
         return 0
