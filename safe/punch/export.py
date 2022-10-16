@@ -150,6 +150,7 @@ def to_dxf(
                     hatch = msp.add_hatch()
                     hatch.rgb = [int(i * 255) for i in o.ViewObject.ShapeColor[0:-1]]
                     hatch.paths.add_polyline_path(points, is_closed=1)
+                    add_edges_to_dxf(o.rect.Edges, {'color': 2}, msp)
                 # draw punch face line
                 if punches:
                     add_edges_to_dxf(o.edges.Edges, {'color': 2}, msp)
