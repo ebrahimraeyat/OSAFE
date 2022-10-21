@@ -174,7 +174,7 @@ def make_column(
     col = Arch.makeStructure(profile)
     col.Nodes = [center, v2]
     place_the_beam(col, line)
-    rotation = 90
+    rotation = 0
     col.AttachmentOffset = App.Placement(
             App.Vector(0, 0, 0),
             App.Rotation(App.Vector(0,0,1),rotation))
