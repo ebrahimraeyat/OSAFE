@@ -23,6 +23,7 @@ class OSAFEWorkbench(Workbench):
         assign_list = OSAFEGui.assign_list
         edit_list = OSAFEGui.edit_list
         view_list = OSAFEGui.view_list
+        help_list = OSAFEGui.help_list
 
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil tools")), command_list)
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil Export")), export_list)
@@ -36,6 +37,7 @@ class OSAFEWorkbench(Workbench):
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Assign")), assign_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Edit")), edit_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&View")), view_list)
+        self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&Help")), help_list)
 
         pref_visual_ui_abs_path = str(Path(OSAFEGui.__file__).parent.absolute() / 'ui' / 'preferences-OSAFE_visual.ui')
         Gui.addPreferencePage(pref_visual_ui_abs_path, "OSAFE")

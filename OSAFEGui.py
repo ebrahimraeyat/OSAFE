@@ -458,13 +458,13 @@ class CivilHelp:
 
     def GetResources(self):
         MenuText = QtCore.QT_TRANSLATE_NOOP(
-            "Civil_help",
-            "Help")
+            "OSAFE-Help",
+            "OSAFE")
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
-            "Civil_help",
-            "Help")
+            "OSAFE-Help",
+            "OSAFE Help")
         path = str(
-                   Path(__file__).parent.absolute() / "Resources" / "icons" / "help.svg"
+                   Path(__file__).parent.absolute() / "Resources" / "icons" / "help.png"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
@@ -654,20 +654,18 @@ command_list = [
             "Civil_etabs",
             "automatic_base_foundation",
             "create_foundation",
-            "osafe_explode_foundation",
             "osafe_automatic_strip",
             "Civil_opening_etabs",
             'civil_punch',
+            "civil_safe",
             # 'civil_sketch',
             # "civil_explod_load_patterns",
             # "Civil_update",
             # "Civil_branch",
             "create_f2k_file",
-            "Civil_help",
             ]
 
 export_list = [
-            "civil_safe",
             "Civil_pdf",
             "Civil_pic",
             "Civil_excel",
@@ -694,7 +692,7 @@ edit_list = [
             "Draft_Trimex",
             "Draft_Join",
             "Draft_Split",
-            # "Draft_Scale",
+            "Draft_Scale",
             "Draft_Stretch",
             "Draft_Rotate",
             "Draft_Offset",
@@ -702,6 +700,7 @@ edit_list = [
             # "Draft_Draft2Sketch",
             # "Draft_Upgrade",
             # "Draft_Downgrade",
+            "osafe_explode_foundation",
             ]
 
 view_list = [
@@ -710,6 +709,7 @@ view_list = [
             "OSAFE_view_group",
             ]
 
-# draw_command_list = [
-#         ''
-# ]
+help_list = [
+            "Separator",
+            "Civil_help",
+            ]
