@@ -2,11 +2,6 @@ from pathlib import Path
 from typing import Union
 import math
 
-
-if __name__ == '__main__':
-    import sys
-    FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
-    sys.path.append(FREECADPATH)
 try:
     import FreeCAD
     import Part
