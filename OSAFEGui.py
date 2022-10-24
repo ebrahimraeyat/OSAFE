@@ -705,8 +705,17 @@ edit_list = [
 
 view_list = [
             "Separator",
-            # "osafe_wireframe_views",
-            "OSAFE_view_group",
+            # "OSAFE_wireframe_views",
+            "OSAFE_view_columns",
+            "OSAFE_view_basefoundation",
+            "OSAFE_view_foundations",
+            "OSAFE_view_design_layer_a",
+            "OSAFE_view_design_layer_b",
+            "OSAFE_view_punch",
+            "OSAFE_view_slabs",
+            "OSAFE_view_arch_wall",
+            "OSAFE_view_beams",
+            # "OSAFE_view_group",
             ]
 
 help_list = [
