@@ -1,4 +1,3 @@
-from lib2to3.pytree import BasePattern
 import math
 from pathlib import Path
 from typing import Union
