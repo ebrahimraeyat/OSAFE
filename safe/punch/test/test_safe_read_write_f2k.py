@@ -10,9 +10,12 @@ import pytest
 filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_kazemi = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'kazemi.FCStd'
-document= FreeCAD.openDocument(str(filename))
-document_mat= FreeCAD.openDocument(str(filename_mat))
-document_kazemi= FreeCAD.openDocument(str(filename_kazemi))
+filename_khalaji = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
+input_f2k = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.F2k'
+document = FreeCAD.openDocument(str(filename))
+document_mat = FreeCAD.openDocument(str(filename_mat))
+document_kazemi = FreeCAD.openDocument(str(filename_kazemi))
+document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
 
 punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
@@ -94,12 +97,17 @@ def test_export_freecad_stiff_elements():
     rw.safe.write()
 
 def test_export_punch_props():
-    input_f2k_path = Path('~\input.f2k').expanduser()
-    input_f2k_path.touch()
     output_f2k_path = Path('~\punch.f2k').expanduser()
-    rw = FRW(input_f2k_path, output_f2k_path, document)
+    rw = FRW(input_f2k, output_f2k_path, document_khalaji)
     rw.export_punch_props()
     rw.safe.write()
+    with open(output_f2k_path, 'r') as f:
+        for line in f:
+            if "IsNull=No" in line:
+                assert True
+                return
+    assert False
+    
 
 def test_get_points_coordinates():
     safe = Safe()
@@ -120,6 +128,9 @@ def test_is_point_exist():
                 Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n'''
 
     id = safe.is_point_exist([2820, 0, 0], content)
+    assert id == '115'
+    # float coordinate
+    id = safe.is_point_exist([2820.0001, 0, 0], content)
     assert id == '115'
     id = safe.is_point_exist([2820, 20, 0], content)
     assert not id

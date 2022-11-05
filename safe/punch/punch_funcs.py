@@ -93,7 +93,7 @@ def punch_null_points(
     null_points_in_general = get_sort_points(common_edges)
     null_points_in_local = []
     for point in null_points_in_general:
-        null_points_in_local.append(point.sub(punch.center_of_punch))
+        null_points_in_local.append(point.sub(punch.center_of_column))
     return null_edges, null_points_in_local
 
 

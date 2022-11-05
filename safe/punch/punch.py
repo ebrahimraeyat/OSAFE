@@ -231,6 +231,8 @@ class Punch:
                 FreeCAD.Vector(0, 0, 1),
                 obj.angle.Value,
                 )
+        else:
+            obj.edges = edges
         # faces = Part.makeCompound(faces)
         rect = punch_funcs.rectangle_face(obj.center_of_column, obj.bx, obj.by)
         if obj.angle.Value != 0:

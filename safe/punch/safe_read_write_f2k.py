@@ -79,7 +79,12 @@ class Safe():
         if points_coordinates is None:
             points_coordinates = self.get_points_coordinates(content)
         for _id, coord in points_coordinates.items():
-            if coord == coordinate:
+            if (
+                len(coord) == 3 and
+                math.isclose(coord[0], coordinate[0], rel_tol=.01) and
+                math.isclose(coord[1], coordinate[1], rel_tol=.01) and
+                math.isclose(coord[2], coordinate[2], rel_tol=.01)
+                ):
                 return _id
         return None
                     

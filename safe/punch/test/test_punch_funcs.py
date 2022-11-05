@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = 'H:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 
 import FreeCAD
@@ -14,10 +14,12 @@ filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 
 filename_strip_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip_foundation.FCStd'
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_base_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
+filename_khalaji = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
 document_strip_foundation = FreeCAD.openDocument(str(filename_strip_foundation))
+document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
 
 
 punch_path = Path(__file__).absolute().parent.parent
@@ -215,16 +217,16 @@ def test_punch_area_edges():
     assert len(edges) == 3
 
 def test_punch_null_edges():
-    punch = document.Punch002
+    punch = document_khalaji.Punch001
     null_edges, common_edges = punch_funcs.punch_null_edges(punch)
-    assert null_edges == ['No', 'Yes', 'Yes', 'No', 'No', 'Yes']
+    assert null_edges == ['Yes', 'No', 'Yes', 'Yes', 'No', 'Yes']
     assert len(null_edges) == 6
     assert len(common_edges) == 6
 
 def test_punch_null_points():
-    punch = document.Punch002
+    punch = document.Punch001
     null_edges, null_points = punch_funcs.punch_null_points(punch)
-    assert null_edges == ['No', 'Yes', 'Yes', 'No', 'No', 'Yes']
+    assert null_edges == ['Yes', 'No', 'Yes', 'Yes', 'No', 'Yes']
     assert len(null_edges) == 6
     assert len(null_points) == 6
 
