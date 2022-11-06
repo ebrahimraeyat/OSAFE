@@ -22,44 +22,154 @@ class Punch:
         self.Type = "Punch"
         obj.Proxy = self
         if not hasattr(obj, "text"):
-            obj.addProperty("App::PropertyLink", "text", "Punch")
+            obj.addProperty(
+                "App::PropertyLink",
+                "text",
+                "Punch",
+                )
         if not hasattr(obj, "faces"):
-            obj.addProperty("Part::PropertyPartShape", "faces", "Punch", "", 1, False)
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "faces",
+                "Punch",
+                "",
+                1,
+                False,
+                )
         if not hasattr(obj, "d"):
-            obj.addProperty("App::PropertyFloat", "d", "Punch", "", 1, True)
+            obj.addProperty(
+                "App::PropertyFloat",
+                "d",
+                "Punch",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "Area"):
-            obj.addProperty("App::PropertyFloat", "Area", "Punch")
+            obj.addProperty(
+                "App::PropertyFloat",
+                "Area",
+                "Punch",
+                )
         if not hasattr(obj, "fc"):
-            obj.addProperty("App::PropertyPressure", "fc", "Punch", "", 1, True)
+            obj.addProperty(
+                "App::PropertyPressure",
+                "fc",
+                "Punch",
+                "",
+                1,True,
+                )
         if not hasattr(obj, "id"):
-            obj.addProperty("App::PropertyString", "id", "Column", "", 1, True)
+            obj.addProperty(
+                "App::PropertyString",
+                "id",
+                "Column",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "I22"):
-            obj.addProperty("App::PropertyFloat", "I22", "Punch", "", 1, True)
+            obj.addProperty(
+                "App::PropertyFloat",
+                "I22",
+                "Punch",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "I33"):
-            obj.addProperty("App::PropertyFloat", "I33", "Punch", "", 1, True)
+            obj.addProperty(
+                "App::PropertyFloat",
+                "I33",
+                "Punch",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "I23"):
-            obj.addProperty("App::PropertyFloat", "I23", "Punch", "", 1, True)
+            obj.addProperty(
+                "App::PropertyFloat",
+                "I23",
+                "Punch",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "center_of_punch"):
             obj.addProperty("App::PropertyVector",
                 "center_of_punch",
                 "Punch",
                 )
         if not hasattr(obj, "Ratio"):
-            obj.addProperty("App::PropertyString", "Ratio", "Punch", "", 1, True).Ratio = '0.'
+            obj.addProperty(
+                "App::PropertyString",
+                "Ratio",
+                "Punch",
+                "",
+                1,
+                True,
+                ).Ratio = '0.'
         if not hasattr(obj, "Location"):
-            obj.addProperty("App::PropertyEnumeration", "Location", "Punch")
+            obj.addProperty(
+                "App::PropertyEnumeration",
+                "Location",
+                "Punch",
+                )
         if not hasattr(obj, "b0"):
-            obj.addProperty("App::PropertyFloat", "b0", "Punch", "", 1, True)
+            obj.addProperty(
+                "App::PropertyFloat",
+                "b0",
+                "Punch",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "alpha_s"):
-            obj.addProperty("App::PropertyInteger", "alpha_s", "Allowable_Stress", "", 1, True)
+            obj.addProperty(
+                "App::PropertyInteger",
+                "alpha_s",
+                "Shear_Stress",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "one_way_shear_capacity"):
-            obj.addProperty("App::PropertyForce", "one_way_shear_capacity", "Allowable_Stress", "", 1, True)
+            obj.addProperty(
+                "App::PropertyForce",
+                "one_way_shear_capacity",
+                "Shear_Stress",
+                "",
+                1,
+                True,
+                )
         if not hasattr(obj, "Vc"):
-            obj.addProperty("App::PropertyForce", "Vc", "Allowable_Stress", "", 1, True)
+            obj.addProperty(
+                "App::PropertyForce",
+                "Vc",
+                "Shear_Stress",
+                "Shear Strength of Concrete",
+                1,
+                True,
+                )
         if not hasattr(obj, "vc"):
-            obj.addProperty("App::PropertyPressure", "vc", "Allowable_Stress", "", 1, True).vc = 1.
+            obj.addProperty(
+                "App::PropertyPressure",
+                "vc",
+                "Shear_Stress",
+                "Shear Stress of Concrete",
+                1,
+                True,
+                ).vc = 1.
         if not hasattr(obj, "Vu"):
-            obj.addProperty("App::PropertyPressure", "Vu", "Allowable_Stress", "", 1, True).Vu = 0
+            obj.addProperty(
+                "App::PropertyPressure",
+                "Vu",
+                "Shear_Stress",
+                "The Ultimate two way shear force in critical section",
+                1,
+                True,
+                ).Vu = 0
+
         if not hasattr(obj, "combos_load"):
             obj.addProperty(
                 "App::PropertyMap",
@@ -158,6 +268,8 @@ class Punch:
             "by",
             "Column",
             )
+
+        
 
         #obj.addProperty("App::PropertyEnumeration", "ds", "Shear_Steel", "")
         #obj.addProperty("App::PropertyEnumeration", "Fys", "Shear_Steel", "")
