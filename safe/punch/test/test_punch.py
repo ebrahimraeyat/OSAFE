@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = 'H:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 
 import FreeCAD
@@ -23,6 +23,14 @@ def test_make_punch():
     foun = document_base_plate.Foundation
     col = document_base_plate.getObjectsByLabel('C1_Story1')[0]
     p = punch.make_punch(foun, col)
+    p.Proxy.execute(p)
+    assert True
+
+def test_punch_reinforcement():
+    foun = document_base_plate.Foundation
+    col = document_base_plate.getObjectsByLabel('C1_Story1')[0]
+    p = punch.make_punch(foun, col)
+    p.Use_Reinforcement = True
     p.Proxy.execute(p)
     assert True
 

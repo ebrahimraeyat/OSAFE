@@ -47,7 +47,7 @@ class Punch:
                 )
         if not hasattr(obj, "Area"):
             obj.addProperty(
-                "App::PropertyFloat",
+                "App::PropertyArea",
                 "Area",
                 "Punch",
                 )
@@ -162,13 +162,53 @@ class Punch:
                 ).vc = 1.
         if not hasattr(obj, "Vu"):
             obj.addProperty(
-                "App::PropertyPressure",
+                "App::PropertyForce",
                 "Vu",
                 "Shear_Stress",
                 "The Ultimate two way shear force in critical section",
                 1,
                 True,
                 ).Vu = 0
+        
+        if not hasattr(obj, "Use_Reinforcement"):
+            obj.addProperty(
+                "App::PropertyBool",
+                "Use_Reinforcement",
+                "Reinforcement",
+                "If it allowed to use reinforcement for calculating punch",
+                ).Use_Reinforcement = False
+        if not hasattr(obj, "Fys"):
+            obj.addProperty(
+                "App::PropertyPressure",
+                "Fys",
+                "Reinforcement",
+                "Stirrup Stress",
+                ).Fys = '340 MPa'
+        
+        if not hasattr(obj, "s"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "s",
+                "Reinforcement",
+                "Distance Between Stirrups",
+                ).s = 0
+        if not hasattr(obj, "Av"):
+            obj.addProperty(
+                "App::PropertyArea",
+                "Av",
+                "Reinforcement",
+                "Total Area of Stirrups",
+                ).Av = 400
+        
+        if not hasattr(obj, "Vs"):
+            obj.addProperty(
+                "App::PropertyForce",
+                "Vs",
+                "Reinforcement",
+                "Shear Forcing of Stirrups",
+                1,
+                True,
+                ).Vs = 0
 
         if not hasattr(obj, "combos_load"):
             obj.addProperty(
@@ -277,7 +317,7 @@ class Punch:
         #obj.Fys = ['340', '400']
         obj.setEditorMode("text", 2)
         obj.setEditorMode("center_of_punch", 2)
-        obj.setEditorMode("Area", 2)
+        # obj.setEditorMode("Area", 2)
         obj.setEditorMode("faces", 2)
 
     def onDocumentRestored(self, obj):
@@ -330,12 +370,12 @@ class Punch:
         obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inertia(faces)
         if 'Corner' in obj.Location:
             obj.I23 = 0
-        obj.Area = punch_funcs.area(faces)
+        obj.Area = f"{punch_funcs.area(faces)} mm^2"
         obj.center_of_punch = punch_funcs.center_of_mass(faces)
         obj.b0 = punch_funcs.length_of_edges(edges)
         obj.gamma_vx, obj.gamma_vy = punch_funcs.gamma_v(obj.bx, obj.by)
         obj.d = d
-        obj.one_way_shear_capacity, obj.Vc, obj.vc = self.allowable_stress(obj)
+        self.allowable_stress(obj)
         edges = Part.makeCompound(edges)
         if obj.angle != 0:
             obj.edges = edges.rotate(
@@ -365,6 +405,13 @@ class Punch:
         obj.Shape = comp
         self.punch_ratios(obj)
 
+        # calculate stirrups
+        if obj.Use_Reinforcement:
+            Av_over_s = (obj.Vu / 0.75 - obj.Vc) / (obj.Fys * obj.foundation.d)
+            obj.s = max(0, obj.Av / Av_over_s)
+            obj.Vs = obj.Av * obj.Fys * obj.foundation.d / obj.s
+
+
     def alphas(self, location):
         if 'Interior' in location:
             return 40
@@ -374,18 +421,18 @@ class Punch:
             return 20
 
     def allowable_stress(self, obj, phi_c=.75):
-        b0d = obj.Area
+        b0d = obj.Area.getValueAs('mm^2').Value
         beta = obj.bx / obj.by
         if beta < 1:
             beta = obj.by / obj.bx
-        fc = obj.fc.getValueAs("N/mm^2")
-        one_way_shear_capacity = math.sqrt(fc) * b0d / 6 * phi_c
-        Vc1 = one_way_shear_capacity * 2
-        Vc2 = one_way_shear_capacity * (1 + 2 / beta)
-        Vc3 = one_way_shear_capacity * (2 + obj.alpha_s * obj.d / obj.b0) / 2
-        Vc = min(Vc1, Vc2, Vc3)
-        vc = Vc / (b0d)
-        return one_way_shear_capacity, Vc, vc
+        fc = obj.fc.getValueAs("N/mm^2").Value
+        obj.one_way_shear_capacity = f"{math.sqrt(fc) * b0d / 6 * phi_c} N"
+        Vc1 = obj.one_way_shear_capacity * 2
+        Vc2 = obj.one_way_shear_capacity * (1 + 2 / beta)
+        Vc3 = obj.one_way_shear_capacity * (2 + obj.alpha_s * obj.d / obj.b0) / 2
+        obj.Vc = min(Vc1, Vc2, Vc3)
+        obj.vc = obj.Vc / (obj.Area)
+        return obj.one_way_shear_capacity, obj.Vc, obj.vc
 
     def ultimate_shear_stress(self, obj):
         location = obj.Location
@@ -393,7 +440,7 @@ class Punch:
         I22 = obj.I22
         I33 = obj.I33
         I23 = obj.I23
-        b0d = obj.Area
+        b0d = obj.Area.getValueAs('mm^2').Value
         x1, y1, _ = obj.center_of_load
         x3, y3, _ = obj.center_of_punch
         combos_Vu = dict()
@@ -413,13 +460,15 @@ class Punch:
         # adding maximum value of Vu to combos_Vu
         max_Vu = max([float(vu) for vu in combos_Vu.values()])
         combos_Vu["Max"] = str(max_Vu)
+        # max_Vu is shear stress, we multiply it with punch area to get ultimate shear force
+        obj.Vu = f"{max_Vu * b0d} N"
         return combos_Vu
 
     def punch_ratios(self, obj):
         combos_Vu = self.ultimate_shear_stress(obj)
         combos_ratio = dict()
         for combo, Vu in combos_Vu.items():
-            ratio = float(Vu) / obj.vc.Value
+            ratio = float(Vu) / obj.vc.getValueAs('MPa').Value
             combos_ratio[combo] = f"{ratio:.2f}"
         obj.combos_ratio = combos_ratio
         ratio = obj.combos_ratio["Max"]
