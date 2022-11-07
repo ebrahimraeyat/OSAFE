@@ -209,6 +209,14 @@ class Punch:
                 1,
                 True,
                 ).Vs = 0
+        
+        if not hasattr(obj, "x"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "x",
+                "Reinforcement",
+                "Requiered Length for set shear stirrups",
+                )
 
         if not hasattr(obj, "combos_load"):
             obj.addProperty(
@@ -410,6 +418,17 @@ class Punch:
             Av_over_s = (obj.Vu / 0.75 - obj.Vc) / (obj.Fys * obj.foundation.d)
             obj.s = max(0, obj.Av / Av_over_s)
             obj.Vs = obj.Av * obj.Fys * obj.foundation.d / obj.s
+            # calculate required length for arranging stirrups
+            Vu = obj.Vu.getValueAs('N').Value
+            fc = obj.fc.getValueAs('MPa').Value
+            b0_prim = Vu * 6 / (math.sqrt(fc) * obj.d)
+            if "Corner" in obj.Location:
+                n = 4
+            elif "Edge" in obj.Location:
+                n = 2
+            elif obj.Location == "Center":
+                n = 1
+            obj.x = f"{n * b0_prim / (2 * math.pi)} mm"
 
 
     def alphas(self, location):
