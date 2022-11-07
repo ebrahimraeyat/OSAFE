@@ -3,6 +3,8 @@ from pathlib import Path
 import FreeCAD
 import FreeCADGui as Gui
 
+from safe.punch.py_widget import resource_rc
+
 punch_path = Path(__file__).parent.parent
 
 
@@ -11,8 +13,10 @@ class Safe12TaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
+        self.form.export_button.clicked.connect(self.export)
+        self.form.cancel_button.clicked.connect(self.reject)
 
-    def accept(self):
+    def export(self):
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
@@ -104,6 +108,12 @@ class Safe12TaskPanel:
             rw.add_preferences()
             rw.safe.write()
         Gui.Control.closeDialog()
+
+    def reject(self):
+        Gui.Control.closeDialog()
+
+    def getStandardButtons(self):
+        return 0
 
 if __name__ == '__main__':
     panel = SafeTaskPanel()
