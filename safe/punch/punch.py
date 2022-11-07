@@ -428,7 +428,11 @@ class Punch:
                 n = 2
             elif obj.Location == "Center":
                 n = 1
-            obj.x = f"{n * b0_prim / (2 * math.pi)} mm"
+            x = n * b0_prim / (2 * math.pi) - obj.d / 2
+            if x > 0:
+                obj.x = f"{x} mm"
+            else:
+                obj.x = 0
 
 
     def alphas(self, location):
