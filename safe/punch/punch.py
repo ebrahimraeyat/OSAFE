@@ -215,7 +215,7 @@ class Punch:
                 "App::PropertyLength",
                 "x",
                 "Reinforcement",
-                "Requiered Length for set shear stirrups",
+                "Required Length for set shear stirrups",
                 )
 
         if not hasattr(obj, "combos_load"):

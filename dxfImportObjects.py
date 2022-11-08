@@ -1305,7 +1305,7 @@ def objectify(data):
     
     Maps object data to the correct object type.
     """
-    objects = [] # colector for finished objects
+    objects = [] # collector for finished objects
     known_types = type_map.keys() # so we don't have to call foo.keys() every iteration
     index = 0
     while index < len(data):
