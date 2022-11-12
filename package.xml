@@ -13,6 +13,7 @@
       <classname>OSAFE</classname>
       <subdirectory>./</subdirectory>
       <depend type="python" optional="False">comtypes</depend>
+      <depend type="python" optional="False">etabs-api</depend>
       <depend type="python" optional="True">pydocx</depend>
     </workbench>
   </content>
