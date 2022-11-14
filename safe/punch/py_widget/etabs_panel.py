@@ -23,16 +23,6 @@ class EtabsTaskPanel:
         self.update_gui()
         self.create_connections()
 
-    def set_etabs_exe(self):
-        if (
-            self.form.use_etabs.isChecked() and
-            not self.form.etabs_exe_path.text()
-        ):
-            param = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Draft")
-            etabs_exe = param.GetString('etabs_exe_path', '')
-            if etabs_exe and Path(etabs_exe).exists():
-                self.form.etabs_exe_path.setText(etabs_exe)
-
     def update_gui(self):
         self.set_load_cases()
         self.set_story()

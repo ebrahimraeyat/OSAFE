@@ -167,7 +167,6 @@ class CivilEtabs:
         import find_etabs
         etabs, filename = find_etabs.find_etabs(
             run=True,
-            software='OSAFE',
             )
         if (
             etabs is None or
