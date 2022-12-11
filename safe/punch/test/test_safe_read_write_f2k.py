@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 # path to FreeCAD.so
-FREECADPATH = 'H:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 import FreeCAD
 import pytest
@@ -125,7 +125,10 @@ def test_is_point_exist():
     content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
                 Point=117   GlobalX=7040   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n   
                 Point=119   GlobalX=14690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
-                Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n'''
+                Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=122   GlobalX=1   GlobalY=8969.629120788806   GlobalZ=0   SpecialPt=Yes\n
+                Point=123   GlobalX=0   GlobalY=8900   GlobalZ=0   SpecialPt=Yes\n
+                '''
 
     id = safe.is_point_exist([2820, 0, 0], content)
     assert id == '115'
@@ -133,6 +136,8 @@ def test_is_point_exist():
     id = safe.is_point_exist([2820.0001, 0, 0], content)
     assert id == '115'
     id = safe.is_point_exist([2820, 20, 0], content)
+    assert not id
+    id = safe.is_point_exist([1, 8900, 0], content)
     assert not id
 
 def test_force_length_unit():
