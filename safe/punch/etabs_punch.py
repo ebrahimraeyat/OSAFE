@@ -151,11 +151,11 @@ class EtabsPunch(object):
                     display_mode_entity="column_display_mode",
                     line_color_entity="column_line_color",
                     )
-                    line.ViewObject.PointSize = 6
-                    if section_type not in ('G', 'None') and import_beams:
-                        line.ViewObject.hide()
-                    if not import_beams:
-                        structure.ViewObject.hide()
+                    # line.ViewObject.PointSize = 6
+                    # if section_type not in ('G', 'None') and import_beams:
+                    #     line.ViewObject.hide()
+                    # if not import_beams:
+                    #     structure.ViewObject.hide()
                 
                 rotation = self.etabs.SapModel.FrameObj.GetLocalAxes(frame_name)[0]
                 insertion = self.etabs.SapModel.FrameObj.GetInsertionPoint(frame_name)

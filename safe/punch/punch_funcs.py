@@ -966,7 +966,8 @@ def make_automatic_base_foundation(
         strip = make_base_foundation(wire, layer, width, height, soil_modulus)
         strips.append(strip)
     for beam in beams:
-        FreeCAD.ActiveDocument.removeObject(beam.Name)
+        # FreeCAD.ActiveDocument.removeObject(beam.Name)
+        beam.ViewObject.hide()
     return strips
 
 def get_common_parts_of_foundation_slabs(foundation):

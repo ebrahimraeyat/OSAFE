@@ -142,6 +142,8 @@ class OSAFEViewBeams:
                 obj.Label.endswith("CenterLine") and obj.Label.startswith("B")
                 ) or (
                 hasattr(obj, "IfcType") and obj.IfcType == "Beam"
+                ) or (
+                    hasattr(obj, 'Proxy') and hasattr(obj.Proxy, 'Type') and obj.Proxy.Type == "Beam"
                 ):
                 show_object(obj, index)
 
