@@ -57,6 +57,42 @@ class OSAFEWorkbench(Workbench):
             Gui.showPreferences("OSAFE", 0)
         FreeCAD.addImportType("CSI ETABS (*.edb *.EDB)", "safe.punch.open_etabs")
 
+    def ContextMenu(self, recipient):
+        if recipient == "View":
+            # user clicked on the 3d view               
+            # if FreeCAD.activeDraftCommand is not None:
+            #     # context menu for active draft command
+            #     if FreeCAD.activeDraftCommand.featureName == "Line":
+            #         # BUG: "Line" gets translated, so the menu is not added correctly
+            #         #      for example in italian for App.activeDraftCommand.featureName
+            #         #      i get "Linea" and not "Line"
+            #         #      If I correct it, the context menu display correctly, 
+            #         #      but icons are grayed out, i think because we can't call them
+            #         #      while another command is active. This prevents adding subcommand
+            #         #      context menu entries.
+            #         self.appendContextMenu("", self.lineList) # so this unuseful
+            #     elif hasattr(FreeCAD.activeDraftCommand, "get_context_menu"):
+            #         pass
+            #         # TODO: get context menu from commands, for code i think it's more tidy
+            # else:
+                # context menu for selected object
+            current_selection = FreeCADGui.Selection.getSelection()
+            if len(current_selection) == 1:
+                obj = current_selection[0]
+                if hasattr(obj, 'IfcType') and obj.IfcType == 'Footing':
+                # TODO: Current implementation add lots of commands to the context
+                #       menu. I think we ca simplify it and add some separators
+                #       to keep everything more tidy.
+                #       Also the command could get context menu from the object view
+                #       provider since it already have one setupContextMenu method.
+                    self.appendContextMenu('', ['osafe_explode_foundation'])
+        # else:
+        #     # user clicked somewhere else on the Gui 
+        #     # TODO: i think we can discard this usecase, since the threeview
+        #     #       has already it's context menu entries in the viewprovider
+        #     if FreeCADGui.Selection.getSelection():
+        #         self.appendContextMenu("Utilities", self.treecmdList)
+
     def splash(self):
         from pathlib import Path
         import shutil
