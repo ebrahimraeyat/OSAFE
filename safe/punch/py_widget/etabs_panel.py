@@ -45,6 +45,7 @@ class EtabsTaskPanel:
         self.form.browse.clicked.connect(self.browse)
         self.form.import_data.clicked.connect(self.import_data)
         self.form.help.clicked.connect(self.show_help)
+        self.form.cancel_pushbutton.clicked.connect(self.accept)
 
     def set_foundation_level(self):
         self.etabs.set_current_unit('N', 'm')
@@ -71,7 +72,7 @@ class EtabsTaskPanel:
         Gui.Selection.clearSelection()
 
     def getStandardButtons(self):
-        return int(QtWidgets.QDialogButtonBox.Cancel)
+        return 0
 
     def accept(self):
         Gui.Control.closeDialog()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>308</width>
-    <height>312</height>
+    <width>324</width>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,64 @@
     <normaloff>:/safe/Resources/icons/strip.svg</normaloff>:/safe/Resources/icons/strip.svg</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="create_pushbutton">
+       <property name="text">
+        <string>Draw</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/strip.svg</normaloff>:/safe/Resources/icons/strip.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel_pushbutton">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/cancel.png</normaloff>:/safe/Resources/icons/cancel.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="help">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/help.png</normaloff>:/safe/Resources/icons/help.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="shortcut">
+        <string>F1</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QGroupBox" name="strip_foundation">
      <property name="title">
@@ -250,35 +308,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="draw_button">
-       <property name="text">
-        <string>Draw</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../py_widget/resource.qrc">
-         <normaloff>:/safe/Resources/icons/strip.svg</normaloff>:/safe/Resources/icons/strip.svg</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="help">
-       <property name="text">
-        <string>&amp;Help</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../py_widget/resource.qrc">
-         <normaloff>:/safe/Resources/icons/help.png</normaloff>:/safe/Resources/icons/help.png</iconset>
-       </property>
-       <property name="shortcut">
-        <string>F1</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

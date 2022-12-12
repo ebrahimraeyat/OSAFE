@@ -18,7 +18,8 @@ class Form:
         self.create_connections()
 
     def create_connections(self):
-        self.form.draw_button.clicked.connect(self.draw)
+        self.form.create_pushbutton.clicked.connect(self.create)
+        self.form.cancel_pushbutton.clicked.connect(self.accept)
         self.form.mat_foundation.clicked.connect(self.uncheck_strip)
         self.form.strip_foundation.clicked.connect(self.uncheck_mat)
         self.form.help.clicked.connect(self.show_help)
@@ -32,7 +33,7 @@ class Form:
         self.form.mat_foundation.setChecked(False)
         self.form.strip_foundation.setChecked(True)
 
-    def draw(self):
+    def create(self):
         doc = FreeCAD.ActiveDocument
         strips = []
         for obj in doc.Objects:
@@ -86,4 +87,4 @@ class Form:
         Gui.Control.closeDialog()
 
     def getStandardButtons(self):
-        return int(QtWidgets.QDialogButtonBox.Cancel)
+        return 0

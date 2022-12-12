@@ -29,6 +29,32 @@
         <iconset resource="../../py_widget/resource.qrc">
          <normaloff>:/safe/Resources/icons/import.svg</normaloff>:/safe/Resources/icons/import.svg</iconset>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel_pushbutton">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/cancel.png</normaloff>:/safe/Resources/icons/cancel.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="shortcut">
+        <string/>
+       </property>
       </widget>
      </item>
      <item>
@@ -39,6 +65,12 @@
        <property name="icon">
         <iconset resource="../../py_widget/resource.qrc">
          <normaloff>:/safe/Resources/icons/help.png</normaloff>:/safe/Resources/icons/help.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
        </property>
        <property name="shortcut">
         <string/>

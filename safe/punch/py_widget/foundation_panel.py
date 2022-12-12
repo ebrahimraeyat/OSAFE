@@ -2,6 +2,7 @@ from pathlib import Path
 
 import FreeCAD
 import FreeCADGui as Gui
+from safe.punch.py_widget import resource_rc
 from safe.punch import punch_funcs
 
 punch_path = Path(__file__).parent.parent
@@ -16,9 +17,14 @@ class Form:
         self.fill_height()
         self.update_gui()
 
+    def getStandardButtons(self):
+        return 0
+
     def create_connections(self):
         self.form.strip.clicked.connect(self.update_gui)
         self.form.mat.clicked.connect(self.update_gui)
+        self.form.create_pushbutton.clicked.connect(self.create)
+        self.form.cancel_pushbutton.clicked.connect(self.accept)
 
     def update_gui(self):
         if self.form.strip.isChecked():
@@ -38,7 +44,7 @@ class Form:
         except:
             pass
 
-    def accept(self):
+    def create(self):
         cover = self.form.cover.value() * 10
         fc = self.form.fc.value()
         ks = self.form.ks.value()
@@ -76,4 +82,7 @@ class Form:
             openings=openings,
             )
         # Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
+        Gui.Control.closeDialog()
+
+    def accept(self):
         Gui.Control.closeDialog()

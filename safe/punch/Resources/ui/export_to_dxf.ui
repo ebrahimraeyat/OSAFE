@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>365</width>
-    <height>146</height>
+    <width>285</width>
+    <height>256</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,15 +67,42 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="export_button">
-     <property name="text">
-      <string>Export</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../../py_widget/resource.qrc">
-       <normaloff>:/safe/Resources/icons/dxf.svg</normaloff>:/safe/Resources/icons/dxf.svg</iconset>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="export_button">
+       <property name="text">
+        <string>Export</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/dxf.svg</normaloff>:/safe/Resources/icons/dxf.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancel_pushbutton">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../py_widget/resource.qrc">
+         <normaloff>:/safe/Resources/icons/cancel.png</normaloff>:/safe/Resources/icons/cancel.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

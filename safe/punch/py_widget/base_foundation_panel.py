@@ -10,8 +10,17 @@ class Form:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'base_foundation_panel.ui'))
+        self.create_connections()
 
-    def accept(self):
+
+    def getStandardButtons(self):
+        return 0
+
+    def create_connections(self):
+        self.form.create_pushbutton.clicked.connect(self.create)
+        self.form.cancel_pushbutton.clicked.connect(self.accept)
+
+    def create(self):
         north_dist = self.form.north_distance.value() * 10 if self.form.north_checkbox.isChecked() else None
         south_dist = self.form.south_distance.value() * 10 if self.form.south_checkbox.isChecked() else None
         east_dist = self.form.east_distance.value() * 10 if self.form.east_checkbox.isChecked() else None
@@ -40,3 +49,6 @@ class Form:
                 east_dist, west_dist, x_stirp_name, y_stirp_name, angle, height, soil_modulus)
         Gui.Control.closeDialog()
         Gui.Selection.clearSelection()
+
+    def accept(self):
+        Gui.Control.closeDialog()

@@ -24,6 +24,7 @@ class Form:
     def create_connections(self):
         self.form.browse.clicked.connect(self.browse)
         self.form.import_button.clicked.connect(self.import_dxf)
+        self.form.cancel_pushbutton.clicked.connect(self.accept)
 
     def browse(self):
         ext = '.dxf'
@@ -65,7 +66,8 @@ class Form:
         if gui:
             Gui.SendMsgToActiveView("ViewFit")
         
-                
+    def getStandardButtons(self):
+        return 0           
     
     def accept(self):
         Gui.Control.closeDialog()

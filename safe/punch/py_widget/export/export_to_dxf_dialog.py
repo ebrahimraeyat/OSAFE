@@ -25,6 +25,7 @@ class Form:
     def create_connections(self):
         self.form.browse.clicked.connect(self.browse)
         self.form.export_button.clicked.connect(self.export)
+        self.form.cancel_pushbutton.clicked.connect(self.accept)
 
     def browse(self):
         ext = '.dxf'
@@ -51,6 +52,8 @@ class Form:
         if ret:
             QMessageBox.information(None, 'Successful', f'Model has been exported to {filename}')
 
+    def getStandardButtons(self):
+        return 0
     
     def accept(self):
         Gui.Control.closeDialog()
