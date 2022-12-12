@@ -101,7 +101,7 @@ class EtabsPunch(object):
                 if section_name:
                     section_index = frame_props[1].index(section_name)
                     section_type_num = frame_props[2][section_index]
-                    section_type, category = section_types_map.get(section_type_num, ('G', 'Genaral'))
+                    section_type, category = section_types_map.get(section_type_num, ('R', 'REC'))
                 else:
                     section_type, category = 'None', 'None'
                 width = frame_props[4][section_index]
