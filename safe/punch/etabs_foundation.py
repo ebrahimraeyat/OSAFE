@@ -1,8 +1,10 @@
 from os.path import join, dirname, abspath
 from typing import Union
+from pathlib import Path
 
 from PySide2 import QtCore
 import FreeCAD
+import FreeCADGui
 # import Part
 import ArchComponent
 
@@ -203,6 +205,19 @@ class ViewProviderFoundation:
                 [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.Slabs] + \
                 [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
         return children
+
+    def setupContextMenu(self, vobj, menu):
+        from PySide2 import QtGui, QtWidgets
+        icon_path = str(
+                Path(__file__).parent.absolute() / "Resources" / "icons" / "explode_foundation.svg"
+                )
+        icon = QtGui.QIcon(icon_path)
+        action1 = QtWidgets.QAction(icon,"Explode Foundation", menu)
+        action1.triggered.connect(explode_foundation)
+        menu.addAction(action1)
+
+def explode_foundation():
+    FreeCADGui.runCommand('osafe_explode_foundation')
 
 def make_foundation(
     cover: float = 75,
