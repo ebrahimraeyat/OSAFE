@@ -165,17 +165,15 @@ class ViewProviderStrip:
         return None
 
     def claimChildren(self):
-        return [FreeCAD.ActiveDocument.getObject(self.Object.Base.Name)]
+        return [self.Object.Base]
 
-    # def onDelete(self, vobj, subelements):
-    #     for o in FreeCAD.ActiveDocument.Objects:
-    #         if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Foundation':
-    #             base_names = [b.Name for b in o.base_foundations]
-    #             if self.Object.Name in base_names:
-    #                 base_names.remove(self.Object.Name)
-    #                 base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
-    #                 o.base_foundations = base_foundations
-    #     return True
+    def onDelete(self, vobj, subelements):
+        name = None
+        if vobj.Object.Base:
+            name = vobj.Object.Base.Name
+        FreeCAD.ActiveDocument.removeObject(vobj.Object.Name)
+        if name is not None:
+            FreeCAD.ActiveDocument.removeObject(name)
 
 
 if __name__ == "__main__":

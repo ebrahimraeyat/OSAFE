@@ -234,7 +234,7 @@ class ViewProviderBaseFoundation:
         self.Object = vobj.Object
 
     def claimChildren(self):
-        children = [FreeCAD.ActiveDocument.getObject(self.Object.Base.Name)]
+        children = [self.Object.Base]
         return children
 
     def getIcon(self):
@@ -246,16 +246,14 @@ class ViewProviderBaseFoundation:
     def __setstate__(self, state):
         return None
 
-    # def onDelete(self, vobj, subelements):
-    #     for o in FreeCAD.ActiveDocument.Objects:
-    #         if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Foundation':
-    #             base_names = [b.Name for b in o.base_foundations]
-    #             if self.Object.Name in base_names:
-    #                 base_names.remove(self.Object.Name)
-    #                 base_foundations = [FreeCAD.ActiveDocument.getObject(name) for name in base_names]
-    #                 o.base_foundations = base_foundations
-    #     return True
-        
+    def onDelete(self, vobj, subelements):
+        name = None
+        if vobj.Object.Base:
+            name = vobj.Object.Base.Name
+        FreeCAD.ActiveDocument.removeObject(vobj.Object.Name)
+        if name is not None:
+            FreeCAD.ActiveDocument.removeObject(name)
+
 
 if __name__ == "__main__":
     p1 = FreeCAD.Vector(0, 0, 0)

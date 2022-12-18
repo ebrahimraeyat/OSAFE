@@ -97,11 +97,16 @@ class _ViewProviderOpening:
         self.Object = vobj.Object
 
     def claimChildren(self):
-        children = [FreeCAD.ActiveDocument.getObject(self.Object.Base.Name)]
+        children = [self.Object.Base]
         return children
 
-    # def onDelete(self, vobj, subelements):
-    #     FreeCAD.ActiveDocument.removeObject(self.Object.Base.Name)
+    def onDelete(self, vobj, subelements):
+        name = None
+        if vobj.Object.Base:
+            name = vobj.Object.Base.Name
+        FreeCAD.ActiveDocument.removeObject(vobj.Object.Name)
+        if name is not None:
+            FreeCAD.ActiveDocument.removeObject(name)
 
     def getIcon(self):
         return str(Path(__file__).parent / "Resources" / "icons" / "opening.svg")

@@ -517,6 +517,11 @@ class ViewProviderPunch:
         self.ViewObject = vobj
         self.Object = vobj.Object
 
+    def onDelete(self, vobj, subelements):
+        if vobj.Object.text:
+            FreeCAD.ActiveDocument.removeObject(vobj.Object.text.Name)
+        return True
+
     def setEdit(self, vobj, mode=0):
         obj = vobj.Object
         ui = Ui(obj)

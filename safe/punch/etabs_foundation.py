@@ -200,10 +200,9 @@ class ViewProviderFoundation:
         return None
 
     def claimChildren(self):
-        children=[
-                FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.base_foundations] + \
-                [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.Slabs] + \
-                [FreeCAD.ActiveDocument.getObject(o.Name) for o in self.Object.openings]
+        children=self.Object.base_foundations + \
+                self.Object.Slabs + \
+                self.Object.openings
         return children
 
     def setupContextMenu(self, vobj, menu):
