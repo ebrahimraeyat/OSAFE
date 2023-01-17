@@ -23,6 +23,10 @@ class EtabsTaskPanel:
         self.update_gui()
         self.create_connections()
 
+    def create_new_document(self):
+        name = self.etabs.get_file_name_without_suffix()
+        FreeCAD.newDocument(name)
+
     def update_gui(self):
         self.set_load_cases()
         self.set_story()
@@ -65,7 +69,9 @@ class EtabsTaskPanel:
         self.form.filename.setText(filename)
 
     def import_data(self):
+        self.create_new_document()
         self.top_of_foundation = self.form.foundation_level.value() * 1000
+        self.add_load_combinations_names()
         self.import_beams_columns()
         self.create_f2k()
         Gui.Control.closeDialog()
@@ -141,6 +147,23 @@ class EtabsTaskPanel:
                 elif type(ret) == str:
                     self.form.result_label.setText(ret)
 
+    def add_load_combinations_names(self):
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return
+        d = {}
+        all_load_combos = self.etabs.load_combinations.get_load_combination_names()
+        all_load_combos_string = ' '.join(all_load_combos)
+        d['all_load_combinations'] = all_load_combos_string
+        types = ['concrete', 'steel']
+        type_combos = self.etabs.database.select_design_load_combinations(types=types)
+        for type_, combos in type_combos.items():
+            if combos is None:
+                combos = []
+            load_combos_string = ','.join(combos)
+            d[f'{type_}_load_combinations'] = load_combos_string
+        doc.Meta = d
+        
     def show_help(self):
         try:
             import Help

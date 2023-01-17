@@ -492,7 +492,11 @@ class Punch:
         combos_ratio = dict()
         for combo, Vu in combos_Vu.items():
             ratio = float(Vu) / obj.vc.getValueAs('MPa').Value
-            combos_ratio[combo] = f"{ratio:.2f}"
+            print(combo)
+            combo_name = combo.split()[0]
+            current_ratio = combos_ratio.get(combo_name, 0)
+            ratio = max(float(current_ratio), ratio)
+            combos_ratio[combo_name] = f"{ratio:.2f}"
         obj.combos_ratio = combos_ratio
         ratio = obj.combos_ratio["Max"]
         obj.Ratio = ratio
@@ -712,7 +716,6 @@ def make_punch(
     p.fc = foun_obj.fc
     p.Location = location
     FreeCAD.ActiveDocument.recompute()
-
     return p
 
 if __name__ == '__main__':

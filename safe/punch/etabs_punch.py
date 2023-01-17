@@ -170,13 +170,9 @@ class EtabsPunch(object):
 
     def import_load_combos(self,
         columns : Union[FreeCAD.DocumentObjectGroup, bool, list] = None,
-        types : list = ['concrete', 'steel'],
         ):
-        type_combos = self.etabs.database.select_design_load_combinations(types=types)
-        joint_design_reactions = self.etabs.database.get_joint_design_reactions(
-            types=[],
-            select_combos=False,
-            )
+        
+        joint_design_reactions = self.etabs.database.get_all_joint_design_reactions()
         doc = FreeCAD.ActiveDocument
         if columns is None:
             if hasattr(doc, 'Columns') and hasattr(doc.Columns, 'Group'):
@@ -197,18 +193,19 @@ class EtabsPunch(object):
             if point_reaction is None:
                 continue
             if type_ in ('concrete', 'steel'):
-                combos = type_combos[type_]
-                # TODO
-                # combos name, modified in get_join_design_reaction, thus can not filter according to concrete or steel combos
-                filt = (joint_design_reactions['UniqueName'] == point_reaction) # & (joint_design_reactions['OutputCase'].isin(combos))
+                combos = FreeCAD.ActiveDocument.Meta[f'{type_}_load_combinations']
+                combos = combos.split(',')
+                filt = (joint_design_reactions['UniqueName'] == point_reaction) & (joint_design_reactions['OutputCase'].isin(combos))
                 d = {}
                 df = joint_design_reactions.loc[filt]
                 for _, row2 in df.iterrows():
                     combo = row2['OutputCase']
+                    steptype = row2['StepType']
+                    combo_name = f'{combo} {steptype}'
                     F = row2['FZ']
                     mx = row2['MX']
                     my = row2['MY']
-                    d[combo] = f"{F}, {mx}, {my}"
+                    d[combo_name] = f"{F}, {mx}, {my}"
                 if not hasattr(col, "combos_load"):
                     col.addProperty(
                         "App::PropertyMap",
@@ -243,8 +240,9 @@ class EtabsPunch(object):
             import_load_combos : bool = True,
             import_beams : bool = True,
         ):
-        name = self.etabs.get_file_name_without_suffix()
-        FreeCAD.newDocument(name)
+        if FreeCAD.ActiveDocument is None:
+            name = self.etabs.get_file_name_without_suffix()
+            FreeCAD.newDocument(name)
         # self.create_slabs_plan()
         try:
             columns = self.create_columns(import_beams)
