@@ -31,7 +31,7 @@ class Foundation(ArchComponent.Component):
                 "fc",
                 "Foundation",
                 "",
-                8,
+                # 8,
                 )
         if not hasattr(obj, "ks"):
             obj.addProperty(

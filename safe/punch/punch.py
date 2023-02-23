@@ -492,7 +492,6 @@ class Punch:
         combos_ratio = dict()
         for combo, Vu in combos_Vu.items():
             ratio = float(Vu) / obj.vc.getValueAs('MPa').Value
-            print(combo)
             combo_name = combo.split()[0]
             current_ratio = combos_ratio.get(combo_name, 0)
             ratio = max(float(current_ratio), ratio)
