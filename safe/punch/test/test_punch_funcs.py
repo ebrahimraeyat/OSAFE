@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-FREECADPATH = 'H:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
 
 import FreeCAD
@@ -15,11 +15,13 @@ filename_strip_foundation = Path(__file__).absolute().parent.parent / 'test_file
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_base_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
 filename_khalaji = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
+filename_test = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'test.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
 document_strip_foundation = FreeCAD.openDocument(str(filename_strip_foundation))
 document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
+document_test = FreeCAD.openDocument(str(filename_test))
 
 
 punch_path = Path(__file__).absolute().parent.parent
@@ -318,7 +320,13 @@ def test_draw_strip_automatically_in_strip_foundation():
     punch_funcs.draw_strip_automatically_in_strip_foundation(document_strip_foundation.Foundation)
 
 
+def test_get_similar_edge_direction_in_common_points_from_edges():
+    edges = []
+    for o in document_test.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Beam':
+            edges.append(o.Shape.Edges[0])
+    df = punch_funcs.get_similar_edge_direction_in_common_points_from_edges(edges)
 
 
 if __name__ == '__main__':
-    test_get_common_part_of_base_foundation()
+    test_get_similar_edge_direction_in_common_points_from_edges()

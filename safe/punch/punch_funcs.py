@@ -1052,17 +1052,17 @@ def get_similar_edge_direction_in_common_points_from_edges(
 
     import pandas as pd
     cols = ['edge', 'is_first', 'is_end', 'x', 'y', 'z']
-    df = pd.DataFrame()
+    all_edges = []
     for e in edges:
         v1, v2 = e.firstVertex(), e.lastVertex()
-        se = pd.Series([e, True, False, v1.X, v1.Y, v1.Z], index=cols)
-        df = df.append(se, ignore_index=True)
-        se = pd.Series([e, False, True, v2.X, v2.Y, v2.Z], index=cols)
-        df = df.append(se, ignore_index=True)
+        all_edges.append([e, True, False, v1.X, v1.Y, v1.Z])
+        all_edges.append([e, False, True, v2.X, v2.Y, v2.Z])
+    df = pd.DataFrame(all_edges, columns=cols)
     group = df.groupby(['x','y', 'z'])
     max_number_edges_connect_to_point = group['edge'].count().max()
     additional_cols = [n for n in range(1, max_number_edges_connect_to_point)]
-    df1 = pd.DataFrame(columns=['point', 'edge'] + additional_cols)
+    cols=['point', 'edge'] + additional_cols
+    df1 = []
     for state, frame in group:
         edges_from_point = list(frame['edge'])
         for edge in edges_from_point:
@@ -1070,8 +1070,9 @@ def get_similar_edge_direction_in_common_points_from_edges(
             preferable_edges = get_in_direction_priority(edge, edges_without_curr_edge, angle)
             none_exist_edge_len = max_number_edges_connect_to_point -  len(preferable_edges) - 1
             preferable_edges += none_exist_edge_len * [None]
-            se = pd.Series([state, edge] +  preferable_edges, index=df1.columns)
-            df1 = df1.append(se, ignore_index=True)
+            df1.append([state, edge] +  preferable_edges)
+    df1 = pd.DataFrame(df1, columns=cols)
+            
     map_dict_edges_to_num = dict()
     for i, e in enumerate(edges, start=1):
         map_dict_edges_to_num[e] = i
