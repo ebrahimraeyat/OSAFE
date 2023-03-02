@@ -107,7 +107,7 @@ def createPdf(doc, pdfName):
     ax1.set_xlim(XMIN, XMAX)
 
     FreeCAD.Console.PrintMessage("Saving pdf file...")
-    fig.savefig(pdfName, orientation='portrait', papertype='a4', bbox_inches='tight', dpi=600)
+    fig.savefig(pdfName, orientation='portrait', bbox_inches='tight', dpi=600)
     FreeCAD.Console.PrintMessage("Pdf file saved as: " + pdfName)
     plt.close()
 
