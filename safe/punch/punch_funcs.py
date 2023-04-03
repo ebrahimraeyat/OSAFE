@@ -3,8 +3,9 @@ import math
 
 import FreeCAD
 import Part
-import Draft
-import DraftGeomUtils
+if FreeCAD.GuiUp:
+    import Draft
+    import DraftGeomUtils
 
 
 def remove_obj(name: str) -> None:
