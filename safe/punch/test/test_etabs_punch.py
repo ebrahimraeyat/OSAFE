@@ -41,9 +41,9 @@ def test_create_punches():
 def test_create_columns():
     etabs.create_columns()
 
-def test_import_load_combos():
+def test_import_loadcases_combos():
     etabs = etabs_punch.EtabsPunch()
-    etabs.import_data(import_load_combos=True)
+    etabs.import_data(import_loadcases_combos=True)
 
 if __name__ == '__main__':
-    test_import_load_combos()
+    test_import_loadcases_combos()

@@ -168,11 +168,13 @@ class EtabsPunch(object):
         progressbar.stop()
         return columns
 
-    def import_load_combos(self,
+    def import_loadcases_combos(self,
         columns : Union[FreeCAD.DocumentObjectGroup, bool, list] = None,
         ):
         
-        joint_design_reactions = self.etabs.database.get_all_joint_design_reactions()
+        joint_design_reactions_combos = self.etabs.database.get_all_joint_design_reactions()
+        self.etabs.load_cases.select_all_load_cases()
+        joint_design_reactions_cases = self.etabs.database.get_joint_design_reactions()
         doc = FreeCAD.ActiveDocument
         if columns is None:
             if hasattr(doc, 'Columns') and hasattr(doc.Columns, 'Group'):
@@ -193,11 +195,12 @@ class EtabsPunch(object):
             if point_reaction is None:
                 continue
             if type_ in ('concrete', 'steel'):
+                # load combinations reactions
                 combos = FreeCAD.ActiveDocument.Meta[f'{type_}_load_combinations']
                 combos = combos.split(',')
-                filt = (joint_design_reactions['UniqueName'] == point_reaction) & (joint_design_reactions['OutputCase'].isin(combos))
+                filt = (joint_design_reactions_combos['UniqueName'] == point_reaction) & (joint_design_reactions_combos['OutputCase'].isin(combos))
                 d = {}
-                df = joint_design_reactions.loc[filt]
+                df = joint_design_reactions_combos.loc[filt]
                 for _, row2 in df.iterrows():
                     combo = row2['OutputCase']
                     steptype = row2['StepType']
@@ -213,6 +216,25 @@ class EtabsPunch(object):
                         "Structure",
                         ).combos_load = d
                 col.setEditorMode('combos_load', 2)
+                # load cases reactions
+                filt = (joint_design_reactions_cases['UniqueName'] == point_reaction)
+                d = {}
+                df = joint_design_reactions_cases.loc[filt]
+                for _, row2 in df.iterrows():
+                    case = row2['OutputCase']
+                    steptype = row2['StepType']
+                    case_name = f'{case} {steptype}'
+                    F = row2['FZ']
+                    mx = row2['MX']
+                    my = row2['MY']
+                    d[case_name] = f"{F}, {mx}, {my}"
+                if not hasattr(col, "cases_load"):
+                    col.addProperty(
+                        "App::PropertyMap",
+                        "cases_load",
+                        "Structure",
+                        ).cases_load = d
+                col.setEditorMode('cases_load', 2)
                 col.recompute() 
 
     def is_restraint(self, points : list):
@@ -237,7 +259,7 @@ class EtabsPunch(object):
 
     def import_data(
             self,
-            import_load_combos : bool = True,
+            import_loadcases_combos : bool = True,
             import_beams : bool = True,
         ):
         if FreeCAD.ActiveDocument is None:
@@ -256,8 +278,8 @@ class EtabsPunch(object):
                 FreeCAD.Vector(0.0, 0.0, 0.0),
                 FreeCAD.Vector(0, 0, 1),
                 self.top_of_foundation)
-        if import_load_combos:
-            self.import_load_combos()
+        if import_loadcases_combos:
+            self.import_loadcases_combos()
         FreeCAD.ActiveDocument.recompute()
         Gui.Selection.clearSelection()
 
