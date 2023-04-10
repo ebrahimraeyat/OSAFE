@@ -24,10 +24,11 @@ class SafeF2k:
                 "output",
                 "Safe",
                 )
+        obj.setEditorMode('output', 1)
 
     def execute(self, obj):
-        input = obj.input
-        obj.input = input.replace('/', '\\')
+        input_ = obj.input
+        obj.input = input_.replace('/', '\\')
         output = obj.output
         obj.output = output.replace('/', '\\')
 

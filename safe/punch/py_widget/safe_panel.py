@@ -3,6 +3,8 @@ from pathlib import Path
 import FreeCAD
 import FreeCADGui as Gui
 
+from PySide2.QtWidgets import QMessageBox
+
 from safe.punch.py_widget import resource_rc
 
 punch_path = Path(__file__).parent.parent
@@ -13,10 +15,40 @@ class Safe12TaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
+        self.set_filename()
+        self.create_connections()
+
+    def create_connections(self):
         self.form.export_button.clicked.connect(self.export)
         self.form.cancel_button.clicked.connect(self.reject)
+        self.form.browse.clicked.connect(self.browse)
+
+    def set_filename(self):
+        doc = FreeCAD.ActiveDocument
+        f2k_file = doc.Safe
+        filename_path = f2k_file.output
+        self.form.filename.setText(filename_path)
+
+    def browse(self):
+        ext = '.F2K'
+        from PySide2.QtWidgets import QFileDialog
+        filters = f"{ext[1:]} (*{ext})"
+        filename, _ = QFileDialog.getSaveFileName(None, 'select file',
+                                                None, filters)
+        if not filename:
+            return
+        if not filename.upper().endswith(ext):
+            filename += ext
+        self.form.filename.setText(filename)
+        doc = FreeCAD.ActiveDocument
+        if hasattr(doc, 'Safe'):
+            f2k_file = doc.Safe
+            f2k_file.output = str(filename)
 
     def export(self):
+        output_f2k_path = self.form.filename.text()
+        if not output_f2k_path or not Path(output_f2k_path).parent.exists():
+            QMessageBox.warnings(None, 'f2k file path', f'Please select an output filename')
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
@@ -75,7 +107,6 @@ class Safe12TaskPanel:
             from safe.punch.safe_read_write_f2k import FreecadReadwriteModel as FRW
             f2k_file = doc.Safe
             input_f2k_path = f2k_file.input
-            output_f2k_path = f2k_file.output
             rw = FRW(input_f2k_path, output_f2k_path, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(
