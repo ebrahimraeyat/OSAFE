@@ -36,7 +36,7 @@ class Safe12TaskPanel:
         filename, _ = QFileDialog.getSaveFileName(None, 'select file',
                                                 None, filters)
         if not filename:
-            return
+            return False
         if not filename.upper().endswith(ext):
             filename += ext
         self.form.filename.setText(filename)
@@ -44,11 +44,16 @@ class Safe12TaskPanel:
         if hasattr(doc, 'Safe'):
             f2k_file = doc.Safe
             f2k_file.output = str(filename)
+            doc.recompute([f2k_file])
+        return True
 
     def export(self):
         output_f2k_path = self.form.filename.text()
         if not output_f2k_path or not Path(output_f2k_path).parent.exists():
-            QMessageBox.warnings(None, 'f2k file path', f'Please select an output filename')
+            QMessageBox.warning(None, 'f2k file path', f'Please select a valid path for f2k output.')
+            if not self.browse():
+                return
+            output_f2k_path = self.form.filename.text()
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
