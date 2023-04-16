@@ -604,8 +604,8 @@ class FreecadReadwriteModel():
                 height = o.Height.getValueAs('m')
                 loadpat = o.loadpat
                 value = mass_per_area * height * self.safe.force_units['Kgf'] / self.safe.length_units['m']
-                p1 = o.Base.start_point
-                p2 = o.Base.end_point
+                p1 = o.Base.Start
+                p2 = o.Base.End
                 coord1 = [i * scale_factor for i in (p1.x, p1.y, p1.z)]
                 coord2 = [i * scale_factor for i in (p2.x, p2.y, p2.z)]
                 p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)

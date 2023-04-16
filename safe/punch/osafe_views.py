@@ -143,7 +143,8 @@ class OSAFEViewBeams:
                 ) or (
                 hasattr(obj, "IfcType") and obj.IfcType == "Beam"
                 ) or (
-                    hasattr(obj, 'Proxy') and hasattr(obj.Proxy, 'Type') and obj.Proxy.Type == "Beam"
+                    hasattr(obj, 'type') and
+                    obj.type == "Beam"
                 ):
                 show_object(obj, index)
 

@@ -39,9 +39,8 @@ class Form:
 
         for o in sel:
             if (
-                hasattr(o, "Proxy") and
-                hasattr(o.Proxy, "Type") and
-                o.Proxy.Type == 'Beam'
+                hasattr(o, "type") and
+                o.type == 'Beam'
                 ):
                 beams.append(o)
         from safe.punch import punch_funcs

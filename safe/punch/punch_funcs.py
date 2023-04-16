@@ -731,7 +731,7 @@ def get_common_part_of_slabs(slabs):
         return None
     shapes = []
     for s in slabs:
-        p1, p2 = extend_two_points(s.start_point, s.end_point)
+        p1, p2 = extend_two_points(s.Start, s.End)
         p1, p2 = get_offset_points(p1, p2, s.offset)
         points = get_width_points(p1, p2, s.width.Value/2, s.angle)
         points.append(points[0])

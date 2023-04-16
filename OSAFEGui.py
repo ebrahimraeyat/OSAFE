@@ -311,13 +311,11 @@ class CivilOpening:
         height = 4000
         foun = None
         doc = FreeCAD.ActiveDocument
+        z = 0
         if hasattr(doc, 'Foundation'):
             foun = doc.Foundation
             height = foun.height.Value
             z = foun.level.Value
-        else:
-            if hasattr(doc, 'Beam'):
-                z = doc.Beam.start_point.z
         points_vec = [FreeCAD.Vector(p[0], p[1], z) for p in points_xyz]
         # wire = Draft.make_wire(points_vec)
         FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Make Opening"))
