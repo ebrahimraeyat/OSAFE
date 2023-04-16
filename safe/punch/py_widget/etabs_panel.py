@@ -91,9 +91,7 @@ class EtabsTaskPanel:
             story = self.form.story.currentText()
             selected_beams = self.form.selected_beams.isChecked()
             exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
-            conc_beams, _  = self.etabs.frame_obj.get_beams_columns(story=story)
-            steel_beams, _  = self.etabs.frame_obj.get_beams_columns(story=story, type_=1)
-            beams = steel_beams + conc_beams
+            beams, _ = self.etabs.frame_obj.get_beams_columns(story=story, types=[1,2])
             if (selected_beams or exclude_selected_beams):
                 names = self.etabs.select_obj.get_selected_obj_type(2)
                 names = [name for name in names if self.etabs.frame_obj.is_beam(name)]
