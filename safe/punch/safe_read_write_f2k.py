@@ -321,11 +321,15 @@ class FreecadReadwriteModel():
         soil_names = []
         names_props = []
         slab_sec_names = []
+        
+        height_name = int(foun.height.getValueAs('cm'))
+        height = int(foun.height.getValueAs(f'{self.length_unit}'))
         if foun.foundation_type == 'Strip':
             for base_foundation in foun.base_foundations:
                 # create slab section
-                height_name = int(base_foundation.height.getValueAs('cm'))
-                height = int(base_foundation.height.getValueAs(f'{self.length_unit}'))
+                if foun.height == 0:
+                    height_name = int(base_foundation.height.getValueAs('cm'))
+                    height = int(base_foundation.height.getValueAs(f'{self.length_unit}'))
                 slab_sec_name = f'SLAB{height_name}'
                 if slab_sec_name not in slab_sec_names:
                     # define slab
@@ -353,8 +357,9 @@ class FreecadReadwriteModel():
                 )
         
         elif foun.foundation_type == 'Mat':
-            height_name = int(foun.height.getValueAs('cm'))
-            height = int(foun.height.getValueAs(f'{self.length_unit}'))
+            if foun.height == 0:
+                height_name = int(foun.height.getValueAs('cm'))
+                height = int(foun.height.getValueAs(f'{self.length_unit}'))
             slab_sec_name = f'SLAB{height_name}'
             if slab_sec_name not in slab_sec_names:
                 # define slab
@@ -407,8 +412,9 @@ class FreecadReadwriteModel():
                 self.create_concrete_material(mat_name=mat_name, fc_mpa=fc_mpa)
                 mat_names.append(mat_name)
             # create slab section
-            height_name = int(slab.height.getValueAs('cm'))
-            height = int(slab.height.getValueAs(f'{self.length_unit}'))
+            if foun.height == 0:
+                height_name = int(slab.height.getValueAs('cm'))
+                height = int(slab.height.getValueAs(f'{self.length_unit}'))
             slab_sec_name = f'SLAB{height_name}'
             if slab_sec_name not in slab_sec_names:
                 # define slab

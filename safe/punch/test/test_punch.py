@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-FREECADPATH = 'H:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = 'G:\\program files\\FreeCAD 0.21\\bin'
 sys.path.append(FREECADPATH)
 
 import FreeCAD

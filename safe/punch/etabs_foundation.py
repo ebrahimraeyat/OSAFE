@@ -48,6 +48,13 @@ class Foundation(ArchComponent.Component):
                 "height",
                 "Geometry",
                 )
+        
+        if not hasattr(obj, "height_punch"):
+            obj.addProperty(
+                "App::PropertyLength",
+                "height_punch",
+                "Geometry",
+                )
 
         if not hasattr(obj, "cover"):
             obj.addProperty(
@@ -146,7 +153,10 @@ class Foundation(ArchComponent.Component):
 
     def _execute(self):
         obj = FreeCAD.ActiveDocument.getObject(self.obj_name)
-        obj.d = obj.height - obj.cover
+        if obj.height == 0:
+            obj.d = obj.height_punch - obj.cover
+        else:
+            obj.d = obj.height - obj.cover
         if not obj:
             FreeCAD.ActiveDocument.recompute()
             return
@@ -258,6 +268,10 @@ def make_foundation(
         for o in FreeCAD.ActiveDocument.Objects:
             if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                 base_foundations.append(o)
+    if height == 0:
+        obj.height_punch = base_foundations[0].height
+    else:
+        obj.height_punch = height
     obj.level = base_foundations[0].Base.Placement.Base.z
     obj.base_foundations = base_foundations
     obj.continuous_layer = continuous_layer

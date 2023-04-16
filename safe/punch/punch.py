@@ -3,8 +3,9 @@ from pathlib import Path
 from typing import Union
 import FreeCAD
 import Part
-import FreeCADGui as Gui
-import PySide2
+if FreeCAD.GuiUp:
+    import FreeCADGui as Gui
+    import PySide2
 
 try:
     from safe.punch import punch_funcs
