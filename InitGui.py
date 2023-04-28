@@ -47,6 +47,21 @@ class OSAFEWorkbench(Workbench):
                 / "images"
                 )
             )
+        
+        # Set up Draft command lists
+        import draftutils.init_tools as it
+        self.draft_snap_commands = it.get_draft_snap_commands()
+
+        # Set up toolbars
+        it.init_toolbar(self,
+                        QtCore.QT_TRANSLATE_NOOP("Workbench", "Draft snap"),
+                        self.draft_snap_commands)
+
+        # Set up preferences pages
+        if hasattr(FreeCADGui, "draftToolBar"):
+            if not hasattr(FreeCADGui.draftToolBar, "loadedPreferences"):
+                FreeCADGui.addPreferencePage(":/ui/preferences-draftsnap.ui", QtCore.QT_TRANSLATE_NOOP("Draft", "Draft"))
+                FreeCADGui.draftToolBar.loadedPreferences = True
 
     def Activated(self):
         from DraftGui import todo
