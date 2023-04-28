@@ -54,6 +54,11 @@ class Safe12TaskPanel:
             if not self.browse():
                 return
             output_f2k_path = self.form.filename.text()
+        doc = FreeCAD.ActiveDocument
+        if hasattr(doc, 'Safe'):
+            f2k_file = doc.Safe
+            f2k_file.output = str(output_f2k_path)
+            doc.recompute([f2k_file])
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
@@ -65,7 +70,6 @@ class Safe12TaskPanel:
         soil_modulus = self.form.soil_modulus.value()
         is_2d = 'Yes' if self.form.analysis_2d.isChecked() else 'No'
         max_mesh_size = self.form.max_mesh_size.value()
-        doc = FreeCAD.ActiveDocument
         slab_names = []
         software_name = software.split()[0]
         if software in ('SAFE 20', 'ETABS 19'):
