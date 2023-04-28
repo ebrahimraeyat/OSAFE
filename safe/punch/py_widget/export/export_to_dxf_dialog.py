@@ -19,7 +19,15 @@ class Form:
 
     def fill_filename(self):
         doc = FreeCAD.ActiveDocument
-        name = Path(doc.FileName).with_suffix('.dxf')
+        if doc.FileName:
+            name = Path(doc.FileName).with_suffix('.dxf')
+        else:
+            try:
+                import etabs_obj
+                etabs = etabs_obj.EtabsModel(backup=False)
+                name = etabs.get_filename().with_suffix('.dxf')
+            except:
+                name = ''
         self.form.filename.setText(str(name))
 
     def create_connections(self):
