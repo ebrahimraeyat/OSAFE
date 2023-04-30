@@ -1,8 +1,5 @@
 from pathlib import Path
-# from typing import Union
-# from PySide2 import QtCore
 import FreeCAD
-import Part
 import ArchComponent
 from safe.punch import punch_funcs
 

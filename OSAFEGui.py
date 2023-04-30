@@ -14,6 +14,7 @@ from safe.punch import (
     gui_slab,
     gui_beam,
     gui_base_foundation,
+    gui_draw_strip,
     gui_rectangular_slab,
     explode_foundation,
     gui_dxf,
@@ -691,6 +692,7 @@ export_list = [
 draw_list = [
             "civil_beam",
             "osafe_base_foundation",
+            "osafe_draw_strip",
             "osafe_rectangular_slab",
             'civil_slab',
             'civil_base_plate',
