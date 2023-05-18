@@ -10,7 +10,7 @@ except:
     import punch_funcs
 
 
-def make_opening(points, height=2000):
+def make_opening(points, height=4000):
     z = points[0].z
     doc = FreeCAD.ActiveDocument
     obj = doc.addObject("Part::FeaturePython", "Opening")
@@ -72,10 +72,10 @@ class Opening(ArchComponent.Component):
         if hasattr(obj, "Base") and obj.Base:
             wire = obj.Base.Shape.Wires[0]
             obj.plan = Part.Face(wire)
-            points = punch_funcs.get_sort_points(
-                wire.Edges,
-                sort_edges=True,
-            )
+            # points = punch_funcs.get_sort_points(
+            #     wire.Edges,
+            #     sort_edges=True,
+            # )
             # lines = []
             # for p1, p2 in zip(points[:-2], points[2:]):
             #     lines.append(Part.makeLine(p1, p2))
