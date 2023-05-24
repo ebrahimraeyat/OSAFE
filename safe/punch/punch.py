@@ -317,6 +317,12 @@ class Punch:
             "by",
             "Column",
             )
+        if not hasattr(obj, "Messages"):
+            obj.addProperty(
+                "App::PropertyString",
+                "Messages",
+                "Message",
+                )
 
         
 
@@ -328,6 +334,7 @@ class Punch:
         obj.setEditorMode("center_of_punch", 2)
         # obj.setEditorMode("Area", 2)
         obj.setEditorMode("faces", 2)
+        obj.setEditorMode("Messages", 1)
 
     def onDocumentRestored(self, obj):
         self.set_properties(obj)
@@ -415,7 +422,10 @@ class Punch:
         self.punch_ratios(obj)
 
         # calculate stirrups
-        if obj.Use_Reinforcement:
+        if float(obj.Ratio) > 1.0:
+            obj.Use_Reinforcement = True
+            
+        # if obj.Use_Reinforcement:
             Av_over_s = (obj.Vu / 0.75 - obj.Vc) / (obj.Fys * obj.foundation.d)
             obj.s = max(0, obj.Av / Av_over_s)
             obj.Vs = obj.Av * obj.Fys * obj.foundation.d / obj.s
@@ -434,6 +444,12 @@ class Punch:
                 obj.x = f"{x} mm"
             else:
                 obj.x = 0
+        if obj.Vs > 2 * obj.Vc:
+            # text = '<html> <span style=" font-size:9pt; font-weight:600; color:#FF0000;">Vs is greater than 2 * Vc</span>'
+            text = 'Vs > 2 * Vc'
+            obj.Messages = text
+        else:
+            obj.Messages = ""
 
 
     def alphas(self, location):

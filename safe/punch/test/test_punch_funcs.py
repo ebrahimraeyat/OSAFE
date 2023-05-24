@@ -233,10 +233,9 @@ def test_punch_null_points():
     assert len(null_points) == 6
 
 def test_get_continuous_edges():
-    slabs = document.Foundation.tape_slabs
-    edges = [s.Shape.Edges[0] for s in slabs]
+    edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
     edges_numbers = punch_funcs.get_continuous_edges(edges)
-    assert edges_numbers == [[6, 1, 2, 3], [11, 12, 13], [4, 5, 14], [8, 7], [10, 9], [15, 16]]
+    assert edges_numbers == [[13, 14, 15], [16, 1, 2, 3], [4, 5, 6], [8, 7], [10, 9], [12, 11]]
 
 def test_get_almost_direction_of_edges_list():
     slabs = document.Foundation.tape_slabs
@@ -321,12 +320,10 @@ def test_draw_strip_automatically_in_strip_foundation():
 
 
 def test_get_similar_edge_direction_in_common_points_from_edges():
-    edges = []
-    for o in document_test.Objects:
-        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'Beam':
-            edges.append(o.Shape.Edges[0])
+    edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
     df = punch_funcs.get_similar_edge_direction_in_common_points_from_edges(edges)
 
 
 if __name__ == '__main__':
-    test_get_similar_edge_direction_in_common_points_from_edges()
+    # test_get_similar_edge_direction_in_common_points_from_edges()
+    test_get_continuous_edges()
