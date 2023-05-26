@@ -50,7 +50,9 @@ class ForceTaskPanel:
                 )
             return
         load_value = self.form.load_value.value()
-        if loadcase in self.all_loads:
+        loads = FreeCAD.ActiveDocument.findObjects(Type='Fem::ConstraintForce')
+        all_loads = [load.Name for load in loads]
+        if loadcase in all_loads:
             load = FreeCAD.ActiveDocument.getObject(loadcase)
             load.Force = load_value
             load.ViewObject.show()
