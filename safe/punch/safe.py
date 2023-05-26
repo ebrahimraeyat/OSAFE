@@ -3,6 +3,8 @@ import pandas as pd
 pd.options.mode.chained_assignment = None
 import numpy as np
 
+import FreeCAD
+
 
 class Safe:
     __bool = {'Yes': True, 'No': False}
@@ -31,7 +33,26 @@ class Safe:
 
     def read_file(self):
         if self.filename.endswith((".xls", ".xlsx")):
-            self.excel = pd.read_excel(self.filename, sheet_name=['Program Control', 'Obj Geom - Point Coordinates', 'Obj Geom - Areas 01 - General', 'Load Assignments - Point Loads', 'Slab Prop 02 - Solid Slabs', 'Slab Property Assignments', 'Material Prop 03 - Concrete', 'Grid Lines', 'Load Combinations', 'Load Cases 06 - Loads Applied'], skiprows=[0, 2])
+            desired_sheet_names = [
+                'Program Control',
+                'Obj Geom - Point Coordinates',
+                'Obj Geom - Areas 01 - General',
+                'Load Assignments - Point Loads',
+                'Slab Prop 02 - Solid Slabs',
+                'Slab Property Assignments',
+                'Material Prop 03 - Concrete',
+                'Load Combinations',
+                'Load Cases 06 - Loads Applied',
+                ]
+            xls = pd.ExcelFile(self.filename)
+            sheet_names = xls.sheet_names
+            grid_lines = 'Grid Lines'
+            if (
+                grid_lines in sheet_names and 
+                FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True)
+                ):
+                desired_sheet_names.append(grid_lines)
+            self.excel = pd.read_excel(self.filename, sheet_name=desired_sheet_names, skiprows=[0, 2])
         elif self.filename.endswith((".mdb", ".accdb")):
             # TODO
             pass
