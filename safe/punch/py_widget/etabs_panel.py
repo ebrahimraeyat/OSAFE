@@ -6,7 +6,7 @@ import FreeCADGui as Gui
 
 from safe.punch.py_widget import resource_rc
 from PySide2.QtGui import QPixmap
-from PySide2 import QtWidgets
+from PySide2.QtCore import Qt
 
 punch_path = Path(__file__).parent.parent
 
@@ -29,17 +29,25 @@ class EtabsTaskPanel:
 
     def update_gui(self):
         self.set_load_cases()
-        self.set_story()
+        self.fill_levels()
         self.set_filename()
 
     def set_load_cases(self):
         FreeCAD.load_cases = self.etabs.load_cases.get_load_cases()
         FreeCAD.dead = self.etabs.load_patterns.get_special_load_pattern_names(1)
 
-    def set_story(self):
-        stories = self.etabs.SapModel.Story.GetNameList()[1]
-        self.form.story.addItems(stories)
-        self.form.story.setCurrentIndex(len(stories) - 1)
+    def fill_levels(self):
+        self.form.levels_list.clear()
+        levels_names = self.etabs.story.get_level_names()
+        self.form.levels_list.addItems(levels_names[1:])
+        lw = self.form.levels_list
+        for i in range(lw.count()):
+            item = lw.item(i)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            if i == 0:
+                item.setCheckState(Qt.Checked)
+            else:
+                item.setCheckState(Qt.Unchecked)
 
     def set_filename(self):
         filename = Path(self.etabs.SapModel.GetModelFilename()).with_suffix('.F2k')
@@ -50,6 +58,12 @@ class EtabsTaskPanel:
         self.form.import_data.clicked.connect(self.import_data)
         self.form.help.clicked.connect(self.show_help)
         self.form.cancel_pushbutton.clicked.connect(self.accept)
+        self.form.all_beams.clicked.connect(self.selection_changed)
+        self.form.selected_beams.clicked.connect(self.selection_changed)
+        self.form.exclude_selected_beams.clicked.connect(self.selection_changed)
+
+    def selection_changed(self):
+        self.form.levels_list.setEnabled(not self.form.selected_beams.isChecked())
 
     def set_foundation_level(self):
         self.etabs.set_current_unit('N', 'm')
@@ -69,10 +83,12 @@ class EtabsTaskPanel:
         self.form.filename.setText(filename)
 
     def import_data(self):
+        selected_beam_names = self.etabs.select_obj.get_selected_obj_type(2)
+        selected_beam_names = [name for name in selected_beam_names if self.etabs.frame_obj.is_beam(name)]
         self.create_new_document()
         self.top_of_foundation = self.form.foundation_level.value() * 1000
         self.add_load_combinations_names()
-        self.import_beams_columns()
+        self.import_beams_columns(selected_beam_names)
         self.create_f2k()
         Gui.Control.closeDialog()
         Gui.Selection.clearSelection()
@@ -83,24 +99,30 @@ class EtabsTaskPanel:
     def accept(self):
         Gui.Control.closeDialog()
 
-    def import_beams_columns(self):
+    def import_beams_columns(self,
+            selected_beam_names: list,
+            ):
         from safe.punch import etabs_punch
         import_beams = self.form.beams_group.isChecked()
         beams_names = None
         if import_beams:
-            story = self.form.story.currentText()
+            level_names = []
+            lw = self.form.levels_list
+            for i in range(lw.count()):
+                item = lw.item(i)
+                if item.checkState() == Qt.Checked:
+                    level_names.append(item.text())
             selected_beams = self.form.selected_beams.isChecked()
             exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
-            beams, _ = self.etabs.frame_obj.get_beams_columns(story=story, types=[1,2])
-            if (selected_beams or exclude_selected_beams):
-                names = self.etabs.select_obj.get_selected_obj_type(2)
-                names = [name for name in names if self.etabs.frame_obj.is_beam(name)]
-                if selected_beams:
-                    beams_names = set(names).intersection(beams)
-                elif exclude_selected_beams:
-                    beams_names = set(beams).difference(names)
-            elif self.form.all_beams.isChecked():
+            beams, _ = self.etabs.frame_obj.get_beams_columns(stories=level_names, types=[1,2])
+            beams = self.etabs.frame_obj.get_unique_frames(beams)
+            if self.form.all_beams.isChecked():
                 beams_names = beams
+            elif selected_beams:
+                beams_names = selected_beam_names
+            elif exclude_selected_beams:
+                beams_names = set(beams).difference(selected_beam_names)
+            beams_names = self.etabs.frame_obj.get_unique_frames(beams_names)
         punch = etabs_punch.EtabsPunch(
                 etabs_model = self.etabs,
                 beam_names = beams_names,
