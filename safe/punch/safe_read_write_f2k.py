@@ -323,13 +323,13 @@ class FreecadReadwriteModel():
         slab_sec_names = []
         
         height_name = int(foun.height.getValueAs('cm'))
-        height = int(foun.height.getValueAs(f'{self.length_unit}'))
+        height = round(foun.height.getValueAs(f'{self.length_unit}'), 2)
         if foun.foundation_type == 'Strip':
             for base_foundation in foun.base_foundations:
                 # create slab section
                 if foun.height == 0:
                     height_name = int(base_foundation.height.getValueAs('cm'))
-                    height = int(base_foundation.height.getValueAs(f'{self.length_unit}'))
+                    height = round(base_foundation.height.getValueAs(f'{self.length_unit}'), 2)
                 slab_sec_name = f'SLAB{height_name}'
                 if slab_sec_name not in slab_sec_names:
                     # define slab
@@ -359,7 +359,7 @@ class FreecadReadwriteModel():
         elif foun.foundation_type == 'Mat':
             if foun.height == 0:
                 height_name = int(foun.height.getValueAs('cm'))
-                height = int(foun.height.getValueAs(f'{self.length_unit}'))
+                height = round(foun.height.getValueAs(f'{self.length_unit}'), 2)
             slab_sec_name = f'SLAB{height_name}'
             if slab_sec_name not in slab_sec_names:
                 # define slab
@@ -414,7 +414,7 @@ class FreecadReadwriteModel():
             # create slab section
             if foun.height == 0:
                 height_name = int(slab.height.getValueAs('cm'))
-                height = int(slab.height.getValueAs(f'{self.length_unit}'))
+                height = round(slab.height.getValueAs(f'{self.length_unit}'), 2)
             slab_sec_name = f'SLAB{height_name}'
             if slab_sec_name not in slab_sec_names:
                 # define slab
