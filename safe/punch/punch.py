@@ -437,7 +437,7 @@ class Punch:
                 n = 4
             elif "Edge" in obj.Location:
                 n = 2
-            elif obj.Location == "Center":
+            elif obj.Location == "Interior":
                 n = 1
             x = n * b0_prim / (2 * math.pi) - obj.d / 2
             if x > 0:

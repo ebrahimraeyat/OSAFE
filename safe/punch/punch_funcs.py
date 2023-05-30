@@ -779,10 +779,13 @@ def get_continuous_base_foundation_shape(
                 base_foundation.extended_first_edge,
                 )
             if intersection:
-                base_foundation.first_edge = \
-                    Part.makeLine(
-                        intersection[0], FreeCAD.Vector(*first_point))
-                break
+                try:
+                    base_foundation.first_edge = \
+                        Part.makeLine(
+                            intersection[0], FreeCAD.Vector(*first_point))
+                    break
+                except Part.OCCError:
+                    continue
     comm = points_common_shape.get(last_point, None)
     if comm is not None:
         shapes.append(comm)
@@ -795,11 +798,14 @@ def get_continuous_base_foundation_shape(
                 base_foundation.extended_last_edge,
                 )
             if intersection:
-                base_foundation.last_edge = \
-                    Part.makeLine(
-                        FreeCAD.Vector(*last_point), intersection[0]
-                            )
-                break
+                try:
+                    base_foundation.last_edge = \
+                        Part.makeLine(
+                            FreeCAD.Vector(*last_point), intersection[0]
+                                )
+                    break
+                except Part.OCCError:
+                    continue
     shapes.append(base_foundation.plan)
     shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
     if len(shapes) > 1:
