@@ -317,11 +317,11 @@ class Punch:
             "by",
             "Column",
             )
-        if not hasattr(obj, "Messages"):
+        if not hasattr(obj, "Warnings"):
             obj.addProperty(
                 "App::PropertyString",
-                "Messages",
-                "Message",
+                "Warnings",
+                "Reinforcement",
                 )
 
         
@@ -334,7 +334,7 @@ class Punch:
         obj.setEditorMode("center_of_punch", 2)
         # obj.setEditorMode("Area", 2)
         obj.setEditorMode("faces", 2)
-        obj.setEditorMode("Messages", 1)
+        obj.setEditorMode("Warnings", 1)
 
     def onDocumentRestored(self, obj):
         self.set_properties(obj)
@@ -447,9 +447,9 @@ class Punch:
         if obj.Vs > 2 * obj.Vc:
             # text = '<html> <span style=" font-size:9pt; font-weight:600; color:#FF0000;">Vs is greater than 2 * Vc</span>'
             text = 'Vs > 2 * Vc'
-            obj.Messages = text
+            obj.Warnings = text
         else:
-            obj.Messages = ""
+            obj.Warnings = ""
 
 
     def alphas(self, location):
