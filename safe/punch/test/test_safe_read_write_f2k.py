@@ -140,6 +140,24 @@ def test_is_point_exist():
     id = safe.is_point_exist([1, 8900, 0], content)
     assert not id
 
+def test_get_last_point_number():
+    safe = Safe()
+    content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=119   GlobalX=14690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=123   GlobalX=0   GlobalY=8900   GlobalZ=0   SpecialPt=Yes\n
+                Point=121   GlobalX=17690   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n
+                Point=122   GlobalX=1   GlobalY=8969.629120788806   GlobalZ=0   SpecialPt=Yes\n
+                Point=117   GlobalX=7040   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n   
+                '''
+
+    id_ = safe.get_last_point_number(content)
+    assert id_ == 124
+    content += "Point=~200   GlobalX=7045   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n"   
+    id_ = safe.get_last_point_number(content)
+    assert id_ == 124
+    id_ = safe.get_last_point_number(content='1')
+    assert id_ == 1000000
+
 def test_force_length_unit():
     safe = Safe()
     content = 'ProgramName="SAFE 2016"   Version=16.0.2   ProgLevel="Post Tensioning"   LicenseNum=*1ZAU45DLGK2A3EX   CurrUnits="Kgf, m, C"   MergeTol=0.0025   ModelDatum=0   StHtAbove=0   StHtBelow=3000   ConcCode="ACI 318-14"'

@@ -57,6 +57,7 @@ class Safe():
         lines = content.split('\n')
         points_coordinates = dict()
         for line in lines:
+            point_name = None
             if not line:
                 continue
             line = line.lstrip(' ')
@@ -68,7 +69,8 @@ class Safe():
                 else:
                     value = float(field_value.split('=')[1])
                     coordinates.append(value)
-            points_coordinates[point_name] = coordinates
+            if point_name is not None:
+                points_coordinates[point_name] = coordinates
         return points_coordinates
 
     def is_point_exist(self,
@@ -87,6 +89,22 @@ class Safe():
                 ):
                 return _id
         return None
+    
+    def get_last_point_number(self,
+        content: Union[str, bool]=None,
+        ):
+        point_coordinated = self.get_points_coordinates(content=content)
+        # get points with numbers, maybe some point did not number ~1000
+        point_numbers = set()
+        for id_ in point_coordinated.keys():
+            try:
+                id_ = int(id_)
+                point_numbers.add(id_)
+            except:
+                continue
+        if len(point_numbers) == 0:
+            return 1000000
+        return max(point_numbers) + 1
                     
     def add_content_to_table(self, table_key, content, append=True):
         '''
@@ -302,7 +320,7 @@ class FreecadReadwriteModel():
         self.safe.force_length_unit()
         self.force_unit = self.safe.force_unit
         self.length_unit = self.safe.length_unit
-        self.last_point_number = 1000
+        self.last_point_number = self.safe.get_last_point_number()
         self.last_area_number = 1000
         self.last_line_number = 1000
 
