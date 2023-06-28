@@ -80,8 +80,8 @@ class Form:
         Gui.Selection.clearSelection()
 
     def show_help(self):
-        from help.show_help import show
-        show('make_auto_strip.html')
+        from freecad_funcs import show_help
+        show_help('make_auto_strip.html', 'OSAFE')
     
     def accept(self):
         Gui.Control.closeDialog()

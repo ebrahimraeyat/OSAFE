@@ -185,20 +185,8 @@ class EtabsTaskPanel:
         doc.Meta = d
         
     def show_help(self):
-        try:
-            import Help
-        except ModuleNotFoundError:
-            from PySide2.QtWidgets import QMessageBox
-            if (QMessageBox.question(
-                    None,
-                    "Install Help",
-                    "You must install Help WB to view the manual, do you want to install it?",
-                             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes) == QMessageBox.No):
-                return
-            Gui.runCommand('Std_AddonMgr',0)
-            return
-        help_path = punch_path.parent.parent / 'help' / 'import_model.html'
-        Help.show(str(help_path))
+        from freecad_funcs import show_help
+        show_help('import_model.html', 'OSAFE')
  
 if __name__ == '__main__':
     panel = EtabsTaskPanel()
