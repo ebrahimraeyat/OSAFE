@@ -66,11 +66,10 @@ class OSAFEWorkbench(Workbench):
     def Activated(self):
         from DraftGui import todo
         import check_update
-        todo.delay(check_update.check_updates, 'OSAFE')
+        check_update.check_updates('OSAFE')
 
         if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("show_at_startup", True):
             Gui.showPreferences("OSAFE", 0)
-        FreeCAD.addImportType("CSI ETABS (*.edb *.EDB)", "safe.punch.open_etabs")
 
     def ContextMenu(self, recipient):
         if recipient == "View":
