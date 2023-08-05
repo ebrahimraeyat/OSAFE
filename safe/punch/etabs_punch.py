@@ -52,12 +52,14 @@ class EtabsPunch(object):
 
     def create_columns(self,
             import_beams : bool = True,
+            beam_elevations: list=[],
             ):
         # joint_design_reactions = self.etabs.database.get_joint_design_reactions()
         # basepoints_coord_and_dims = self.etabs.database.get_basepoints_coord_and_dims(
         #         joint_design_reactions
         #     )
-
+        force, length = self.etabs.get_current_unit()
+        self.etabs.set_current_unit(force, 'mm')
         columns = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Columns")
         beams = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Beams")
         profiles = {}
@@ -76,7 +78,12 @@ class EtabsPunch(object):
         for i in range(frames_count):
             progressbar.next(True)
             frame_name = frames[1][i]
+            z1 = frames[8][i]
+            z2 = frames[11][i]
             if import_beams and frame_name in self.beam_names:
+                if beam_elevations:
+                    if z1 not in beam_elevations or z2 not in beam_elevations:
+                        continue
                 v1 = FreeCAD.Vector(frames[6][i], frames[7][i], self.top_of_foundation)
                 v2 = FreeCAD.Vector(frames[9][i], frames[10][i], self.top_of_foundation)
                 beam_name = beam.make_beam(v1, v2)
@@ -166,6 +173,7 @@ class EtabsPunch(object):
                     FreeCAD.Rotation(FreeCAD.Vector(0,0,1),rotation))
                 structure.Nodes = [v1, v2]
         progressbar.stop()
+        self.etabs.set_current_unit(force, length)
         return columns
 
     def import_load_combos(self,
@@ -239,13 +247,17 @@ class EtabsPunch(object):
             self,
             import_load_combos : bool = True,
             import_beams : bool = True,
+            beam_elevations: list=[],
         ):
         if FreeCAD.ActiveDocument is None:
             name = self.etabs.get_file_name_without_suffix()
             FreeCAD.newDocument(name)
         # self.create_slabs_plan()
         try:
-            columns = self.create_columns(import_beams)
+            columns = self.create_columns(
+                import_beams,
+                beam_elevations=beam_elevations,
+                )
         except TypeError:
             pass
         if FreeCAD.GuiUp:

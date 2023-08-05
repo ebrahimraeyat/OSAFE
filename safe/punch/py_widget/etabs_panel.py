@@ -107,11 +107,14 @@ class EtabsTaskPanel:
         beams_names = None
         if import_beams:
             level_names = []
+            elevations = []
             lw = self.form.levels_list
             for i in range(lw.count()):
                 item = lw.item(i)
                 if item.checkState() == Qt.Checked:
-                    level_names.append(item.text())
+                    level_name = item.text()
+                    level_names.append(level_name)
+                    elevations.append(self.etabs.SapModel.Story.GetElevation(level_name)[0])
             selected_beams = self.form.selected_beams.isChecked()
             exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
             beams, _ = self.etabs.frame_obj.get_beams_columns(stories=level_names, types=[1,2])
@@ -128,7 +131,10 @@ class EtabsTaskPanel:
                 beam_names = beams_names,
                 top_of_foundation=self.top_of_foundation,
             )
-        punch.import_data(import_beams=import_beams)
+        punch.import_data(
+            import_beams=import_beams,
+            beam_elevations=elevations,
+            )
 
     def create_f2k(self):
         filename = self.form.filename.text()
