@@ -1,3 +1,6 @@
+from typing import Union
+import numpy as np
+
 try:
     # from safe.punch.axis import create_grids
     # from safe.punch.punch_funcs import remove_obj
@@ -17,7 +20,7 @@ import FreeCADGui as Gui
 import Arch
 import DraftVecUtils
 import math
-from typing import Union
+
 
 from safe.punch import punch_funcs
 
@@ -82,7 +85,7 @@ class EtabsPunch(object):
             z2 = frames[11][i]
             if import_beams and frame_name in self.beam_names:
                 if beam_elevations:
-                    if z1 not in beam_elevations or z2 not in beam_elevations:
+                    if not close_to_any(z1, beam_elevations) or not close_to_any(z2, beam_elevations):
                         continue
                 v1 = FreeCAD.Vector(frames[6][i], frames[7][i], self.top_of_foundation)
                 v2 = FreeCAD.Vector(frames[9][i], frames[10][i], self.top_of_foundation)
@@ -326,3 +329,6 @@ def get_xy_cardinal_point(
     elif cardinal in (1, 2, 3):
         y = height / 2
     return x, y
+
+def close_to_any(a, floats, **kwargs):
+  return np.any(np.isclose(a, floats, **kwargs))
