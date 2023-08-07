@@ -105,9 +105,9 @@ class EtabsTaskPanel:
         from safe.punch import etabs_punch
         import_beams = self.form.beams_group.isChecked()
         beams_names = None
+        elevations = []
         if import_beams:
             level_names = []
-            elevations = []
             lw = self.form.levels_list
             for i in range(lw.count()):
                 item = lw.item(i)
