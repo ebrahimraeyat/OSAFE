@@ -787,6 +787,74 @@ class FreecadReadwriteModel():
         table_key = "SLAB PROPERTIES 02 - SOLID SLABS"
         slab_prop_content = f'Slab={name}   Type={type_}   MatProp={material}   Thickness={thickness}   Ortho=No\n'
         self.safe.add_content_to_table(table_key, slab_prop_content)
+    
+    def export_freecad_columns(self):
+        # Create Concrete Zero
+        mat_contents = self.safe.tables_contents.get("MATERIAL PROPERTIES 03 - CONCRETE", None)
+        if mat_contents is None or "CONCRETE_ZERO" not in mat_contents:
+            fc_mpa = self.doc.Foundation.fc.getValueAs('MPa')
+            self.create_concrete_material('CONCRETE_ZERO', fc_mpa, 0)
+        point_coords_table_key = "OBJECT GEOMETRY - POINT COORDINATES"
+        curr_point_content = self.safe.tables_contents.get(point_coords_table_key, '')
+        scale_factor = self.safe.length_units['mm']
+        length_unit = self.safe.length_unit
+        col_sections_dimensions = []
+        lines01_general_content = ''
+        column_properties_general_content = ''
+        column_properties02_rectangular_content = ''
+        column_property_assignments_content = ''
+        column_property_modifiers_content = ''
+        column_local_axes_content = ''
+        column_insertion_point_content = ''
+        points_content = ''
+        i = 0
+        for o in self.doc.Objects:
+            if hasattr(o, "IfcType") and o.IfcType == "Column":
+                i += 1
+                v1, v2 = o.Nodes
+                x_lenght = o.Base.Height.getValueAs(length_unit)
+                y_lenght = o.Base.Width.getValueAs(length_unit)
+                rotation = math.degrees(o.Placement.Rotation.Angle) - 90
+                column_properties_general_content += f'Column=COL{self.last_line_number}   Type=Rectangular\n'
+                content = f"Column=COL{self.last_line_number}   MatProp=CONCRETE_ZERO   SecDim2={x_lenght}   SecDim3={y_lenght}   AutoRigid=No   AutoDrop=No   IncludeCap=No\n"
+                column_properties02_rectangular_content += content
+                column_property_assignments_content += f'Line={self.last_line_number} ColProp=COL{self.last_line_number}\n'
+                column_property_modifiers_content += f"Line={self.last_line_number}   Area=1   As2=1   As3=1   J=1   I22=0.7   I33=0.7   Weight=1\n"
+                column_local_axes_content += f"Line={self.last_line_number} Angle={rotation}\n"
+                column_insertion_point_content += f'Line={self.last_line_number}   CardinalPt="10 (centroid)"\n'
+                # if col_sections_dimensions:
+ 
+ 
+                # height = o.Height.getValueAs(length_unit)
+                coord1 = [coord * scale_factor for coord in (v1.x, v1.y, v1.z)]
+                coord2 = [coord * scale_factor for coord in (v2.x, v2.y, v2.z)]
+                p1_name = self.safe.is_point_exist(coord1, curr_point_content + points_content)
+                p2_name = self.safe.is_point_exist(coord2, curr_point_content + points_content)
+                if p1_name is None:
+                    points_content += f"Point={self.last_point_number}   GlobalX={coord1[0]}   GlobalY={coord1[1]}   GlobalZ={coord1[2]}   SpecialPt=No\n"
+                    p1_name = self.last_point_number
+                    self.last_point_number += 1
+                if p2_name is None:
+                    points_content += f"Point={self.last_point_number}   GlobalX={coord2[0]}   GlobalY={coord2[1]}   GlobalZ={coord2[2]}   SpecialPt=No\n"
+                    p2_name = self.last_point_number
+                    self.last_point_number += 1
+                lines01_general_content += f'Line={self.last_line_number}   PointI={p1_name}   PointJ={p2_name}   LineType=Column\n'
+                self.last_line_number += 1
+                
+        if points_content:
+            self.safe.add_content_to_table(point_coords_table_key, points_content)
+        # Add to F2k
+        tables_contents = {
+            "OBJECT GEOMETRY - LINES 01 - GENERAL": lines01_general_content,
+            "COLUMN PROPERTIES 01 - GENERAL": column_properties_general_content,
+            "COLUMN PROPERTIES 02 - RECTANGULAR": column_properties02_rectangular_content,
+            "COLUMN PROPERTY ASSIGNMENTS": column_property_assignments_content,
+            "COLUMN PROPERTY MODIFIERS": column_property_modifiers_content,
+            "COLUMN LOCAL AXES": column_local_axes_content,
+            "COLUMN INSERTION POINT": column_insertion_point_content,
+        }
+        for table_key, content in tables_contents.items():
+            self.safe.add_content_to_table(table_key, content)
 
     def add_preferences(self):
         table_key = "DESIGN PREFERENCES 02 - REBAR COVER - SLABS"

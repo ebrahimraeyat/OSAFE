@@ -11,6 +11,7 @@ filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 
 filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_kazemi = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'kazemi.FCStd'
 filename_khalaji = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
+filename_adampira = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'adampira.FCStd'
 input_f2k = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.F2k'
 document = FreeCAD.openDocument(str(filename))
 document_mat = FreeCAD.openDocument(str(filename_mat))
@@ -30,24 +31,24 @@ def test_export_freecad_slabs():
     assert len(slabs) == 33
 
 def test_export_freecad_wall_loads():
-    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path = Path(r'~\input.f2k').expanduser()
     input_f2k_path.touch()
-    output_f2k_path = Path('~\\wall_loads.f2k').expanduser()
+    output_f2k_path = Path(r'~\wall_loads.f2k').expanduser()
     rw = FRW(input_f2k_path, output_f2k_path, document)
     rw.export_freecad_wall_loads()
     rw.safe.write()
 
 def test_add_uniform_gravity_load():
-    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path = Path(r'~\input.f2k').expanduser()
     input_f2k_path.touch()
-    output_f2k_path = Path('~\\uniform.f2k').expanduser()
+    output_f2k_path = Path(r'~\uniform.f2k').expanduser()
     rw = FRW(input_f2k_path, output_f2k_path, document)
     slabs = rw.export_freecad_slabs()
     rw.add_uniform_gravity_load(slabs, 'DEAD', 200)
     rw.safe.write()
     assert len(slabs) == 1
     # Mat 
-    output_f2k_path = Path('~\\uniform_mat.f2k').expanduser()
+    output_f2k_path = Path(r'~\uniform_mat.f2k').expanduser()
     rw = FRW(input_f2k_path, output_f2k_path, document_mat)
     slabs = rw.export_freecad_slabs()
     rw.add_uniform_gravity_load(slabs, 'DEAD', 200)
@@ -56,18 +57,18 @@ def test_add_uniform_gravity_load():
 
 
 def test_export_freecad_slabs_mat():
-    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path = Path(r'~\input.f2k').expanduser()
     input_f2k_path.touch()
-    output_f2k_path = Path('~\output_mat.f2k').expanduser()
+    output_f2k_path = Path(r'~\output_mat.f2k').expanduser()
     rw = FRW(input_f2k_path, output_f2k_path, document_mat)
     slabs = rw.export_freecad_slabs()
     rw.safe.write()
     assert len(slabs) == 5
 
 def test_export_freecad_openings():
-    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path = Path(r'~\input.f2k').expanduser()
     input_f2k_path.touch()
-    output_f2k_path = Path('~\output_mat.f2k').expanduser()
+    output_f2k_path = Path(r'~\output_mat.f2k').expanduser()
     rw = FRW(input_f2k_path, output_f2k_path, document_mat)
     slabs = rw.export_freecad_openings()
     rw.safe.write()
@@ -84,9 +85,9 @@ def test_export_freecad_mat_strips():
     rw.safe.write()
 
 def test_add_preferences():
-    input_f2k_path = Path('~\input.f2k').expanduser()
+    input_f2k_path = Path(r'~\input.f2k').expanduser()
     input_f2k_path.touch()
-    output_f2k_path = Path('~\pref.f2k').expanduser()
+    output_f2k_path = Path(r'~\pref.f2k').expanduser()
     rw = FRW(input_f2k_path, output_f2k_path, document)
     rw.add_preferences()
     rw.safe.write()
@@ -97,7 +98,7 @@ def test_export_freecad_stiff_elements():
     rw.safe.write()
 
 def test_export_punch_props():
-    output_f2k_path = Path('~\punch.f2k').expanduser()
+    output_f2k_path = Path(r'~\punch.f2k').expanduser()
     rw = FRW(input_f2k, output_f2k_path, document_khalaji)
     rw.export_punch_props()
     rw.safe.write()
@@ -107,8 +108,47 @@ def test_export_punch_props():
                 assert True
                 return
     assert False
-    
 
+def test_export_freecad_columns():
+    output_f2k_path = Path(r'~\columns.f2k').expanduser()
+    doc = FreeCAD.openDocument(str(filename_adampira))
+    rw = FRW(input_f2k, output_f2k_path, doc)
+    rw.export_freecad_columns()
+    rw.safe.write()
+    obj_geo_line01 = False
+    col_prop_general = False
+    col_prop_rec = False
+    col_prop_assign = False
+    col_prop_mod = False
+    col_prop_angle = False
+    col_prop_insertion = False
+    with open(output_f2k_path, 'r') as f:
+        for line in f:
+            if "Line=1008   PointI=51   PointJ=52   LineType=Column" in line:
+                obj_geo_line01 = True
+            if "Column=COL1008   Type=Rectangular" in line:
+                col_prop_general = True
+            if "Column=COL1007   MatProp=CONCRETE_ZERO   SecDim2=700.0   SecDim3=500.0" in line:
+                col_prop_rec = True
+            if "Line=1006 ColProp=COL1006" in line:
+                col_prop_assign = True
+            if "Line=1008   Area=1   As2=1   As3=1   J=1   I22=0.7   I33=0.7   Weight=1" in line:
+                col_prop_mod = True
+            if "Line=1004 Angle=50." in line:
+                col_prop_angle = True
+            if 'Line=1006   CardinalPt="10 (centroid)"' in line:
+                col_prop_insertion = True
+    for col_prop in (
+        obj_geo_line01,
+        col_prop_general,
+        col_prop_rec,
+        col_prop_assign,
+        col_prop_mod,
+        col_prop_angle,
+        col_prop_insertion,
+    ):
+        assert col_prop
+            
 def test_get_points_coordinates():
     safe = Safe()
     content = '''Point=115   GlobalX=2820   GlobalY=0   GlobalZ=0   SpecialPt=Yes\n

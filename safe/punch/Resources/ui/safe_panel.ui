@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>405</height>
+    <height>413</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,24 +89,14 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
-      <widget class="QCheckBox" name="analysis_2d">
-       <property name="text">
-        <string>2D Ananlysis</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Soil Properties</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="Line" name="line">
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
@@ -122,28 +112,28 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Name</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QLineEdit" name="soil_name">
        <property name="text">
         <string>SOIL</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="7" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Modulus</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="7" column="1">
       <widget class="QDoubleSpinBox" name="soil_modulus">
        <property name="prefix">
         <string/>
@@ -168,14 +158,14 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Max. Mesh Size</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="8" column="1">
       <widget class="QDoubleSpinBox" name="max_mesh_size">
        <property name="prefix">
         <string/>
@@ -200,20 +190,40 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Software</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QComboBox" name="software">
        <item>
         <property name="text">
          <string>SAFE 16</string>
         </property>
        </item>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="analysis_2d">
+       <property name="text">
+        <string>2D Ananlysis</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="QCheckBox" name="columns">
+       <property name="text">
+        <string>Columns</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>

@@ -66,6 +66,7 @@ class Safe12TaskPanel:
         is_strips = self.form.strips_checkbox.isChecked()
         is_stiffs = self.form.stiff_elements_checkbox.isChecked()
         is_punches = self.form.punches.isChecked()
+        is_columns = self.form.punches.isChecked()
         soil_name = self.form.soil_name.text()
         soil_modulus = self.form.soil_modulus.value()
         is_2d = 'Yes' if self.form.analysis_2d.isChecked() else 'No'
@@ -143,6 +144,8 @@ class Safe12TaskPanel:
                 rw.export_freecad_strips()
             if is_stiffs:
                 rw.export_freecad_stiff_elements()
+            if is_columns:
+                rw.export_freecad_columns()
             if is_punches:
                 rw.export_punch_props()
             rw.add_preferences()
