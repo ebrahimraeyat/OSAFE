@@ -22,6 +22,9 @@ from safe.punch import (
     base_plate,
     osafe_views,
     )
+from osafe_gui import (
+    gui_export_strips
+)
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
@@ -681,13 +684,14 @@ command_list = [
             ]
 
 export_list = [
-            "Civil_pdf",
-            "Civil_pic",
-            "Civil_excel",
-            "Civil_docx",
-            "Civil_dxf",
-            "osafe_import_dxf",
-            ]
+    "osafe_export_strips",
+    "Civil_pdf",
+    "Civil_pic",
+    "Civil_excel",
+    "Civil_docx",
+    "Civil_dxf",
+    "osafe_import_dxf",
+]
 
 draw_list = [
             "civil_beam",

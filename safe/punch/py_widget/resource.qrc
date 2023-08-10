@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../Resources/icons/export_strips.svg</file>
     <file>../Resources/icons/foundation.svg</file>
     <file>../Resources/icons/base_foundation.svg</file>
     <file>../Resources/icons/safe.png</file>
