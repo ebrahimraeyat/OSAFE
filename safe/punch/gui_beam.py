@@ -55,6 +55,8 @@ class Beam(Line):
                 points_string.append(DraftVecUtils.toString(self.node[0]))
             cmd_list = ['from safe.punch.beam import make_beam']
             for p1, p2 in zip(points_string[:-1], points_string[1:]):
+                if DraftVecUtils.equals(p1, p2):
+                    continue
                 cmd_list.append(f'make_beam({p1}, {p2})')
             self.commit(translate("civil", "Create beam"),
                         cmd_list)

@@ -50,6 +50,8 @@ class EtabsPunch(object):
             xj, yj = row['xj'], row['yj']
             v1 = FreeCAD.Vector(xi, yi, self.top_of_foundation)
             v2 = FreeCAD.Vector(xj, yj, self.top_of_foundation)
+            if DraftVecUtils.equals(v1, v2):
+                continue
             slabs[slab_name] = beam.make_beam(v1, v2)
         return slabs
 
@@ -89,6 +91,8 @@ class EtabsPunch(object):
                         continue
                 v1 = FreeCAD.Vector(frames[6][i], frames[7][i], self.top_of_foundation)
                 v2 = FreeCAD.Vector(frames[9][i], frames[10][i], self.top_of_foundation)
+                if DraftVecUtils.equals(v1, v2):
+                    continue
                 beam_name = beam.make_beam(v1, v2)
                 beams.addObject(beam_name)
             elif self.etabs.frame_obj.is_column(frame_name):
