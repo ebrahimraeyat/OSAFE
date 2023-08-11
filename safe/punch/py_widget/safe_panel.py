@@ -66,7 +66,7 @@ class Safe12TaskPanel:
         is_strips = self.form.strips_checkbox.isChecked()
         is_stiffs = self.form.stiff_elements_checkbox.isChecked()
         is_punches = self.form.punches.isChecked()
-        is_columns = self.form.punches.isChecked()
+        is_columns = self.form.columns.isChecked()
         soil_name = self.form.soil_name.text()
         soil_modulus = self.form.soil_modulus.value()
         is_2d = 'Yes' if self.form.analysis_2d.isChecked() else 'No'
