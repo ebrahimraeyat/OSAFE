@@ -36,7 +36,7 @@ class EtabsPunch(object):
             self.etabs = etabs_obj.EtabsModel(backup=False)
         else:
             self.etabs = etabs_model
-        self.etabs.set_current_unit('N', 'mm')
+        self.etabs.set_current_unit('KN', 'mm')
         self.beam_names = beam_names
         self.top_of_foundation = top_of_foundation
 

@@ -66,7 +66,7 @@ class EtabsTaskPanel:
         self.form.levels_list.setEnabled(not self.form.selected_beams.isChecked())
 
     def set_foundation_level(self):
-        self.etabs.set_current_unit('N', 'm')
+        self.etabs.set_current_unit('KN', 'm')
         base_level = self.etabs.story.get_base_name_and_level()[1]
         self.form.foundation_level.setValue(base_level)
 
@@ -83,7 +83,7 @@ class EtabsTaskPanel:
         self.form.filename.setText(filename)
 
     def import_data(self):
-        self.etabs.set_current_unit('N', 'mm')
+        self.etabs.set_current_unit('KN', 'mm')
         selected_beam_names = self.etabs.select_obj.get_selected_obj_type(2)
         selected_beam_names = [name for name in selected_beam_names if self.etabs.frame_obj.is_beam(name)]
         self.create_new_document()
