@@ -25,15 +25,8 @@ class OsafeExportStrips:
                 'ToolTip': tool_tip}
 
     def Activated(self):
-        import find_etabs
-        etabs, filename = find_etabs.find_etabs(backup=True)
-        if (
-            etabs is None or
-            filename is None
-            ):
-            return
         from safe.punch.py_widget.export import export_strips_panel
-        win = export_strips_panel.Form(etabs=etabs)
+        win = export_strips_panel.Form()
         Gui.Control.showDialog(win)
 
     def IsActive(self):

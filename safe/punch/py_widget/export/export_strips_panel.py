@@ -15,25 +15,20 @@ class Form:
 
     def __init__(
         self,
-        etabs=None,
         ):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'export_strips_panel.ui'))
-        self.etabs = etabs
         self.etabs_clicked = False
-        self.update_gui()
         self.create_connections()
-
-    def create_new_document(self):
-        name = self.etabs.get_file_name_without_suffix()
-        FreeCAD.newDocument(name)
-
-    def update_gui(self):
-        if self.etabs is not None:
-            self.fill_levels()
-            self.set_filename()
 
     def fill_levels(self):
         if not self.etabs_clicked:
+            import find_etabs
+            etabs, filename = find_etabs.find_etabs(backup=True)
+            if (
+                etabs is None or
+                filename is None
+                ):
+                return
             levels_names = self.etabs.story.get_level_names()
             self.form.levels_list.addItems(levels_names[1:])
             self.etabs_clicked = True
@@ -50,6 +45,7 @@ class Form:
         self.form.safe20.clicked.connect(self.selection_changed)
         self.form.safe16.clicked.connect(self.selection_changed)
         self.form.etabs.clicked.connect(self.selection_changed)
+        self.form.etabs.clicked.connect(self.fill_levels)
 
     def selection_changed(self):
         if self.form.safe20.isChecked():
@@ -90,8 +86,15 @@ class Form:
                 )
             self.etabs.view.refresh_view()
         elif self.form.safe20.isChecked():
-            self.etabs.area.export_freecad_strips(doc=doc)
-            self.etabs.view.refresh_view()
+            import find_etabs
+            etabs, filename = find_etabs.find_etabs(software='SAFE', backup=False)
+            if (
+                etabs is None or
+                filename is None
+                ):
+                return
+            etabs.area.export_freecad_strips(doc=doc)
+            etabs.view.refresh_view()
         elif self.form.safe16.isChecked():
             raise NotImplementedError
         QMessageBox.information(None, "Applied to Software", "Strips Written Successfully.")
