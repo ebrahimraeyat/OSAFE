@@ -18,14 +18,15 @@ class Form:
         ):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'export_strips_panel.ui'))
         self.etabs_clicked = False
+        self.etabs = None
         self.create_connections()
 
     def fill_levels(self):
         if not self.etabs_clicked:
             import find_etabs
-            etabs, filename = find_etabs.find_etabs(backup=True)
+            self.etabs, filename = find_etabs.find_etabs(backup=True)
             if (
-                etabs is None or
+                self.etabs is None or
                 filename is None
                 ):
                 return
@@ -86,15 +87,16 @@ class Form:
                 )
             self.etabs.view.refresh_view()
         elif self.form.safe20.isChecked():
-            import find_etabs
-            etabs, filename = find_etabs.find_etabs(software='SAFE', backup=False)
-            if (
-                etabs is None or
-                filename is None
-                ):
-                return
-            etabs.area.export_freecad_strips(doc=doc)
-            etabs.view.refresh_view()
+            if self.etabs is None:
+                import find_etabs
+                self.etabs, filename = find_etabs.find_etabs(software='SAFE', backup=False)
+                if (
+                    self.etabs is None or
+                    filename is None
+                    ):
+                    return
+            self.etabs.area.export_freecad_strips(doc=doc)
+            self.etabs.view.refresh_view()
         elif self.form.safe16.isChecked():
             raise NotImplementedError
         QMessageBox.information(None, "Applied to Software", "Strips Written Successfully.")
