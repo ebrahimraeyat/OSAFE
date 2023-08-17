@@ -152,6 +152,9 @@ class Safe12TaskPanel:
                 rw.export_punch_props()
             rw.add_preferences()
             rw.safe.write()
+            if Path(f2k_file.input).exists():
+                with open(f2k_file.input) as f:
+                    f2k_file.input_str = f.read()
         Gui.Control.closeDialog()
 
     def reject(self):
