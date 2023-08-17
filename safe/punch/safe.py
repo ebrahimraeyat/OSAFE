@@ -49,7 +49,7 @@ class Safe:
             grid_lines = 'Grid Lines'
             if (
                 grid_lines in sheet_names and 
-                FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True)
+                FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("draw_grid", True)
                 ):
                 desired_sheet_names.append(grid_lines)
             self.excel = pd.read_excel(self.filename, sheet_name=desired_sheet_names, skiprows=[0, 2])

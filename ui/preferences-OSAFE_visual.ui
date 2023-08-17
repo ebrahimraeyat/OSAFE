@@ -1168,7 +1168,7 @@
           <cstring>apply_aci2019</cstring>
          </property>
          <property name="prefPath" stdset="0">
-          <cstring>Mod/Civil</cstring>
+          <cstring>Mod/OSAFE</cstring>
          </property>
         </widget>
        </item>
@@ -1200,7 +1200,7 @@
             <cstring>picture_ext</cstring>
            </property>
            <property name="prefPath" stdset="0">
-            <cstring>Mod/Civil</cstring>
+            <cstring>Mod/OSAFE</cstring>
            </property>
            <item>
             <property name="text">
@@ -1239,7 +1239,7 @@
              <cstring>draw_grid</cstring>
             </property>
             <property name="prefPath" stdset="0">
-             <cstring>Mod/Civil</cstring>
+             <cstring>Mod/OSAFE</cstring>
             </property>
            </widget>
           </item>
@@ -1255,7 +1255,7 @@
              <cstring>extend_grid</cstring>
             </property>
             <property name="prefPath" stdset="0">
-             <cstring>Mod/Civil</cstring>
+             <cstring>Mod/OSAFE</cstring>
             </property>
            </widget>
           </item>
@@ -1302,7 +1302,7 @@
                <cstring>RatioTolerance</cstring>
               </property>
               <property name="prefPath" stdset="0">
-               <cstring>Mod/Civil</cstring>
+               <cstring>Mod/OSAFE</cstring>
               </property>
              </widget>
             </item>
@@ -1343,7 +1343,7 @@
                <cstring>Ratio_above_color</cstring>
               </property>
               <property name="prefPath" stdset="0">
-               <cstring>Mod/Civil</cstring>
+               <cstring>Mod/OSAFE</cstring>
               </property>
              </widget>
             </item>
@@ -1384,7 +1384,7 @@
                <cstring>Ratio_below_color</cstring>
               </property>
               <property name="prefPath" stdset="0">
-               <cstring>Mod/Civil</cstring>
+               <cstring>Mod/OSAFE</cstring>
               </property>
              </widget>
             </item>
@@ -1404,7 +1404,7 @@
                <cstring>is_text_color</cstring>
               </property>
               <property name="prefPath" stdset="0">
-               <cstring>Mod/Civil</cstring>
+               <cstring>Mod/OSAFE</cstring>
               </property>
              </widget>
             </item>
@@ -1434,7 +1434,7 @@
                <cstring>text_color</cstring>
               </property>
               <property name="prefPath" stdset="0">
-               <cstring>Mod/Civil</cstring>
+               <cstring>Mod/OSAFE</cstring>
               </property>
              </widget>
             </item>
@@ -1445,6 +1445,51 @@
        </item>
        <item>
         <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Export</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Safe</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="Gui::PrefCheckBox" name="checkBox_3">
+            <property name="text">
+             <string>Export Columns</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
+            </property>
+            <property name="prefEntry" stdset="0">
+             <cstring>export_columns_to_safe</cstring>
+            </property>
+            <property name="prefPath" stdset="0">
+             <cstring>Mod/OSAFE</cstring>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>

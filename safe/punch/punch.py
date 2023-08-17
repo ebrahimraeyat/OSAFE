@@ -519,7 +519,7 @@ class Punch:
 
     @staticmethod
     def __get_color(pref_intity, color=674321151):
-        c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
+        c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetUnsigned(pref_intity, color)
         r = float((c >> 24) & 0xFF) / 255.0
         g = float((c >> 16) & 0xFF) / 255.0
         b = float((c >> 8) & 0xFF) / 255.0
@@ -561,14 +561,14 @@ class ViewProviderPunch:
         if prop == "Ratio":
             if float(obj.Ratio) == 0:
                 return
-            ratio = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetFloat("RatioTolerance", 1.0)
+            ratio = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetFloat("RatioTolerance", 1.0)
             if float(obj.Ratio) > ratio:
                 color = get_color("Ratio_above_color", 4278190335)
             else:
                 color = get_color("Ratio_below_color", 16711935)
             obj.ViewObject.ShapeColor = color
             if hasattr(obj, "text") and obj.text:
-                if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("is_text_color", False):
+                if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("is_text_color", False):
                     color = get_color("text_color", 674321151)
                 if hasattr(obj.text.ViewObject, "TextColor"):
                     obj.text.ViewObject.TextColor = color
@@ -709,7 +709,7 @@ class Ui:
 
 
 def get_color(pref_intity, color=16711935):
-    c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
+    c = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetUnsigned(pref_intity, color)
     r = float((c >> 24) & 0xFF) / 255.0
     g = float((c >> 16) & 0xFF) / 255.0
     b = float((c >> 8) & 0xFF) / 255.0

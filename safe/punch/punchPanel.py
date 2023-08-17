@@ -104,7 +104,7 @@ class PunchTaskPanel:
         pdf.createPdf(doc, filename)
 
     def export_to_image(self):
-        i = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetInt("picture_ext", 0)
+        i = App.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetInt("picture_ext", 0)
         ext = ('png', 'jpg', 'pdf')[i]
         filename = self.get_save_filename(f'.{ext}')
         doc = App.ActiveDocument

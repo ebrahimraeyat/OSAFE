@@ -121,7 +121,7 @@ class Geom(object):
             p.id = str(key)
 
     def grid_lines(self):
-        if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
+        if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("draw_grid", True):
             return
 
         gridLines = self._safe.grid_lines()

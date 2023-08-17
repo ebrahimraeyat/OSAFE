@@ -69,7 +69,7 @@ class CivilPictur:
     def Activated(self):
         from safe.punch import export
         doc = FreeCAD.ActiveDocument
-        i = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetInt("picture_ext", 0)
+        i = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetInt("picture_ext", 0)
         ext = ('png', 'jpg', 'pdf')[i]
         filename = get_save_filename(f'.{ext}')
         export.createPdf(doc, filename)

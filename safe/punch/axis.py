@@ -16,7 +16,7 @@ no_of_edge_in_on_axis = 4
 
 def create_x_grid(sketch, xcoord, text, i, YMIN, YMAX, y1, y2, y3, y4, yc):
     text = str(text)
-    if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("extend_grid", True):
+    if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("extend_grid", True):
         g = Part.makeLine(FreeCAD.Vector(xcoord, YMIN, 0), FreeCAD.Vector(xcoord, YMAX, 0))
         Part.show(g)
     # g.ViewObject.DrawStyle = 'Dashdot'
@@ -56,7 +56,7 @@ def create_x_grid(sketch, xcoord, text, i, YMIN, YMAX, y1, y2, y3, y4, yc):
 
 def create_y_grid(sketch, ycoord, text, i, XMIN, XMAX, x1, x2, x3, x4, xc):
     text = str(text)
-    if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("extend_grid", True):
+    if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("extend_grid", True):
         g = Part.makeLine(FreeCAD.Vector(XMIN, ycoord, 0), FreeCAD.Vector(XMAX, ycoord, 0))
     # # g.DrawStyle = "Dashdot"
         Part.show(g)

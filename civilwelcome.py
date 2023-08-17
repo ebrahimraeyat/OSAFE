@@ -23,4 +23,4 @@ class CivilWelcome:
         # if result:
         #     FreeCADGui.runCommand("Civil_Setup")
 
-        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").SetBool("FirstTime", False)
+        FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetBool("FirstTime", False)

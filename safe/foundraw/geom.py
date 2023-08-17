@@ -115,7 +115,7 @@ class Geom(object):
     #   return point_loads_areas_contain
 
     def grid_lines(self):
-        if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetBool("draw_grid", True):
+        if not App.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("draw_grid", True):
             return
 
         gridLines = self._safe.grid_lines()
@@ -170,7 +170,7 @@ class Geom(object):
 
     @staticmethod
     def __get_color(pref_intity, color=674321151):
-        c = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Civil").GetUnsigned(pref_intity, color)
+        c = App.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetUnsigned(pref_intity, color)
         r = float((c >> 24) & 0xFF) / 255.0
         g = float((c >> 16) & 0xFF) / 255.0
         b = float((c >> 8) & 0xFF) / 255.0

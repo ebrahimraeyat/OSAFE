@@ -17,6 +17,8 @@ class Safe12TaskPanel:
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
         self.set_filename()
         self.create_connections()
+        if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("export_columns_to_safe", False):
+            self.form.columns.setChecked(True)
 
     def create_connections(self):
         self.form.export_button.clicked.connect(self.export)
