@@ -118,7 +118,8 @@ class EtabsTaskPanel:
                     elevations.append(self.etabs.SapModel.Story.GetElevation(level_name)[0])
             selected_beams = self.form.selected_beams.isChecked()
             exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
-            beams, _ = self.etabs.frame_obj.get_beams_columns(stories=level_names, types=[1,2])
+            #  types: {1: steel, 2: concrete, 3: composite Beam, 7: No Design, 13: composite column }
+            beams, _ = self.etabs.frame_obj.get_beams_columns(stories=level_names, types=[1,2,3,7,13])
             beams = self.etabs.frame_obj.get_unique_frames(beams)
             if self.form.all_beams.isChecked():
                 beams_names = beams
