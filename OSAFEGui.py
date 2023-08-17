@@ -207,12 +207,22 @@ class CivilSafe1620:
             QMessageBox.warning(None, "Missing Safe Object", "You don't have Safe Object, please create it first!")
             return
         if not Path(doc.Safe.input).exists():
-            QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, please select a valid path for Safe Object input.")
-            return
+            QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, Maybe the path is change. we try to find it!")
+            if not doc.Safe.input_str:
+                QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, please select a valid path for Safe Object input.")
+                return
+            else:
+                import tempfile
+                default_tmp_dir = tempfile._get_default_tempdir()
+                name = next(tempfile._get_candidate_names())
+                punch_temp_file = Path(default_tmp_dir) / f'{name}.F2k'
+                with open(punch_temp_file, 'w') as f:
+                    f.write(doc.Safe.input_str)
+                doc.Safe.input = str(punch_temp_file)
         with open(doc.Safe.input) as f:
-            for line in f:
+            for line in f:  
                 if "$ TITLES" in line:
-                    QMessageBox.warning(None, "version 12", "Your input F2K file is in Safe 12, please Save it as Safe 16")
+                    QMessageBox.warning(None, "version 12", "Your input F2K file is in Safe 12 format, please Save as Safe 16")
                     return
                 elif 'TABLE:  "PROGRAM CONTROL"' in line:
                     break

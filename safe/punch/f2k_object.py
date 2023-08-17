@@ -18,6 +18,12 @@ class SafeF2k:
                 "input",
                 "Safe",
                 )
+        if not hasattr(obj, "input_str"):
+            obj.addProperty(
+                "App::PropertyString",
+                "input_str",
+                "Safe",
+                ).input_str=''
         if not hasattr(obj, "output"):
             obj.addProperty(
                 "App::PropertyFile",
@@ -25,12 +31,19 @@ class SafeF2k:
                 "Safe",
                 )
         obj.setEditorMode('output', 1)
+        obj.setEditorMode('input_str', 2)
 
     def execute(self, obj):
         input_ = obj.input
         obj.input = input_.replace('/', '\\')
         output = obj.output
         obj.output = output.replace('/', '\\')
+        try:
+            if Path(obj.input).exists():
+                with open(obj.input) as f:
+                    obj.input_str = f.read()
+        except:
+            pass
 
     def onDocumentRestored(self, obj):
         self.set_properties(obj)
@@ -49,7 +62,7 @@ class ViewProviderF2k:
         return None
 
 def make_safe_f2k(
-    input : str,
+    input : str='',
     output : Union[str, None] = None,
     ):
     obj = FreeCAD.ActiveDocument.addObject("App::FeaturePython", "Safe")
