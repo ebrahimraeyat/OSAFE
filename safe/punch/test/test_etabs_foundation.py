@@ -27,6 +27,16 @@ def test_make_foundation():
     ret = etabs_foundation.make_foundation(base_foundations=bfs)
     assert True
 
+def test_change_foundation_height():
+    bfs = []
+    for o in document_base_foundation.Objects:
+        if hasattr(o, 'Proxy') and o.Proxy.Type == 'BaseFoundation':
+            bfs.append(o)
+    ret = etabs_foundation.make_foundation(base_foundations=bfs)
+    ret.height = 810
+    document_base_foundation.recompute([ret])
+    assert ret.height_punch.Value == 810
+
 
 
 

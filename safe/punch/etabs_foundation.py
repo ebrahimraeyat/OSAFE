@@ -145,6 +145,11 @@ class Foundation(ArchComponent.Component):
         obj.setEditorMode('level', 2)
         obj.setEditorMode('d', 1)
 
+    def onChanged(self, obj, prop):
+        """Execute when a property is changed."""
+        if prop == 'height' and obj.height != 0 and hasattr(obj, 'height_punch'):
+            obj.height_punch = obj.height
+
     def execute(self, obj):
         if obj.redraw:
             obj.redraw = False
@@ -170,8 +175,6 @@ class Foundation(ArchComponent.Component):
                 split_mat=obj.split,
                 slabs=obj.Slabs,
                 )
-            
-        
         # obj.plan, obj.plan_without_openings, holes = punch_funcs.get_foundation_plan_with_holes(obj)
         # obj.Shape = obj.plan.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
         # for i, face in enumerate(obj.Shape.Faces, start=1):
@@ -291,6 +294,7 @@ def make_foundation(
     if FreeCAD.GuiUp:
         for bf in base_foundations:
             show_object(bf, False)
+            show_object(bf.Base, False)
     FreeCAD.ActiveDocument.commitTransaction()
     FreeCAD.ActiveDocument.recompute()
     return obj
