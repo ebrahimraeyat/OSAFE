@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>260</width>
-    <height>413</height>
+    <width>356</width>
+    <height>526</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -229,28 +229,62 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLineEdit" name="filename">
-       <property name="inputMask">
-        <string/>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="placeholderText">
-        <string>*.F2K</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="browse">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Input F2k</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLineEdit" name="input_filename">
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>*.F2K</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="input_browse">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Output F2k</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLineEdit" name="output_filename">
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>*.F2K</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="output_browse">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

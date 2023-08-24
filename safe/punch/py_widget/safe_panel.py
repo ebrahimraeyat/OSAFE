@@ -3,7 +3,7 @@ from pathlib import Path
 import FreeCAD
 import FreeCADGui as Gui
 
-from PySide2.QtWidgets import QMessageBox
+from PySide2.QtWidgets import QMessageBox, QFileDialog
 
 from safe.punch.py_widget import resource_rc
 
@@ -15,6 +15,8 @@ class Safe12TaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'safe_panel.ui'))
+        self.form.input_browse.setObjectName("input_browse")
+        self.form.output_browse.setObjectName("output_browse")
         self.set_filename()
         self.create_connections()
         if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("export_columns_to_safe", False):
@@ -23,17 +25,36 @@ class Safe12TaskPanel:
     def create_connections(self):
         self.form.export_button.clicked.connect(self.export)
         self.form.cancel_button.clicked.connect(self.reject)
-        self.form.browse.clicked.connect(self.browse)
+        self.form.input_browse.clicked.connect(self.input_browse)
+        self.form.output_browse.clicked.connect(self.output_browse)
 
     def set_filename(self):
         doc = FreeCAD.ActiveDocument
         f2k_file = doc.Safe
+        filename_path = f2k_file.input
+        self.form.input_filename.setText(filename_path)
         filename_path = f2k_file.output
-        self.form.filename.setText(filename_path)
+        self.form.output_filename.setText(filename_path)
 
-    def browse(self):
+    def input_browse(self):
         ext = '.F2K'
-        from PySide2.QtWidgets import QFileDialog
+        filters = f"{ext[1:]} (*{ext})"
+        filename, _ = QFileDialog.getOpenFileName(None, 'select file',
+                                                None, filters)
+        if not filename:
+            return False
+        if not filename.upper().endswith(ext):
+            filename += ext
+        self.form.input_filename.setText(filename)
+        doc = FreeCAD.ActiveDocument
+        if hasattr(doc, 'Safe'):
+            f2k_file = doc.Safe
+            f2k_file.input = str(filename)
+            doc.recompute([f2k_file])
+        return True
+    
+    def output_browse(self):
+        ext = '.F2K'
         filters = f"{ext[1:]} (*{ext})"
         filename, _ = QFileDialog.getSaveFileName(None, 'select file',
                                                 None, filters)
@@ -41,7 +62,7 @@ class Safe12TaskPanel:
             return False
         if not filename.upper().endswith(ext):
             filename += ext
-        self.form.filename.setText(filename)
+        self.form.output_filename.setText(filename)
         doc = FreeCAD.ActiveDocument
         if hasattr(doc, 'Safe'):
             f2k_file = doc.Safe
@@ -50,17 +71,6 @@ class Safe12TaskPanel:
         return True
 
     def export(self):
-        output_f2k_path = self.form.filename.text()
-        if not output_f2k_path or not Path(output_f2k_path).parent.exists():
-            QMessageBox.warning(None, 'f2k file path', f'Please select a valid path for f2k output.')
-            if not self.browse():
-                return
-            output_f2k_path = self.form.filename.text()
-        doc = FreeCAD.ActiveDocument
-        if hasattr(doc, 'Safe'):
-            f2k_file = doc.Safe
-            f2k_file.output = str(output_f2k_path)
-            doc.recompute([f2k_file])
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
@@ -116,9 +126,27 @@ class Safe12TaskPanel:
                 etabs.database.create_punching_shear_perimeter_table(punches)
             etabs.SapModel.View.RefreshView()
         elif software == 'SAFE 16':
+            input_f2k_path = self.form.input_filename.text()
+            if not input_f2k_path or not Path(input_f2k_path).parent.exists():
+                QMessageBox.warning(None, 'Input F2K', 'Please Select a Valid Path for Input f2k.')
+                ret = self.form.input_browse.click()
+                if not ret:
+                    return
+                input_f2k_path = self.form.input_filename.text()
+            output_f2k_path = self.form.output_filename.text()
+            if not output_f2k_path or not Path(output_f2k_path).parent.exists():
+                QMessageBox.warning(None, 'Output F2K', 'Please Select a Valid Path for Output f2k.')
+                ret = self.form.output_browse.click()
+                if not ret:
+                    return
+                output_f2k_path = self.form.output_filename.text()
+            doc = FreeCAD.ActiveDocument
+            if hasattr(doc, 'Safe'):
+                f2k_file = doc.Safe
+                f2k_file.input = str(input_f2k_path)
+                f2k_file.output = str(output_f2k_path)
+                doc.recompute([f2k_file])
             from safe.punch.safe_read_write_f2k import FreecadReadwriteModel as FRW
-            f2k_file = doc.Safe
-            input_f2k_path = f2k_file.input
             rw = FRW(input_f2k_path, output_f2k_path, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(
@@ -164,4 +192,4 @@ class Safe12TaskPanel:
         return 0
 
 if __name__ == '__main__':
-    panel = SafeTaskPanel()
+    panel = Safe12TaskPanel()
