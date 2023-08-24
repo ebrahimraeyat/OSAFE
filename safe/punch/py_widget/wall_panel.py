@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from PySide2 import QtWidgets
+
 import FreeCAD
 import FreeCADGui as Gui
 import ArchWall
@@ -24,20 +26,26 @@ class WallTaskPanel:
         self.form.create_button.clicked.connect(self.create_wall)
 
     def create_wall(self):
+        loadpat = self.form.loadpat.currentText()
+        if not loadpat:
+            QtWidgets.QMessageBox.warning(None, "Load Case Name", "Please Enter the name of Load Case.")
+            return
         sel = Gui.Selection.getSelection()
-        slabs = []
+        if len(sel) == 0:
+            QtWidgets.QMessageBox.warning(None, "Selection", "Please Select Lines or Wires.")
+            return
+
+        wires = []
+        import draftutils.utils as utils
         for s in sel:
-            if (hasattr(s, "Proxy") and
-                hasattr(s.Proxy, "Type") and
-                s.Proxy.Type == "Beam"
-                ):
-                slabs.append(s)
-        if not slabs:
-            return None
+            if utils.get_type(s) == 'Wire':
+                wires.append(s)
+        if len(wires) == 0:
+            QtWidgets.QMessageBox.warning(None, "Selection", "Please Select Lines or Wires.")
+            return
         weight = self.form.weight.value()
         height = self.form.height_box.value()
         create_blocks = self.form.create_blocks.isChecked()
-        loadpat = self.form.loadpat.currentText()
         mat = FreeCAD.ActiveDocument.findObjects(Type='App::MaterialObjectPython')
         if not mat:
             import Arch
@@ -45,7 +53,7 @@ class WallTaskPanel:
             mat.Color = (0.89, .89, 0.)
         else:
             mat = mat[0]
-        for s in slabs:
+        for s in wires:
             wall = ArchWall.makeWall(baseobj=s,height=height * 1000)
             wall.addProperty('App::PropertyInteger', 'weight', 'Wall')
             wall.addProperty('App::PropertyString', 'loadpat', 'Wall')
