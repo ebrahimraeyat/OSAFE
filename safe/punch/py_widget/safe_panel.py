@@ -7,6 +7,8 @@ from PySide2.QtWidgets import QMessageBox, QFileDialog
 
 from safe.punch.py_widget import resource_rc
 
+from freecad_funcs import add_to_clipboard
+
 punch_path = Path(__file__).parent.parent
 
 
@@ -183,6 +185,7 @@ class Safe12TaskPanel:
             if Path(f2k_file.input).exists():
                 with open(f2k_file.input) as f:
                     f2k_file.input_str = f.read()
+        add_to_clipboard(f2k_file.output)
         Gui.Control.closeDialog()
 
     def reject(self):
@@ -190,6 +193,6 @@ class Safe12TaskPanel:
 
     def getStandardButtons(self):
         return 0
-
+    
 if __name__ == '__main__':
     panel = Safe12TaskPanel()
