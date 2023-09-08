@@ -50,6 +50,10 @@ class ForceTaskPanel:
                 )
             return
         load_value = self.form.load_value.value()
+        version = float('.'.join(FreeCAD.Version()[0:2]))
+        if version <= 0.19:
+            Gui.activateWorkbench("FemWorkbench")
+            Gui.activateWorkbench("OSAFEWorkbench")
         loads = FreeCAD.ActiveDocument.findObjects(Type='Fem::ConstraintForce')
         all_loads = [load.Name for load in loads]
         if loadcase in all_loads:
