@@ -703,6 +703,10 @@ def get_foundation_shape_from_base_foundations(
         shape = Part.makeCompound(shapes)
         plan = get_top_faces(strip_shape, fuse=True)
     elif foundation_type == 'Mat':
+        if height == 0:
+            from collections import Counter
+            counts = Counter(heights)
+            height = counts.most_common[0][0]
         outer_wire = get_top_faces(strip_shape, fuse=True).OuterWire
         plan_without_openings = Part.Face(outer_wire)
         if split_mat:
