@@ -404,9 +404,9 @@
         <widget class="Gui::PrefColorButton" name="base_foundation_b_shape_color">
          <property name="color" stdset="0">
           <color>
-           <red>50</red>
-           <green>0</green>
-           <blue>255</blue>
+           <red>255</red>
+           <green>255</green>
+           <blue>0</blue>
           </color>
          </property>
          <property name="prefEntry" stdset="0">
@@ -438,9 +438,9 @@
         <widget class="Gui::PrefColorButton" name="base_foundation_a_shape_color">
          <property name="color" stdset="0">
           <color>
-           <red>255</red>
-           <green>0</green>
-           <blue>50</blue>
+           <red>0</red>
+           <green>255</green>
+           <blue>0</blue>
           </color>
          </property>
          <property name="prefEntry" stdset="0">
@@ -455,9 +455,9 @@
         <widget class="Gui::PrefColorButton" name="base_foundation_b_line_color">
          <property name="color" stdset="0">
           <color>
-           <red>50</red>
-           <green>0</green>
-           <blue>255</blue>
+           <red>255</red>
+           <green>255</green>
+           <blue>0</blue>
           </color>
          </property>
          <property name="prefEntry" stdset="0">
@@ -576,7 +576,7 @@
           <color>
            <red>255</red>
            <green>0</green>
-           <blue>50</blue>
+           <blue>0</blue>
           </color>
          </property>
          <property name="prefEntry" stdset="0">
@@ -626,9 +626,9 @@
         <widget class="Gui::PrefColorButton" name="base_foundation_a_line_color">
          <property name="color" stdset="0">
           <color>
-           <red>255</red>
-           <green>0</green>
-           <blue>50</blue>
+           <red>0</red>
+           <green>255</green>
+           <blue>0</blue>
           </color>
          </property>
          <property name="prefEntry" stdset="0">
@@ -1031,7 +1031,7 @@
           <color>
            <red>255</red>
            <green>0</green>
-           <blue>50</blue>
+           <blue>0</blue>
           </color>
          </property>
          <property name="prefEntry" stdset="0">
@@ -1046,7 +1046,7 @@
         <widget class="Gui::PrefColorButton" name="design_layer_b_shape_color">
          <property name="color" stdset="0">
           <color>
-           <red>50</red>
+           <red>0</red>
            <green>0</green>
            <blue>255</blue>
           </color>
@@ -1123,7 +1123,7 @@
         <widget class="Gui::PrefColorButton" name="design_layer_b_line_color">
          <property name="color" stdset="0">
           <color>
-           <red>50</red>
+           <red>0</red>
            <green>0</green>
            <blue>255</blue>
           </color>
