@@ -1411,12 +1411,17 @@ def draw_strip_automatically_in_mat_foundation(
 
 def draw_strip_automatically_in_strip_foundation(
             foundation = None,
+            split: bool=False,
+            tolerance: float=1e-7,
             # openings : Union[list, bool] = None,
             # y_width : Union[float, bool] = None,
             # equal : bool = False,
             # x_layer_name = 'A',
             # draw_x : bool = True,
             ):
+    '''
+    split: If a strip is not straight, break the strip in some parts
+    '''
     if foundation is None:
         foundation = FreeCAD.ActiveDocument.Foundation
     from safe.punch import strip
@@ -1431,19 +1436,30 @@ def draw_strip_automatically_in_strip_foundation(
         edges.extend(base_foundation.Base.Shape.Edges)
         if not base_foundation.last_edge.isNull():
             edges.append(base_foundation.last_edge)
-        if is_straight_line(edges):
-            first_point = edges[0].firstVertex().Point
-            last_point = edges[-1].lastVertex().Point
-            points = [first_point, last_point]
+        points = get_points_from_indirection_edges(edges=edges, tol=tolerance)
+        if split and len(points) > 2:
+            for p1, p2 in zip(points[0:-1], points[1:]):
+                wire = Draft.make_wire((p1, p2), face=False)
+                s = strip.make_strip(
+                                    wire,
+                                    layer=layer, 
+                                    width=base_foundation.width.Value,
+                                    left_width=base_foundation.left_width.Value,
+                                    right_width=base_foundation.right_width.Value,
+                                    align = base_foundation.align,
+                                    )
+                if layer == 'A':
+                    i += 1
+                    strip_name = f'CS{layer}{i}'
+                    a_strips.addObject(s)
+                else:
+                    j += 1
+                    strip_name = f'CS{layer}{j}'
+                    b_strips.addObject(s)
+                s.Label = strip_name
         else:
-            points = get_sorted_points(edges, last=True, sort_edges=False)
-            # remove 1 and -2 point index
-            if not base_foundation.first_edge.isNull():
-                points.remove(points[1])
-            if not base_foundation.last_edge.isNull():
-                points.remove(points[-2])
-        wire = Draft.make_wire(points, face=False)
-        s = strip.make_strip(
+            wire = Draft.make_wire(points, face=False)
+            s = strip.make_strip(
                             wire,
                             layer=layer, 
                             width=base_foundation.width.Value,
@@ -1451,15 +1467,15 @@ def draw_strip_automatically_in_strip_foundation(
                             right_width=base_foundation.right_width.Value,
                             align = base_foundation.align,
                             )
-        if layer == 'A':
-            i += 1
-            strip_name = f'CS{layer}{i}'
-            a_strips.addObject(s)
-        else:
-            j += 1
-            strip_name = f'CS{layer}{j}'
-            b_strips.addObject(s)
-        s.Label = strip_name
+            if layer == 'A':
+                i += 1
+                strip_name = f'CS{layer}{i}'
+                a_strips.addObject(s)
+            else:
+                j += 1
+                strip_name = f'CS{layer}{j}'
+                b_strips.addObject(s)
+            s.Label = strip_name
 
 def is_straight_line(edges, tol=1e-7):
     if len(edges) > 1:
@@ -1470,6 +1486,18 @@ def is_straight_line(edges, tol=1e-7):
             if dir_start_edge.cross(dir_edge).Length > tol:
                 return False
     return True
+
+def get_points_from_indirection_edges(edges, tol=1e-7):
+    points = [edges[0].firstVertex().Point]
+    if len(edges) > 1:
+        for e1, e2 in zip(edges[0:-1], edges[1:]):
+            dir_e1 = e1.tangentAt(e1.FirstParameter)
+            dir_e2 = e2.tangentAt(e2.FirstParameter)
+            print(dir_e1.cross(dir_e2).Length)
+            if dir_e1.cross(dir_e2).Length > tol:
+                points.append(e1.lastVertex().Point)
+    points.append(edges[-1].lastVertex().Point)
+    return points
 
 def get_sorted_points(
             edges,

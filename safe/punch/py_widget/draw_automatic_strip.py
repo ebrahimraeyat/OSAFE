@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from PySide2.QtWidgets import QMessageBox
-from PySide2 import QtWidgets
 
 import FreeCAD
 import FreeCADGui as Gui
@@ -16,6 +15,11 @@ class Form:
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'Resources' / 'ui' / 'draw_automatic_strip.ui'))
         self.create_connections()
+        if FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetBool("osafe_split_strips", False):
+            self.form.split.setChecked(True)
+            self.split_clicked(True)
+        tol = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetFloat("osafe_split_strips_tolerance", .001)
+        self.form.tolerance.setValue(tol)
 
     def create_connections(self):
         self.form.create_pushbutton.clicked.connect(self.create)
@@ -23,6 +27,11 @@ class Form:
         self.form.mat_foundation.clicked.connect(self.uncheck_strip)
         self.form.strip_foundation.clicked.connect(self.uncheck_mat)
         self.form.help.clicked.connect(self.show_help)
+        self.form.split.clicked.connect(self.split_clicked)
+
+    def split_clicked(self, checked):
+        self.form.tol_label.setEnabled(checked)
+        self.form.tolerance.setEnabled(checked)
 
     def uncheck_strip(self, state):
         # if state == Qt.Checked:
@@ -75,7 +84,9 @@ class Form:
                 consider_openings=consider_openings,
             )
         else:
-            punch_funcs.draw_strip_automatically_in_strip_foundation()
+            split = self.form.split.isChecked()
+            tol = self.form.tolerance.value()
+            punch_funcs.draw_strip_automatically_in_strip_foundation(split=split, tolerance=tol)
         self.accept()
         Gui.Selection.clearSelection()
 

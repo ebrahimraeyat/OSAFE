@@ -35,6 +35,34 @@ def test_sort_vertex():
 
 def test_get_sort_points():
     v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(2, 1, 0)
+    v3 = FreeCAD.Vector(3, 3, 0)
+    v4 = FreeCAD.Vector(4, 5, 0)
+    v5 = FreeCAD.Vector(6, 6, 0)
+    vs = (v1, v2, v3, v4, v5)
+    edges = []
+    for p1, p2 in zip(vs[0:], vs[1:-1]):
+        l = Part.makeLine(p1, p2)
+        edges.append(Part.Edge(l))
+    points = punch_funcs.get_points_from_indirection_edges(edges)
+    assert len(points) == 4
+    assert points == [v1, v2, v4, v5]
+    # one edge
+    points = punch_funcs.get_points_from_indirection_edges(edges[0])
+    assert len(points) == 2
+    assert points == [v1, v2]
+    #  straight line
+    vs = (v1, v3, v5)
+    edges = []
+    for p1, p2 in zip(vs[0:], vs[1:-1]):
+        l = Part.makeLine(p1, p2)
+        edges.append(Part.Edge(l))
+    points = punch_funcs.get_points_from_indirection_edges(edges)
+    assert len(points) == 2
+    assert points == [v1, v5]
+
+def test_get_sort_points():
+    v1 = FreeCAD.Vector(0, 0, 0)
     v2 = FreeCAD.Vector(5, 0, 0)
     v3 = FreeCAD.Vector(5, 0, 0)
     v4 = FreeCAD.Vector(10, 0, 0)
@@ -317,7 +345,6 @@ def test_draw_strip_automatically_in_mat_foundation():
 
 def test_draw_strip_automatically_in_strip_foundation():
     punch_funcs.draw_strip_automatically_in_strip_foundation(document_strip_foundation.Foundation)
-
 
 def test_get_similar_edge_direction_in_common_points_from_edges():
     edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
