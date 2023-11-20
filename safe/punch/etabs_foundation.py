@@ -48,6 +48,12 @@ class Foundation(ArchComponent.Component):
                 "height",
                 "Geometry",
                 )
+        if not hasattr(obj, "volume"):
+            obj.addProperty(
+                "App::PropertyFloat",
+                "volume",
+                "Foundation",
+                )
         
         if not hasattr(obj, "height_punch"):
             obj.addProperty(
@@ -187,6 +193,7 @@ class Foundation(ArchComponent.Component):
         # 		):
         # 		o.References = [obj, obj.top_face]
         # obj.d = obj.height - obj.cover
+        obj.volume = obj.Shape.Volume / 1e9
         FreeCAD.ActiveDocument.recompute()
 
     def onDocumentRestored(self, obj):
