@@ -371,6 +371,12 @@ class Punch:
         y = obj.by + d
         offset_shape = punch_funcs.rectangle_face(obj.center_of_column, x, y)
         foun_plan = obj.foundation.plan.copy()
+        # for rotate columns the location must be for not rotated columns
+        not_rotate_edges = punch_funcs.punch_area_edges(foun_plan, offset_shape)
+        not_rotate_faces = punch_funcs.punch_faces(not_rotate_edges, d)
+        if obj.user_location:
+            not_rotate_faces = punch_funcs.get_user_location_faces(not_rotate_faces, obj.Location)
+        obj.Location = punch_funcs.location_of_column(not_rotate_faces)
         if obj.angle != 0:
             foun_plan.rotate(
                 obj.center_of_column,
@@ -381,7 +387,6 @@ class Punch:
         faces = punch_funcs.punch_faces(edges, d)
         if obj.user_location:
             faces = punch_funcs.get_user_location_faces(faces, obj.Location)
-        obj.Location = punch_funcs.location_of_column(faces)
         obj.alpha_s = self.alphas(obj.Location)
         obj.I22, obj.I33, obj.I23 = punch_funcs.moment_inertia(faces)
         if 'Corner' in obj.Location:
@@ -476,6 +481,9 @@ class Punch:
 
     def ultimate_shear_stress(self, obj):
         location = obj.Location
+        angle = math.radians(obj.angle.Value)
+        cosine = math.cos(angle)
+        sinus = math.sin(angle)
         location = location.rstrip('1234').lower()
         I22 = obj.I22
         I33 = obj.I33
@@ -491,8 +499,8 @@ class Punch:
                 y4 = f.CenterOfMass.y
                 vu, mx, my = [float(force) for force in forces.split(",")]
                 Vu = vu / b0d + \
-                    (obj.gamma_vx * (mx - vu * (y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - \
-                    (obj.gamma_vy * (my - vu * (x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
+                    (obj.gamma_vx * (mx * cosine - my * sinus - vu * (y3 - y1)) * (I33 * (y4 - y3) - I23 * (x4 - x3))) / (I22 * I33 - I23 ** 2) - \
+                    (obj.gamma_vy * (my * cosine + mx * sinus - vu * (x3 - x1)) * (I22 * (x4 - x3) - I23 * (y4 - y3))) / (I22 * I33 - I23 ** 2)
                 Vu *= 1000
                 faces_ratio.append(Vu)
             max_ratio_in_combo = max(faces_ratio)
