@@ -46,12 +46,19 @@ def test_rotated_punch():
     assert col.Shape.BoundBox.XLength == 500
     assert col.Shape.BoundBox.YLength == 500
     # document_base_plate.recompute()
-    r1 = p.Ratio
-    for angle in range(90, 900, 90):
-        col.AttachmentOffset = FreeCAD.Placement(FreeCAD.Vector(0,0,0),FreeCAD.Rotation(FreeCAD.Vector(0,0,1),angle))
-        document_base_plate.recompute()
-        print(angle, p.angle)
-        assert float(r1) == float(p.Ratio)
+    for i in range(0, 90, 10):
+        col.AttachmentOffset = FreeCAD.Placement(FreeCAD.Vector(0,0,0),FreeCAD.Rotation(FreeCAD.Vector(0,0,1),i))
+        p.Proxy.execute(p)
+        r1 = p.Ratio
+        print(20 * '=' + '\n')
+        print(i, p.Ratio)
+        print(20 * '=' + '\n')
+        for angle in range(i+90, 720, 90):
+            col.AttachmentOffset = FreeCAD.Placement(FreeCAD.Vector(0,0,0),FreeCAD.Rotation(FreeCAD.Vector(0,0,1),angle))
+            p.Proxy.execute(p)
+            # document_base_plate.recompute()
+            print(p.angle, p.Ratio)
+            assert pytest.approx(float(r1), abs=.01) == pytest.approx(float(p.Ratio), abs=.01)
     
 def test_punch_reinforcement():
     foun = document_base_plate.Foundation
