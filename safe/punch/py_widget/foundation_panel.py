@@ -1,9 +1,10 @@
 from pathlib import Path
 
+from PySide2.QtWidgets import QMessageBox
+
 import FreeCAD
 import FreeCADGui as Gui
 from safe.punch.py_widget import resource_rc
-from safe.punch import punch_funcs
 
 punch_path = Path(__file__).parent.parent
 
@@ -70,6 +71,15 @@ class Form:
                     base_foundations.append(o)
                 elif hasattr(o, "IfcType") and o.IfcType == "Opening Element":
                     openings.append(o)
+        if len(base_foundations) == 0:
+            if QMessageBox.question(
+                None,
+                'Base Foundation',
+                'There is no Base Foundation in your model, Do you want to draw those?',
+                ) == QMessageBox.Yes:
+                Gui.Control.closeDialog()
+                Gui.runCommand("automatic_base_foundation") 
+            return
         from safe.punch.etabs_foundation import make_foundation
         make_foundation(
             cover=cover,
