@@ -117,7 +117,7 @@ class OSAFEWorkbench(Workbench):
         # image = Path(param.GetString('splash_screen'))
         user_path = Path(FreeCAD.getUserAppDataDir())   
         # if not image.exists():
-        image = user_path / 'Mod' / 'OSAFE' / 'images' / 'splash.png'
+        image = user_path / 'Mod' / 'OSAFE' / 'images' / 'civiltools.png'
         if not image.exists():
             return
         splash_path = (user_path / 'Gui' / 'images')
@@ -127,10 +127,15 @@ class OSAFEWorkbench(Workbench):
             pass
         suffix = image.suffix
         splash_image_path = splash_path / f'splash_image{suffix}'
-        splashes = [i for i in splash_path.glob("splash_image.*")]
         # check if splash image folder is empty
-        if not splashes:
+        hash_md5 = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetString("splash_hash_md5", '')
+        splash_hash_md5 = "85b13cbcb16dca64d61456f56d54e4d3"
+        if hash_md5 != splash_hash_md5:
+            for i in splash_path.glob("splash_image.*"):
+                i.unlink()
             shutil.copy(image, splash_image_path)
+            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetString("splash_hash_md5", splash_hash_md5)
+            FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/civilTools").SetString("splash_hash_md5", splash_hash_md5)
             return
         # import hashlib
         # image_md5 = hashlib.md5(open(image, 'rb').read()).hexdigest()
@@ -143,5 +148,6 @@ class OSAFEWorkbench(Workbench):
         #         si_path.unlink()
         # if not exists:
         #     shutil.copy(image, splash_image_path)
+
 
 Gui.addWorkbench(OSAFEWorkbench())
