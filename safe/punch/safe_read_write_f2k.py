@@ -22,7 +22,7 @@ class Safe():
             output_f2k_path = input_f2k_path
         self.output_f2k_path = output_f2k_path
         self.__file_object = None
-        self.tables_contents = None
+        self.tables_contents = {}
 
     def __enter__(self):
         self.__file_object = open(self.input_f2k_path, 'r')
@@ -131,7 +131,7 @@ class Safe():
         content : Union[str, bool] = None,
         ):
         if content is None:
-            if self.tables_contents is None:
+            if len(self.tables_contents) == 0:
                 self.get_tables_contents()
             table_key = "PROGRAM CONTROL"
             content = self.tables_contents.get(table_key, None)
@@ -146,9 +146,28 @@ class Safe():
         self.force_units = self.get_force_units(self.force_unit)
         self.length_units = self.get_length_units(self.length_unit)
         return force, length
+    
+    def set_sthtbelow(self,
+                      level: float=0,
+                      content : Union[str, bool] = None,
+                      ):
+        table_key = "PROGRAM CONTROL"
+        if content is None:
+            if len(self.tables_contents) == 0:
+                self.get_tables_contents()
+            content = self.tables_contents.get(table_key, None)
+            if content is None:
+                return None
+        label = 'StHtBelow='
+        first_label_index = content.find(label)
+        last_label_index = first_label_index + len(label)
+        end_index = content[last_label_index:].find(' ') + last_label_index
+        content = content[:last_label_index] + f'{level}' + content[end_index:] 
+        self.tables_contents[table_key] = content
+        return content
 
     def write(self):
-        if self.tables_contents is None:
+        if len(self.tables_contents) == 0:
             self.get_tables_contents()
         with open(self.output_f2k_path, 'w') as writer:
             for table_key, content in self.tables_contents.items():
@@ -259,7 +278,7 @@ class Safe12(Safe):
         return force, length
 
     def write(self):
-        if self.tables_contents is None:
+        if len(self.tables_contents) == 0:
             self.get_tables_contents()
         with open(self.output_f2k_path, 'w') as writer:
             for table_key, content in self.tables_contents.items():
@@ -320,6 +339,7 @@ class FreecadReadwriteModel():
         self.safe.force_length_unit()
         self.force_unit = self.safe.force_unit
         self.length_unit = self.safe.length_unit
+        self.safe.set_sthtbelow()
         self.last_point_number = self.safe.get_last_point_number()
         self.last_area_number = 1000
         self.last_line_number = 1000
