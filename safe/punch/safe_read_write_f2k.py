@@ -160,9 +160,16 @@ class Safe():
                 return None
         label = 'StHtBelow='
         first_label_index = content.find(label)
+        if first_label_index == -1: # version 14
+            label = 'ModelDatum='
+            first_label_index = content.find(label)
         last_label_index = first_label_index + len(label)
-        end_index = content[last_label_index:].find(' ') + last_label_index
-        content = content[:last_label_index] + f'{level}' + content[end_index:] 
+        space_index = content[last_label_index:].find(' ')
+        if space_index == -1:
+            content = content[:last_label_index] + f'{level}'
+        else:
+            end_index = space_index + last_label_index
+            content = content[:last_label_index] + f'{level}' + content[end_index:] 
         self.tables_contents[table_key] = content
         return content
 

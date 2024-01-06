@@ -200,10 +200,15 @@ def test_get_last_point_number():
 
 def test_set_sthtbelow():
     safe = Safe()
-    content = 'ProgramName="SAFE 2016"   Version=16.0.2   ProgLevel="Post Tensioning"   LicenseNum=*1ZAU45DLGK2A3EX   CurrUnits="Kgf, m, C"   MergeTol=0.0025   ModelDatum=0   StHtAbove=0   StHtBelow=3000   ConcCode="ACI 318-14"'
-    safe.force_length_unit(content)
-    content = safe.set_sthtbelow(content=content)
-    assert " StHtBelow=0 " in content
+    content16 = 'ProgramName="SAFE 2016"   Version=16.0.2   ProgLevel="Post Tensioning"   LicenseNum=*1ZAU45DLGK2A3EX   CurrUnits="Kgf, m, C"   MergeTol=0.0025   ModelDatum=0   StHtAbove=0   StHtBelow=3000   ConcCode="ACI 318-14"'
+    safe.force_length_unit(content16)
+    content = safe.set_sthtbelow(content=content16)
+    assert content == content16.replace('3000', '0')
+    # version 14
+    content14 = 'ProgramName="SAFE 2014"   Version=14.0.0   ProgLevel="Post Tensioning"   CurrUnits="N, mm, C"  ModelDatum=0.0'
+    safe.force_length_unit(content14)
+    content = safe.set_sthtbelow(content=content14)
+    assert content == content14[:-2]
 
 def test_force_length_unit():
     safe = Safe()
