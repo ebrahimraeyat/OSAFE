@@ -32,11 +32,12 @@ class Safe12TaskPanel:
 
     def set_filename(self):
         doc = FreeCAD.ActiveDocument
-        f2k_file = doc.Safe
-        filename_path = f2k_file.input
-        self.form.input_filename.setText(filename_path)
-        filename_path = f2k_file.output
-        self.form.output_filename.setText(filename_path)
+        if hasattr(doc, 'Safe'):
+            f2k_file = doc.Safe
+            filename_path = f2k_file.input
+            self.form.input_filename.setText(filename_path)
+            filename_path = f2k_file.output
+            self.form.output_filename.setText(filename_path)
 
     def input_browse(self):
         ext = '.F2K'
@@ -73,6 +74,9 @@ class Safe12TaskPanel:
         return True
 
     def export(self):
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
@@ -128,28 +132,42 @@ class Safe12TaskPanel:
                 etabs.database.create_punching_shear_perimeter_table(punches)
             etabs.SapModel.View.RefreshView()
         elif software == 'SAFE 16':
+            if not hasattr(doc, 'Safe'):
+                from safe.punch.f2k_object import make_safe_f2k
+                make_safe_f2k('')
             input_f2k_path = self.form.input_filename.text()
-            if not input_f2k_path or not Path(input_f2k_path).parent.exists():
-                QMessageBox.warning(None, 'Input F2K', 'Please Select a Valid Path for Input f2k.')
-                ret = self.form.input_browse.click()
-                if not ret:
-                    return
-                input_f2k_path = self.form.input_filename.text()
             output_f2k_path = self.form.output_filename.text()
-            if not output_f2k_path or not Path(output_f2k_path).parent.exists():
-                QMessageBox.warning(None, 'Output F2K', 'Please Select a Valid Path for Output f2k.')
+            f2k_file = doc.Safe
+            f2k_file.input = str(input_f2k_path)
+            f2k_file.output = str(output_f2k_path)
+            doc.recompute([f2k_file])
+            # check input f2k file
+            from safe.punch.safe_read_write_f2k import get_f2k_version
+            ver = get_f2k_version(doc=doc)
+            if ver is None:
+                QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, Maybe the path is change. we try to find it!")
+                if not f2k_file.input_str:
+                    QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, please select a valid path for input f2k.")
+                    return False
+                else:
+                    import tempfile
+                    default_tmp_dir = tempfile._get_default_tempdir()
+                    name = next(tempfile._get_candidate_names())
+                    punch_temp_file = Path(default_tmp_dir) / f'{name}.F2k'
+                    with open(punch_temp_file, 'w') as f:
+                        f.write(f2k_file.input_str)
+                    f2k_file.input = str(punch_temp_file)
+            elif ver < 14:
+                QMessageBox.warning(None, "Version Error", f"The version of input f2k is {ver}, please convert it to version 14 or 16.")
+                return 
+            if output_f2k_path == '' or not Path(f2k_file.output).parent.exists():
+                QMessageBox.warning(None, "Missing Output Path", "Your output folder for saving f2k file did not exists, please select a valid path for output f2k.")
                 ret = self.form.output_browse.click()
                 if not ret:
                     return
-                output_f2k_path = self.form.output_filename.text()
-            doc = FreeCAD.ActiveDocument
-            if hasattr(doc, 'Safe'):
-                f2k_file = doc.Safe
-                f2k_file.input = str(input_f2k_path)
-                f2k_file.output = str(output_f2k_path)
-                doc.recompute([f2k_file])
+        
             from safe.punch.safe_read_write_f2k import FreecadReadwriteModel as FRW
-            rw = FRW(input_f2k_path, output_f2k_path, doc)
+            rw = FRW(f2k_file.input, f2k_file.output, doc)
             if is_slabs:
                 slab_names = rw.export_freecad_slabs(
                     soil_name=soil_name,

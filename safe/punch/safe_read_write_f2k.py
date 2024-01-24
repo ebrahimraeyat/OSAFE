@@ -901,6 +901,41 @@ def is_straight_line(edges, tol=1e-7):
                 return False
     return True
 
+def get_f2k_version(doc=None,
+                    content: str='',
+                    ):
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return None
+    if content:
+        lines = content.split('\n')
+        for line in lines:
+            if 'SAFE "8' in line:
+                return 8
+            elif "SAFE 12" in line:
+                return 12
+            elif 'Version=14' in line:
+                return 14
+            elif 'Version=16' in line:
+                return 16
+    else:
+        if not hasattr(doc, 'Safe'):
+            return None
+        if doc.Safe.input == '' or not Path(doc.Safe.input).exists():
+            return None
+        with open(doc.Safe.input) as f:
+            for line in f:
+                if 'SAFE "8' in line:
+                    return 8
+                elif "SAFE 12" in line:
+                    return 12
+                elif 'Version=14' in line:
+                    return 14
+                elif 'Version=16' in line:
+                    return 16
+    return None
+
 if __name__ == '__main__':
     import sys
     from pathlib import Path

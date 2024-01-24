@@ -202,33 +202,6 @@ class CivilSafe1620:
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        doc = FreeCAD.ActiveDocument
-        if not hasattr(doc, 'Safe'):
-            QMessageBox.warning(None, "Missing Safe Object", "You don't have Safe Object, please create it first!")
-            return
-        if not Path(doc.Safe.input).exists():
-            QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, Maybe the path is change. we try to find it!")
-            if not doc.Safe.input_str:
-                QMessageBox.warning(None, "Missing Input F2k", "You don't have any input f2k file, please select a valid path for Safe Object input.")
-                return
-            else:
-                import tempfile
-                default_tmp_dir = tempfile._get_default_tempdir()
-                name = next(tempfile._get_candidate_names())
-                punch_temp_file = Path(default_tmp_dir) / f'{name}.F2k'
-                with open(punch_temp_file, 'w') as f:
-                    f.write(doc.Safe.input_str)
-                doc.Safe.input = str(punch_temp_file)
-        with open(doc.Safe.input) as f:
-            for line in f:  
-                if "$ TITLES" in line:
-                    QMessageBox.warning(None, "version 12", "Your input F2K file is in Safe 12 format, please Save as Safe 16")
-                    return
-                elif 'TABLE:  "PROGRAM CONTROL"' in line:
-                    break
-        if not Path(doc.Safe.output).parent.exists():
-            QMessageBox.warning(None, "Missing Output Path", "Your output folder for saving f2k file did not exists, please select a valid path for Safe Object output.")
-        
         allow, check = allowed_to_continue(
             'safe_export.bin',
             'https://gist.githubusercontent.com/ebrahimraeyat/0f14001cbbd16a23bfc8d2844d97947b/raw/',

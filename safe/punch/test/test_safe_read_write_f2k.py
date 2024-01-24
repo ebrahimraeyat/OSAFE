@@ -259,5 +259,28 @@ def test_is_point_exist12():
     id = safe.is_point_exist([2.820, .20], content)
     assert not id
 
+def test_get_f2k_version():
+    from safe_read_write_f2k import get_f2k_version
+    # version 14, 16
+    content = 'ProgramName="SAFE 2016"   Version=%i.0.2   ProgLevel="Post Tensioning"   LicenseNum=*1ZAU45DLGK2A3EX   CurrUnits="Kgf, m, C"   MergeTol=0.0025   ModelDatum=0   StHtAbove=0   StHtBelow=3000   ConcCode="ACI 318-14"'
+    for version in (14, 16):
+        ver = get_f2k_version(doc='alaki', content=content % version)
+        assert version == ver
+    ver = get_f2k_version(doc='alaki', content=content % 200)
+    assert ver is None
+    # version 8, 12
+    content = '''$ File G:\design\97\hajrezaee\mosavab\etabs\hajrezaee_97-03-01.e2k saved 5/26/2016 5:10:58 AM
+ 
+                SAFE %s.2.0.S
+                UNITS  kgf  m
+                $ TITLES'
+            '''
+    ver = get_f2k_version(doc='alaki', content=content % '12')
+    assert ver == 12
+    ver = get_f2k_version(doc='alaki', content=content % '"8')
+    assert ver == 8
+    ver = get_f2k_version(doc='alaki', content=content % '8')
+    assert ver is None
+
 if __name__ == '__main__':
     test_export_freecad_mat_strips()
