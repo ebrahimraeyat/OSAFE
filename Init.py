@@ -1,3 +1,3 @@
 import FreeCAD
 
-FreeCAD.addImportType("CSI SAFE (*.xls *.xlsx)", "safe.punch.geom")
+FreeCAD.addImportType("CSI SAFE (*.xls *.xlsx)", "old_punch.geom")

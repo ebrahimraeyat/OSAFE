@@ -6,7 +6,7 @@ class OSAFEWorkbench(Workbench):
 
         from pathlib import Path
         import civilwelcome
-        self.__class__.Icon = str(Path(civilwelcome.__file__).parent.absolute() / 'images' / 'safe.png')
+        self.__class__.Icon = str(Path(civilwelcome.__file__).parent / 'osafe_images' / 'safe.png')
         self.__class__.MenuText = "OSAFE"
         self.__class__.ToolTip = "OSafe Workbench"
 
@@ -41,15 +41,10 @@ class OSAFEWorkbench(Workbench):
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Edit")), edit_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&View")), view_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&Help")), help_list)
-
-        pref_visual_ui_abs_path = str(Path(OSAFEGui.__file__).parent.absolute() / 'ui' / 'preferences-OSAFE_visual.ui')
+        osafe_path = Path(OSAFEGui.__file__).parent
+        pref_visual_ui_abs_path = str(osafe_path / 'osafe_widgets' / 'preferences-OSAFE_visual.ui')
         Gui.addPreferencePage(pref_visual_ui_abs_path, "OSAFE")
-        Gui.addIconPath(
-            str(
-                Path(OSAFEGui.__file__).parent.absolute()
-                / "images"
-                )
-            )
+        Gui.addIconPath(str(osafe_path / "osafe_images"))
         # if int(FreeCAD.Version()[1]) > 19:
         #     # Set up Draft command lists
         #     import draftutils.init_tools as it
@@ -67,7 +62,6 @@ class OSAFEWorkbench(Workbench):
         #             FreeCADGui.draftToolBar.loadedPreferences = True
 
     def Activated(self):
-        from DraftGui import todo
         import check_update
         check_update.check_updates('OSAFE')
 
@@ -117,7 +111,7 @@ class OSAFEWorkbench(Workbench):
         # image = Path(param.GetString('splash_screen'))
         user_path = Path(FreeCAD.getUserAppDataDir())   
         # if not image.exists():
-        image = user_path / 'Mod' / 'OSAFE' / 'images' / 'civiltools.png'
+        image = user_path / 'Mod' / 'OSAFE' / 'osafe_images' / 'civiltools.png'
         if not image.exists():
             return
         splash_path = (user_path / 'Gui' / 'images')

@@ -6,7 +6,7 @@
   <license file="LICENSE">LGPLv2.1</license>
   <url type="repository" branch="master">https://github.com/ebrahimraeyat/OSAFE</url>
   <url type="website">https://github.com/ebrahimraeyat/OSAFE/wiki</url>
-  <icon>images/safe.png</icon>
+  <icon>osafe_images/safe.png</icon>
 
   <content>
     <workbench>

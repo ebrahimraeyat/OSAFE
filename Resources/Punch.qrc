@@ -1,7 +1,0 @@
-<RCC>
-    <qresource>
-        <file>icons/civil-engineering.png</file>
-        <file>icons/punch.svg</file>
-        <file>ui/preferences-punch_visual.ui</file>
-    </qresource>
-</RCC>

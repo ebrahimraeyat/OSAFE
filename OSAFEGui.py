@@ -1,50 +1,38 @@
-import os
 from pathlib import Path
-import PySide2
 from PySide2 import QtCore
 from PySide2.QtWidgets import QMessageBox
 import FreeCAD
 import FreeCADGui as Gui
-# import DraftTools
 from draftutils.translate import translate
 import civilwelcome
 
-from safe.punch import (
+from osafe_py_widgets import (
     gui_punch,
-    gui_slab,
-    gui_beam,
-    gui_base_foundation,
-    gui_draw_strip,
-    gui_rectangular_slab,
-    explode_foundation,
     gui_dxf,
     gui_automatic_strip,
-    base_plate,
+    explode_foundation,
     osafe_views,
     )
-from osafe_gui import (
+from osafe_draw import (
+    draw_slab,
+    draw_beam,
+    draw_base_foundation,
+    draw_strip,
+    draw_rectangular_slab,
+)
+from osafe_py_widgets import (
     gui_export_strips
+)
+
+from osafe_objects import (
+    base_plate,
 )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
 
-
-# class Copy(DraftTools.Move):
-
-#     def __init__(self):
-#         DraftTools.Move.__init__(self)
-
-#     def GetResources(self):
-
-#         return {'Pixmap': os.path.join(os.path.dirname(__file__), "images", "copy.svg"),
-#                 'MenuText': QtCore.QT_TRANSLATE_NOOP("Copy", "Copy"),
-#                 'ToolTip': QtCore.QT_TRANSLATE_NOOP("TogglePanels", "Copies selected objects to another location"),
-#                 'Accel': 'C,P'}
-
-
 class CivilPdf:
     def Activated(self):
-        from safe.punch import export
+        from osafe_import_export import export
         doc = FreeCAD.ActiveDocument
         filename = get_save_filename('.pdf')
         export.createPdf(doc, filename)
@@ -56,7 +44,7 @@ class CivilPdf:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_pdf",
             "export to pdf")
-        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "pdf.svg")
+        path = str(Path(__file__).parent /"osafe_images" / "pdf.svg")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -67,7 +55,7 @@ class CivilPdf:
 
 class CivilPictur:
     def Activated(self):
-        from safe.punch import export
+        from osafe_import_export import export
         doc = FreeCAD.ActiveDocument
         i = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetInt("picture_ext", 0)
         ext = ('png', 'jpg', 'pdf')[i]
@@ -81,7 +69,7 @@ class CivilPictur:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_pic",
             "export to picture")
-        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "png.png")
+        path = str(Path(__file__).parent / "osafe_images" / "png.png")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -99,13 +87,13 @@ class CivilExcel:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_excel",
             "export the result of punches to excel")
-        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "xlsx.png")
+        path = str(Path(__file__).parent / "osafe_images" / "xlsx.png")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch import export
+        from osafe_import_export import export
         doc = FreeCAD.ActiveDocument
         punches = []
         for o in doc.Objects:
@@ -128,7 +116,7 @@ class CivilDocx:
         ToolTip = QtCore.QT_TRANSLATE_NOOP(
             "Civil_docx",
             "export the result to Word")
-        path = str(Path(__file__).parent / 'safe' / 'punch' / "Resources" / "icons" / "word.png")
+        path = str(Path(__file__).parent / "osafe_images" / "word.png")
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
@@ -141,7 +129,7 @@ class CivilDocx:
             )
         if not allow:
             return
-        from safe.punch import report
+        from osafe_import_export import report
         doc = FreeCAD.ActiveDocument
         filename = get_save_filename('.docx')
         report.create_punches_report(doc, filename)
@@ -161,7 +149,7 @@ class CivilEtabs:
             "civil_etabs",
             "Read Data From Etabs")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "etabs.png"
+                   Path(__file__).parent / "osafe_images" / "etabs.png"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
@@ -177,7 +165,7 @@ class CivilEtabs:
             filename is None
             ):
             return
-        from safe.punch.py_widget import etabs_panel
+        from osafe_py_widgets import etabs_panel
         panel = etabs_panel.EtabsTaskPanel(etabs=etabs)
         Gui.Control.showDialog(panel)
         return panel
@@ -195,7 +183,7 @@ class CivilSafe1620:
             "civil_safe",
             "Export Model to Safe")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "safe.png"
+                   Path(__file__).parent / "osafe_images" / "safe.png"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
@@ -210,7 +198,7 @@ class CivilSafe1620:
             )
         if not allow:
             return
-        from safe.punch.py_widget import safe_panel
+        from osafe_py_widgets import safe_panel
         panel = safe_panel.Safe12TaskPanel()
         Gui.Control.showDialog(panel)
         show_warning_about_number_of_use(check)
@@ -229,14 +217,14 @@ class CivilForce:
             "civil_force",
             "Assign force to foundation")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "force.svg"
+                   Path(__file__).parent / "osafe_images" / "force.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch.py_widget import force_panel
+        from osafe_py_widgets import force_panel
         panel = force_panel.ForceTaskPanel()
         Gui.Control.showDialog(panel)
         return panel
@@ -255,14 +243,14 @@ class CivilWall:
             "civil_wall",
             "Create wall on foundation")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "wall.svg"
+                   Path(__file__).parent / "osafe_images" / "wall.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch.py_widget import wall_panel
+        from osafe_py_widgets import wall_panel
         panel = wall_panel.WallTaskPanel()
         Gui.Control.showDialog(panel)
         return panel
@@ -281,14 +269,14 @@ class CivilOpening:
             "civil",
             "create an opening from selected points in etabs model")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "opening.svg"
+                   Path(__file__).parent / "osafe_images" / "opening.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch import opening
+        from osafe_objects import opening
         import etabs_obj
         etabs = etabs_obj.EtabsModel(backup=False)
         etabs.set_current_unit('kN', 'mm')
@@ -327,7 +315,7 @@ class CivilExplodLoadPatterns:
             "civil_explode",
             "Explode Load Patterns")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "explode.svg"
+                   Path(__file__).parent / "osafe_images" / "explode.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
@@ -341,7 +329,7 @@ class CivilExplodLoadPatterns:
             )
         if not allow:
             return
-        from safe.punch.py_widget import explode_seismic_load_patterns
+        from osafe_py_widgets import explode_seismic_load_patterns
         panel = explode_seismic_load_patterns.Form()
         Gui.Control.showDialog(panel)
         show_warning_about_number_of_use(check)
@@ -361,14 +349,14 @@ class CivilCreateF2k:
             "civil_create_f2k",
             "Create F2k File")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "f2k.svg"
+                   Path(__file__).parent / "osafe_images" / "f2k.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch.py_widget import create_f2k_command
+        from osafe_py_widgets import create_f2k_command
         import etabs_obj
         etabs = etabs_obj.EtabsModel(backup=False)
         panel = create_f2k_command.Form(etabs)
@@ -388,14 +376,14 @@ class CivilBaseFoundation:
             "civil_base_foundation",
             "Create base of foundation")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "automatic_base_foundation.svg"
+                   Path(__file__).parent / "osafe_images" / "automatic_base_foundation.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch.py_widget import base_foundation_panel
+        from osafe_py_widgets import base_foundation_panel
         panel = base_foundation_panel.Form()
         Gui.Control.showDialog(panel)
         return panel
@@ -414,14 +402,14 @@ class CivilFoundation:
             "civil_foundation",
             "Create foundation")
         path = str(
-                   Path(__file__).parent.absolute() / 'safe' / 'punch' / "Resources" / "icons" / "foundation.svg"
+                   Path(__file__).parent / "osafe_images" / "foundation.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
                 'ToolTip': ToolTip}
 
     def Activated(self):
-        from safe.punch.py_widget import foundation_panel
+        from osafe_py_widgets import foundation_panel
         panel = foundation_panel.Form()
         Gui.Control.showDialog(panel)
         return panel
@@ -439,7 +427,7 @@ class CivilFoundation:
 #             "civil_change branch",
 #             "Change branch")
 #         path = str(
-#                    Path(__file__).parent.absolute() / "Resources" / "icons" / "change_branch.svg"
+#                    Path(__file__).parent.absolute() / "osafe_images" / "change_branch.svg"
 #                    )
 #         return {'Pixmap': path,
 #                 'MenuText': MenuText,
@@ -465,7 +453,7 @@ class CivilHelp:
             "OSAFE-Help",
             "OSAFE Help")
         path = str(
-                   Path(__file__).parent.absolute() / "Resources" / "icons" / "help.png"
+                   Path(__file__).parent.absolute() / "osafe_images" / "help.png"
                    )
         return {'Pixmap': path,
                 'MenuText': MenuText,
@@ -489,7 +477,7 @@ class CivilHelp:
 #             "Civil_update",
 #             "Update")
 #         path = str(
-#                    Path(__file__).parent.absolute() / "Resources" / "icons" / "update.png"
+#                    Path(__file__).parent.absolute() / "osafe_images" / "update.png"
 #                    )
 #         return {'Pixmap': path,
 #                 'MenuText': MenuText,
@@ -553,7 +541,7 @@ def show_warning_about_number_of_use(check):
 class SerialForm:
     def __init__(self):
         serial_ui = str(
-            Path(__file__).parent.absolute() / 'Resources' / 'ui' / 'serial.ui'
+            Path(__file__).parent / 'osafe_widgets' / 'serial.ui'
             )
         self.form = Gui.PySideUic.loadUi(serial_ui)
 
@@ -564,7 +552,7 @@ class RectangleSlab:
 
     def GetResources(self):
 
-        return {'Pixmap'  : str(Path(__file__).parent.absolute() / 'safe' / 'punch' / 'Resources' / 'icons' / 'rectangle.svg'),
+        return {'Pixmap'  : str(Path(__file__).parent / 'osafe_images' / 'rectangle.svg'),
                 'MenuText': "Draw Rectangle Slab",
                 'ToolTip': "EXPERIMENTAL\nDraw Rectangle Slab.\nSelect 2 Punches to draw a slab between them."}
 
@@ -592,8 +580,8 @@ class RectangleSlab:
                 o.Proxy.Type == "Punch":
                 punches.append(o)
         if len(punches) == 2:
-            from safe.punch import rectangle_slab
-            slab = rectangle_slab.make_rectangle_slab(punch1.center_of_load, punch2.center_of_load, width=1000, height=800)
+            from osafe_objects import rectangular_slab
+            slab = rectangular_slab.make_rectangle_slab(punch1.center_of_load, punch2.center_of_load, width=1000, height=800)
             foun = FreeCAD.ActiveDocument.Foundation
             foun.tape_slabs = foun.tape_slabs + [slab]
             FreeCAD.ActiveDocument.recompute([foun, punch1, punch2])
@@ -644,8 +632,8 @@ Gui.addCommand('osafe_import_dxf', gui_dxf.OsafeImportDxf())
 Gui.addCommand('create_f2k_file', CivilCreateF2k())
 Gui.addCommand('automatic_base_foundation', CivilBaseFoundation())
 Gui.addCommand('create_foundation', CivilFoundation())
-Gui.addCommand('civil_slab', gui_slab.Slab())
-Gui.addCommand('civil_beam', gui_beam.Beam())
+Gui.addCommand('civil_slab', draw_slab.Slab())
+Gui.addCommand('civil_beam', draw_beam.Beam())
 # Gui.addCommand('civil_base_foundation', gui_base_foundation.BaseFoundation())
 Gui.addCommand('civil_punch', gui_punch.Punch())
 Gui.addCommand('osafe_automatic_strip', gui_automatic_strip.OsafeAutomaticStrip())
