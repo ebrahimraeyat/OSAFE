@@ -146,7 +146,6 @@ class DrawStrip(gui_lines.Line):
         closed: bool, optional
             Close the line if `True`.
         """
-        p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         # if self.ui:
             # self.linetrack.finalize()
         if not utils.getParam("UiMode", 1):
@@ -194,7 +193,7 @@ class DrawStrip(gui_lines.Line):
 
         "sets up a taskbox widget"
         punch_path = Path(__file__).parent.parent
-        w = Gui.PySideUic.loadUi(str(punch_path / 'osafe_images' / 'draw_strip.ui'))
+        w = Gui.PySideUic.loadUi(str(punch_path / 'osafe_widgets' / 'draw_strip.ui'))
     
         self.layer_box = w.strip_layer
         self.width_spinbox = w.width_spinbox
@@ -256,10 +255,16 @@ class DrawStrip(gui_lines.Line):
 
     def set_layer(self):
         self.layer = self.draw_strip_ui.strip_layer.currentText()
-        if self.layer == 'A':
-            self.obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
-        elif self.layer == 'B':
-            self.obj.ViewObject.ShapeColor = (0.20,0.00,1.00)
+        if self.layer in  ('A', 'B'):
+            layer = self.layer.lower()
+            osafe_funcs.format_view_object(
+                obj=self.obj,
+                shape_color_entity=f'design_layer_{layer}_shape_color',
+                line_width_entity='design_layer_a_line_width',
+                display_mode_entity='design_layer_a_display_mode',
+                line_color_entity=f'design_layer_{layer}_line_color',
+                transparency_entity='design_layer_a_transparency',
+            )
         elif self.layer == 'other':
             self.obj.ViewObject.ShapeColor = (0.20,1.00,0.00)
         FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetString("draw_strip_layer",self.layer)

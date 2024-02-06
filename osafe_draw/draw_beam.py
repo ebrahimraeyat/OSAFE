@@ -21,11 +21,11 @@ class Beam(Line):
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
-            "civil_beam",
-            "Create beam")
+            "osafe_draw_beam",
+            "Beam")
         tool_tip = QtCore.QT_TRANSLATE_NOOP(
-            "civil_beam",
-            "Create beam")
+            "osafe_draw_beam",
+            "Draw Beam")
         path = str(
                    Path(__file__).parent.parent / "osafe_images" / "beam.svg"
                    )

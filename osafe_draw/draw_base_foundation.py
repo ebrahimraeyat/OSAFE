@@ -28,11 +28,11 @@ class BaseFoundation(gui_lines.Line):
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
-            "civil_base_foundation",
-            "Create base_foundation")
+            "osafe_base_foundation",
+            "Base Foundation")
         tool_tip = QtCore.QT_TRANSLATE_NOOP(
-            "civil_base_foundation",
-            "Create base_foundation")
+            "osafe_base_foundation",
+            "Draw Base Foundation")
         path = str(
                    Path(__file__).parent.parent / "osafe_images" / "base_foundation.svg"
                    )
@@ -278,10 +278,16 @@ class BaseFoundation(gui_lines.Line):
 
     def set_layer(self):
         self.layer = self.base_foundation_ui.strip_layer.currentText()
-        if self.layer == 'A':
-            self.obj.ViewObject.ShapeColor = (1.00,0.00,0.20)
-        elif self.layer == 'B':
-            self.obj.ViewObject.ShapeColor = (0.20,0.00,1.00)
+        if self.layer in  ('A', 'B'):
+            layer = self.layer.lower()
+            osafe_funcs.format_view_object(
+                obj=self.obj,
+                shape_color_entity=f'base_foundation_{layer}_shape_color',
+                line_width_entity='base_foundation_a_line_width',
+                display_mode_entity='base_foundation_a_display_mode',
+                line_color_entity=f'base_foundation_{layer}_line_color',
+                transparency_entity='base_foundation_a_transparency',
+            )
         elif self.layer == 'other':
             self.obj.ViewObject.ShapeColor = (0.20,1.00,0.00)
         FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").SetString("base_foundation_layer",self.layer)

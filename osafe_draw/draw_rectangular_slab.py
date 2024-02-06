@@ -26,11 +26,11 @@ class RectangularSlab(gui_lines.Line):
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
-            "civil_rectangular_slab",
-            "Create Rectangular Slab")
+            "osafe_rectangular_slab",
+            "Rectangular Slab")
         tool_tip = QtCore.QT_TRANSLATE_NOOP(
-            "civil_rectangular_slab",
-            "Create Rectangular Slab")
+            "osafe_rectangular_slab",
+            "Draw Rectangular Slab")
         path = str(
                    Path(__file__).parent.parent / "osafe_images" / "rectangular_slab.svg"
                    )
@@ -194,7 +194,7 @@ class RectangularSlab(gui_lines.Line):
 
         "sets up a taskbox widget"
         punch_path = Path(__file__).parent.parent
-        w = Gui.PySideUic.loadUi(str(punch_path / 'osafe_images' / 'base_foundation.ui'))
+        w = Gui.PySideUic.loadUi(str(punch_path / 'osafe_widgets' / 'base_foundation.ui'))
     
         self.layer_box = w.strip_layer
         self.width_spinbox = w.width_spinbox
