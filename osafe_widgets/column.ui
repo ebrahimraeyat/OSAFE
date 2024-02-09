@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Stories</class>
- <widget class="QDialog" name="Stories">
+ <class>punch</class>
+ <widget class="QDialog" name="punch">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Columns</string>
+   <string>Punch Edit</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
