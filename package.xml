@@ -3,7 +3,7 @@
   <description>This is a workbench for FreeCAD that creates foundation model from CSI ETABS model results.</description>
   <version>2022.05.29</version>
   <maintainer email="ebe79442114@gmail.com">Raeyat Roknabadi Ebrahim</maintainer>
-  <license file="LICENSE">LGPLv2.1</license>
+  <license file="LICENSE">LGPL-2.1-or-later</license>
   <url type="repository" branch="master">https://github.com/ebrahimraeyat/OSAFE</url>
   <url type="website">https://github.com/ebrahimraeyat/OSAFE/wiki</url>
   <icon>images/safe.png</icon>
