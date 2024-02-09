@@ -48,13 +48,6 @@ class BasePlate:
                 "BasePlate",
                 )
         
-        if not hasattr(obj, "Column"):
-            obj.addProperty(
-                "App::PropertyLink",
-                "Column",
-                "BasePlate",
-                )
-
     def onDocumentRestored(self, obj):
         self.set_properties(obj)
 
@@ -110,7 +103,14 @@ def make_base_plate(
     obj.By = by
     obj.Thickness = thickness
     if column:
-        obj.Column = column
+        column = FreeCAD.ActiveDocument.getObjectsByLabel(column)[0]
+        if not hasattr(column, "base_plate"):
+            column.addProperty(
+                "App::PropertyLink",
+                "base_plate",
+                "BasePlate",
+                )
+        column.base_plate = obj
     FreeCAD.ActiveDocument.recompute()
     return obj
 
@@ -175,13 +175,15 @@ class CommandBasePlate:
         if point is None:
             self.tracker.finalize()
             return
-        self.tracker.finalize()
         FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Plate"))
         dx = self.x_offset_input.value() * 10
         dy = self.y_offset_input.value() * 10
         cardinal_dx, cardinal_dy = self.get_xy_cardinal_point(self.cardinal_point)
         FreeCADGui.doCommand('from osafe_objects import base_plate')
-        FreeCADGui.doCommand(f'bp = base_plate.make_base_plate(bx={self.bx}, by={self.by}, thickness={self.thickness})')
+        if self.column:
+            FreeCADGui.doCommand(f'bp = base_plate.make_base_plate(bx={self.bx}, by={self.by}, thickness={self.thickness}, column="{self.column.Label}")')
+        else:
+            FreeCADGui.doCommand(f'bp = base_plate.make_base_plate(bx={self.bx}, by={self.by}, thickness={self.thickness})')
 
         # calculate rotation
         rot = FreeCAD.Rotation()
@@ -198,7 +200,6 @@ class CommandBasePlate:
 
         FreeCADGui.doCommand(f'bp.Placement.Base = FreeCAD.{point}')
         FreeCADGui.doCommand(f'bp.Placement.Rotation = FreeCAD.{rot}')
-        FreeCADGui.doCommand(f'bp.Column = FreeCAD.ActiveDocument.{self.column.Name}')
         FreeCAD.ActiveDocument.commitTransaction()
         FreeCAD.ActiveDocument.recompute()
         self.Activated()

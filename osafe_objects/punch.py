@@ -258,6 +258,12 @@ class Punch:
                 "column",
                 "Column",
                 )
+        if not hasattr(obj, "base_plate"):
+            obj.addProperty(
+                "App::PropertyLink",
+                "base_plate",
+                "Column",
+                )
 
         if not hasattr(obj, "center_of_load"):
             obj.addProperty(
@@ -345,12 +351,8 @@ class Punch:
         # try to find base plate if column is steel
         obj.angle = math.degrees(obj.column.Placement.Rotation.Angle) - 90
         base_plate = None
-        inlist = obj.column.InList
-        if inlist:
-            for o in inlist:
-                if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BasePlate':
-                    base_plate = o
-                    break
+        if hasattr(obj.column, 'base_plate') and obj.column.base_plate:
+            base_plate = obj.column.base_plate
         colbb = obj.column.Shape.BoundBox
         if base_plate:
             bpbb = base_plate.Shape.BoundBox
@@ -553,7 +555,6 @@ class ViewProviderPunch:
     def setEdit(self, vobj, mode=0):
         obj = vobj.Object
         ui = Ui(obj)
-        ui.setupUi()
         Gui.Control.showDialog(ui)
         return True
     
@@ -681,28 +682,43 @@ class Ui:
         import os
         self.form = Gui.PySideUic.loadUi(str(Path(__file__).parent.parent / "osafe_widgets" / "column.ui"))
         self.punch_obj = punch_obj
-
-    def setupUi(self):
+        self.create_connections()
         self.fill_form(self.punch_obj)
+
+    def create_connections(self):
+        self.form.location.currentIndexChanged.connect(self.modify_punch)
+        self.form.column_bx.valueChanged.connect(self.modify_punch)
+        self.form.column_by.valueChanged.connect(self.modify_punch)
+        self.form.base_plate_bx.valueChanged.connect(self.modify_punch)
+        self.form.base_plate_by.valueChanged.connect(self.modify_punch)
+
+
+    # def setupUi(self):
 
     def fill_form(self, punch_obj):
         location = punch_obj.Location
         index = self.form.location.findText(location)
-        bx = punch_obj.bx
-        by = punch_obj.by
-        user_modified = punch_obj.user_location
-
+        column_bx = punch_obj.column.Base.Height.Value
+        column_by = punch_obj.column.Base.Width.Value
         self.form.location.setCurrentIndex(index)
-        self.form.bx.setValue(int(bx))
-        self.form.by.setValue(int(by))
-        if user_modified:
-            self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Checked)
-        else:
-            self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Unchecked)
+        self.form.column_bx.setValue(int(column_bx))
+        self.form.column_by.setValue(int(column_by))
+        if hasattr(punch_obj.column, 'base_plate') and punch_obj.column.base_plate:
+            self.form.base_plate_groupbox.setEnabled(True)
+            base_plate_bx = punch_obj.column.base_plate.Bx
+            base_plate_by = punch_obj.column.base_plate.By
+            self.form.base_plate_bx.setValue(int(base_plate_bx))
+            self.form.base_plate_by.setValue(int(base_plate_by))
+
+        # user_modified = punch_obj.user_location
+
+        # if user_modified:
+        #     self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Checked)
+        # else:
+        #     self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Unchecked)
 
     def accept(self):
         self.modify_punch()
-        self.punch_obj.recompute(True)
         Gui.Control.closeDialog()
 
     def reject(self):
@@ -711,8 +727,15 @@ class Ui:
     def modify_punch(self):
         self.punch_obj.Location = self.form.location.currentText()
         self.punch_obj.user_location = self.form.user_modified.isChecked()
-        self.punch_obj.bx = float(self.form.bx.value())
-        self.punch_obj.by = float(self.form.by.value())
+        self.punch_obj.column.Base.Height.Value = float(self.form.column_bx.value())
+        self.punch_obj.column.Base.Width.Value = float(self.form.column_by.value())
+        if self.form.base_plate_groupbox.isEnabled():
+            self.punch_obj.column.base_plate.Bx = float(self.form.base_plate_bx.value())
+            self.punch_obj.column.base_plate.By = float(self.form.base_plate_by.value())
+            self.punch_obj.column.base_plate.recompute(True)
+        self.punch_obj.column.recompute(True)
+        self.punch_obj.recompute(True)
+
 
 
 def get_color(pref_intity, color=16711935):
