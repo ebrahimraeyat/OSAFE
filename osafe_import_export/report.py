@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 from decimal import Decimal
+import math
 
 import numpy as np
 
@@ -15,29 +16,23 @@ except ImportError:
     subprocess.check_call(['python', "-m", "pip", "install", package])
 
 
-
-punch_path = Path(__file__).parent.parent
+from python_functions import get_temp_filepath
 from osafe_funcs import  osafe_funcs
 import Part
 
-try:
-    import FreeCAD
-except:
-    # path to FreeCAD.so
-    FREECADPATH = '/usr/lib/freecad-daily-python3/lib/'
-    sys.path.append(FREECADPATH)
-    import FreeCAD
+import FreeCAD
+import Part
 
-
-def add_edges_to_ax(obj, ax, linewidth=.5):
+def add_edges_to_ax(obj, ax, linewidth=.5, linestyle='-'):
     for e in obj.Edges:
-        if not len(e.Vertexes) == 2:
+        if len(e.Vertexes) != 2:
             continue
         v1, v2 = e.Vertexes
         xy = [[v1.X, v1.Y], [v2.X, v2.Y]]
-        p = patches.Polygon(xy, edgecolor='black', linewidth=linewidth, closed=False)
+        p = patches.Polygon(xy, edgecolor='black', linewidth=linewidth, 
+                            linestyle=linestyle, closed=False,
+                            )
         ax.add_patch(p)
-
 
 def add_key_plan_edges_to_ax(punch, ax):
     comp = Part.makeCompound([
@@ -53,65 +48,90 @@ def add_column_to_ax(punch, ax):
     if FreeCAD.GuiUp:
         color = punch.ViewObject.ShapeColor[:-1]
     else:
-        color = (.5, 0.5, 0.5)
-    xy = [[v.X, v.Y] for v in punch.rect.Vertexes]
+        color = (0.5, 0.5, 0.5)
+    z_min = punch.column.Shape.BoundBox.ZMin
+    for face in punch.column.Shape.Faces:
+        if face.BoundBox.ZMin == z_min and face.BoundBox.ZMax == z_min:
+            break
+    xy = [[v.X, v.Y] for v in face.OuterWire.Vertexes]
     xy = osafe_funcs.sort_vertex(xy)
     p = patches.Polygon(xy, edgecolor='black', linewidth=.8, facecolor=color, closed=True)
     ax.add_patch(p)
 
+def add_base_plate_to_ax(punch, ax):
+    if hasattr(punch.column, 'base_plate') and punch.column.base_plate:
+        base_plate = punch.column.base_plate
+        color = (1, 0 , 0)
+        if FreeCAD.GuiUp:
+            color = base_plate.ViewObject.ShapeColor[:-1]
+    else:
+        return
+    # Draw base plate
+    z_min = base_plate.Shape.BoundBox.ZMin
+    for face in base_plate.Shape.Faces:
+        if face.BoundBox.ZMin == z_min and face.BoundBox.ZMax == z_min:
+            break
+    xy = [[v.X, v.Y] for v in face.Vertexes]
+    xy = osafe_funcs.sort_vertex(xy)
+    p = patches.Polygon(xy, edgecolor='black', linewidth=.8, facecolor=color, closed=True)
+    ax.add_patch(p)
+    # Add equivalent column
+    xy = [[v.X, v.Y] for v in punch.rect.Vertexes]
+    xy = osafe_funcs.sort_vertex(xy)
+    p = patches.Polygon(xy, edgecolor='black', linewidth=.6, closed=False)
+    ax.add_patch(p)
 
 def add_punch_edges_to_ax(punch, ax):
     edges = punch.edges
-    add_edges_to_ax(edges, ax, linewidth=.8)
+    add_edges_to_ax(edges, ax, linewidth=2)
+    ret_null_edges, common_edges = osafe_funcs.punch_null_edges(punch=punch)
+    null_edges = []
+    for ret, edge in zip(ret_null_edges, common_edges):
+        if ret == 'Yes':
+            null_edges.append(edge)
+    null_edges = Part.makeCompound(null_edges)
+    add_edges_to_ax(null_edges, ax, linewidth=.1)
+    add_base_plate_to_ax(punch, ax)
     add_column_to_ax(punch, ax)
-    set_ax_boundbox(edges, ax)
+    set_ax_boundbox(common_edges, ax)
     # return comp
 
+def get_column_points_for_dimensioning(col):
+    z_min = col.Shape.BoundBox.ZMin
+    for face in col.Shape.Faces:
+        if face.BoundBox.ZMin == z_min and face.BoundBox.ZMax == z_min:
+            break
+    e1, e2 = Part.__sortEdges__(face.OuterWire.Edges)[2:]
+    v1, v2 = e1.Vertexes
+    v3, v4 = e2.Vertexes
+    return v1, v2, v3, v4
+
 def add_punch_edges_dimension_to_ax(punch, ax):
-    xmin = punch.center_of_load.x - punch.bx / 2
-    ymin = punch.center_of_load.y - punch.by / 2
-    x2 = xmin + punch.bx
-    y2 = ymin + punch.by
-    annotate_dim(ax,(xmin, ymin),(x2, ymin), direction='BOT', offset=80)
-    annotate_dim(ax,(xmin, ymin),(xmin, y2), direction='LEFT', offset=100)
-    edges_dim = get_edges_direction_in_punch(punch)
-    for e, loc in edges_dim.items():
+    v1, v2, v3, v4 = get_column_points_for_dimensioning(punch.column)
+    offset = 60
+    annotate_dim(ax,(v1.X, v1.Y),(v2.X, v2.Y), offset=offset, arrows=False)
+    annotate_dim(ax,(v3.X, v3.Y),(v4.X, v4.Y), offset=offset, arrows=False)
+    for e in punch.edges.Edges:
         v1, v2 = e.Vertexes
-        if loc in ('LEFT', 'RIGHT'):
-            offset = 120
-        else:
-            offset = 80
-        annotate_dim(ax,(v1.X, v1.Y), (v2.X, v2.Y), direction=loc, offset=offset,
-            rotation=48)
+        annotate_dim(ax,(v1.X, v1.Y), (v2.X, v2.Y), offset=-offset)
 
 def set_ax_boundbox(shape, ax, scale=1, bb_add=120):
+    if isinstance(shape, list):
+        shape = Part.makeCompound(shape)
     b = shape.BoundBox
     xmin, ymin, xmax, ymax = b.XMin, b.YMin, b.XMax, b.YMax
     ax.set_xlim((xmin - bb_add) * scale, (xmax + bb_add) * scale)
     ax.set_ylim((ymin - bb_add) * scale, (ymax + bb_add) * scale)
 
-def get_edges_direction_in_punch(punch):
-    edges_direction = {}
-    x_center = punch.center_of_load.x
-    y_center = punch.center_of_load.y
-    for e in punch.edges.Edges:
-        bb = e.BoundBox
-        if bb.XLength <= bb.YLength:
-            if bb.XMax > x_center:
-                edges_direction[e] = 'RIGHT'
-            elif bb.XMax < x_center:
-                edges_direction[e] = 'LEFT'
-        elif bb.XLength > bb.YLength:
-            if bb.YMax > y_center:
-                edges_direction[e] = 'TOP'
-            elif bb.YMax < y_center:
-                edges_direction[e] = 'BOT'
-    return edges_direction
-
 def get_punch_picture(
         punch,
         filename='',
         ) -> Path:
+    # fig, axes = plt.subplots(2, 1)
+    # for ax in axes:
+    #     ax.set_aspect('equal')
+    #     ax.axis('off')
+    # ax1, ax2 = axes
     fig = plt.figure(constrained_layout=True)
     widths = [2, 2, 2]
     heights = [2, 2, 1]
@@ -121,46 +141,52 @@ def get_punch_picture(
     plt.axis('off')
     add_punch_edges_to_ax(punch, ax1)
     add_punch_edges_dimension_to_ax(punch, ax1)
+    # ax2 = fig.add_subplot(2, 1, 2, aspect='equal')
     ax2 = fig.add_subplot(gs[-1, 1], aspect='equal')
     plt.axis('off')
     add_key_plan_edges_to_ax(punch, ax2)
-    import tempfile
-    default_tmp_dir = tempfile._get_default_tempdir()
-    if not filename:
-        filename = punch.Name
-    filename_path = Path(default_tmp_dir) / f'{filename}.jpg'
-    fig.savefig(str(filename_path), orientation='portrait',
+    if not filename or not Path(filename).exists():
+        filename = get_temp_filepath(suffix='jpg', filename=punch.Name)
+    fig.savefig(str(filename), orientation='portrait',
         # papertype='a4',
         bbox_inches='tight', dpi=600)
     plt.clf()
     plt.close(fig)
-    return filename_path
+    return filename
 
-def move_xy(xy, direction, dist=200):
-    if direction in ('BOT', 'LEFT'):
-        dist = -dist
-    if direction in  ('TOP', 'BOT'):
-        return (xy[0], xy[1] + dist)
-    elif direction in ('LEFT', 'RIGHT'):
-        return (xy[0] + dist, xy[1])
+def move_xy(xy, dist=200, angle=0):
+    # return xy
+    x_offset = dist * np.cos(angle + np.pi/2)
+    y_offset = dist * np.sin(angle + np.pi/2)
+    return (xy[0] + x_offset, xy[1] + y_offset)
 
-
-def annotate_dim(ax,xyfrom,xyto, direction='TOP', offset=200, text=None, rotation=0):
+def annotate_dim(ax,xyfrom,xyto, offset=100, text=None, arrows=True):
     '''
     direction: dimension arrow offset. can be: 'TOP', 'BOT', 'LEFT', 'RIGHT'
     '''
-    xyfrom = move_xy(xyfrom, direction, offset)
-    xyto = move_xy(xyto, direction, offset)
+    delta_x = xyto[0] - xyfrom[0]
+    delta_y = xyto[1] - xyfrom[1]
+    angle = np.arctan2(delta_y, delta_x)
+    fontsize = 5
     if text is None:
-        dist = np.sqrt((xyfrom[0]-xyto[0])**2 + (xyfrom[1]-xyto[1])**2)
-        text = f'{dist: .0f}'
-    color = 'grey'
-    ax.annotate("",xyfrom,xyto,arrowprops=dict(arrowstyle='<->', lw=.2, edgecolor=color))
-    ax.annotate("",xyfrom,xyto,arrowprops=dict(arrowstyle='|-|', lw=.2, edgecolor=color))
-    bbox=dict(fc="white", ec="none")
-    ax.text((xyto[0]+xyfrom[0])/2,(xyto[1]+xyfrom[1])/2,text,fontsize=7,
+        dist = np.sqrt((xyfrom[0] - xyto[0]) ** 2 + (xyfrom[1] - xyto[1]) ** 2)
+        text = f'{dist / 10: .0f} cm'
+        if not arrows and dist < 300:
+            offset = 20
+        #     fontsize = 3
+    xyfrom = move_xy(xyfrom, offset, angle=angle)
+    xyto = move_xy(xyto, offset, angle=angle)
+    if abs(angle) > math.pi / 2:
+        angle = angle - math.pi
+    color = 'blue'
+    if arrows:
+        ax.annotate("",xyfrom,xyto, arrowprops=dict(arrowstyle='<->', lw=.2, color=color))
+    # ax.annotate("",xyfrom,xyto,arrowprops=dict(arrowstyle='|-|', lw=.2, edgecolor=color))
+    bbox=dict(fc="white", ec="none", pad=0.1)
+    ax.text((xyto[0]+xyfrom[0])/2,(xyto[1]+xyfrom[1])/2,text,fontsize=fontsize,
         color=color,ha="center", va="center", bbox=bbox,
-        rotation=rotation)
+        rotation=np.degrees(angle),
+        )
 
 def export_dataframe_to_docx(df, doc=None):
     if not doc:
@@ -246,6 +272,7 @@ def add_punch_properties_to_doc(punch, doc=None):
 
 def create_doc():
     import docx
+    punch_path = Path(__file__).parent.parent
     filepath = punch_path / 'osafe_import_export' / 'templates' / 'punch_default.docx'
     doc = docx.Document(str(filepath))
     return doc
