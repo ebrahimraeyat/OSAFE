@@ -1,4 +1,4 @@
-import sys
+import os
 from pathlib import Path
 from decimal import Decimal
 import math
@@ -55,7 +55,7 @@ def add_column_to_ax(punch, ax):
             break
     xy = [[v.X, v.Y] for v in face.OuterWire.Vertexes]
     xy = osafe_funcs.sort_vertex(xy)
-    p = patches.Polygon(xy, edgecolor='black', linewidth=.8, facecolor=color, closed=True)
+    p = patches.Polygon(xy, edgecolor='black', linewidth=.4, facecolor=color, closed=True)
     ax.add_patch(p)
 
 def add_base_plate_to_ax(punch, ax):
@@ -73,12 +73,12 @@ def add_base_plate_to_ax(punch, ax):
             break
     xy = [[v.X, v.Y] for v in face.Vertexes]
     xy = osafe_funcs.sort_vertex(xy)
-    p = patches.Polygon(xy, edgecolor='black', linewidth=.8, facecolor=color, closed=True)
+    p = patches.Polygon(xy, edgecolor='black', linewidth=.4, facecolor=color, closed=True)
     ax.add_patch(p)
     # Add equivalent column
     xy = [[v.X, v.Y] for v in punch.rect.Vertexes]
     xy = osafe_funcs.sort_vertex(xy)
-    p = patches.Polygon(xy, edgecolor='black', linewidth=.6, closed=False)
+    p = patches.Polygon(xy, edgecolor='black', linewidth=.6, closed=True, alpha=.2)
     ax.add_patch(p)
 
 def add_punch_edges_to_ax(punch, ax):
@@ -253,14 +253,14 @@ def add_punch_properties_to_doc(punch, doc=None):
     if not doc:
         doc = create_doc()
     d = dict()
-    d['Punch ID'] = punch.id
+    d['Column'] = punch.id.split('_')[0]
     d['Ratio'] = punch.Ratio
     d['location'] = punch.Location
-    d['X Coordinate'] = f'{punch.center_of_load.x} mm'
-    d['Y Coordinate'] = f'{punch.center_of_load.y} mm'
-    d['perimeter'] = f'{punch.b0:.0f} mm'
-    d['Eff. depth'] = f'{punch.d:.0f} mm'
-    d['Cover'] = f'{punch.foundation.cover.Value:.0f} mm'
+    d['X Coordinate'] = f'{punch.center_of_load.x / 10:.0f} cm'
+    d['Y Coordinate'] = f'{punch.center_of_load.y / 10:.0f} cm'
+    d['perimeter'] = f'{punch.b0 / 10:.0f} cm'
+    d['Cover'] = f'{punch.foundation.cover.Value / 10:.1f} cm'
+    d['Eff. depth'] = f'{punch.d / 10:.1f} cm'
     d['I22'] = f'{Decimal(punch.I22):.2E} mm^4'
     d['I33'] = f'{Decimal(punch.I33):.2E} mm^4'
     d['I23'] = f'{Decimal(punch.I23):.2E} mm^4'
@@ -284,7 +284,7 @@ def create_report(
                 ):
     if not doc:
         doc = create_doc()
-    doc.add_heading(f'PUNCH ID = {punch.id}',0)
+    doc.add_heading(f'Column = {punch.id.split("_")[0]}',1)
     image_file_path = get_punch_picture(punch)
     doc.add_picture(str(image_file_path), width=Inches(3.5))
     doc.add_paragraph()
@@ -316,6 +316,7 @@ def create_punches_report(
     if filename:
         doc.save(filename)
     progressbar.stop()
+    os.startfile(filename)
     return doc
 
 

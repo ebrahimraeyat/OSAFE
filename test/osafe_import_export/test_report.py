@@ -46,8 +46,10 @@ def test_export_dataframe_to_docx():
 
 def test_create_report():
     punch = document.Punch
-    filename = 'c:\\alaki\\jafari.docx'
+    filename = get_temp_filepath(suffix='docx', filename='test')
     report.create_report(punch, filename)
+    assert filename.exists()
+    open_file(filename)
 
 def test_get_edges_direction_in_punch():
     punch = document.Punch

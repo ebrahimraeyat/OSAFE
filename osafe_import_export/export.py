@@ -1,10 +1,12 @@
 from typing import Union
+import os
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import FreeCAD
 
 from osafe_funcs import osafe_funcs
+from python_functions import open_file
 
 def createPdf(doc, pdfName):
     if not pdfName:
@@ -109,6 +111,7 @@ def createPdf(doc, pdfName):
     fig.savefig(pdfName, orientation='portrait', bbox_inches='tight', dpi=600)
     FreeCAD.Console.PrintMessage("Pdf file saved as: " + pdfName)
     plt.close()
+    os.startfile(pdfName)
 
 def to_excel(
              punches: list,
@@ -121,6 +124,7 @@ def to_excel(
         ],
         axis=1)
     combos_ratios.to_excel(filename)
+    os.startfile(filename)
 
 def to_dxf(
            filename: str,
@@ -193,6 +197,7 @@ def to_dxf(
 
     FreeCAD.Console.PrintMessage("Saving dxf file...")
     FreeCAD.Console.PrintMessage("dxf file saved as: " + filename)
+    os.startfile(filename)
     return True
 
 
