@@ -1395,7 +1395,7 @@ def draw_strip_automatically_in_strip_foundation(
         points = get_points_from_indirection_edges(edges=edges, tol=tolerance)
         if split and len(points) > 2:
             for p1, p2 in zip(points[0:-1], points[1:]):
-                wire = Draft.make_wire((p1, p2), face=False)
+                wire = Draft.make_wire([p1, p2], face=False)
                 s = strip.make_strip(
                                     wire,
                                     layer=layer, 
