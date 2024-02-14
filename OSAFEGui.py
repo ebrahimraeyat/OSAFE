@@ -385,6 +385,9 @@ class CivilBaseFoundation:
     def Activated(self):
         from osafe_py_widgets import base_foundation_panel
         panel = base_foundation_panel.Form()
+        sel = Gui.Selection.getSelection()
+        if len(sel) > 0:
+            panel.form.selection_checkbox.setChecked(True)
         Gui.Control.showDialog(panel)
         return panel
 

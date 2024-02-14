@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Union
-from PySide2 import QtCore
 import FreeCAD
 import ArchComponent
 

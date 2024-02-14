@@ -16,12 +16,14 @@ filename_mat = Path(__file__).parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_base_foundation = Path(__file__).parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
 filename_khalaji = Path(__file__).parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
 filename_test = Path(__file__).parent / 'test_files' / 'freecad' / 'test.FCStd'
+filename_base_plate = Path(__file__).parent / 'test_files' / 'freecad' / 'base_plate.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
 document_strip_foundation = FreeCAD.openDocument(str(filename_strip_foundation))
 document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
 document_test = FreeCAD.openDocument(str(filename_test))
+document_base_plate = FreeCAD.openDocument(str(filename_base_plate))
 
 
 punch_path = Path(__file__).parent.parent
@@ -332,6 +334,24 @@ def test_draw_strip_automatically_in_strip_foundation():
 def test_get_similar_edge_direction_in_common_points_from_edges():
     edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
     df = osafe_funcs.get_similar_edge_direction_in_common_points_from_edges(edges)
+
+def test_get_objects_of_type():
+    objs = osafe_funcs.get_objects_of_type('BaseFoundation', document_base_plate)
+    assert len(objs) == 7
+
+def test_get_beams():
+    beams = osafe_funcs.get_beams(doc=document_base_plate)
+    assert len(beams) == 1
+
+def test_is_beam_shape_on_base_foundations_base():
+    beam = osafe_funcs.get_beams(doc=document_base_plate)[0]
+    base_foudndations = osafe_funcs.get_objects_of_type('BaseFoundation')
+    ret = osafe_funcs.is_beam_shape_on_base_foundations_base(beam, base_foudndations)
+    assert ret
+
+def test_get_beams_in_doc_that_belogns_to_base_foundations():
+    beams = osafe_funcs.get_beams_in_doc_that_belogns_to_base_foundations(doc=document_base_plate)
+    assert len(beams) == 1
 
 
 if __name__ == '__main__':

@@ -1455,6 +1455,70 @@ def get_points_from_indirection_edges(edges, tol=1e-7):
     points.append(edges[-1].lastVertex().Point)
     return points
 
+def get_objects_of_type(
+        type_: str,
+        doc=None,
+        ):
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return []
+    objs = []
+    for o in doc.Objects:
+        if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == type_:
+            objs.append(o)
+    return objs
+
+def get_beams(doc=None):
+    beams = []
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return beams
+    for o in doc.Objects:
+        if (
+            hasattr(o, "type") and
+            o.type == 'Beam'
+            ):
+            beams.append(o)
+    return beams
+        
+
+def is_beam_shape_on_base_foundations_base(
+        beam,
+        base_foundations : list=None,
+        ):
+    if base_foundations is None:
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return False
+        base_foundations = get_objects_of_type('BaseFoundation')
+    if len(base_foundations) == 0:
+        return False
+    p1, p2 = beam.Points
+    mid_point = (p1 + p2) / 2
+    for bf in base_foundations:
+        if bf.Shape.isInside(mid_point, .01, True):
+            return True
+    return False
+
+def get_beams_in_doc_that_belogns_to_base_foundations(doc= None):
+    '''
+    Search in doc for beams that their geometry are in Base of base foundations in model
+    '''
+    ret = set()
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return ret
+    base_foudations = get_objects_of_type('BaseFoundation')
+    beams = get_beams(doc)
+    for beam in beams:
+        if is_beam_shape_on_base_foundations_base(beam=beam, base_foundations=base_foudations):
+            ret.add(beam.Name)
+    return ret
+
+
 def get_sorted_points(
             edges,
             vector=True,

@@ -5,6 +5,7 @@ import FreeCADGui as Gui
 
 from PySide2.QtWidgets import QMessageBox
 
+from osafe_funcs import osafe_funcs
 from osafe_py_widgets import resource_rc
 
 punch_path = Path(__file__).parent.parent
@@ -62,7 +63,15 @@ class Form:
                 message = "There is No Beams in Model."
             QMessageBox.warning(None, "Beams", message)
             return
-        from osafe_funcs import osafe_funcs
+        if len(sel) == 0: # Check for beams that now are in base foundations
+            used_beam = osafe_funcs.get_beams_in_doc_that_belogns_to_base_foundations(doc)
+            current_beam = [beam.Name for beam in beams]
+            new_beams = set(current_beam).difference(used_beam)
+            if len(new_beams) == 0:
+                message = "There is No Remained Beams in Model."
+                QMessageBox.warning(None, "Beams", message)
+                return
+            beams = [doc.getObjectsByLabel(name)[0] for name in new_beams]
         osafe_funcs.make_automatic_base_foundation(beams, width, north_dist, south_dist,
                 east_dist, west_dist, x_stirp_name, y_stirp_name, angle, height, soil_modulus)
         Gui.Selection.clearSelection()
