@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Create Foundation</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../osafe_py_widgets/resource.qrc">
+    <normaloff>:/safe/osafe_images/foundation.svg</normaloff>:/safe/osafe_images/foundation.svg</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">

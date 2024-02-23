@@ -654,7 +654,7 @@ command_list = [
             # "civil_explod_load_patterns",
             # "Civil_update",
             # "Civil_branch",
-            "create_f2k_file",
+            # "create_f2k_file",
             ]
 
 export_list = [
@@ -671,8 +671,8 @@ draw_list = [
             "civil_beam",
             "osafe_base_foundation",
             "osafe_draw_strip",
-            "osafe_rectangular_slab",
-            'civil_slab',
+            # "osafe_rectangular_slab",
+            # 'civil_slab',
             'civil_base_plate',
             "Draft_Wire",
             ]
@@ -700,6 +700,7 @@ edit_list = [
 view_list = [
             "Separator",
             # "OSAFE_wireframe_views",
+            "OSAFE_view_beams",
             "OSAFE_view_columns",
             "OSAFE_view_basefoundation",
             "OSAFE_view_foundations",
@@ -708,7 +709,6 @@ view_list = [
             "OSAFE_view_punch",
             "OSAFE_view_slabs",
             "OSAFE_view_arch_wall",
-            "OSAFE_view_beams",
             # "OSAFE_view_group",
             ]
 

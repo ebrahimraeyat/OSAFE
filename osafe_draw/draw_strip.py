@@ -33,7 +33,7 @@ class DrawStrip(gui_lines.Line):
             "civil_draw_strip",
             "Draw Strip")
         path = str(
-                   Path(__file__).parent.parent / "osafe_images" / "draw_strip.svg"
+                   Path(__file__).parent.parent / "osafe_images" / "strip.svg"
                    )
         return {'Pixmap': path,
                 'MenuText': menu_text,
