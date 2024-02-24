@@ -4,6 +4,8 @@ from PySide2.QtWidgets import QMessageBox
 import FreeCAD
 import FreeCADGui as Gui
 
+from osafe_py_widgets import resource_rc
+
 punch_path = Path(__file__).parent.parent
 
 
@@ -25,7 +27,7 @@ class ForceTaskPanel:
         deads = []
         try:
             import find_etabs
-            etabs, _ = find_etabs.find_etabs(run=False)
+            etabs, _ = find_etabs.find_etabs(run=False, backup=False)
             deads = etabs.load_patterns.get_special_load_pattern_names(1)
         except:
             if hasattr(FreeCAD, 'load_cases'):

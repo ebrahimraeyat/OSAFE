@@ -31,8 +31,8 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>40</width>
-         <height>40</height>
+         <width>60</width>
+         <height>60</height>
         </size>
        </property>
       </widget>
@@ -48,8 +48,8 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>40</width>
-         <height>40</height>
+         <width>60</width>
+         <height>60</height>
         </size>
        </property>
       </widget>

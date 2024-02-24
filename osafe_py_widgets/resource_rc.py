@@ -2674,6 +2674,1144 @@ y$dK\xcc\xb1x\x9f\xbd\xfa\xec\xdel\xd5(\xb8\
 \xcc\x9dv\xc0\x1b\xa2\xf5\xeb{\xee\xd3\xc0f\x16 N\
 \xe2\xcaZg\xc6C\xeb\x92\xa0\xa6\x07\xdc\x0d\xb7`\xa9\
 \xfeO?\xbd\xf9\xc3o\xfe?\x1e#\xcb]\
+\x00\x00F\xf3\
+<\
+?xml version=\x221.\
+0\x22 encoding=\x22UTF\
+-8\x22 standalone=\x22\
+no\x22?>\x0a<svg\x0a   ve\
+rsion=\x221.1\x22\x0a   w\
+idth=\x22256\x22\x0a   he\
+ight=\x22256\x22\x0a   vi\
+ewBox=\x220 0 256 2\
+56\x22\x0a   xml:space\
+=\x22preserve\x22\x0a   i\
+d=\x22svg18\x22\x0a   sod\
+ipodi:docname=\x22a\
+uto_strip.svg\x22\x0a \
+  inkscape:versi\
+on=\x221.2.2 (732a0\
+1da63, 2022-12-0\
+9)\x22\x0a   xmlns:ink\
+scape=\x22http://ww\
+w.inkscape.org/n\
+amespaces/inksca\
+pe\x22\x0a   xmlns:sod\
+ipodi=\x22http://so\
+dipodi.sourcefor\
+ge.net/DTD/sodip\
+odi-0.dtd\x22\x0a   xm\
+lns:xlink=\x22http:\
+//www.w3.org/199\
+9/xlink\x22\x0a   xmln\
+s=\x22http://www.w3\
+.org/2000/svg\x22\x0a \
+  xmlns:svg=\x22htt\
+p://www.w3.org/2\
+000/svg\x22><sodipo\
+di:namedview\x0a   \
+id=\x22namedview20\x22\
+\x0a   pagecolor=\x22#\
+ffffff\x22\x0a   borde\
+rcolor=\x22#666666\x22\
+\x0a   borderopacit\
+y=\x221.0\x22\x0a   inksc\
+ape:pageshadow=\x22\
+2\x22\x0a   inkscape:p\
+ageopacity=\x220.0\x22\
+\x0a   inkscape:pag\
+echeckerboard=\x220\
+\x22\x0a   showgrid=\x22f\
+alse\x22\x0a   inkscap\
+e:zoom=\x221.129713\
+6\x22\x0a   inkscape:c\
+x=\x22-113.30305\x22\x0a \
+  inkscape:cy=\x224\
+6.914545\x22\x0a   ink\
+scape:window-wid\
+th=\x221920\x22\x0a   ink\
+scape:window-hei\
+ght=\x22991\x22\x0a   ink\
+scape:window-x=\x22\
+-9\x22\x0a   inkscape:\
+window-y=\x22-9\x22\x0a  \
+ inkscape:window\
+-maximized=\x221\x22\x0a \
+  inkscape:curre\
+nt-layer=\x22svg18\x22\
+\x0a   inkscape:sho\
+wpageshadow=\x222\x22\x0a\
+   inkscape:desk\
+color=\x22#d1d1d1\x22 \
+/>\x0a<desc\x0a   id=\x22\
+desc2\x22>Created w\
+ith Fabric.js 1.\
+7.22</desc>\x0a<def\
+s\x0a   id=\x22defs4\x22>\
+<linearGradient\x0a\
+   inkscape:coll\
+ect=\x22always\x22\x0a   \
+id=\x22linearGradie\
+nt11912\x22><stop\x0a \
+    style=\x22stop-\
+color:#0000ff;st\
+op-opacity:1;\x22\x0a \
+    offset=\x220\x22\x0a \
+    id=\x22stop1190\
+8\x22 /><stop\x0a     \
+style=\x22stop-colo\
+r:#0000ff;stop-o\
+pacity:0;\x22\x0a     \
+offset=\x221\x22\x0a     \
+id=\x22stop11910\x22 /\
+></linearGradien\
+t><rect\x0a   x=\x2215\
+9.92176\x22\x0a   y=\x224\
+8.195598\x22\x0a   wid\
+th=\x2280.743274\x22\x0a \
+  height=\x22121.11\
+491\x22\x0a   id=\x22rect\
+9011\x22 /><rect\x0a  \
+ x=\x22156.47921\x22\x0a \
+  y=\x2245.066013\x22\x0a\
+   width=\x2274.484\
+105\x22\x0a   height=\x22\
+97.017112\x22\x0a   id\
+=\x22rect8955\x22 /><l\
+inearGradient\x0a  \
+ id=\x22linearGradi\
+ent17054\x22\x0a   ink\
+scape:swatch=\x22gr\
+adient\x22><stop\x0a  \
+   style=\x22stop-c\
+olor:#e98800;sto\
+p-opacity:1;\x22\x0a  \
+   offset=\x220.735\
+66878\x22\x0a     id=\x22\
+stop17050\x22 /><st\
+op\x0a     style=\x22s\
+top-color:#aa880\
+0;stop-opacity:0\
+;\x22\x0a     offset=\x22\
+1\x22\x0a     id=\x22stop\
+17052\x22 /></linea\
+rGradient><inksc\
+ape:path-effect\x0a\
+   effect=\x22bspli\
+ne\x22\x0a   id=\x22path-\
+effect1709\x22\x0a   i\
+s_visible=\x22true\x22\
+\x0a   lpeversion=\x22\
+1\x22\x0a   weight=\x2233\
+.333333\x22\x0a   step\
+s=\x222\x22\x0a   helper_\
+size=\x220\x22\x0a   appl\
+y_no_weight=\x22tru\
+e\x22\x0a   apply_with\
+_weight=\x22true\x22\x0a \
+  only_selected=\
+\x22false\x22 /><inksc\
+ape:path-effect\x0a\
+   effect=\x22bspli\
+ne\x22\x0a   id=\x22path-\
+effect926\x22\x0a   is\
+_visible=\x22true\x22\x0a\
+   lpeversion=\x221\
+\x22\x0a   weight=\x2233.\
+333333\x22\x0a   steps\
+=\x222\x22\x0a   helper_s\
+ize=\x220\x22\x0a   apply\
+_no_weight=\x22true\
+\x22\x0a   apply_with_\
+weight=\x22true\x22\x0a  \
+ only_selected=\x22\
+false\x22 /><rect\x0a \
+  x=\x2215.968\x22\x0a   \
+y=\x2219.916553\x22\x0a  \
+ width=\x22244.2749\
+6\x22\x0a   height=\x2223\
+4.57273\x22\x0a   id=\x22\
+rect6819\x22 />\x0a\x0a\x09\x0a\
+\x0a\x09\x0a\x09\x0a\x09\x0a\x09\x0a<linear\
+Gradient\x0a   inks\
+cape:collect=\x22al\
+ways\x22\x0a   xlink:h\
+ref=\x22#linearGrad\
+ient11912\x22\x0a   id\
+=\x22linearGradient\
+11914\x22\x0a   x1=\x2220\
+.029339\x22\x0a   y1=\x22\
+129.25183\x22\x0a   x2\
+=\x22136.44987\x22\x0a   \
+y2=\x22129.25183\x22\x0a \
+  gradientUnits=\
+\x22userSpaceOnUse\x22\
+ /><rect\x0a   x=\x221\
+59.92175\x22\x0a   y=\x22\
+48.195599\x22\x0a   wi\
+dth=\x2280.743271\x22\x0a\
+   height=\x22121.1\
+1491\x22\x0a   id=\x22rec\
+t9011-8\x22 /></def\
+s>\x0a\x0a<g\x0a   id=\x22g3\
+172\x22\x0a   style=\x22f\
+ill:none;fill-op\
+acity:1;stroke:#\
+f35517;stroke-op\
+acity:1\x22 /><g\x0a  \
+ id=\x22Page\x22\x0a   tr\
+ansform=\x22matrix(\
+3.2354294,0,0,3.\
+1192281,-19156.3\
+89,-12987.103)\x22\x0a\
+   style=\x22stroke\
+-width:3.05331;s\
+troke-dasharray:\
+none\x22><g\x0a     st\
+roke-linejoin=\x22b\
+evel\x22\x0a     strok\
+e=\x22#000000\x22\x0a    \
+ fill-rule=\x22even\
+odd\x22\x0a     id=\x22Dr\
+awingContent-7\x22\x0a\
+     stroke-line\
+cap=\x22square\x22\x0a   \
+  stroke-width=\x22\
+1\x22\x0a     fill=\x22no\
+ne\x22\x0a     style=\x22\
+stroke-width:3.0\
+5331;stroke-dash\
+array:none\x22><g\x0a \
+      stroke=\x22no\
+ne\x22\x0a       font-\
+weight=\x22400\x22\x0a   \
+    fill-opacity\
+=\x220\x22\x0a       tran\
+sform=\x22translate\
+(5945,4205)\x22\x0a   \
+    font-size=\x222\
+7.5167px\x22\x0a      \
+ font-family=\x22'M\
+S Shell Dlg 2'\x22\x0a\
+       font-styl\
+e=\x22normal\x22\x0a     \
+  fill=\x22#000000\x22\
+\x0a       id=\x22g10-\
+2\x22\x0a       style=\
+\x22stroke-width:3.\
+05331;stroke-das\
+harray:none\x22><pa\
+th\x0a         fill\
+-rule=\x22evenodd\x22\x0a\
+         d=\x22M 20\
+,30 10,-30 H -10\
+ L -20,30 H 0 20\
+\x22\x0a         vecto\
+r-effect=\x22non-sc\
+aling-stroke\x22\x0a  \
+       id=\x22path8\
+-9\x22\x0a         sty\
+le=\x22stroke-width\
+:3.05331;stroke-\
+dasharray:none\x22 \
+/></g><g\x0a       \
+stroke-linejoin=\
+\x22bevel\x22\x0a       s\
+troke=\x22#000000\x22\x0a\
+       font-weig\
+ht=\x22400\x22\x0a       \
+stroke-linecap=\x22\
+square\x22\x0a       s\
+troke-width=\x221\x22\x0a\
+       transform\
+=\x22translate(5945\
+,4205)\x22\x0a       f\
+ont-size=\x2227.516\
+7px\x22\x0a       font\
+-family=\x22'MS She\
+ll Dlg 2'\x22\x0a     \
+  font-style=\x22no\
+rmal\x22\x0a       fil\
+l=\x22none\x22\x0a       \
+stroke-opacity=\x22\
+1\x22\x0a       id=\x22g1\
+4-4\x22\x0a       styl\
+e=\x22stroke-width:\
+3.05331;stroke-d\
+asharray:none\x22><\
+rect\x0a         x=\
+\x220\x22\x0a         wid\
+th=\x220\x22\x0a         \
+y=\x220\x22\x0a         h\
+eight=\x220\x22\x0a      \
+   id=\x22rect12-3\x22\
+\x0a         style=\
+\x22stroke-width:3.\
+05331;stroke-das\
+harray:none\x22 /><\
+/g><g\x0a       str\
+oke-linejoin=\x22be\
+vel\x22\x0a       stro\
+ke=\x22#000000\x22\x0a   \
+    font-weight=\
+\x22400\x22\x0a       str\
+oke-linecap=\x22rou\
+nd\x22\x0a       strok\
+e-width=\x227\x22\x0a    \
+   transform=\x22tr\
+anslate(5945,420\
+5)\x22\x0a       font-\
+size=\x2227.5167px\x22\
+\x0a       font-fam\
+ily=\x22'MS Shell D\
+lg 2'\x22\x0a       fo\
+nt-style=\x22normal\
+\x22\x0a       fill=\x22n\
+one\x22\x0a       stro\
+ke-opacity=\x221\x22\x0a \
+      id=\x22g18-5\x22\
+\x0a       style=\x22s\
+troke-width:3.05\
+331;stroke-dasha\
+rray:none\x22><path\
+\x0a         fill-r\
+ule=\x22evenodd\x22\x0a  \
+       d=\x22M 0,30\
+ H 20\x22\x0a         \
+vector-effect=\x22n\
+one\x22\x0a         id\
+=\x22path16-9\x22\x0a    \
+     style=\x22stro\
+ke-width:3.05331\
+;stroke-dasharra\
+y:none\x22 /></g><g\
+\x0a       stroke-l\
+inejoin=\x22bevel\x22\x0a\
+       stroke=\x22#\
+000000\x22\x0a       f\
+ont-weight=\x22400\x22\
+\x0a       stroke-l\
+inecap=\x22round\x22\x0a \
+      stroke-wid\
+th=\x227\x22\x0a       tr\
+ansform=\x22transla\
+te(5945,4205)\x22\x0a \
+      font-size=\
+\x2227.5167px\x22\x0a    \
+   font-family=\x22\
+'MS Shell Dlg 2'\
+\x22\x0a       font-st\
+yle=\x22normal\x22\x0a   \
+    fill=\x22none\x22\x0a\
+       stroke-op\
+acity=\x221\x22\x0a      \
+ id=\x22g22-4\x22\x0a    \
+   style=\x22stroke\
+-width:3.05331;s\
+troke-dasharray:\
+none\x22><path\x0a    \
+     fill-rule=\x22\
+evenodd\x22\x0a       \
+  d=\x22M 20,30 10,\
+-30\x22\x0a         ve\
+ctor-effect=\x22non\
+e\x22\x0a         id=\x22\
+path20\x22\x0a        \
+ style=\x22stroke-w\
+idth:3.05331;str\
+oke-dasharray:no\
+ne\x22 /></g><g\x0a   \
+    stroke-linej\
+oin=\x22bevel\x22\x0a    \
+   stroke=\x22#0000\
+00\x22\x0a       font-\
+weight=\x22400\x22\x0a   \
+    stroke-linec\
+ap=\x22round\x22\x0a     \
+  stroke-width=\x22\
+7\x22\x0a       transf\
+orm=\x22translate(5\
+945,4205)\x22\x0a     \
+  font-size=\x2227.\
+5167px\x22\x0a       f\
+ont-family=\x22'MS \
+Shell Dlg 2'\x22\x0a  \
+     font-style=\
+\x22normal\x22\x0a       \
+fill=\x22none\x22\x0a    \
+   stroke-opacit\
+y=\x221\x22\x0a       id=\
+\x22g26-6\x22\x0a       s\
+tyle=\x22stroke-wid\
+th:3.05331;strok\
+e-dasharray:none\
+\x22><path\x0a        \
+ fill-rule=\x22even\
+odd\x22\x0a         d=\
+\x22M 10,-30 H -10\x22\
+\x0a         vector\
+-effect=\x22none\x22\x0a \
+        id=\x22path\
+24-8\x22\x0a         s\
+tyle=\x22stroke-wid\
+th:3.05331;strok\
+e-dasharray:none\
+\x22 /></g><g\x0a     \
+  stroke-linejoi\
+n=\x22bevel\x22\x0a      \
+ stroke=\x22#000000\
+\x22\x0a       font-we\
+ight=\x22400\x22\x0a     \
+  stroke-linecap\
+=\x22round\x22\x0a       \
+stroke-width=\x227\x22\
+\x0a       transfor\
+m=\x22translate(594\
+5,4205)\x22\x0a       \
+font-size=\x2227.51\
+67px\x22\x0a       fon\
+t-family=\x22'MS Sh\
+ell Dlg 2'\x22\x0a    \
+   font-style=\x22n\
+ormal\x22\x0a       fi\
+ll=\x22none\x22\x0a      \
+ stroke-opacity=\
+\x221\x22\x0a       id=\x22g\
+30-1\x22\x0a       sty\
+le=\x22stroke-width\
+:3.05331;stroke-\
+dasharray:none\x22>\
+<path\x0a         f\
+ill-rule=\x22evenod\
+d\x22\x0a         d=\x22M\
+ -10,-30 -20,30\x22\
+\x0a         vector\
+-effect=\x22none\x22\x0a \
+        id=\x22path\
+28\x22\x0a         sty\
+le=\x22stroke-width\
+:3.05331;stroke-\
+dasharray:none\x22 \
+/></g><g\x0a       \
+stroke-linejoin=\
+\x22bevel\x22\x0a       s\
+troke=\x22#000000\x22\x0a\
+       font-weig\
+ht=\x22400\x22\x0a       \
+stroke-linecap=\x22\
+round\x22\x0a       st\
+roke-width=\x227\x22\x0a \
+      transform=\
+\x22translate(5945,\
+4205)\x22\x0a       fo\
+nt-size=\x2227.5167\
+px\x22\x0a       font-\
+family=\x22'MS Shel\
+l Dlg 2'\x22\x0a      \
+ font-style=\x22nor\
+mal\x22\x0a       fill\
+=\x22none\x22\x0a       s\
+troke-opacity=\x221\
+\x22\x0a       id=\x22g34\
+-8\x22\x0a       style\
+=\x22stroke-width:3\
+.05331;stroke-da\
+sharray:none\x22><p\
+ath\x0a         fil\
+l-rule=\x22evenodd\x22\
+\x0a         d=\x22M -\
+20,30 H 0\x22\x0a     \
+    vector-effec\
+t=\x22none\x22\x0a       \
+  id=\x22path32-6\x22\x0a\
+         style=\x22\
+stroke-width:3.0\
+5331;stroke-dash\
+array:none\x22 /></\
+g></g></g><text\x0a\
+   xml:space=\x22pr\
+eserve\x22\x0a   id=\x22t\
+ext8953\x22\x0a   styl\
+e=\x22font-style:no\
+rmal;font-varian\
+t:normal;font-we\
+ight:normal;font\
+-stretch:normal;\
+font-size:16px;f\
+ont-family:'Arti\
+fakt Element';-i\
+nkscape-font-spe\
+cification:'Arti\
+fakt Element';wh\
+ite-space:pre;sh\
+ape-inside:url(#\
+rect8955);displa\
+y:inline;fill:#f\
+f6600;fill-opaci\
+ty:1;stroke:#000\
+000;stroke-width\
+:4;stroke-lineca\
+p:square;stroke-\
+dasharray:0.4, 0\
+.4;stroke-dashof\
+fset:5.2;stroke-\
+opacity:1\x22 /><te\
+xt\x0a   xml:space=\
+\x22preserve\x22\x0a   id\
+=\x22text9009\x22\x0a   s\
+tyle=\x22font-style\
+:normal;font-var\
+iant:normal;font\
+-weight:normal;f\
+ont-stretch:norm\
+al;font-size:52.\
+3955px;font-fami\
+ly:'Artifakt Ele\
+ment';-inkscape-\
+font-specificati\
+on:'Artifakt Ele\
+ment';white-spac\
+e:pre;shape-insi\
+de:url(#rect9011\
+);display:inline\
+;fill:none;fill-\
+opacity:1;stroke\
+:#000000;stroke-\
+width:0.322865;s\
+troke-linecap:sq\
+uare;stroke-dash\
+array:none;strok\
+e-dashoffset:0;s\
+troke-opacity:1\x22\
+\x0a   transform=\x22m\
+atrix(2.2067781,\
+0,0,1.8311167,-1\
+85.06275,-97.697\
+706)\x22><tspan\x0a   \
+  x=\x22159.92188\x22\x0a\
+     y=\x2295.61324\
+\x22\x0a     id=\x22tspan\
+1025\x22>A</tspan><\
+/text><text\x0a   x\
+ml:space=\x22preser\
+ve\x22\x0a   id=\x22text9\
+009-0\x22\x0a   style=\
+\x22font-style:norm\
+al;font-variant:\
+normal;font-weig\
+ht:normal;font-s\
+tretch:normal;fo\
+nt-size:52.3955p\
+x;font-family:'A\
+rtifakt Element'\
+;-inkscape-font-\
+specification:'A\
+rtifakt Element'\
+;white-space:pre\
+;shape-inside:ur\
+l(#rect9011-8);d\
+isplay:inline;fi\
+ll:none;fill-opa\
+city:1;stroke:#0\
+00000;stroke-wid\
+th:0.322865;stro\
+ke-linecap:squar\
+e;stroke-dasharr\
+ay:none;stroke-d\
+ashoffset:0;stro\
+ke-opacity:1\x22\x0a  \
+ transform=\x22matr\
+ix(2.2067781,0,0\
+,1.8311167,-185.\
+85824,-14.47586)\
+\x22><tspan\x0a     x=\
+\x22159.92188\x22\x0a    \
+ y=\x2295.61324\x22\x0a  \
+   id=\x22tspan1027\
+\x22>B</tspan></tex\
+t><path\x0a   style\
+=\x22fill:none;stro\
+ke:#000000;strok\
+e-width:7.11625;\
+stroke-linecap:b\
+utt;stroke-linej\
+oin:miter;stroke\
+-miterlimit:4;st\
+roke-dasharray:2\
+1.3487, 7.11625;\
+stroke-dashoffse\
+t:0;stroke-opaci\
+ty:1\x22\x0a   d=\x22M 78\
+.865515,252.9388\
+8 V 5.7017001\x22\x0a \
+  id=\x22path884\x22\x0a \
+  sodipodi:nodet\
+ypes=\x22cc\x22 /><pat\
+h\x0a   style=\x22fill\
+:url(#linearGrad\
+ient11914);fill-\
+opacity:1;stroke\
+:none;stroke-wid\
+th:0.688508;stro\
+ke-linecap:squar\
+e;stroke-dasharr\
+ay:0.0688509, 0.\
+0688509;stroke-d\
+ashoffset:0.8950\
+61\x22\x0a   d=\x22m 20.0\
+29339,216.81609 \
+c 0,-0.3795 6.75\
+9902,-39.77758 1\
+5.022005,-87.551\
+28 8.262102,-47.\
+773697 15.022004\
+,-87.177616 15.0\
+22004,-87.564263\
+ 0,-0.496613 3.6\
+75043,-0.702993 \
+12.518337,-0.702\
+993 h 12.518337 \
+v 6.572127 6.572\
+127 h 3.755501 3\
+.755501 v -6.572\
+127 -6.572127 h \
+11.89242 c 8.380\
+266,0 11.892416,\
+0.207613 11.8924\
+16,0.702993 0,0.\
+386647 6.75991,3\
+9.790566 15.0220\
+1,87.564263 8.26\
+21,47.7737 15.02\
+2,87.17178 15.02\
+2,87.55128 0,0.4\
+9204 -7.72204,0.\
+69002 -26.91442,\
+0.69002 H 82.621\
+024 v -7.19805 -\
+7.19804 h -3.755\
+501 -3.755501 v \
+7.19804 7.19805 \
+H 47.569681 c -1\
+9.648418,0 -27.5\
+40342,-0.19773 -\
+27.540342,-0.690\
+02 z m 62.591685\
+,-31.5447 v -10.\
+95355 h -3.75550\
+1 -3.755501 v 10\
+.95355 10.95354 \
+h 3.755501 3.755\
+501 z m 0,-28.16\
+626 v -10.95355 \
+h -3.755501 -3.7\
+55501 v 10.95355\
+ 10.95354 h 3.75\
+5501 3.755501 z \
+m 0,-28.79218 v \
+-10.95354 h -3.7\
+55501 -3.755501 \
+v 10.95354 10.95\
+355 h 3.755501 3\
+.755501 z m 0,-2\
+8.16625 V 89.193\
+151 h -3.755501 \
+-3.755501 v 10.9\
+53549 10.95354 h\
+ 3.755501 3.7555\
+01 z m 0,-28.792\
+179 V 60.400976 \
+h -3.755501 -3.7\
+55501 v 10.95354\
+5 10.953545 h 3.\
+755501 3.755501 \
+z\x22\x0a   id=\x22path11\
+906\x22 /><path\x0a   \
+style=\x22fill:none\
+;fill-opacity:1;\
+stroke:#000000;s\
+troke-width:1.55\
+8;stroke-linecap\
+:square;stroke-d\
+asharray:0.15579\
+999,0.15579999;s\
+troke-dashoffset\
+:2.02541593;stro\
+ke-opacity:1\x22\x0a  \
+ d=\x22m 209.0553,2\
+46.61386 c -0.09\
+24,-0.12241 -0.5\
+9261,-2.31932 -1\
+.11162,-4.88202 \
+-0.51899,-2.5627\
+1 -1.04665,-4.88\
+613 -1.17257,-5.\
+16317 -0.26479,-\
+0.58255 -1.2218,\
+-1.12406 -2.9518\
+7,-1.67023 -0.65\
+539,-0.20691 -2.\
+29673,-0.85895 -\
+3.64741,-1.44898\
+ -2.01587,-0.880\
+64 -2.5745,-1.05\
+615 -3.11851,-0.\
+97983 -0.70189,0\
+.0985 -2.57999,1\
+.14826 -7.01536,\
+3.92136 -1.49387\
+,0.93401 -2.8041\
+2,1.64334 -2.911\
+67,1.57628 -0.10\
+748,-0.0671 -0.7\
+8066,-0.68315 -1\
+.49582,-1.36911 \
+l -1.30029,-1.24\
+72 2.37428,-3.47\
+087 c 2.89082,-4\
+.22595 3.58125,-\
+5.4163 3.58125,-\
+6.17423 0,-0.363\
+02 -0.43192,-1.4\
+4749 -1.17163,-2\
+.94172 -0.6444,-\
+1.3017 -1.38126,\
+-2.95419 -1.6374\
+6,-3.67221 -0.69\
+991,-1.96151 -0.\
+89379,-2.13121 -\
+2.98493,-2.6127 \
+-0.97974,-0.2255\
+7 -3.44241,-0.71\
+354 -5.47261,-1.\
+08436 -4.23745,-\
+0.77397 -3.87808\
+,-0.5008 -3.8817\
+7,-2.95062 -0.00\
+2,-1.54191 -0.00\
+2,-1.54381 0.465\
+81,-1.64349 0.25\
+748,-0.0548 1.65\
+552,-0.30445 3.1\
+0676,-0.5546 6.5\
+1788,-1.12342 7.\
+5738,-1.39533 7.\
+96541,-2.05115 0\
+.12054,-0.20186 \
+0.41746,-0.94392\
+ 0.65985,-1.6490\
+1 0.24238,-0.705\
+12 0.96711,-2.38\
+257 1.61052,-3.7\
+277 1.17915,-2.4\
+6518 1.3293,-3.0\
+4172 0.97741,-3.\
+75291 -0.33254,-\
+0.67207 -2.18377\
+,-3.49427 -4.029\
+12,-6.1424 l -1.\
+77613,-2.5488 1.\
+32089,-1.27908 c\
+ 0.72648,-0.7034\
+9 1.40567,-1.326\
+83 1.50929,-1.38\
+518 0.10356,-0.0\
+583 1.64391,0.80\
+415 3.42284,1.91\
+67 4.33837,2.713\
+24 6.03855,3.619\
+64 6.78953,3.619\
+64 0.36091,0 1.5\
+5795,-0.42409 2.\
+95204,-1.04583 1\
+.28973,-0.57523 \
+3.10657,-1.30801\
+ 4.0374,-1.62843\
+ 0.93083,-0.3204\
+3 1.85407,-0.751\
+65 2.05163,-0.95\
+829 0.37257,-0.3\
+8965 1.08552,-3.\
+19227 2.05796,-8\
+.08997 0.55792,-\
+2.80997 0.47725,\
+-2.73705 2.94285\
+,-2.66035 l 1.62\
+73,0.0506 0.1303\
+5,0.62315 c 0.07\
+17,0.34272 0.442\
+03,2.2255 0.8229\
+8,4.18394 0.9326\
+9,4.79488 1.1496\
+8,5.57474 1.6456\
+7,5.91464 0.2237\
+2,0.15331 1.2652\
+9,0.57505 2.3145\
+7,0.93719 1.0492\
+8,0.36215 2.8388\
+4,1.07174 3.9768\
+,1.57686 1.13796\
+,0.50513 2.31333\
+,0.91843 2.61193\
+,0.91843 0.70602\
+,0 2.36051,-0.88\
+434 6.61315,-3.5\
+3481 l 3.46338,-\
+2.15856 1.43083,\
+1.36223 c 0.7869\
+4,0.74922 1.4308\
+1,1.39505 1.4308\
+1,1.43518 0,0.04\
+01 -1.0236,1.569\
+4 -2.27469,3.398\
+4 -2.8844,4.2168\
+ -3.51682,5.258 \
+-3.62771,5.97266\
+ -0.0709,0.45707\
+ 0.0936,0.94099 \
+0.79829,2.34704 \
+0.48817,0.97419 \
+1.25848,2.68141 \
+1.7118,3.7938 0.\
+45331,1.11239 0.\
+94284,2.21192 1.\
+08786,2.44337 0.\
+35747,0.5706 1.2\
+2588,0.80717 6.4\
+7516,1.76399 2.4\
+3433,0.44372 4.6\
+3672,0.85227 4.8\
+9419,0.9079 l 0.\
+46815,0.10117 v \
+1.86086 c 0,1.32\
+764 -0.061,1.883\
+62 -0.2128,1.940\
+29 -0.11703,0.04\
+37 -2.43433,0.48\
+974 -5.14954,0.9\
+9126 -2.71523,0.\
+50153 -5.17572,1\
+.02825 -5.46777,\
+1.17052 -0.55706\
+,0.27136 -1.211,\
+1.35166 -1.60033\
+,2.64372 -0.1180\
+3,0.39169 -0.712\
+29,1.75371 -1.32\
+058,3.02669 -1.3\
+6419,2.85484 -1.\
+45558,3.16534 -1\
+.15399,3.92027 0\
+.28802,0.72095 1\
+.71184,2.93372 4\
+.04607,6.28802 l\
+ 1.7763,2.55255 \
+-1.03381,1.00877\
+ c -0.5686,0.554\
+84 -1.23292,1.19\
+143 -1.47628,1.4\
+1466 l -0.44247,\
+0.40588 -3.45147\
+,-2.15841 c -4.5\
+6786,-2.8565 -5.\
+85029,-3.55049 -\
+6.56097,-3.55049\
+ -0.32926,0 -1.4\
+9036,0.41337 -2.\
+67308,0.95165 -1\
+.15005,0.52341 -\
+2.94882,1.24972 \
+-3.99732,1.61403\
+ -1.04848,0.3642\
+9 -2.09181,0.814\
+94 -2.31851,1.00\
+145 -0.46946,0.3\
+8621 -0.73816,1.\
+3745 -1.90469,7.\
+00557 -0.41768,2\
+.01616 -0.83177,\
+3.60533 -0.96193\
+,3.6916 -0.37429\
+,0.24811 -3.6500\
+2,0.19221 -3.844\
+6,-0.0655 z m 4.\
+4784,-16.88222 c\
+ 9.5459,-1.3886 \
+16.37485,-9.8852\
+2 15.23597,-18.9\
+5666 -1.4898,-11\
+.86654 -15.02873\
+,-18.7226 -26.17\
+985,-13.25735 -4\
+.7397,2.32297 -8\
+.28146,6.68843 -\
+9.40569,11.59319\
+ -0.47016,2.0511\
+8 -0.47016,5.210\
+54 0,7.26172 2.0\
+1576,8.79425 11.\
+03356,14.71426 2\
+0.34957,13.3591 \
+z\x22\x0a   id=\x22path20\
+41\x22 /><path\x0a   s\
+tyle=\x22fill:#0000\
+ff;stroke-width:\
+0.619626;stroke-\
+linecap:square;s\
+troke-dasharray:\
+0.0619626, 0.061\
+9626;stroke-dash\
+offset:0.805513\x22\
+\x0a   d=\x22m 173.147\
+42,74.925645 c 0\
+.42089,-1.044057\
+ 6.26215,-15.839\
+873 12.98058,-32\
+.87959 l 12.2153\
+1,-30.981304 h 5\
+.64233 5.64233 l\
+ 13.00724,32.013\
+213 c 7.15399,17\
+.607266 13.13105\
+,32.403295 13.28\
+237,32.880062 0.\
+26077,0.82162 0.\
+0746,0.860147 -3\
+.5681,0.738448 l\
+ -3.84322,-0.128\
+395 -4.07131,-10\
+.179572 -4.07131\
+,-10.179571 -16.\
+20563,-0.116064 \
+-16.20562,-0.116\
+061 -1.57185,4.0\
+99371 c -0.86451\
+,2.254655 -2.633\
+45,6.887693 -3.9\
+3097,10.295636 l\
+ -2.35913,6.1962\
+61 -3.85414,0.12\
+7926 -3.85414,0.\
+12793 z m 44.430\
+84,-25.908797 c \
+-0.45485,-1.1562\
+66 -3.66873,-9.4\
+31334 -7.14195,-\
+18.389039 -3.473\
+21,-8.957706 -6.\
+46882,-16.127665\
+ -6.65691,-15.93\
+3242 -0.18808,0.\
+194422 -3.06095,\
+7.504617 -6.3841\
+6,16.244879 -3.3\
+232,8.74026 -6.4\
+2251,16.856255 -\
+6.88734,18.03554\
+4 l -0.84515,2.1\
+44161 h 14.37126\
+ 14.37126 z\x22\x0a   \
+id=\x22path6240\x22 />\
+<path\x0a   style=\x22\
+fill:#ff0000;str\
+oke-width:0.6196\
+26;stroke-lineca\
+p:square;stroke-\
+dasharray:0.0619\
+626, 0.0619626;s\
+troke-dashoffset\
+:0.805513\x22\x0a   d=\
+\x22M 181.68322,126\
+.98792 V 93.9795\
+42 l 15.1587,0.1\
+77311 c 13.73766\
+,0.160689 15.476\
+29,0.265021 18.5\
+4635,1.112936 9.\
+34271,2.580348 1\
+3.6673,6.817821 \
+14.33881,14.0499\
+51 0.77845,8.383\
+93 -2.6901,13.56\
+028 -10.42091,15\
+.55178 -1.70977,\
+0.44045 -3.04558\
+,0.9901 -2.96846\
+,1.22145 0.0771,\
+0.23135 1.42322,\
+0.68214 2.99135,\
+1.00174 6.16724,\
+1.25696 11.18041\
+,4.98555 12.3579\
+6,9.19134 0.8042\
+9,2.87263 0.4250\
+1,11.09595 -0.60\
+075,13.0251 -1.3\
+2433,2.49069 -4.\
+38883,5.1721 -7.\
+83941,6.85944 -6\
+.54072,3.19843 -\
+11.02348,3.80571\
+ -28.1753,3.8169\
+5 l -13.38834,0.\
+009 z m 32.39392\
+,27.31873 c 5.50\
+989,-1.45633 8.0\
+2014,-3.10173 9.\
+69266,-6.35329 0\
+.66339,-1.28969 \
+0.84465,-2.58074\
+ 0.84465,-6.0160\
+1 0,-5.35384 -0.\
+891,-7.42935 -4.\
+15498,-9.67867 -\
+3.90165,-2.68876\
+ -5.38305,-2.936\
+61 -18.74905,-3.\
+13689 l -12.0605\
+8,-0.18072 v 13.\
+37676 13.37676 l\
+ 10.51151,-0.244\
+07 c 8.6014,-0.1\
+9972 11.13013,-0\
+.40758 13.91579,\
+-1.14387 z m 2.1\
+8781,-31.81697 c\
+ 3.52462,-1.7363\
+3 5.04564,-3.708\
+56 5.73633,-7.43\
+803 0.53372,-2.8\
+819 0.22295,-7.1\
+17 -0.68101,-9.2\
+8047 -0.31567,-0\
+.75551 -1.43051,\
+-2.10684 -2.4774\
+3,-3.00296 -3.82\
+296,-3.272317 -8\
+.87324,-4.291934\
+ -21.25841,-4.29\
+1934 h -7.93459 \
+v 12.861514 12.8\
+6151 l 11.85053,\
+-0.13705 11.8505\
+4,-0.13705 z\x22\x0a  \
+ id=\x22path6242\x22 /\
+><path\x0a   style=\
+\x22fill:#0000ff;st\
+roke-width:1.379\
+11;stroke-lineca\
+p:square;stroke-\
+dasharray:0.1379\
+11, 0.137911;str\
+oke-dashoffset:1\
+.79286\x22\x0a   d=\x22m \
+208.91827,240.40\
+07 c -1.09091,-5\
+.14061 -1.19282,\
+-5.27065 -5.5500\
+7,-7.08144 -5.69\
+03,-2.36478 -7.0\
+2359,-2.32127 -1\
+1.28412,0.36829 \
+-5.79552,3.65855\
+ -6.87298,2.6472\
+1 -3.09813,-2.90\
+799 2.68944,-3.9\
+5786 2.73515,-5.\
+28691 0.37088,-1\
+0.7828 -1.82988,\
+-4.25368 -1.8796\
+5,-4.2891 -7.524\
+03,-5.35412 -3.1\
+2508,-0.58966 -5\
+.68196,-1.3908 -\
+5.68196,-1.78032\
+ 0,-0.38951 2.48\
+587,-1.24412 5.5\
+2415,-1.89914 5.\
+26802,-1.13571 5\
+.61444,-1.37525 \
+7.47178,-5.16652\
+ 2.61769,-5.3433\
+3 2.52315,-7.043\
+07 -0.63415,-11.\
+4016 -1.47746,-2\
+.03957 -2.45791,\
+-4.07784 -2.1787\
+7,-4.52949 0.279\
+14,-0.45165 2.49\
+645,0.40262 4.92\
+737,1.89837 4.82\
+703,2.97011 7.23\
+642,2.9804 13.17\
+872,0.0563 2.651\
+29,-1.30466 3.22\
+866,-2.19361 4.3\
+0948,-6.63509 1.\
+51751,-6.23598 2\
+.96084,-6.15777 \
+4.05825,0.21991 \
+0.79035,4.5932 0\
+.90521,4.73355 5\
+.55761,6.79106 6\
+.01607,2.66059 6\
+.49453,2.64016 1\
+1.52709,-0.49219\
+ 4.97776,-3.0982\
+3 6.31969,-2.701\
+19 3.78611,1.120\
+22 -3.90705,5.89\
+304 -3.97553,6.3\
+843 -1.64978,11.\
+83413 1.98549,4.\
+6525 2.44477,5.1\
+1861 5.67166,5.7\
+5602 6.42048,1.2\
+6826 7.49453,1.6\
+1388 7.49453,2.4\
+1166 0,0.43537 -\
+2.42781,1.32402 \
+-5.39513,1.97479\
+ l -5.39512,1.18\
+321 -2.13304,5.0\
+6977 -2.13305,5.\
+06976 2.65968,4.\
+32253 c 1.46282,\
+2.37739 2.65968,\
+4.57722 2.65968,\
+4.88851 0,1.1094\
+1 -1.85685,0.533\
+6 -5.31108,-1.64\
+696 -4.27252,-2.\
+69713 -5.58866,-\
+2.73521 -11.3780\
+1,-0.32927 -4.46\
+779,1.85673 -4.5\
+48,1.95805 -5.60\
+622,7.08144 -0.5\
+9047,2.85877 -1.\
+53695,5.19776 -2\
+.1033,5.19776 -0\
+.56634,0 -1.5298\
+,-2.35655 -2.141\
+03,-5.23678 z m \
+12.09762,-12.123\
+26 c 14.24678,-8\
+.15673 10.91673,\
+-29.2692 -5.2274\
+8,-33.14214 -12.\
+52337,-3.00431 -\
+23.8224,5.28446 \
+-23.93803,17.560\
+52 -0.0518,5.503\
+15 0.92747,8.087\
+44 4.54646,11.99\
+766 6.29042,6.79\
+661 16.42966,8.2\
+7264 24.61905,3.\
+58396 z\x22\x0a   id=\x22\
+path978\x22 /></svg\
+>\x0a\
 \x00\x00\x1e\xf5\
 \x00\
 \x01R\x02x\x9c\xed]Mo\x1cG\x92\xbd\xfbW\x14\
@@ -7185,6 +8323,10 @@ qt_resource_name = b"\
 \x05\xe8\x10\xc7\
 \x00f\
 \x00o\x00u\x00n\x00d\x00a\x00t\x00i\x00o\x00n\x00.\x00s\x00v\x00g\
+\x00\x0e\
+\x00i\x95\x87\
+\x00a\
+\x00u\x00t\x00o\x00_\x00s\x00t\x00r\x00i\x00p\x00.\x00s\x00v\x00g\
 \x00\x08\
 \x08/Ug\
 \x00w\
@@ -7238,35 +8380,37 @@ qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x02\
 \x00\x00\x00\x00\x00\x00\x00\x00\
-\x00\x00\x00\x0e\x00\x02\x00\x00\x00\x10\x00\x00\x00\x03\
+\x00\x00\x00\x0e\x00\x02\x00\x00\x00\x11\x00\x00\x00\x03\
 \x00\x00\x00\x00\x00\x00\x00\x00\
-\x00\x00\x00\xf2\x00\x00\x00\x00\x00\x01\x00\x00\xed\x8d\
+\x00\x00\x00\xb0\x00\x00\x00\x00\x00\x01\x00\x00\xa6\x13\
+\x00\x00\x01\x8d\xd5~\x14F\
+\x00\x00\x01\x14\x00\x00\x00\x00\x00\x01\x00\x014\x84\
 \x00\x00\x01\x89\xdf\x187-\
-\x00\x00\x01n\x00\x00\x00\x00\x00\x01\x00\x01w^\
+\x00\x00\x01\x90\x00\x00\x00\x00\x00\x01\x00\x01\xbeU\
 \x00\x00\x01\x85E\xe7\xc2\xf8\
-\x00\x00\x00\xc6\x00\x00\x00\x00\x00\x01\x00\x00\xc5\x0c\
+\x00\x00\x00\xe8\x00\x00\x00\x00\x00\x01\x00\x01\x0c\x03\
 \x00\x00\x01\x8d\xd6\x071\x96\
-\x00\x00\x01\x1a\x00\x01\x00\x00\x00\x01\x00\x01\x08\xde\
+\x00\x00\x01<\x00\x01\x00\x00\x00\x01\x00\x01O\xd5\
 \x00\x00\x01\x8d\xd5\xc7\x10\x16\
 \x00\x00\x00\x8e\x00\x01\x00\x00\x00\x01\x00\x00\x5cq\
 \x00\x00\x01\x8d\xd6m\xf3\xc1\
-\x00\x00\x01\xd2\x00\x00\x00\x00\x00\x01\x00\x01\xb2\xcc\
+\x00\x00\x01\xf4\x00\x00\x00\x00\x00\x01\x00\x01\xf9\xc3\
 \x00\x00\x01\x85E\xe7\xc2\xf7\
-\x00\x00\x01\xba\x00\x00\x00\x00\x00\x01\x00\x01\xa4q\
+\x00\x00\x01\xdc\x00\x00\x00\x00\x00\x01\x00\x01\xebh\
 \x00\x00\x01\x85E\xe7\xc2\xf6\
-\x00\x00\x01\x90\x00\x00\x00\x00\x00\x01\x00\x01\x93\xb3\
+\x00\x00\x01\xb2\x00\x00\x00\x00\x00\x01\x00\x01\xda\xaa\
 \x00\x00\x01\x85E\xe7\xc2\xee\
-\x00\x00\x00\xb0\x00\x01\x00\x00\x00\x01\x00\x00\xa6\x13\
+\x00\x00\x00\xd2\x00\x01\x00\x00\x00\x01\x00\x00\xed\x0a\
 \x00\x00\x01\x8d\xd0\xac\xd7\x10\
 \x00\x00\x00v\x00\x01\x00\x00\x00\x01\x00\x00\x1d\x86\
 \x00\x00\x01\x8d\xd6dls\
 \x00\x00\x00^\x00\x01\x00\x00\x00\x01\x00\x00\x14\xdc\
 \x00\x00\x01\x8d\xd6\x09\x03=\
-\x00\x00\x012\x00\x01\x00\x00\x00\x01\x00\x01[c\
+\x00\x00\x01T\x00\x01\x00\x00\x00\x01\x00\x01\xa2Z\
 \x00\x00\x01\x85E\xe7\xc2\xf5\
-\x00\x00\x01T\x00\x00\x00\x00\x00\x01\x00\x01`7\
+\x00\x00\x01v\x00\x00\x00\x00\x00\x01\x00\x01\xa7.\
 \x00\x00\x01\x85E\xe7\xc2\xf5\
-\x00\x00\x01\xa6\x00\x00\x00\x00\x00\x01\x00\x01\x9bA\
+\x00\x00\x01\xc8\x00\x00\x00\x00\x00\x01\x00\x01\xe28\
 \x00\x00\x01\x85E\xe7\xc2\xf6\
 \x00\x00\x00H\x00\x00\x00\x00\x00\x01\x00\x00\x0b\xce\
 \x00\x00\x01\x85E\xe7\xc2\xf7\

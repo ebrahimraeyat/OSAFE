@@ -6,6 +6,8 @@ import FreeCAD
 import FreeCADGui as Gui
 import ArchWall
 
+from osafe_py_widgets import resource_rc
+
 punch_path = Path(__file__).parent.parent
 
 
@@ -13,7 +15,7 @@ class WallTaskPanel:
 
     def __init__(self):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'osafe_widgets' / 'wall_panel.ui'))
-        self.fill_load_patterns()
+        self.fill_load_cases()
         self.create_connections()
         Gui.runCommand('Std_DrawStyle',2)
         Gui.runCommand('OSAFE_view_beams',1)
@@ -21,11 +23,16 @@ class WallTaskPanel:
         Gui.runCommand('OSAFE_view_design_layer_a',0)
         Gui.runCommand('OSAFE_view_design_layer_b',0)
 
-    def fill_load_patterns(self):
-        if hasattr(FreeCAD, 'load_cases'):
-            self.form.loadpat.addItems(FreeCAD.load_cases)
-        else:
-            pass
+    def fill_load_cases(self):
+        deads = []
+        try:
+            import find_etabs
+            etabs, _ = find_etabs.find_etabs(run=False, backup=False)
+            deads = etabs.load_patterns.get_special_load_pattern_names(1)
+        except:
+            if hasattr(FreeCAD, 'load_cases'):
+                deads = FreeCAD.load_cases
+        self.form.loadpat.addItems(deads)
 
     def create_connections(self):
         self.form.create_button.clicked.connect(self.create_wall)
