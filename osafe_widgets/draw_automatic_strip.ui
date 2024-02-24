@@ -27,7 +27,7 @@
        </property>
        <property name="icon">
         <iconset resource="../osafe_py_widgets/resource.qrc">
-         <normaloff>:/safe/osafe_images/strip.svg</normaloff>:/safe/osafe_images/strip.svg</iconset>
+         <normaloff>:/safe/osafe_images/auto_strip.svg</normaloff>:/safe/osafe_images/auto_strip.svg</iconset>
        </property>
        <property name="iconSize">
         <size>

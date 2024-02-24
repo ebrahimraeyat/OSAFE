@@ -15,6 +15,11 @@ class WallTaskPanel:
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'osafe_widgets' / 'wall_panel.ui'))
         self.fill_load_patterns()
         self.create_connections()
+        Gui.runCommand('Std_DrawStyle',2)
+        Gui.runCommand('OSAFE_view_beams',1)
+        Gui.runCommand('OSAFE_view_basefoundation',0)
+        Gui.runCommand('OSAFE_view_design_layer_a',0)
+        Gui.runCommand('OSAFE_view_design_layer_b',0)
 
     def fill_load_patterns(self):
         if hasattr(FreeCAD, 'load_cases'):
@@ -28,7 +33,7 @@ class WallTaskPanel:
     def create_wall(self):
         loadpat = self.form.loadpat.currentText()
         if not loadpat:
-            QtWidgets.QMessageBox.warning(None, "Load Case Name", "Please Enter the name of Load Case.")
+            QtWidgets.QMessageBox.warning(None, "Load Case Name", "Please Enter the name of the Loadcase.")
             return
         sel = Gui.Selection.getSelection()
         if len(sel) == 0:
@@ -74,3 +79,4 @@ class WallTaskPanel:
                 wall.ViewObject.DisplayMode = 'Shaded'
                 wall.ViewObject.Transparency = 60
         FreeCAD.ActiveDocument.recompute()
+        Gui.runCommand('Std_DrawStyle',0)

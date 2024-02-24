@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>207</width>
-    <height>164</height>
+    <height>205</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,6 +52,12 @@
      <property name="icon">
       <iconset resource="../osafe_py_widgets/resource.qrc">
        <normaloff>:/safe/osafe_images/wall.svg</normaloff>:/safe/osafe_images/wall.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>60</width>
+       <height>60</height>
+      </size>
      </property>
     </widget>
    </item>
