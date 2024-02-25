@@ -46,6 +46,7 @@ class Form:
             pass
 
     def create(self):
+        doc = FreeCAD.ActiveDocument
         cover = self.form.cover.value() * 10
         fc = self.form.fc.value()
         ks = self.form.ks.value()
@@ -66,7 +67,7 @@ class Form:
                     elif hasattr(o, "IfcType") and o.IfcType == "Opening Element":
                         openings.append(o)
         if not base_foundations:
-            for o in FreeCAD.ActiveDocument.Objects:
+            for o in doc.Objects:
                 if hasattr(o, 'Proxy') and hasattr(o.Proxy, 'Type') and o.Proxy.Type == 'BaseFoundation':
                     base_foundations.append(o)
                 elif hasattr(o, "IfcType") and o.IfcType == "Opening Element":
@@ -80,6 +81,22 @@ class Form:
                 Gui.Control.closeDialog()
                 Gui.runCommand("automatic_base_foundation") 
             return
+        # Check if exists a Foundation
+        if hasattr(doc, "Foundation"):
+            current_base_foundations = {o.Name for o in doc.Foundation.base_foundations}
+            new_base_foundations = {o.Name for o in base_foundations}
+            not_used_base_foundations = new_base_foundations.difference(current_base_foundations)
+            if len(not_used_base_foundations) == 0:
+                QMessageBox.warning(None, "Existence of Foundation", "Foundation exists and there is no additional Base Foundation to add to foundation\nMaybe an error in model did not allowed to create Foundation.")
+                Gui.Control.closeDialog()
+                return
+            all_base_foundations = current_base_foundations.union(new_base_foundations)
+            all_base_foundations = [doc.getObjectsByLabel(label)[0] for label in all_base_foundations]
+            doc.Foundation.base_foundations = all_base_foundations
+            doc.recompute()
+            Gui.Control.closeDialog()
+            return
+
         from osafe_objects.etabs_foundation import make_foundation
         make_foundation(
             cover=cover,
