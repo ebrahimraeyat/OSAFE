@@ -3,6 +3,7 @@ from pathlib import Path
 from PySide2.QtWidgets import QMessageBox
 import FreeCAD
 import FreeCADGui as Gui
+from draftutils.translate import translate
 
 from osafe_py_widgets import resource_rc
 
@@ -53,6 +54,7 @@ class ForceTaskPanel:
             return
         load_value = self.form.load_value.value()
         version = float('.'.join(FreeCAD.Version()[0:2]))
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Apply load on Foundation"))
         if version <= 0.19:
             Gui.activateWorkbench("FemWorkbench")
             Gui.activateWorkbench("OSAFEWorkbench")
@@ -75,6 +77,7 @@ class ForceTaskPanel:
             constraint.Force = load_value
             constraint.Reversed = True
         FreeCAD.ActiveDocument.recompute()
+        FreeCAD.ActiveDocument.commitTransaction()
         
 if __name__ == '__main__':
     panel = ForceTaskPanel()

@@ -2,6 +2,7 @@ from pathlib import Path
 
 import FreeCAD
 import FreeCADGui as Gui
+from draftutils.translate import translate
 
 from PySide2.QtWidgets import QMessageBox
 
@@ -72,8 +73,10 @@ class Form:
                 QMessageBox.warning(None, "Beams", message)
                 return
             beams = [doc.getObjectsByLabel(name)[0] for name in new_beams]
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Base Foundations"))
         osafe_funcs.make_automatic_base_foundation(beams, width, north_dist, south_dist,
                 east_dist, west_dist, x_stirp_name, y_stirp_name, angle, height, soil_modulus)
+        FreeCAD.ActiveDocument.commitTransaction()
         Gui.Selection.clearSelection()
         Gui.Control.closeDialog()
 

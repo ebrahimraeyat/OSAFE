@@ -7,6 +7,7 @@ from PySide2.QtCore import QT_TRANSLATE_NOOP
 import FreeCAD
 import FreeCADGui as Gui
 import Draft
+from draftutils.translate import translate
 
 from osafe_objects.punch import make_punch
 
@@ -46,6 +47,7 @@ class Punch:
                     break
         if foun is None:
             return
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Punches"))
         if hasattr(doc, 'Punches'):
             punches = doc.Punches
             columns = [punch.column.Name for punch in punches.Group]
@@ -74,6 +76,7 @@ class Punch:
                 punch.id = o.Label
                 punches.addObject(punch)
         FreeCAD.ActiveDocument.recompute()
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         return not FreeCAD.ActiveDocument is None

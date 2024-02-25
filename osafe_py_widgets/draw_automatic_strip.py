@@ -4,6 +4,8 @@ from PySide2.QtWidgets import QMessageBox
 
 import FreeCAD
 import FreeCADGui as Gui
+from draftutils.translate import translate
+
 
 from osafe_py_widgets import resource_rc
 
@@ -44,6 +46,7 @@ class Form:
 
     def create(self):
         doc = FreeCAD.ActiveDocument
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Automatic Strips"))
         strips = []
         for obj in doc.Objects:
             if (
@@ -87,6 +90,7 @@ class Form:
             split = self.form.split.isChecked()
             tol = self.form.tolerance.value()
             osafe_funcs.draw_strip_automatically_in_strip_foundation(split=split, tolerance=tol)
+        FreeCAD.ActiveDocument.commitTransaction()
         self.accept()
         Gui.Selection.clearSelection()
 

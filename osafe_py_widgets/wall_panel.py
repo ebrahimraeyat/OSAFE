@@ -5,6 +5,7 @@ from PySide2 import QtWidgets
 import FreeCAD
 import FreeCADGui as Gui
 import ArchWall
+from draftutils.translate import translate
 
 from osafe_py_widgets import resource_rc
 
@@ -59,6 +60,7 @@ class WallTaskPanel:
         height = self.form.height_box.value()
         create_blocks = self.form.create_blocks.isChecked()
         mat = FreeCAD.ActiveDocument.findObjects(Type='App::MaterialObjectPython')
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Walls"))
         if not mat:
             import Arch
             mat =  Arch.makeMaterial('Bricks')
@@ -87,3 +89,4 @@ class WallTaskPanel:
                 wall.ViewObject.Transparency = 60
         FreeCAD.ActiveDocument.recompute()
         Gui.runCommand('Std_DrawStyle',0)
+        FreeCAD.ActiveDocument.commitTransaction()

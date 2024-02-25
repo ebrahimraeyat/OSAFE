@@ -4,6 +4,8 @@ from PySide2.QtWidgets import QMessageBox
 
 import FreeCAD
 import FreeCADGui as Gui
+from draftutils.translate import translate
+
 from osafe_py_widgets import resource_rc
 
 punch_path = Path(__file__).parent.parent
@@ -82,6 +84,7 @@ class Form:
                 Gui.runCommand("automatic_base_foundation") 
             return
         # Check if exists a Foundation
+        FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Create Foundations"))
         if hasattr(doc, "Foundation"):
             current_base_foundations = {o.Name for o in doc.Foundation.base_foundations}
             new_base_foundations = {o.Name for o in base_foundations}
@@ -89,10 +92,12 @@ class Form:
             if len(not_used_base_foundations) == 0:
                 QMessageBox.warning(None, "Existence of Foundation", "Foundation exists and there is no additional Base Foundation to add to foundation\nMaybe an error in model did not allowed to create Foundation.")
                 Gui.Control.closeDialog()
+                FreeCAD.ActiveDocument.commitTransaction()
                 return
             all_base_foundations = current_base_foundations.union(new_base_foundations)
             all_base_foundations = [doc.getObjectsByLabel(label)[0] for label in all_base_foundations]
             doc.Foundation.base_foundations = all_base_foundations
+            FreeCAD.ActiveDocument.commitTransaction()
             doc.recompute()
             Gui.Control.closeDialog()
             return
@@ -108,6 +113,7 @@ class Form:
             ks=ks,
             openings=openings,
             )
+        FreeCAD.ActiveDocument.commitTransaction()
         # Gui.ActiveDocument.ActiveView.setCameraType("Perspective")
         Gui.Control.closeDialog()
 
