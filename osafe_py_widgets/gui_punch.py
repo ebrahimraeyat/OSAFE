@@ -46,12 +46,19 @@ class Punch:
                     break
         if foun is None:
             return
-        punches = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Punches")
+        if hasattr(doc, 'Punches'):
+            punches = doc.Punches
+            columns = [punch.column.Name for punch in punches.Group]
+        else:
+            punches = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Punches")
+            columns = []
         for o in doc.Objects:
             if hasattr(o, 'IfcType') and \
                 o.IfcType == 'Column' and \
                     hasattr(o, 'combos_load') and \
                         hasattr(o, 'Base'):
+                if o.Name in columns:
+                    continue
                 punch = make_punch(
                     foun,
                     o,
