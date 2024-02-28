@@ -889,8 +889,7 @@ def get_right_wires_from_left_wire(
         ):
     '''
     get a wire, and return the number_of_wires Wire in the right of wire
-    with distance
-    height: The height of foundation or concrete frame
+    with distances of distance
     face: Top face of foundation or frame
     '''
     normal = FreeCAD.Vector(0, 0, 1)
@@ -908,9 +907,22 @@ def get_right_wires_from_left_wire(
         wires = com.Wires
     return wires
     
-
-
-    
+def get_base_rebars_from_left_wire(
+        wire: Part.Shape,
+        number_of_rebars: int,
+        distance: float,
+        face: Part.Shape=None,
+        cover: float=75,
+        ):
+    '''
+    get a wire, and return the number_of_rebars Wire in the right of wire
+    with distances of distance
+    face: Top face of foundation or frame
+    '''
+    wire, *_ = get_extended_wire(wire, -cover)
+    wires = get_right_wires_from_left_wire(wire, number_of_rebars, distance, face)
+    return wires
+        
 
 def remove_null_edges_from_wire(w):
     es = []
