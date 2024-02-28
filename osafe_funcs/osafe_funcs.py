@@ -3,9 +3,9 @@ import math
 
 import FreeCAD
 import Part
+import DraftGeomUtils
 if FreeCAD.GuiUp:
     import Draft
-    import DraftGeomUtils
 
 
 def remove_obj(name: str) -> None:
@@ -821,7 +821,6 @@ def make_base_foundation_shape_from_beams(
     return sh, wire, wl, wr
 
 def get_left_right_offset_wire_and_shape(wire, left_width, right_width):
-    import DraftGeomUtils
     normal = FreeCAD.Vector(0, 0, 1)
     dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
     dvec.normalize()
@@ -881,6 +880,37 @@ def get_extended_wire(wire, length=2000):
         edges = [e1] + wire.Edges + [e2]
     wire = Part.Wire(edges)
     return wire, e1, e2
+
+def get_right_wires_from_left_wire(
+        wire: Part.Shape,
+        number_of_wires: int,
+        distance: float,
+        face: Part.Shape=None,
+        ):
+    '''
+    get a wire, and return the number_of_wires Wire in the right of wire
+    with distance
+    height: The height of foundation or concrete frame
+    face: Top face of foundation or frame
+    '''
+    normal = FreeCAD.Vector(0, 0, 1)
+    dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
+    wires = [wire]
+    for i in range(1, number_of_wires):
+        dvec.normalize()
+        dvec.multiply(i * distance)
+        right_wire = DraftGeomUtils.offsetWire(wire, dvec)
+        right_wire = remove_null_edges_from_wire(right_wire)
+        wires.append(right_wire)
+    if face is not None:
+        wires_shape = Part.makeCompound(wires)
+        com = face.common(wires_shape)
+        wires = com.Wires
+    return wires
+    
+
+
+    
 
 def remove_null_edges_from_wire(w):
     es = []
