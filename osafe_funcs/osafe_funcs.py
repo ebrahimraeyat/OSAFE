@@ -465,6 +465,8 @@ def extend_two_points(
         y = eval(equation)
         dist = math.sqrt((x - p1.x) ** 2 + 
                         (y - p1.y) ** 2)
+        if length < 0:
+            dx *= -1
         if dist > d:
             new_end_point = FreeCAD.Vector(x, y, p2.z)
             x = p1.x - dx
@@ -846,7 +848,9 @@ def get_extended_wire_first_last_edge(wire, length=4000):
         p1 = v1.Point
         p4 = v4.Point
         p11, p22 = extend_two_points(p1, p4, length)
-
+        if length < 0:
+            e = Part.makeLine(p11, p22)
+            return e, e
     else:
         v1 = start_edge.firstVertex()
         v2 = start_edge.lastVertex()
@@ -858,16 +862,25 @@ def get_extended_wire_first_last_edge(wire, length=4000):
         p3 = v3.Point
         p4 = v4.Point
         _, p22 = extend_two_points(p3, p4, length)
-    e1 = Part.makeLine(p11, p1)
-    e2 = Part.makeLine(p4, p22)
+    if length < 0:
+        e1 = Part.makeLine(p11, p2)
+        e2 = Part.makeLine(p3, p22)
+    else:
+        e1 = Part.makeLine(p11, p1)
+        e2 = Part.makeLine(p4, p22)
     return e1, e2
 
 def get_extended_wire(wire, length=2000):
     e1, e2 = get_extended_wire_first_last_edge(wire, length)
-    edges = [e1] + wire.Edges + [e2]
+    if length < 0:
+        if len(wire.Edges) == 1:
+            edges = [e1]
+        else:
+            edges = [e1] + wire.Edges[1:-1] + [e2]
+    else:
+        edges = [e1] + wire.Edges + [e2]
     wire = Part.Wire(edges)
     return wire, e1, e2
-    
 
 def remove_null_edges_from_wire(w):
     es = []

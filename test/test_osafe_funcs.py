@@ -129,6 +129,100 @@ def test_get_points_connections_from_slabs():
     points_slabs = osafe_funcs.get_points_connections_from_slabs(slabs)
     assert len(points_slabs) == 11
 
+def test_get_extended_wire_first_last_edge():
+    # one edge wire
+    # horizontal line one edge
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(10, 0, 0)
+    e = Part.makeLine(p1, p2)
+    wire = Part.Wire([e])
+    e1, e2 = osafe_funcs.get_extended_wire_first_last_edge(wire, 1)
+    assert e1.Length == 1
+    assert e2.Length == 1
+    assert e1.BoundBox.XMin == -1
+    assert e1.BoundBox.XMax == 0
+    assert e2.BoundBox.XMin == 10
+    assert e2.BoundBox.XMax == 11
+    # Negative value
+    e1, e2 = osafe_funcs.get_extended_wire_first_last_edge(wire, -1)
+    assert e1.Length == 8
+    assert e2.Length == 8
+    assert e1.BoundBox.XMin == 1
+    assert e1.BoundBox.XMax == 9
+    assert e2.BoundBox.XMin == 1
+    assert e2.BoundBox.XMax == 9
+    # two edge wire
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(5, 0, 0)
+    p3 = FreeCAD.Vector(10, 0, 0)
+    e1 = Part.makeLine(p1, p2)
+    e2 = Part.makeLine(p2, p3)
+    wire = Part.Wire([e1, e2])
+    e11, e22 = osafe_funcs.get_extended_wire_first_last_edge(wire, 1)
+    assert e11.Length == 1
+    assert e22.Length == 1
+    assert e11.BoundBox.XMin == -1
+    assert e11.BoundBox.XMax == 0
+    assert e22.BoundBox.XMin == 10
+    assert e22.BoundBox.XMax == 11
+    # Negative Value
+    e11, e22 = osafe_funcs.get_extended_wire_first_last_edge(wire, -1)
+    assert e11.Length == 4
+    assert e22.Length == 4
+    assert e11.BoundBox.XMin == 1
+    assert e11.BoundBox.XMax == 5
+    assert e22.BoundBox.XMin == 5
+    assert e22.BoundBox.XMax == 9
+
+def test_get_extended_wire():
+    # one edge wire
+    # horizontal line one edge
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(10, 0, 0)
+    e = Part.makeLine(p1, p2)
+    wire = Part.Wire([e])
+    w, e1, e2 = osafe_funcs.get_extended_wire(wire, 1)
+    assert len(w.Edges) == 3
+    assert e1.Length == 1
+    assert e2.Length == 1
+    assert e1.BoundBox.XMin == -1
+    assert e1.BoundBox.XMax == 0
+    assert e2.BoundBox.XMin == 10
+    assert e2.BoundBox.XMax == 11
+    # Negative value
+    w, e1, e2 = osafe_funcs.get_extended_wire(wire, -1)
+    assert len(w.Edges) == 1
+    assert e1.Length == 8
+    assert e2.Length == 8
+    assert e1.BoundBox.XMin == 1
+    assert e1.BoundBox.XMax == 9
+    assert e2.BoundBox.XMin == 1
+    assert e2.BoundBox.XMax == 9
+    # two edge wire
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(5, 0, 0)
+    p3 = FreeCAD.Vector(10, 0, 0)
+    e1 = Part.makeLine(p1, p2)
+    e2 = Part.makeLine(p2, p3)
+    wire = Part.Wire([e1, e2])
+    w, e11, e22 = osafe_funcs.get_extended_wire(wire, 1)
+    assert len(w.Edges) == 4
+    assert e11.Length == 1
+    assert e22.Length == 1
+    assert e11.BoundBox.XMin == -1
+    assert e11.BoundBox.XMax == 0
+    assert e22.BoundBox.XMin == 10
+    assert e22.BoundBox.XMax == 11
+    # Negative Value
+    w, e11, e22 = osafe_funcs.get_extended_wire(wire, -1)
+    assert len(w.Edges) == 2
+    assert e11.Length == 4
+    assert e22.Length == 4
+    assert e11.BoundBox.XMin == 1
+    assert e11.BoundBox.XMax == 5
+    assert e22.BoundBox.XMin == 5
+    assert e22.BoundBox.XMax == 9
+
 def test_extend_two_points():
     # horizontal line
     p1 = FreeCAD.Vector(0, 0, 0)
@@ -153,6 +247,13 @@ def test_extend_two_points():
     new_p1, new_p2 = osafe_funcs.extend_two_points(p1, p2, math.sqrt(2))
     assert new_p1 == FreeCAD.Vector(-1, -1, 0)
     assert new_p2 == FreeCAD.Vector(2, 2, 0)
+    # negative value
+    p1 = FreeCAD.Vector(0, 0, 0)
+    p2 = FreeCAD.Vector(10, 0, 0)
+    new_p1, new_p2 = osafe_funcs.extend_two_points(p1, p2, -1)
+    assert new_p1 == FreeCAD.Vector(1, 0, 0)
+    assert new_p2 == FreeCAD.Vector(9, 0, 0)
+
 
 def test_get_width_points():
     p1 = FreeCAD.Vector(0, 0, 0)
