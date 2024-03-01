@@ -253,6 +253,11 @@ def test_extend_two_points():
     new_p1, new_p2 = osafe_funcs.extend_two_points(p1, p2, -1)
     assert new_p1 == FreeCAD.Vector(1, 0, 0)
     assert new_p2 == FreeCAD.Vector(9, 0, 0)
+    # vertical line with negative value
+    p2 = FreeCAD.Vector(0, 10, 0)
+    new_p1, new_p2 = osafe_funcs.extend_two_points(p1, p2, -1)
+    assert new_p1 == FreeCAD.Vector(0, 1, 0)
+    assert new_p2 == FreeCAD.Vector(0, 9, 0)
 
 def test_get_right_wires_from_left_wire():
     cover = 75
@@ -314,17 +319,53 @@ def test_get_base_rebars_from_left_wire():
     p11 = FreeCAD.Vector(0, y3 - cover, 0)
     p22 = FreeCAD.Vector(x4, y3 - cover, 0)
     left_wire = Part.Wire(Part.makeLine(p11, p22))
-    for number_of_wires in range(2, 20):
-        distance = (y3 - 2 * cover) / (number_of_wires - 1)
+    for number_of_rebars in range(2, 20):
+        distance = (y3 - 2 * cover) / (number_of_rebars - 1)
         # Without Face
-        right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_wires, distance)
-        assert len(right_wires) == number_of_wires
+        right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_rebars, distance)
+        assert len(right_wires) == number_of_rebars
         # With Face
-        right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_wires, distance, face)
-        assert len(right_wires) == number_of_wires
+        right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_rebars, distance, face)
+        assert len(right_wires) == number_of_rebars
         # Face with opening
-        right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_wires, distance, face_2)
-        assert len(right_wires) == number_of_wires + ((y2 - cover) // distance) + 1
+        right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_rebars, distance, face_2)
+        assert len(right_wires) == number_of_rebars + ((y2 - cover) // distance) + 1
+
+def test_get_centerline_of_rebars_from_left_wire():
+    cover = 75
+    x1 = 0
+    x2 = 2000
+    x3 = 3000
+    x4 = 5000
+    y1 = 0
+    y2 = 300
+    y3 = 1000
+    p1 = FreeCAD.Vector(x1, y1, 0)
+    p2 = FreeCAD.Vector(x4, y1, 0)
+    p3 = FreeCAD.Vector(x4, y3, 0)
+    p4 = FreeCAD.Vector(x1, y3, 0)
+    p5 = FreeCAD.Vector(x2, y1, 0)
+    p6 = FreeCAD.Vector(x2, y2, 0)
+    p7 = FreeCAD.Vector(x3, y2, 0)
+    p8 = FreeCAD.Vector(x3, y1, 0)
+    points = [p1, p2, p3, p4, p1]
+    face = Part.Face(Part.makePolygon(points))
+    points = [p1, p5, p6, p7, p8, p2, p3, p4, p1]
+    face_2 = Part.Face(Part.makePolygon(points))
+    p11 = FreeCAD.Vector(0, y3 - cover, 0)
+    p22 = FreeCAD.Vector(x4, y3 - cover, 0)
+    left_wire = Part.Wire(Part.makeLine(p11, p22))
+    for number_of_rebars in range(2, 20):
+        distance = (y3 - 2 * cover) / (number_of_rebars - 1)
+        # Without Face
+        right_wires = osafe_funcs.get_centerline_of_rebars_from_left_wire(left_wire, number_of_rebars, distance)
+        assert len(right_wires) == number_of_rebars
+        # With Face
+        right_wires = osafe_funcs.get_centerline_of_rebars_from_left_wire(left_wire, number_of_rebars, distance, face)
+        assert len(right_wires) == number_of_rebars
+        # Face with opening
+        right_wires = osafe_funcs.get_centerline_of_rebars_from_left_wire(left_wire, number_of_rebars, distance, face_2)
+        assert len(right_wires) == number_of_rebars + ((y2 - cover) // distance) + 1
 
 def test_get_width_points():
     p1 = FreeCAD.Vector(0, 0, 0)
