@@ -928,9 +928,12 @@ def get_base_rebars_from_left_wire(
     face: Top face of foundation or frame
     '''
     radius = rebar_diameter / 2
-    wire, *_ = get_extended_wire(wire, -(cover + radius))
     wires = get_right_wires_from_left_wire(wire, number_of_rebars, distance, face)
-    return wires
+    base_rebars = []
+    for wire in wires:
+        wire, *_ = get_extended_wire(wire, -(cover + radius))
+        base_rebars.append(wire)
+    return base_rebars
 
 def get_centerline_of_rebars_from_left_wire(
         wire: Part.Shape,
@@ -951,7 +954,7 @@ def get_centerline_of_rebars_from_left_wire(
     diameter: diameter of rebar
     length_after_arc: multiply to diameter of rebar, for example 16 * db
     '''
-    wires = get_base_rebars_from_left_wire(wire, number_of_rebars, distance, face, cover)
+    wires = get_base_rebars_from_left_wire(wire, number_of_rebars, distance, face, cover, diameter)
     radius = diameter / 2
     new_wires = []
     for wire in wires:
