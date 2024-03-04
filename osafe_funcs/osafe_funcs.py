@@ -888,11 +888,12 @@ def get_extended_wire(wire, length=2000):
     wire = Part.Wire(edges)
     return wire, e1, e2
 
-def get_right_wires_from_left_wire(
+def  get_right_wires_from_left_wire(
         wire: Part.Shape,
         number_of_wires: int,
         distance: float,
         face: Part.Shape=None,
+        extended: float= 0,
         ):
     '''
     get a wire, and return the number_of_wires Wire in the right of wire
@@ -901,6 +902,8 @@ def get_right_wires_from_left_wire(
     '''
     normal = FreeCAD.Vector(0, 0, 1)
     dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
+    if extended != 0:
+        wire, *_ = get_extended_wire(wire, extended)
     wires = [wire]
     for i in range(1, number_of_wires):
         dvec.normalize()
@@ -921,6 +924,7 @@ def get_base_rebars_from_left_wire(
         face: Part.Shape=None,
         cover: float=75,
         rebar_diameter: int=20,
+        extended: float= 0,
         ):
     '''
     get a wire, and return the number_of_rebars Wire in the right of wire
@@ -928,7 +932,7 @@ def get_base_rebars_from_left_wire(
     face: Top face of foundation or frame
     '''
     radius = rebar_diameter / 2
-    wires = get_right_wires_from_left_wire(wire, number_of_rebars, distance, face)
+    wires = get_right_wires_from_left_wire(wire, number_of_rebars, distance, face, extended)
     base_rebars = []
     for wire in wires:
         wire, *_ = get_extended_wire(wire, -(cover + radius))
@@ -938,23 +942,24 @@ def get_base_rebars_from_left_wire(
 def get_centerline_of_rebars_from_left_wire(
         wire: Part.Shape,
         number_of_rebars: int,
-        distance: float,
+        spacing: float,
         face: Part.Shape=None,
         cover: float=75,
         diameter: int=20,
         stirrup_diameter: int=12,
-        length_after_arc: float=16,
+        factor_after_arc: float=16,
         rebars_location: str='TOP', # 'BOT'
-        radius_of_arc: float=3,
+        rounding: float=3,
+        extended: float=0,
         ) -> list:
     '''
     get a wire, and return the number_of_rebars Wire in the right of wire
-    with distances of distance
+    with spaces of spacing
     face: Top face of foundation or frame
     diameter: diameter of rebar
-    length_after_arc: multiply to diameter of rebar, for example 16 * db
+    factor_after_arc: multiply to diameter of rebar, for example 16 * db
     '''
-    wires = get_base_rebars_from_left_wire(wire, number_of_rebars, distance, face, cover, diameter)
+    wires = get_base_rebars_from_left_wire(wire, number_of_rebars, spacing, face, cover, diameter, extended)
     radius = diameter / 2
     new_wires = []
     for wire in wires:
@@ -964,16 +969,65 @@ def get_centerline_of_rebars_from_left_wire(
         v2 = wire.Vertexes[-1]
         v1 = v1.Point
         v2 = v2.Point
-        elongation = (sign * (length_after_arc * diameter - radius))
+        elongation = (sign * (factor_after_arc * diameter - radius))
         v11 = FreeCAD.Vector(v1.x, v1.y, v1.z + elongation)
         v22 = FreeCAD.Vector(v2.x, v2.y, v2.z + elongation)
         e1 = Part.makeLine(v11, v1)
         e2 = Part.makeLine(v22, v2)
         edges = [e1] + wire.Edges + [e2]
         new_wire = Part.Wire(edges)
-        new_wire = DraftGeomUtils.filletWire(new_wire, radius_of_arc * radius)
+        new_wire = DraftGeomUtils.filletWire(new_wire, rounding * radius)
         new_wires.append(new_wire)
     return new_wires
+
+def get_base_top_bot_rebar_from_left_wire(
+        wire: Part.Shape,
+        number_of_top_rebars: int,
+        number_of_bot_rebars: int,
+        width: float,
+        top_face: Part.Shape,
+        cover: float,
+        height: float,
+        top_rebar_diameter: int=20,
+        bot_rebar_diameter: int=20,
+        stirrup_diameter: int=12,
+        extended: float=0,
+        bot_face: Union[Part.Shape, None]=None,
+        ):
+    '''
+    get a wire, and return the top and bottom of wires in foundation
+    '''
+    top_spacing = (width - 2 * (cover + stirrup_diameter) - top_rebar_diameter) / (number_of_top_rebars - 1)
+    top_wires = get_base_rebars_from_left_wire(
+        wire,
+        number_of_top_rebars,
+        top_spacing,
+        top_face,
+        cover,
+        top_rebar_diameter,
+        extended)
+    if number_of_top_rebars == number_of_bot_rebars and top_rebar_diameter == bot_rebar_diameter:
+        bot_wires = []
+        for w in top_wires:
+            w = w.copy()
+            w = w.translate(FreeCAD.Vector(0, 0, -height))
+            bot_wires.append(w)
+    else:
+        if bot_face is None:
+            face = top_face.copy()
+            bot_face = face.translate(FreeCAD.Vector(0, 0, -height))
+        wire = wire.copy()
+        wire = wire.translate(FreeCAD.Vector(0, 0, -height))
+        bot_spacing = (width - 2 * (cover + stirrup_diameter) - bot_rebar_diameter) / (number_of_bot_rebars - 1)
+        bot_wires = get_base_rebars_from_left_wire(
+            wire,
+            number_of_bot_rebars,
+            bot_spacing,
+            bot_face,
+            cover,
+            top_rebar_diameter,
+            extended)
+    return top_wires, bot_wires
 
 def remove_null_edges_from_wire(w):
     es = []

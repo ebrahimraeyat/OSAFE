@@ -17,6 +17,7 @@ filename_base_foundation = Path(__file__).parent / 'test_files' / 'freecad' / 'b
 filename_khalaji = Path(__file__).parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
 filename_test = Path(__file__).parent / 'test_files' / 'freecad' / 'test.FCStd'
 filename_base_plate = Path(__file__).parent / 'test_files' / 'freecad' / 'base_plate.FCStd'
+filename_rashidzadeh = Path(__file__).parent / 'test_files' / 'freecad' / 'rashidzadeh.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
@@ -24,6 +25,7 @@ document_strip_foundation = FreeCAD.openDocument(str(filename_strip_foundation))
 document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
 document_test = FreeCAD.openDocument(str(filename_test))
 document_base_plate = FreeCAD.openDocument(str(filename_base_plate))
+document_rashidzadeh = FreeCAD.openDocument(str(filename_rashidzadeh))
 
 
 punch_path = Path(__file__).parent.parent
@@ -330,6 +332,39 @@ def test_get_base_rebars_from_left_wire():
         # Face with opening
         right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_rebars, distance, face_2)
         assert len(right_wires) == number_of_rebars + ((y2 - cover) // distance) + 1
+
+def test_get_base_top_bot_rebar_from_left_wire():
+    foundation = document_rashidzadeh.Foundation
+    top_face = osafe_funcs.get_top_faces(foundation.Shape, fuse=True)
+    strip = document_rashidzadeh.Strip009
+    wire = strip.Base.Shape.Wires[0]
+    number_of_top_rebars = 6
+    number_of_bot_rebars = 6
+    height = foundation.height.Value
+    top_wires, bot_wires = osafe_funcs.get_base_top_bot_rebar_from_left_wire(
+        wire,
+        number_of_top_rebars=number_of_top_rebars,
+        number_of_bot_rebars=number_of_bot_rebars,
+        width=strip.width.Value,
+        top_face=top_face,
+        cover = foundation.cover.Value,
+        height=height,
+        top_rebar_diameter=20,
+        bot_rebar_diameter=16,
+        stirrup_diameter=12,
+        extended=500,
+    )
+    assert len(top_wires) == 4
+    assert len(bot_wires) == 4
+    for wire in top_wires:
+        for vertex in wire.Vertexes:
+            assert top_face.isInside(FreeCAD.Vector(vertex.X, vertex.Y, vertex.Z), 0.1, True)
+    face = top_face.copy()
+    bot_face = face.translate(FreeCAD.Vector(0, 0, -height))
+    for wire in bot_wires:
+        for vertex in wire.Vertexes:
+            assert bot_face.isInside(FreeCAD.Vector(vertex.X, vertex.Y, vertex.Z), 0.1, True)
+    
 
 def test_get_centerline_of_rebars_from_left_wire():
     cover = 75
