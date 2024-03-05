@@ -73,6 +73,7 @@ def make_rebars(
             if FreeCAD.GuiUp:
                 ViewProviderOsafeRebar(obj.ViewObject)
             rebars.addObject(obj)
+    return rebars
 
 
 class OsafeRebar(ArchComponent.Component):
@@ -257,7 +258,6 @@ class OsafeRebar(ArchComponent.Component):
         obj.cover.Value,
         obj.stirrup_diameter.Value,
         obj.foundation,
-        None,
         None,
         obj.rounding,
         obj.factor_after_arc,

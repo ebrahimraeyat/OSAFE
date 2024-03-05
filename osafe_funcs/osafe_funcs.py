@@ -4,8 +4,7 @@ import math
 import FreeCAD
 import Part
 import DraftGeomUtils
-if FreeCAD.GuiUp:
-    import Draft
+import Draft
 
 
 def remove_obj(name: str) -> None:
@@ -389,20 +388,6 @@ def get_sub_areas_points_from_face_with_scales(
         faces_points.append(points)
     return faces_points
 
-def get_points_connections_from_slabs(slabs):
-    d = {}
-    for s in slabs:
-        v1 = s.start_point
-        v2 = s.end_point
-        for v in (v1, v2):
-            p = (v.x, v.y, v.z)
-            current_slabs = d.get(p, None)
-            if current_slabs is None:
-                d[p] = [s]
-            else:
-                d[p].append(s)
-    return d
-
 def get_points_inside_base_foundations(
     base_foundations : list,
     ) -> dict:
@@ -695,21 +680,6 @@ def get_foundation_shape_from_base_foundations(
             shape = shape.removeSplitter()
     return shape, outer_wire, plan, plan_without_openings
 
-def get_common_part_of_slabs(slabs):
-    if len(slabs) < 2:
-        return None
-    shapes = []
-    for s in slabs:
-        p1, p2 = extend_two_points(s.Start, s.End)
-        p1, p2 = get_offset_points(p1, p2, s.offset)
-        points = get_width_points(p1, p2, s.width.Value/2, s.angle)
-        points.append(points[0])
-        shapes.append(Part.Face(Part.makePolygon(points)))
-    comm = shapes[0]
-    for sh in shapes[1:]:
-        comm = comm.common(sh)
-    return comm
-
 def get_continuous_base_foundation_shape(
         base_foundation,
         points_common_shape,
@@ -892,13 +862,13 @@ def  get_right_wires_from_left_wire(
         wire: Part.Shape,
         number_of_wires: int,
         distance: float,
-        face: Part.Shape=None,
+        cut_shape: Part.Shape=None,
         extended: float= 0,
         ):
     '''
     get a wire, and return the number_of_wires Wire in the right of wire
     with distances of distance
-    face: Top face of foundation or frame
+    cut_shape: Top cut_shape of foundation or frame
     '''
     normal = FreeCAD.Vector(0, 0, 1)
     dvec = DraftGeomUtils.vec(wire.Edges[0]).cross(normal)
@@ -911,9 +881,12 @@ def  get_right_wires_from_left_wire(
         right_wire = DraftGeomUtils.offsetWire(wire, dvec)
         right_wire = remove_null_edges_from_wire(right_wire)
         wires.append(right_wire)
-    if face is not None:
+    if cut_shape is not None:
         wires_shape = Part.makeCompound(wires)
-        com = face.common(wires_shape)
+        dz = cut_shape.BoundBox.Center.z - wires_shape.BoundBox.Center.z
+        wires_shape = wires_shape.translate(FreeCAD.Vector(0, 0, dz))
+        com = cut_shape.common(wires_shape)
+        com = com.translate(FreeCAD.Vector(0, 0, -dz))
         wires = com.Wires
     return wires
     
@@ -921,7 +894,7 @@ def get_base_rebars_from_left_wire(
         wire: Part.Shape,
         number_of_rebars: int,
         distance: float,
-        face: Part.Shape=None,
+        cut_shape: Part.Shape=None,
         cover: float=75,
         rebar_diameter: int=20,
         extended: float= 0,
@@ -929,10 +902,10 @@ def get_base_rebars_from_left_wire(
     '''
     get a wire, and return the number_of_rebars Wire in the right of wire
     with distances of distance
-    face: Top face of foundation or frame
+    cut_shape: cut_shape to cut base rebars with it
     '''
     radius = rebar_diameter / 2
-    wires = get_right_wires_from_left_wire(wire, number_of_rebars, distance, face, extended)
+    wires = get_right_wires_from_left_wire(wire, number_of_rebars, distance, cut_shape, extended)
     base_rebars = []
     for wire in wires:
         wire, *_ = get_extended_wire(wire, -(cover + radius))
@@ -943,7 +916,7 @@ def get_centerline_of_rebars_from_left_wire(
         wire: Part.Shape,
         number_of_rebars: int,
         spacing: float,
-        face: Part.Shape=None,
+        cut_shape: Part.Shape=None,
         cover: float=75,
         diameter: int=20,
         stirrup_diameter: int=12,
@@ -955,11 +928,11 @@ def get_centerline_of_rebars_from_left_wire(
     '''
     get a wire, and return the number_of_rebars Wire in the right of wire
     with spaces of spacing
-    face: Top face of foundation or frame
+    cut_shape: cut_shape to cut with base wires with it
     diameter: diameter of rebar
     factor_after_arc: multiply to diameter of rebar, for example 16 * db
     '''
-    wires = get_base_rebars_from_left_wire(wire, number_of_rebars, spacing, face, cover, diameter, extended)
+    wires = get_base_rebars_from_left_wire(wire, number_of_rebars, spacing, cut_shape, cover, diameter, extended)
     radius = diameter / 2
     new_wires = []
     for wire in wires:
@@ -985,14 +958,13 @@ def get_base_top_bot_rebar_from_left_wire(
         number_of_top_rebars: int,
         number_of_bot_rebars: int,
         width: float,
-        top_face: Part.Shape,
+        cut_shape: Part.Shape,
         cover: float,
         height: float,
         top_rebar_diameter: int=20,
         bot_rebar_diameter: int=20,
         stirrup_diameter: int=12,
         extended: float=0,
-        bot_face: Union[Part.Shape, None]=None,
         ):
     '''
     get a wire, and return the top and bottom of wires in foundation
@@ -1002,7 +974,7 @@ def get_base_top_bot_rebar_from_left_wire(
         wire,
         number_of_top_rebars,
         top_spacing,
-        top_face,
+        cut_shape,
         cover,
         top_rebar_diameter,
         extended)
@@ -1013,9 +985,6 @@ def get_base_top_bot_rebar_from_left_wire(
             w = w.translate(FreeCAD.Vector(0, 0, -height))
             bot_wires.append(w)
     else:
-        if bot_face is None:
-            face = top_face.copy()
-            bot_face = face.translate(FreeCAD.Vector(0, 0, -height))
         wire = wire.copy()
         wire = wire.translate(FreeCAD.Vector(0, 0, -height))
         bot_spacing = (width - 2 * (cover + stirrup_diameter) - bot_rebar_diameter) / (number_of_bot_rebars - 1)
@@ -1023,7 +992,7 @@ def get_base_top_bot_rebar_from_left_wire(
             wire,
             number_of_bot_rebars,
             bot_spacing,
-            bot_face,
+            cut_shape,
             cover,
             top_rebar_diameter,
             extended)
@@ -1124,14 +1093,13 @@ def get_top_bot_rebar_shapes_from_left_wire(
         number_of_top_rebars: int,
         number_of_bot_rebars: int,
         width: float,
-        top_face: Part.Shape,
+        cut_shape: Part.Shape,
         height: float,
         cover: float=75,
         top_rebar_diameter: int=20,
         bot_rebar_diameter: int=20,
         stirrup_diameter: int=12,
         extended: float=0,
-        bot_face: Union[Part.Shape, None]=None,
         rounding: float=3,
         factor_after_arc: float=16,
         ):
@@ -1143,14 +1111,13 @@ def get_top_bot_rebar_shapes_from_left_wire(
         number_of_top_rebars,
         number_of_bot_rebars,
         width,
-        top_face,
+        cut_shape,
         cover,
         height,
         top_rebar_diameter,
         bot_rebar_diameter,
         stirrup_diameter,
         extended,
-        bot_face,
     )
     top_wires, bot_wires = get_centerline_of_top_bot_rebars_from_wires(
         top_wires=top_wires,
@@ -1188,8 +1155,7 @@ def get_top_bot_rebar_shapes_from_strip_and_foundation(
         cover: float=0,
         stirrup_diameter: int=12,
         foundation=None,
-        top_face: Union[Part.Shape, None]=None,
-        bot_face: Union[Part.Shape, None]=None,
+        cut_shape: Union[Part.Shape, None]=None,
         rounding: float=3,
         factor_after_arc: float=16,
         extended: float=0,
@@ -1203,8 +1169,8 @@ def get_top_bot_rebar_shapes_from_strip_and_foundation(
         height = foundation.height.Value
     if cover == 0:
         cover = foundation.cover.Value
-    if top_face is None:
-        top_face = get_top_faces(foundation.Shape, fuse=True)
+    if cut_shape is None:
+        cut_shape = foundation.Shape.copy()
     dist_from_left = cover + stirrup_diameter + max(top_rebar_diameter, bot_rebar_diameter)
     left_wire = get_left_wire_from_strip(strip, dist_from_left)
     if min_ratio_of_rebars != 0:
@@ -1221,14 +1187,13 @@ def get_top_bot_rebar_shapes_from_strip_and_foundation(
         number_of_top_rebars,
         number_of_bot_rebars,
         width,
-        top_face,
+        cut_shape,
         height,
         cover,
         top_rebar_diameter,
         bot_rebar_diameter,
         stirrup_diameter,
         extended,
-        bot_face,
         rounding,
         factor_after_arc,
         )
@@ -1301,74 +1266,6 @@ def make_automatic_base_foundation(
         # FreeCAD.ActiveDocument.removeObject(beam.Name)
         beam.ViewObject.hide()
     return strips
-
-def get_common_parts_of_foundation_slabs(foundation):
-    points_slabs = get_points_connections_from_slabs(foundation.tape_slabs)
-    points_common_part = {}
-    for p, slabs in points_slabs.items():
-        comm = get_common_part_of_slabs(slabs)
-        if comm is None:
-            continue
-        points_common_part[p] = comm
-    return points_common_part
-
-def get_foundation_plan_without_openings(
-    foundation,
-    ) -> Part.Face:
-    slabs = foundation.tape_slabs
-    points_common_part = get_common_parts_of_foundation_slabs(foundation)
-    common_parts = list(points_common_part.values())
-    solids = [f.extrude(FreeCAD.Vector(0, 0, -1)) for f in [s.plan for s in slabs] + common_parts]
-    shape = solids[0].fuse(solids[1:])
-    shape = shape.removeSplitter()
-    for f in shape.Faces:
-        if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == foundation.level.Value:
-            foundation_plan = f
-            break
-    if foundation.foundation_type == 'Strip':
-        plan = foundation_plan
-    elif foundation.foundation_type == 'Mat':
-        plan = Part.Face(foundation_plan.OuterWire)
-    return plan
-
-def get_foundation_plan_with_openings(
-    foundation,
-    ) -> Part.Face:
-    plan_without_openings = get_foundation_plan_without_openings(foundation)
-    plan_with_openings = plan_without_openings.copy()
-    if len(foundation.openings) > 0:
-        new_shape = plan_with_openings.extrude(FreeCAD.Vector(0, 0, -1))
-        new_shape = new_shape.cut([o.Shape for o in foundation.openings])
-        for f in new_shape.Faces:
-            if f.BoundBox.ZLength == 0 and f.BoundBox.ZMax == foundation.level.Value:
-                plan_with_openings = f
-                break
-    return plan_with_openings, plan_without_openings
-
-def get_foundation_plan_with_holes(
-    foundation,
-    ) -> Part.Face:
-    plan_with_openings, plan_without_openings = get_foundation_plan_with_openings(foundation)
-    if foundation.foundation_type == 'Strip':
-        mat = Part.Face(plan_with_openings.OuterWire)
-        cut = mat.cut([plan_with_openings])
-        holes = cut.SubShapes
-    elif foundation.foundation_type == 'Mat':
-        holes = [o.plan for o in foundation.openings]
-    return plan_with_openings, plan_without_openings, holes
-
-def get_points_of_foundation_plan_and_holes(
-    foundation,
-    ) -> list:
-    plan_with_openings, plan_without_openings, holes = get_foundation_plan_with_holes(foundation)
-    points = []
-    if foundation.foundation_type == 'Strip':
-        edges_list = [plan.Edges for plan in [plan_with_openings] + holes]
-    elif foundation.foundation_type == 'Mat':
-        edges_list = [plan.Edges for plan in [plan_without_openings] + holes]
-    for edges in edges_list:
-        points.append(get_sort_points(edges))
-    return points
 
 def get_similar_edge_direction_in_common_points_from_edges(
         edges : list,
@@ -1490,26 +1387,6 @@ def get_continuous_slabs(
     for numbers in edges_numbers:
         continuous_slabs.append([slabs[i-1] for i in numbers])
     return continuous_slabs
-
-def get_continuous_points_from_slabs(
-        slabs : list,
-        angle : int = 45,
-        ) -> list:
-    '''
-    This function get a list of slabs and calculate continuous slabs.
-    then it return a list contain list of continuous points in each 
-    list of slabs
-
-    angle is maximum angle between two adjacent slabs
-    '''
-    continuous_slabs = get_continuous_slabs(slabs, angle)
-    continuous_points = []
-    for ss in continuous_slabs:
-        edges = [s.Shape.Edges[0] for s in ss]
-        points = get_sort_points(edges, get_last=True)
-        continuous_points.append(points)
-    return continuous_points, continuous_slabs
-    
 
 def get_in_direction_priority(edge, edges,
         angle: int = 45):
@@ -1857,7 +1734,7 @@ def is_beam_shape_on_base_foundations_base(
         doc = FreeCAD.ActiveDocument
         if doc is None:
             return False
-        base_foundations = get_objects_of_type('BaseFoundation')
+        base_foundations = get_objects_of_type('BaseFoundation', doc)
     if len(base_foundations) == 0:
         return False
     p1, p2 = beam.Points
@@ -1876,7 +1753,7 @@ def get_beams_in_doc_that_belogns_to_base_foundations(doc= None):
         doc = FreeCAD.ActiveDocument
         if doc is None:
             return ret
-    base_foudations = get_objects_of_type('BaseFoundation')
+    base_foudations = get_objects_of_type('BaseFoundation', doc)
     beams = get_beams(doc)
     for beam in beams:
         if is_beam_shape_on_base_foundations_base(beam=beam, base_foundations=base_foudations):

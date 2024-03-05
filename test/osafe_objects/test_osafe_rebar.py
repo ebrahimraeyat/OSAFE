@@ -19,10 +19,12 @@ filename_rashidzadeh = Path(__file__).parent.parent / 'test_files' / 'freecad' /
 
 
 def test_make_rebars():
-    FreeCAD.openDocument(str(filename_rashidzadeh))
-    make_rebars()
+    doc = FreeCAD.openDocument(str(filename_rashidzadeh))
+    rebars = make_rebars()
     FreeCAD.ActiveDocument.recompute()
-    assert True
+    assert len(rebars.Group) == len(doc.Foundation.base_foundations)
+    for rebar in rebars.Group:
+        assert not rebar.Shape.isNull()
 
 if __name__ == '__main__':
     test_make_rebars()
