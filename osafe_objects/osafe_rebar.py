@@ -264,8 +264,8 @@ class OsafeRebar(ArchComponent.Component):
         obj.extended.Value,
         obj.min_ratio_of_rebars,
         )
-        obj.Shape = Part.makeCompound(top_rebar_shapes + bot_rebar_shapes)
         self.wires = top_wires + bot_wires
+        obj.Shape = Part.makeCompound(top_rebar_shapes + bot_rebar_shapes)
 
 class ViewProviderOsafeRebar(ArchComponent.ViewProviderComponent):
 
