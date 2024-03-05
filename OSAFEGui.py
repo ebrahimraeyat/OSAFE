@@ -10,6 +10,7 @@ from osafe_py_widgets import (
     gui_punch,
     gui_dxf,
     gui_automatic_strip,
+    gui_automatic_rebars,
     explode_foundation,
     osafe_views,
     )
@@ -650,6 +651,7 @@ command_list = [
             "Civil_opening_etabs",
             'civil_punch',
             "civil_safe",
+            "osafe_automatic_rebars",
             # 'civil_sketch',
             # "civil_explod_load_patterns",
             # "Civil_update",

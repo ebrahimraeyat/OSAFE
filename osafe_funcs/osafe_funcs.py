@@ -1029,6 +1029,211 @@ def get_base_top_bot_rebar_from_left_wire(
             extended)
     return top_wires, bot_wires
 
+def get_centerline_of_rebars_from_wires(
+        wires: List[Part.Shape],
+        cover: float=75,
+        diameter: int=20,
+        stirrup_diameter: int=12,
+        rounding: float=3,
+        factor_after_arc: float=16,
+        location: str="TOP",
+        ):
+    '''
+    get a wire, and return the centerline of rebars
+    '''
+    sign = -1 if location == 'TOP' else 1
+    new_wires = []
+    radius = diameter / 2
+    for wire in wires:
+        wire = wire.translate(FreeCAD.Vector(0, 0,  sign * (cover + stirrup_diameter + radius)))
+        v1 = wire.Vertexes[0]
+        v2 = wire.Vertexes[-1]
+        v1 = v1.Point
+        v2 = v2.Point
+        elongation = (sign * (factor_after_arc * diameter - radius))
+        v11 = FreeCAD.Vector(v1.x, v1.y, v1.z + elongation)
+        v22 = FreeCAD.Vector(v2.x, v2.y, v2.z + elongation)
+        e1 = Part.makeLine(v11, v1)
+        e2 = Part.makeLine(v22, v2)
+        edges = [e1] + wire.Edges + [e2]
+        new_wire = Part.Wire(edges)
+        new_wire = DraftGeomUtils.filletWire(new_wire, rounding * diameter)
+        new_wires.append(new_wire)
+    return new_wires
+    
+def get_centerline_of_top_bot_rebars_from_wires(
+        top_wires: List[Part.Shape],
+        bot_wires: List[Part.Shape],
+        cover: float=75,
+        top_diameter: int=20,
+        bot_diameter: int=20,
+        stirrup_diameter: int=12,
+        rounding: float=3,
+        factor_after_arc: float=16,
+        ):
+    '''
+    get a wire, and return the top and bottom centerline of rebars
+    '''
+    top_rebars = get_centerline_of_rebars_from_wires(
+        top_wires,
+        cover,
+        top_diameter,
+        stirrup_diameter,
+        rounding,
+        factor_after_arc,
+        location='TOP',
+        )
+    bot_rebars = get_centerline_of_rebars_from_wires(
+        bot_wires,
+        cover,
+        bot_diameter,
+        stirrup_diameter,
+        rounding,
+        factor_after_arc,
+        location='BOT',
+        )
+    return top_rebars, bot_rebars
+
+def get_rebars_shapes_from_wires(
+        wires: Union[Part.Shape],
+        radius: float,
+):
+    shapes = []
+    for wire in wires:
+        bpoint, bvec = get_base_and_axis(wire)
+        if not bpoint:
+            return
+        circle = Part.makeCircle(radius, bpoint, bvec)
+        circle = Part.Wire(circle)
+        try:
+            bar = wire.makePipeShell([circle], True, False, 2)
+            shapes.append(bar)
+        except Part.OCCError:
+            print("Arch: error sweeping rebar profile along the base sketch")
+            continue
+    return shapes
+
+def get_base_and_axis(wire):
+    "returns a base point and orientation axis from the base wire"
+    e = wire.Edges[0]
+    v = e.tangentAt(e.FirstParameter)
+    return e.Vertexes[0].Point,v
+
+def get_top_bot_rebar_shapes_from_left_wire(
+        wire: Part.Shape,
+        number_of_top_rebars: int,
+        number_of_bot_rebars: int,
+        width: float,
+        top_face: Part.Shape,
+        height: float,
+        cover: float=75,
+        top_rebar_diameter: int=20,
+        bot_rebar_diameter: int=20,
+        stirrup_diameter: int=12,
+        extended: float=0,
+        bot_face: Union[Part.Shape, None]=None,
+        rounding: float=3,
+        factor_after_arc: float=16,
+        ):
+    '''
+    get a wire, and return the top and bottom  rebar shapes
+    '''
+    top_wires, bot_wires = get_base_top_bot_rebar_from_left_wire(
+        wire,
+        number_of_top_rebars,
+        number_of_bot_rebars,
+        width,
+        top_face,
+        cover,
+        height,
+        top_rebar_diameter,
+        bot_rebar_diameter,
+        stirrup_diameter,
+        extended,
+        bot_face,
+    )
+    top_wires, bot_wires = get_centerline_of_top_bot_rebars_from_wires(
+        top_wires=top_wires,
+        bot_wires=bot_wires,
+        cover=cover,
+        top_diameter=top_rebar_diameter,
+        bot_diameter=bot_rebar_diameter,
+        stirrup_diameter=stirrup_diameter,
+        rounding=rounding,
+        factor_after_arc=factor_after_arc,
+    )
+    top_rebar_shapes = get_rebars_shapes_from_wires(top_wires, top_rebar_diameter / 2)
+    bot_rebar_shapes = get_rebars_shapes_from_wires(bot_wires, bot_rebar_diameter / 2)
+    return top_rebar_shapes, bot_rebar_shapes, top_wires, bot_wires
+
+def get_left_wire_from_strip(strip, cover=0):
+    main_wire = strip.Base.Shape.copy()
+    normal = FreeCAD.Vector(0, 0, 1)
+    dvec = DraftGeomUtils.vec(main_wire.Edges[0]).cross(normal)
+    dvec.normalize()
+    dvec = dvec.negative()
+    dvec.multiply(strip.left_width.Value - cover)
+    left_wire = DraftGeomUtils.offsetWire(main_wire,dvec)
+    left_wire = remove_null_edges_from_wire(left_wire)
+    return left_wire
+
+def get_top_bot_rebar_shapes_from_strip_and_foundation(
+        strip,
+        top_rebar_diameter: int=20,
+        bot_rebar_diameter: int=20,
+        number_of_top_rebars: int=0,
+        number_of_bot_rebars: int=0,
+        width: float=0,
+        height: float=0,
+        cover: float=0,
+        stirrup_diameter: int=12,
+        foundation=None,
+        top_face: Union[Part.Shape, None]=None,
+        bot_face: Union[Part.Shape, None]=None,
+        rounding: float=3,
+        factor_after_arc: float=16,
+        extended: float=0,
+        min_ratio_of_rebars: float=0.0018,
+        ):
+    # Get left wire of strip
+    # get width
+    if width == 0:
+        width = strip.width.Value
+    if height == 0:
+        height = foundation.height.Value
+    if cover == 0:
+        cover = foundation.cover.Value
+    if top_face is None:
+        top_face = get_top_faces(foundation.Shape, fuse=True)
+    dist_from_left = cover + stirrup_diameter + max(top_rebar_diameter, bot_rebar_diameter)
+    left_wire = get_left_wire_from_strip(strip, dist_from_left)
+    if min_ratio_of_rebars != 0:
+        as_min = min_ratio_of_rebars * height * width
+        as_top_rebar = math.pi * top_rebar_diameter ** 2 / 4
+        number_of_top_rebars_min = int((as_min // as_top_rebar) + 1 )
+        as_bot_rebar = math.pi * bot_rebar_diameter ** 2 / 4
+        number_of_bot_rebars_min = int((as_min // as_bot_rebar) + 1 )
+        number_of_top_rebars = max(number_of_top_rebars, number_of_top_rebars_min)
+        number_of_bot_rebars = max(number_of_bot_rebars, number_of_bot_rebars_min)
+    print(f"{number_of_top_rebars=}, {number_of_bot_rebars=}")
+    top_rebar_shapes, bot_rebar_shapes, top_wires, bot_wires = get_top_bot_rebar_shapes_from_left_wire(
+        left_wire,
+        number_of_top_rebars,
+        number_of_bot_rebars,
+        width,
+        top_face,
+        height,
+        cover,
+        top_rebar_diameter,
+        bot_rebar_diameter,
+        stirrup_diameter,
+        extended,
+        bot_face,
+        rounding,
+        factor_after_arc,
+        )
+    return top_rebar_shapes, bot_rebar_shapes, top_wires, bot_wires
+        
 def remove_null_edges_from_wire(w):
     es = []
     for e in w.Edges:

@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import numpy as np
 
 FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
 sys.path.append(FREECADPATH)
@@ -333,6 +334,36 @@ def test_get_base_rebars_from_left_wire():
         right_wires = osafe_funcs.get_base_rebars_from_left_wire(left_wire, number_of_rebars, distance, face_2)
         assert len(right_wires) == number_of_rebars + ((y2 - cover) // distance) + 1
 
+def test_get_top_bot_rebar_shapes_from_left_wire():
+    foundation = document_rashidzadeh.Foundation
+    top_face = osafe_funcs.get_top_faces(foundation.Shape, fuse=True)
+    strip = document_rashidzadeh.Strip009
+    wire = strip.Base.Shape.Wires[0]
+    top_rebars, bot_rebars, *_ = osafe_funcs.get_top_bot_rebar_shapes_from_left_wire(
+        wire,
+        number_of_top_rebars=6,
+        number_of_bot_rebars=7,
+        width=strip.width.Value,
+        top_face=top_face,
+        height=foundation.height.Value,
+        cover=foundation.cover.Value,
+    )
+    assert len(top_rebars) == 4
+    assert len(bot_rebars) == 4
+
+def test_get_top_bot_rebar_shapes_from_strip_and_foundation():
+    foundation = document_rashidzadeh.Foundation
+    strip = document_rashidzadeh.Strip009
+    top_rebars, bot_rebars, *_ = osafe_funcs.get_top_bot_rebar_shapes_from_strip_and_foundation(
+        strip,
+        number_of_top_rebars=6,
+        number_of_bot_rebars=7,
+        foundation=foundation,
+        min_ratio_of_rebars=0,
+    )
+    assert len(top_rebars) == 6
+    assert len(bot_rebars) == 7
+
 def test_get_base_top_bot_rebar_from_left_wire():
     foundation = document_rashidzadeh.Foundation
     top_face = osafe_funcs.get_top_faces(foundation.Shape, fuse=True)
@@ -364,7 +395,46 @@ def test_get_base_top_bot_rebar_from_left_wire():
     for wire in bot_wires:
         for vertex in wire.Vertexes:
             assert bot_face.isInside(FreeCAD.Vector(vertex.X, vertex.Y, vertex.Z), 0.1, True)
-    
+
+def test_get_centerline_of_rebars_from_wires():
+    p1 = FreeCAD.Vector(-1000, -1000, 0)
+    p2 = FreeCAD.Vector(1000, 1000, 0)
+    p3 = FreeCAD.Vector(2000, 1000, 0)
+    wire = Part.Wire(Part.makePolygon([p1, p2, p3]))
+    rebars = osafe_funcs.get_centerline_of_rebars_from_wires(wires=[wire])
+    assert len(rebars) == 1
+    new_wire = rebars[0]
+    bb = new_wire.BoundBox
+    np.testing.assert_allclose(bb.ZLength, 310, atol=.01)
+    np.testing.assert_allclose(bb.ZMax, -97, atol=.01)
+    np.testing.assert_allclose(bb.ZMin, -407, atol=.01)
+    # Bottom rebars
+    wire = Part.Wire(Part.makePolygon([p1, p2, p3]))
+    rebars = osafe_funcs.get_centerline_of_rebars_from_wires(wires=[wire], location="BOT")
+    assert len(rebars) == 1
+    new_wire = rebars[0]
+    bb = new_wire.BoundBox
+    np.testing.assert_allclose(bb.ZLength, 310, atol=.01)
+    np.testing.assert_allclose(bb.ZMax, 407, atol=.01)
+    np.testing.assert_allclose(bb.ZMin, 97, atol=.01)
+
+def test_get_rebars_shapes_from_wires():
+    lengths = range(100, 1000, 100)
+    radiuses = range(10, 26, 2)
+    for length, radius in zip(lengths, radiuses):
+        p11 = FreeCAD.Vector(-1000, -1000, -length)
+        p1 = FreeCAD.Vector(-1000, -1000, 0)
+        p2 = FreeCAD.Vector(1000, 1000, 0)
+        p3 = FreeCAD.Vector(2000, 1000, 0)
+        p33 = FreeCAD.Vector(2000, 1000, -length)
+        wire = Part.Wire(Part.makePolygon([p11, p1, p2, p3, p33]))
+        rebars = osafe_funcs.get_rebars_shapes_from_wires(wires=[wire], radius=radius)
+        assert len(rebars) == 1
+        rebar = rebars[0]
+        bb = rebar.BoundBox
+        np.testing.assert_allclose(bb.ZLength, length + radius, atol=.01)
+        np.testing.assert_allclose(bb.ZMax, radius, atol=.01)
+        np.testing.assert_allclose(bb.ZMin, -length, atol=.01)
 
 def test_get_centerline_of_rebars_from_left_wire():
     cover = 75
