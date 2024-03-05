@@ -584,6 +584,19 @@ def test_get_beams_in_doc_that_belogns_to_base_foundations():
     beams = osafe_funcs.get_beams_in_doc_that_belogns_to_base_foundations(doc=document_base_plate)
     assert len(beams) == 1
 
+def test_get_total_length_of_shapes():
+    x1 = 0
+    x2 = 5000
+    y1 = 0
+    y2 = 1000
+    p1 = FreeCAD.Vector(x1, y1, 0)
+    p2 = FreeCAD.Vector(x2, y1, 0)
+    p4 = FreeCAD.Vector(x1, y2, 0)
+    p3 = FreeCAD.Vector(x2, y2, 0)
+    points = [p1, p2, p3, p4, p1]
+    face = Part.Face(Part.makePolygon(points))
+    length = osafe_funcs.get_total_length_of_shapes([face])
+    assert length == (x2 + y2) * 2
 
 if __name__ == '__main__':
     # test_get_similar_edge_direction_in_common_points_from_edges()

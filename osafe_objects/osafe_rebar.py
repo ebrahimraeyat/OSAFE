@@ -204,6 +204,43 @@ class OsafeRebar(ArchComponent.Component):
                 QT_TRANSLATE_NOOP(app_prop,
                 "Extended length of base rebar")
                 ).extended=0
+        if "top_length" not in pl:
+            obj.addProperty(
+                prop_dist,
+                "top_length",
+                "Bill",
+                QT_TRANSLATE_NOOP(app_prop,
+                "Total length of all top rebars"))
+            obj.setEditorMode("top_length", 1)
+        if "bot_length" not in pl:
+            obj.addProperty(
+                prop_dist,
+                "bot_length",
+                "Bill",
+                QT_TRANSLATE_NOOP(app_prop,
+                "Total length of all bot rebars"))
+            obj.setEditorMode("bot_length", 1)
+        if not hasattr(obj, "top_weight"):
+            obj.addProperty(
+                prop_float,
+                "top_weight",
+                "Bill",
+                "The weight of top rebars (ton)",
+                )
+        if not hasattr(obj, "bot_weight"):
+            obj.addProperty(
+                prop_float,
+                "bot_weight",
+                "Bill",
+                "The weight of bottom rebars (ton)",
+                )
+        if not hasattr(obj, "total_weight"):
+            obj.addProperty(
+                prop_float,
+                "total_weight",
+                "Bill",
+                "The weight of top and bottom rebars (ton)",
+                )
         # if "placement_list" not in pl:
         #     obj.addProperty(
         #         "App::PropertyPlacementList",
@@ -219,14 +256,6 @@ class OsafeRebar(ArchComponent.Component):
         #         QT_TRANSLATE_NOOP(app_prop,
         #         "Length of a single rebar"))
         #     obj.setEditorMode("length", 1)
-        # if "total_length" not in pl:
-        #     obj.addProperty(
-        #         prop_dist,
-        #         "total_length",
-        #         "Rebar",
-        #         QT_TRANSLATE_NOOP(app_prop,
-        #         "Total length of all rebars"))
-        #     obj.setEditorMode("total_length", 1)
         # if "mark" not in pl:
         #     obj.addProperty(
         #         prop_string,
@@ -264,7 +293,13 @@ class OsafeRebar(ArchComponent.Component):
         obj.extended.Value,
         obj.min_ratio_of_rebars,
         )
-        self.wires = top_wires + bot_wires
+        self.top_wires = top_wires
+        self.bot_wires = bot_wires
+        obj.top_length = osf.get_total_length_of_shapes(top_wires)
+        obj.bot_length = osf.get_total_length_of_shapes(bot_wires)
+        obj.top_weight = osf.get_total_volume_of_shapes(top_rebar_shapes) * 7850e-12
+        obj.bot_weight = osf.get_total_volume_of_shapes(bot_rebar_shapes) * 7850e-12
+        obj.total_weight = obj.top_weight + obj.bot_weight
         obj.Shape = Part.makeCompound(top_rebar_shapes + bot_rebar_shapes)
 
 class ViewProviderOsafeRebar(ArchComponent.ViewProviderComponent):
@@ -328,11 +363,12 @@ class ViewProviderOsafeRebar(ArchComponent.ViewProviderComponent):
         if prop == "Shape":
             if hasattr(self,"centerline") and self.centerline:
                 self.centerlinegroup.removeChild(self.centerline)
-            if hasattr(obj.Proxy,"wires") and obj.Proxy.wires:
+            if hasattr(obj.Proxy,"top_wires") and obj.Proxy.top_wires:
                 from pivy import coin
                 import re
                 self.centerline = coin.SoSeparator()
-                comp = Part.makeCompound(obj.Proxy.wires)
+                wires = obj.Proxy.top_wires + obj.Proxy.bot_wires
+                comp = Part.makeCompound(wires)
                 pts = re.findall("point \[(.*?)\]",comp.writeInventor().replace("\n",""))
                 pts = [p.split(",") for p in pts]
                 for pt in pts:
@@ -381,22 +417,3 @@ class ViewProviderOsafeRebar(ArchComponent.ViewProviderComponent):
 
         modes=["Centerline"]
         return modes+ArchComponent.ViewProviderComponent.getDisplayModes(self,vobj)
-
-def get_length_of_rebar(rebar):
-
-    """ get_length_of_rebar(RebarObject): Calculates the length of the rebar."""
-    base = rebar.Base
-    # When rebar is derived from DWire
-    if hasattr(base, "Length"):
-        return base.Length
-    # When rebar is derived from Sketch
-    elif base.isDerivedFrom("Sketcher::SketchObject"):
-        length = 0
-        for geo in base.Geometry:
-            length += geo.length()
-        return length
-    elif base.isDerivedFrom("Part::Helix"):
-        return base.Shape.Wires[0].Length
-    else:
-        FreeCAD.Console.PrintError("Cannot calculate rebar length from its base object\n")
-        return None

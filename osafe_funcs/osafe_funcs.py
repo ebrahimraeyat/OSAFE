@@ -1181,7 +1181,6 @@ def get_top_bot_rebar_shapes_from_strip_and_foundation(
         number_of_bot_rebars_min = int((as_min // as_bot_rebar) + 1 )
         number_of_top_rebars = max(number_of_top_rebars, number_of_top_rebars_min)
         number_of_bot_rebars = max(number_of_bot_rebars, number_of_bot_rebars_min)
-    print(f"{number_of_top_rebars=}, {number_of_bot_rebars=}")
     top_rebar_shapes, bot_rebar_shapes, top_wires, bot_wires = get_top_bot_rebar_shapes_from_left_wire(
         left_wire,
         number_of_top_rebars,
@@ -1691,7 +1690,6 @@ def get_points_from_indirection_edges(edges, tol=1e-7):
         for e1, e2 in zip(edges[0:-1], edges[1:]):
             dir_e1 = e1.tangentAt(e1.FirstParameter)
             dir_e2 = e2.tangentAt(e2.FirstParameter)
-            print(dir_e1.cross(dir_e2).Length)
             if dir_e1.cross(dir_e2).Length > tol:
                 points.append(e1.lastVertex().Point)
     points.append(edges[-1].lastVertex().Point)
@@ -1783,6 +1781,24 @@ def get_sorted_points(
         else:
             points.append(v)
     return points
+
+def get_total_length_of_shapes(shapes: List[Part.Shape]):
+
+    """ get total length of Shapes."""
+    total_len = 0
+    for shape in shapes:
+        if hasattr(shape, "Length"):
+            total_len += shape.Length
+    return total_len
+
+def get_total_volume_of_shapes(shapes: List[Part.Shape]):
+
+    """ get total volume of Shapes."""
+    total_volume = 0
+    for shape in shapes:
+        if hasattr(shape, "Volume"):
+            total_volume += shape.Volume
+    return total_volume
 
 def get_color(param, pref_intity, color=674321151):
     c = param.GetUnsigned(pref_intity, color)
