@@ -20,13 +20,13 @@
 #***************************************************************************
 # Modified Amritpal Singh <amrit3701@gmail.com> on 07-07-2017
 # Modified Ebrahim Raeyat <ebe79442114@gmail.com> on 03-01-2024
+from pathlib import Path
 
 import FreeCAD
 import Part
 import ArchComponent
 import ArchCommands
 if FreeCAD.GuiUp:
-    import FreeCADGui
     from draftutils.translate import translate
     from PySide.QtCore import QT_TRANSLATE_NOOP
 else:
@@ -326,9 +326,7 @@ class ViewProviderOsafeRebar(ArchComponent.ViewProviderComponent):
         self.setProperties(vobj)
 
     def getIcon(self):
-
-        import Arch_rc
-        return ":/icons/Arch_Rebar_Tree.svg"
+        return str(Path(__file__).parent.parent / "osafe_images" / "osafe_rebar.svg")
 
     # def setEdit(self, vobj, mode):
     #     # The Reinforcement Workbench does not implement resetEdit.
