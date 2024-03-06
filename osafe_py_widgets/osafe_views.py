@@ -77,10 +77,32 @@ class OSAFEViewBaseFoundation:
                 if obj.Proxy.Type == "BaseFoundation":
                     show_object(obj, index)
                     show_object(obj.Base, index)
-                elif obj.Proxy.Type == "Strip":
-                    if index != 0:
-                        obj.ViewObject.hide()
+                elif obj.Proxy.Type in ("Strip", "Rebar") and index != 0:
+                    obj.ViewObject.hide()
+                    if hasattr(obj, "Base") and hasattr(obj.Base, "ViewObject"):
                         obj.Base.ViewObject.hide()
+
+class OSAFEViewRebars:
+    def GetResources(self):
+        return {
+            "Pixmap": str(
+                Path(__file__).parent.parent / "osafe_images" / "view_osafe_rebar.svg"
+                ),
+            "MenuText": "Rebars",
+            "Checkable": True,
+        }
+
+    def IsActive(self):
+        return FreeCAD.ActiveDocument is not None
+
+    def Activated(self, index):
+        for obj in FreeCAD.ActiveDocument.Objects:
+            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type"):
+                if obj.Proxy.Type == "Rebar":
+                    show_object(obj, index)
+                elif obj.Proxy.Type in ("Strip", "BaseFoundation") and index != 0:
+                    obj.ViewObject.hide()
+                    obj.Base.ViewObject.hide()
 
 
 class OSAFEViewArchWall:
@@ -208,9 +230,10 @@ class OSAFEViewDesignLayer:
                 if obj.Proxy.Type == 'Strip':
                     show_object(obj, index)
                     show_object(obj.Base, index)
-                elif obj.Proxy.Type == "BaseFoundation" and index != 0:
+                elif obj.Proxy.Type in ("Rebar", "BaseFoundation") and index != 0:
                     obj.ViewObject.hide()
-                    obj.Base.ViewObject.hide()
+                    if hasattr(obj, "Base") and hasattr(obj.Base, "ViewObject"):
+                            obj.Base.ViewObject.hide()
 
 
 class OSAFEViewPunch:
@@ -243,3 +266,4 @@ FreeCADGui.addCommand("OSAFE_view_foundations", OSAFEViewFoundations())
 FreeCADGui.addCommand("OSAFE_view_design_layer", OSAFEViewDesignLayer())
 FreeCADGui.addCommand("OSAFE_view_punch", OSAFEViewPunch())
 FreeCADGui.addCommand("OSAFE_view_arch_wall", OSAFEViewArchWall())
+FreeCADGui.addCommand("OSAFE_view_rebars", OSAFEViewRebars())
