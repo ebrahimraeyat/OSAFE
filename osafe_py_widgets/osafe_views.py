@@ -55,7 +55,7 @@ class WireFrameView:
         pass
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
 
 class OSAFEViewBaseFoundation:
@@ -69,13 +69,18 @@ class OSAFEViewBaseFoundation:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
-            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type") and obj.Proxy.Type == "BaseFoundation":
-                show_object(obj, index)
-                show_object(obj.Base, index)
+            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type"):
+                if obj.Proxy.Type == "BaseFoundation":
+                    show_object(obj, index)
+                    show_object(obj.Base, index)
+                elif obj.Proxy.Type == "Strip":
+                    if index != 0:
+                        obj.ViewObject.hide()
+                        obj.Base.ViewObject.hide()
 
 
 class OSAFEViewArchWall:
@@ -89,7 +94,7 @@ class OSAFEViewArchWall:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -108,7 +113,7 @@ class OSAFEViewColumns:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -131,7 +136,7 @@ class OSAFEViewBeams:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -157,7 +162,7 @@ class OSAFEViewSlabs:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -176,7 +181,7 @@ class OSAFEViewFoundations:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -184,44 +189,29 @@ class OSAFEViewFoundations:
                 show_object(obj, index)
 
 
-class OSAFEViewDesignLayerA:
+class OSAFEViewDesignLayer:
     def GetResources(self):
         return {
             "Pixmap": str(
-                Path(__file__).parent.parent / "osafe_images" / "view_design_layer_a.svg"
+                Path(__file__).parent.parent / "osafe_images" / "view_design_layer.svg"
             ),
-            "MenuText": "Layer A",
+            "MenuText": "Design Strip",
             "Checkable": True,
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
-            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type") and obj.Proxy.Type == "Strip" and obj.layer == "A":
-                show_object(obj, index)
-                show_object(obj.Base, index)
+            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type"):
+                if obj.Proxy.Type == 'Strip':
+                    show_object(obj, index)
+                    show_object(obj.Base, index)
+                elif obj.Proxy.Type == "BaseFoundation" and index != 0:
+                    obj.ViewObject.hide()
+                    obj.Base.ViewObject.hide()
 
-
-class OSAFEViewDesignLayerB:
-    def GetResources(self):
-        return {
-            "Pixmap": str(
-                Path(__file__).parent.parent / "osafe_images" / "view_design_layer_b.svg"
-            ),
-            "MenuText": "Layer B",
-            "Checkable": True,
-        }
-
-    def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
-
-    def Activated(self, index):
-        for obj in FreeCAD.ActiveDocument.Objects:
-            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type") and obj.Proxy.Type == "Strip" and obj.layer == "B":
-                show_object(obj, index)
-                show_object(obj.Base, index)
 
 class OSAFEViewPunch:
     def GetResources(self):
@@ -234,7 +224,7 @@ class OSAFEViewPunch:
         }
 
     def IsActive(self):
-        return not FreeCAD.ActiveDocument is None
+        return FreeCAD.ActiveDocument is not None
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
@@ -250,7 +240,6 @@ FreeCADGui.addCommand("OSAFE_view_columns", OSAFEViewColumns())
 FreeCADGui.addCommand("OSAFE_view_beams", OSAFEViewBeams())
 FreeCADGui.addCommand("OSAFE_view_slabs", OSAFEViewSlabs())
 FreeCADGui.addCommand("OSAFE_view_foundations", OSAFEViewFoundations())
-FreeCADGui.addCommand("OSAFE_view_design_layer_a", OSAFEViewDesignLayerA())
-FreeCADGui.addCommand("OSAFE_view_design_layer_b", OSAFEViewDesignLayerB())
+FreeCADGui.addCommand("OSAFE_view_design_layer", OSAFEViewDesignLayer())
 FreeCADGui.addCommand("OSAFE_view_punch", OSAFEViewPunch())
 FreeCADGui.addCommand("OSAFE_view_arch_wall", OSAFEViewArchWall())
