@@ -30,6 +30,7 @@ if FreeCAD.GuiUp:
     import FreeCADGui as Gui
     from draftutils.translate import translate
     from PySide.QtCore import QT_TRANSLATE_NOOP
+    from osafe_py_widgets import resource_rc
 else:
     def translate(ctxt,txt):
         return txt
@@ -410,44 +411,43 @@ class ViewProviderOsafeRebar(ArchComponent.ViewProviderComponent):
 
 
 class Ui:
-    def __init__(self, rebar_obj=None):
-        import os
+    def __init__(self, obj=None):
         self.form = Gui.PySideUic.loadUi(str(Path(__file__).parent.parent / "osafe_widgets" / "edit_objects" / "edit_osafe_rebars.ui"))
-        self.rebar_obj = rebar_obj
+        self.obj = obj
         self.create_connections()
         self.original_values = self.fill_form()
 
     def create_connections(self):
-        self.form.top_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_rebar)
-        self.form.bot_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_rebar)
-        self.form.stirrup_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_rebar)
-        self.form.extended_spinbox.valueChanged.connect(self.modify_rebar)
-        self.form.cover_spinbox.valueChanged.connect(self.modify_rebar)
-        self.form.height_spinbox.valueChanged.connect(self.modify_rebar)
-        self.form.width_spinbox.valueChanged.connect(self.modify_rebar)
-        self.form.impose_minimum_spinbox.valueChanged.connect(self.modify_rebar)
+        self.form.top_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_obj)
+        self.form.bot_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_obj)
+        self.form.stirrup_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_obj)
+        self.form.extended_spinbox.valueChanged.connect(self.modify_obj)
+        self.form.cover_spinbox.valueChanged.connect(self.modify_obj)
+        self.form.height_spinbox.valueChanged.connect(self.modify_obj)
+        self.form.width_spinbox.valueChanged.connect(self.modify_obj)
+        self.form.impose_minimum_spinbox.valueChanged.connect(self.modify_obj)
         self.form.accept_pushbutton.clicked.connect(self.accept)
         self.form.cancel_pushbutton.clicked.connect(self.reject)
 
     def fill_form(self):
-        top_diameter = self.rebar_obj.top_diameter
+        top_diameter = self.obj.top_diameter
         top_index = self.form.top_rebar_diameter_combobox.findText(str(int(top_diameter)))
         self.form.top_rebar_diameter_combobox.setCurrentIndex(top_index)
-        bot_diameter = self.rebar_obj.bot_diameter 
+        bot_diameter = self.obj.bot_diameter 
         bot_index = self.form.bot_rebar_diameter_combobox.findText(str(int(bot_diameter)))
         self.form.bot_rebar_diameter_combobox.setCurrentIndex(bot_index)
-        stirrup_diameter = self.rebar_obj.stirrup_diameter
+        stirrup_diameter = self.obj.stirrup_diameter
         stirrup_index = self.form.stirrup_rebar_diameter_combobox.findText(str(int(stirrup_diameter)))
         self.form.stirrup_rebar_diameter_combobox.setCurrentIndex(stirrup_index) 
-        extended = self.rebar_obj.extended.Value
+        extended = self.obj.extended.Value
         self.form.extended_spinbox.setValue(extended / 10)
-        cover = self.rebar_obj.cover.Value
+        cover = self.obj.cover.Value
         self.form.cover_spinbox.setValue(cover / 10)
-        height = self.rebar_obj.height.Value
+        height = self.obj.height.Value
         self.form.height_spinbox.setValue(height / 10)
-        width = self.rebar_obj.width.Value
+        width = self.obj.width.Value
         self.form.width_spinbox.setValue(width / 10)
-        min_ratio = self.rebar_obj.min_ratio_of_rebars
+        min_ratio = self.obj.min_ratio_of_rebars
         self.form.impose_minimum_spinbox.setValue(min_ratio)
         self.set_properties()
         return {
@@ -468,32 +468,32 @@ class Ui:
         return 0
 
     def reject(self):
-        self.rebar_obj.top_diameter = self.original_values["top_diameter"]
-        self.rebar_obj.bot_diameter = self.original_values["bot_diameter"]
-        self.rebar_obj.stirrup_diameter = self.original_values["stirrup_diameter"]
-        self.rebar_obj.extended = self.original_values["extended"]
-        self.rebar_obj.cover = self.original_values["cover"]
-        self.rebar_obj.height = self.original_values["height"]
-        self.rebar_obj.width = self.original_values["width"]
-        self.rebar_obj.min_ratio_of_rebars = self.original_values["min_ratio"]
-        self.rebar_obj.recompute(True)
+        self.obj.top_diameter = self.original_values["top_diameter"]
+        self.obj.bot_diameter = self.original_values["bot_diameter"]
+        self.obj.stirrup_diameter = self.original_values["stirrup_diameter"]
+        self.obj.extended = self.original_values["extended"]
+        self.obj.cover = self.original_values["cover"]
+        self.obj.height = self.original_values["height"]
+        self.obj.width = self.original_values["width"]
+        self.obj.min_ratio_of_rebars = self.original_values["min_ratio"]
+        self.obj.recompute(True)
         Gui.Control.closeDialog()
 
-    def modify_rebar(self):
-        self.rebar_obj.top_diameter = int(self.form.top_rebar_diameter_combobox.currentText())
-        self.rebar_obj.bot_diameter = int(self.form.bot_rebar_diameter_combobox.currentText())
-        self.rebar_obj.stirrup_diameter = int(self.form.stirrup_rebar_diameter_combobox.currentText())
-        self.rebar_obj.extended = self.form.extended_spinbox.value() * 10
-        self.rebar_obj.cover = self.form.cover_spinbox.value() * 10
-        self.rebar_obj.height = self.form.height_spinbox.value() * 10
-        self.rebar_obj.width = self.form.width_spinbox.value() * 10
-        self.rebar_obj.min_ratio_of_rebars = self.form.impose_minimum_spinbox.value()
-        self.rebar_obj.recompute(True)
+    def modify_obj(self):
+        self.obj.top_diameter = int(self.form.top_rebar_diameter_combobox.currentText())
+        self.obj.bot_diameter = int(self.form.bot_rebar_diameter_combobox.currentText())
+        self.obj.stirrup_diameter = int(self.form.stirrup_rebar_diameter_combobox.currentText())
+        self.obj.extended = self.form.extended_spinbox.value() * 10
+        self.obj.cover = self.form.cover_spinbox.value() * 10
+        self.obj.height = self.form.height_spinbox.value() * 10
+        self.obj.width = self.form.width_spinbox.value() * 10
+        self.obj.min_ratio_of_rebars = self.form.impose_minimum_spinbox.value()
+        self.obj.recompute(True)
         self.set_properties()
 
     def set_properties(self):
-        self.form.total_top_length_spinbox.setValue(self.rebar_obj.top_length.Value / 1000)
-        self.form.total_bot_length_spinbox.setValue(self.rebar_obj.bot_length.Value / 1000)
-        self.form.total_top_weight_spinbox.setValue(self.rebar_obj.top_weight * 1000)
-        self.form.total_bot_weight_spinbox.setValue(self.rebar_obj.bot_weight * 1000)
-        self.form.total_weight_spinbox.setValue(self.rebar_obj.total_weight * 1000)
+        self.form.total_top_length_spinbox.setValue(self.obj.top_length.Value / 1000)
+        self.form.total_bot_length_spinbox.setValue(self.obj.bot_length.Value / 1000)
+        self.form.total_top_weight_spinbox.setValue(self.obj.top_weight * 1000)
+        self.form.total_bot_weight_spinbox.setValue(self.obj.bot_weight * 1000)
+        self.form.total_weight_spinbox.setValue(self.obj.total_weight * 1000)

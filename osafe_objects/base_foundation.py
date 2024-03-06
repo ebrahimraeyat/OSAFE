@@ -5,6 +5,10 @@ import ArchComponent
 
 from osafe_funcs import osafe_funcs
 
+if FreeCAD.GuiUp:
+    import FreeCADGui as Gui
+    from osafe_py_widgets import resource_rc
+
 
 def make_base_foundation(
         base,
@@ -227,7 +231,6 @@ class ViewProviderBaseFoundation:
     def __init__(self, vobj):
         vobj.Proxy = self
         
-
     def attach(self, vobj):
         self.ViewObject = vobj
         self.Object = vobj.Object
@@ -244,6 +247,19 @@ class ViewProviderBaseFoundation:
 
     def __setstate__(self, state):
         return None
+    
+    def setEdit(self, vobj, mode=0):
+        obj = vobj.Object
+        ui = Ui(obj)
+        Gui.Control.showDialog(ui)
+        return True
+    
+    def unsetEdit(self, vobj, mode):
+        Gui.Control.closeDialog()
+        return
+        
+    def doubleClicked(self,vobj):
+        self.setEdit(vobj)
 
     def onDelete(self, vobj, subelements):
         name = None
@@ -252,6 +268,104 @@ class ViewProviderBaseFoundation:
         FreeCAD.ActiveDocument.removeObject(vobj.Object.Name)
         if name is not None:
             FreeCAD.ActiveDocument.removeObject(name)
+
+class Ui:
+    def __init__(self, obj=None):
+        self.form = Gui.PySideUic.loadUi(str(Path(__file__).parent.parent / "osafe_widgets" / "edit_objects" / "edit_base_foundation.ui"))
+        self.obj = obj
+        self.original_values = self.fill_form()
+        self.obj.ViewObject.Visibility = True
+        self.align_changed()
+        self.create_connections()
+
+    def create_connections(self):
+        self.form.strip_layer.currentIndexChanged.connect(self.modify_obj)
+        self.form.align.currentIndexChanged.connect(self.align_changed)
+        self.form.width_spinbox.valueChanged.connect(self.width_changed)
+        self.form.left_width_spinbox.valueChanged.connect(self.width_changed)
+        self.form.right_width_spinbox.valueChanged.connect(self.width_changed)
+        self.form.accept_pushbutton.clicked.connect(self.accept)
+        self.form.cancel_pushbutton.clicked.connect(self.reject)
+
+    def align_changed(self):
+        align = self.form.align.currentText()
+        if align.lower() == 'center':
+            self.form.left_width_spinbox.setEnabled(False)
+            self.form.right_width_spinbox.setEnabled(False)
+        elif align.lower() == 'left':
+            self.form.left_width_spinbox.setEnabled(True)
+            self.form.right_width_spinbox.setEnabled(False)
+        elif align.lower() == 'right':
+            self.form.left_width_spinbox.setEnabled(False)
+            self.form.right_width_spinbox.setEnabled(True)
+        self.modify_obj()
+
+    def width_changed(self):
+        bf_width = self.form.width_spinbox.value() * 10
+        align = self.form.align.currentText()
+        if align == 'Left':
+            sl = self.form.left_width_spinbox.value() * 10
+            sr = bf_width - sl
+        elif align == 'Right':
+            sr = self.form.right_width_spinbox.value() * 10
+            sl = bf_width - sr
+        elif align == 'Center':
+            sr = sl = bf_width / 2
+        self.form.left_width_spinbox.setValue(int(sl / 10))
+        self.form.right_width_spinbox.setValue(int(sr / 10))
+        self.modify_obj()
+
+    def fill_form(self):
+        layer = self.obj.layer
+        index = self.form.strip_layer.findText(layer)
+        self.form.strip_layer.setCurrentIndex(index)
+        # align
+        align = self.obj.align
+        index = self.form.align.findText(align)
+        self.form.align.setCurrentIndex(index)
+        # width spinbox
+        width = self.obj.width.Value
+        self.form.width_spinbox.setValue(width / 10)
+        # left width spinbox
+        left_width = self.obj.left_width.Value
+        self.form.left_width_spinbox.setValue(left_width / 10)
+        # right width spinbox
+        right_width = self.obj.right_width.Value
+        self.form.right_width_spinbox.setValue(right_width / 10)
+        return {
+        "layer": layer,
+        "align": align,
+        "width": width,
+        "left_width": left_width,
+        "right_width": right_width,
+        "visibility": self.obj.ViewObject.Visibility,
+        }
+
+    def accept(self):
+        self.obj.ViewObject.Visibility = self.original_values["visibility"]
+        FreeCAD.ActiveDocument.recompute()
+        Gui.Control.closeDialog()
+
+    def getStandardButtons(self):
+        return 0
+
+    def reject(self):
+        self.obj.layer = self.original_values["layer"]
+        self.obj.align = self.original_values["align"]
+        self.obj.width = self.original_values["width"]
+        self.obj.left_width = self.original_values["left_width"]
+        self.obj.right_width = self.original_values["right_width"]
+        self.obj.ViewObject.Visibility = self.original_values["visibility"]
+        self.obj.recompute(True)
+        Gui.Control.closeDialog()
+
+    def modify_obj(self):
+        self.obj.layer = self.form.strip_layer.currentText()
+        self.obj.align = self.form.align.currentText()
+        self.obj.width = self.form.width_spinbox.value() * 10
+        self.obj.left_width = self.form.left_width_spinbox.value() * 10
+        self.obj.right_width = self.form.right_width_spinbox.value() * 10
+        self.obj.recompute(True)
 
 
 if __name__ == "__main__":
