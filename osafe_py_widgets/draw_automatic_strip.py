@@ -22,6 +22,15 @@ class Form:
             self.split_clicked(True)
         tol = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE").GetFloat("osafe_split_strips_tolerance", .001)
         self.form.tolerance.setValue(tol)
+        self.set_foundation_type()
+
+    def set_foundation_type(self):
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return
+        if hasattr(doc, "Foundation"):
+            if doc.Foundation.foundation_type == "Mat":
+                self.uncheck_strip()
 
     def create_connections(self):
         self.form.create_pushbutton.clicked.connect(self.create)
@@ -35,12 +44,11 @@ class Form:
         self.form.tol_label.setEnabled(checked)
         self.form.tolerance.setEnabled(checked)
 
-    def uncheck_strip(self, state):
-        # if state == Qt.Checked:
+    def uncheck_strip(self):
         self.form.mat_foundation.setChecked(True)
         self.form.strip_foundation.setChecked(False)
     
-    def uncheck_mat(self, state):
+    def uncheck_mat(self):
         self.form.mat_foundation.setChecked(False)
         self.form.strip_foundation.setChecked(True)
 
