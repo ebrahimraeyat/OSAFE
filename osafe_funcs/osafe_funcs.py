@@ -6,6 +6,8 @@ import Part
 import DraftGeomUtils
 import Draft
 
+from osafe_objects import strip
+
 
 def remove_obj(name: str) -> None:
     o = FreeCAD.ActiveDocument.getObject(name)
@@ -1563,7 +1565,7 @@ def draw_strip_automatically_in_mat_foundation(
     y_max_f = foundation_bb.YMax
     z = foundation.level.Value
     import BOPTools.SplitAPI as sp
-    from osafe_objects import strip
+    
     i = j = 0
     if draw_x:
         x_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","x_strips")
@@ -1606,10 +1608,70 @@ def draw_strip_automatically_in_mat_foundation(
                     s.Label = f'CS{y_layer_name}{j}'
                     y_strips.addObject(s)
 
+def draw_strip_from_base_foundation(
+            base_foundation,
+            i,
+            j,
+            split: bool=False,
+            tolerance: float=1e-7,
+            ):
+    '''
+    split: If a strip is not straight, break the strip in some parts
+    '''
+    layer = base_foundation.layer
+    edges = []
+    if not base_foundation.first_edge.isNull():
+        edges.append(base_foundation.first_edge)
+    edges.extend(base_foundation.Base.Shape.Edges)
+    if not base_foundation.last_edge.isNull():
+        edges.append(base_foundation.last_edge)
+    points = get_points_from_indirection_edges(edges=edges, tol=tolerance)
+    strips = []
+    if split and len(points) > 2:
+        for p1, p2 in zip(points[0:-1], points[1:]):
+            wire = Draft.make_wire([p1, p2], face=False)
+            s = strip.make_strip(
+                                wire,
+                                layer=layer, 
+                                width=base_foundation.width.Value,
+                                left_width=base_foundation.left_width.Value,
+                                right_width=base_foundation.right_width.Value,
+                                align = base_foundation.align,
+                                )
+            if layer == 'A':
+                i += 1
+                strip_name = f'CS{layer}{i}'
+            else:
+                j += 1
+                strip_name = f'CS{layer}{j}'
+            s.Label = strip_name
+            strips.append(s)
+    else:
+        wire = Draft.make_wire(points, face=False)
+        s = strip.make_strip(
+                        wire,
+                        layer=layer, 
+                        width=base_foundation.width.Value,
+                        left_width=base_foundation.left_width.Value,
+                        right_width=base_foundation.right_width.Value,
+                        align = base_foundation.align,
+                        )
+        if layer == 'A':
+            i += 1
+            strip_name = f'CS{layer}{i}'
+            strips.append(s)
+        else:
+            j += 1
+            strip_name = f'CS{layer}{j}'
+            strips.append(s)
+        s.Label = strip_name
+    return strips, i, j
+
 def draw_strip_automatically_in_strip_foundation(
             foundation = None,
             split: bool=False,
             tolerance: float=1e-7,
+            base_foundations: Union[list, None] = None,
             # openings : Union[list, bool] = None,
             # y_width : Union[float, bool] = None,
             # equal : bool = False,
@@ -1619,60 +1681,27 @@ def draw_strip_automatically_in_strip_foundation(
     '''
     split: If a strip is not straight, break the strip in some parts
     '''
-    if foundation is None:
-        foundation = FreeCAD.ActiveDocument.Foundation
-    from osafe_objects import strip
+    if base_foundations is None:
+        if foundation is None:
+            foundation = FreeCAD.ActiveDocument.Foundation
+        base_foundations = foundation.base_foundations
     a_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","A_strips")
     b_strips = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","B_strips")
     i = j = 0
-    for base_foundation in foundation.base_foundations:
-        layer = base_foundation.layer
-        edges = []
-        if not base_foundation.first_edge.isNull():
-            edges.append(base_foundation.first_edge)
-        edges.extend(base_foundation.Base.Shape.Edges)
-        if not base_foundation.last_edge.isNull():
-            edges.append(base_foundation.last_edge)
-        points = get_points_from_indirection_edges(edges=edges, tol=tolerance)
-        if split and len(points) > 2:
-            for p1, p2 in zip(points[0:-1], points[1:]):
-                wire = Draft.make_wire([p1, p2], face=False)
-                s = strip.make_strip(
-                                    wire,
-                                    layer=layer, 
-                                    width=base_foundation.width.Value,
-                                    left_width=base_foundation.left_width.Value,
-                                    right_width=base_foundation.right_width.Value,
-                                    align = base_foundation.align,
-                                    )
-                if layer == 'A':
-                    i += 1
-                    strip_name = f'CS{layer}{i}'
-                    a_strips.addObject(s)
-                else:
-                    j += 1
-                    strip_name = f'CS{layer}{j}'
-                    b_strips.addObject(s)
-                s.Label = strip_name
-        else:
-            wire = Draft.make_wire(points, face=False)
-            s = strip.make_strip(
-                            wire,
-                            layer=layer, 
-                            width=base_foundation.width.Value,
-                            left_width=base_foundation.left_width.Value,
-                            right_width=base_foundation.right_width.Value,
-                            align = base_foundation.align,
-                            )
-            if layer == 'A':
-                i += 1
-                strip_name = f'CS{layer}{i}'
+    for base_foundation in base_foundations:
+        strips, i, j = draw_strip_from_base_foundation(
+            base_foundation=base_foundation,
+            i=i,
+            j=j,
+            split=split,
+            tolerance=tolerance,
+            )
+        for s in strips:
+            if s.layer == 'A':
                 a_strips.addObject(s)
-            else:
-                j += 1
-                strip_name = f'CS{layer}{j}'
+            elif s.layer == 'B':
                 b_strips.addObject(s)
-            s.Label = strip_name
+    return a_strips, b_strips
 
 def is_straight_line(edges, tol=1e-7):
     if len(edges) > 1:

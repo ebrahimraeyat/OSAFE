@@ -7,22 +7,16 @@ sys.path.append(FREECADPATH)
 import FreeCAD
 import pytest
 
-filename = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'strip.FCStd'
-filename_mat = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'mat.FCStd'
-filename_kazemi = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'kazemi.FCStd'
-filename_khalaji = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
-filename_adampira = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'adampira.FCStd'
+filename_rashidzadeh = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'rashidzadeh.FCStd'
 input_f2k = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.F2k'
-document = FreeCAD.openDocument(str(filename))
-document_mat = FreeCAD.openDocument(str(filename_mat))
-document_kazemi = FreeCAD.openDocument(str(filename_kazemi))
-document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
 
 punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
 
-from safe_read_write_f2k import FreecadReadwriteModel as FRW
-from safe_read_write_f2k import Safe, Safe12
+from osafe_import_export.safe_read_write_f2k import FreecadReadwriteModel as FRW
+from osafe_import_export.safe_read_write_f2k import Safe, Safe12
+import osafe_funcs.osafe_funcs as osf
+
 
 def test_export_freecad_slabs():
     rw = FRW(doc=document_kazemi)
@@ -75,7 +69,13 @@ def test_export_freecad_openings():
     assert len(slabs) == 1
 
 def test_export_freecad_strips():
-    rw = FRW(doc=document_kazemi)
+    document = FreeCAD.openDocument(str(filename_rashidzadeh))
+    rw = FRW(doc=document)
+    rw.export_freecad_strips()
+    rw.safe.write()
+    strips = osf.get_objects_of_type("Strip")
+    for strip in strips:
+        osf.remove_obj(strip.Name)
     rw.export_freecad_strips()
     rw.safe.write()
 

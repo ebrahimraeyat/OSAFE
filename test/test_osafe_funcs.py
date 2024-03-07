@@ -557,8 +557,21 @@ def test_draw_strip_automatically_in_mat_foundation():
     doc.recompute()
     osafe_funcs.draw_strip_automatically_in_mat_foundation(doc.Foundation)
 
+def test_draw_strip_from_base_foundation():
+    bfs = osafe_funcs.get_objects_of_type("BaseFoundation", doc=document_rashidzadeh)
+    i = j = 0
+    strips = []
+    for bf in bfs:
+        strip, i, j = osafe_funcs.draw_strip_from_base_foundation(bf, i, j)
+        strips.extend(strip)
+    assert len(bfs) == len(strips)
+
 def test_draw_strip_automatically_in_strip_foundation():
-    osafe_funcs.draw_strip_automatically_in_strip_foundation(document_rashidzadeh.Foundation)
+    bfs = osafe_funcs.get_objects_of_type("BaseFoundation", doc=document_rashidzadeh)
+    a_strips, b_strips = osafe_funcs.draw_strip_automatically_in_strip_foundation(document_rashidzadeh.Foundation)
+    assert len(bfs) == len(a_strips.Group) + len(b_strips.Group)
+    a_strips, b_strips = osafe_funcs.draw_strip_automatically_in_strip_foundation(base_foundations=bfs)
+    assert len(bfs) == len(a_strips.Group) + len(b_strips.Group)
 
 def test_get_similar_edge_direction_in_common_points_from_edges():
     edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]

@@ -3,10 +3,10 @@ from pathlib import Path
 import FreeCAD
 import FreeCADGui as Gui
 
-from PySide2.QtWidgets import QMessageBox, QFileDialog
+from PySide2.QtWidgets import QMessageBox, QFileDialog, QMessageBox
 
 from osafe_py_widgets import resource_rc
-
+from osafe_funcs import osafe_funcs as osf
 from freecad_funcs import add_to_clipboard
 
 punch_path = Path(__file__).parent.parent
@@ -191,7 +191,18 @@ class Safe12TaskPanel:
             if is_openings:
                 rw.export_freecad_openings(doc)
             if is_strips:
-                rw.export_freecad_strips()
+                strips = osf.get_objects_of_type("Strip")
+                if len(strips) == 0 and doc.Foundation.foundation_type == 'Mat':
+                    if (
+                        QMessageBox.question(
+                            None,
+                            "Design Strip",
+                            "There is no Design Strip in this model, do you want to Create those?"
+                            ) == QMessageBox.Yes):
+                        self.reject()
+                        Gui.runCommand("osafe_automatic_strip")
+                        return
+                rw.export_freecad_strips(strips=strips)
             if is_stiffs:
                 rw.export_freecad_stiff_elements()
             if is_columns:
@@ -204,7 +215,7 @@ class Safe12TaskPanel:
                 with open(f2k_file.input) as f:
                     f2k_file.input_str = f.read()
         add_to_clipboard(f2k_file.output)
-        Gui.Control.closeDialog()
+        self.reject()
 
     def reject(self):
         Gui.Control.closeDialog()
