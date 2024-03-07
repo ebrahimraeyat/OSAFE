@@ -1,4 +1,6 @@
 from pathlib import Path
+
+import Part
 import FreeCAD
 import ArchComponent
 from osafe_funcs import osafe_funcs
@@ -15,7 +17,12 @@ def make_strip(
         ):
     obj = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Strip")
     Strip(obj)
-    obj.Base = base
+    if not isinstance(base, Part.Shape):
+        obj.Base = base
+    elif isinstance(base, Part.Shape):
+        obj.base_wire = base
+    else:
+        return
     obj.layer = layer
     obj.design_type = design_type
     obj.width = width
@@ -91,6 +98,12 @@ class Strip(ArchComponent.Component):
                 "plan",
                 "Geometry",
                 )
+        if not hasattr(obj, "base_wire"):
+            obj.addProperty(
+                "Part::PropertyPartShape",
+                "base_wire",
+                "Geometry",
+                )
 
     def execute(self, obj):
         if obj.width.Value == 0:
@@ -107,7 +120,9 @@ class Strip(ArchComponent.Component):
             sr = sl = obj.width.Value / 2
             obj.left_width = sl
             obj.right_width = sr
-        shape, _, _ = osafe_funcs.get_left_right_offset_wire_and_shape(obj.Base.Shape, sl, sr)
+        if obj.Base:
+            obj.base_wire = obj.Base.Shape.Wires[0]
+        shape, _, _ = osafe_funcs.get_left_right_offset_wire_and_shape(obj.base_wire, sl, sr)
         obj.Shape = shape
         if FreeCAD.GuiUp:
             if obj.layer == 'A':
