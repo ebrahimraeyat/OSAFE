@@ -32,7 +32,7 @@ class OSAFEWorkbench(Workbench):
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil Draw")), draw_list)
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil Assign")), assign_list)
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Edit")), edit_list)
-        self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE View")), view_list)
+        self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE View")), view_list[1:])
         self.appendToolbar(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Snap")), snap_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Civil")), command_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Export")), export_list)

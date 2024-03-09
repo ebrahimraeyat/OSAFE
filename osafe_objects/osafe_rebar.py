@@ -21,6 +21,7 @@
 # Modified Amritpal Singh <amrit3701@gmail.com> on 07-07-2017
 # Modified Ebrahim Raeyat <ebe79442114@gmail.com> on 03-01-2024
 from pathlib import Path
+from typing import Union
 
 import FreeCAD
 import Part
@@ -58,24 +59,87 @@ def make_rebars(
     if not doc:
         FreeCAD.Console.PrintError("No active document. Aborting\n")
         return
+    foundation = doc.Foundation
     rebars = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Rebars")
     for strip in doc.Objects:
         if hasattr(strip, "Proxy") and hasattr(strip.Proxy, "Type") and strip.Proxy.Type == "Strip":
-            obj = doc.addObject("Part::FeaturePython","Rebar")
-            OsafeRebar(obj)
-            obj.Label = translate("osafe","Rebar")
-            obj.strip = strip
-            obj.top_diameter = top_rebar_diameter
-            obj.bot_diameter = bot_rebar_diameter
-            obj.stirrup_diameter = stirrup_diameter
-            obj.extended = extended
-            obj.min_ratio_of_rebars = min_ratio_of_rebars
-            foundation = doc.Foundation
-            obj.foundation = foundation
-            if FreeCAD.GuiUp:
-                ViewProviderOsafeRebar(obj.ViewObject)
-            rebars.addObject(obj)
+            rebar = make_rebar_from_foundation(
+                strip,
+                foundation,
+                top_rebar_diameter=top_rebar_diameter,
+                bot_rebar_diameter=bot_rebar_diameter,
+                stirrup_diameter=stirrup_diameter,
+                extended=extended,
+                min_ratio_of_rebars=min_ratio_of_rebars,
+                doc=doc,
+            )
+            rebars.addObject(rebar)
     return rebars
+
+def make_rebar_from_foundation(
+        strip,
+        foundation,
+        top_rebar_diameter: int=20,
+        bot_rebar_diameter: int=20,
+        stirrup_diameter: int=20,
+        extended: float=0,
+        min_ratio_of_rebars: float= 0.0018,
+        doc=None,
+):
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+    obj = doc.addObject("Part::FeaturePython","Rebar")
+    OsafeRebar(obj)
+    obj.Label = translate("osafe","Rebar")
+    obj.strip = strip
+    obj.top_diameter = top_rebar_diameter
+    obj.bot_diameter = bot_rebar_diameter
+    obj.stirrup_diameter = stirrup_diameter
+    obj.extended = extended
+    obj.min_ratio_of_rebars = min_ratio_of_rebars
+    obj.foundation = foundation
+    if FreeCAD.GuiUp:
+        ViewProviderOsafeRebar(obj.ViewObject)
+    return obj
+
+
+def make_rebar_from_scratch(
+        left_strip=None,
+        foundation=None,
+        doc=None,
+):
+    cover = 75
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+    obj = doc.addObject("Part::FeaturePython","Rebar")
+    OsafeRebar(obj)
+    obj.Label = translate("osafe","Rebar")
+    obj.top_diameter = 20
+    obj.bot_diameter = 20
+    obj.stirrup_diameter = 12
+    obj.extended = 0
+    obj.min_ratio_of_rebars = 0.0018
+    if foundation is None:
+        foundation = doc.addObject("Part::Box","Box")
+        foundation.Length = 1000
+        foundation.Height = 1000
+        foundation.Width = 1000
+    if left_strip is None:
+        from osafe_objects import strip
+        import Draft
+        wire = Draft.make_wire([FreeCAD.Vector(0, 0, 0), FreeCAD.Vector(1000, 0, 0)])
+        left_strip = strip.make_strip(wire, align="Left", left_width=cover)
+    doc.recompute()
+    obj.strip = left_strip
+    obj.foundation = foundation
+    obj.width = 0
+    obj.cover = cover
+    obj.height = 1000
+    obj.number_of_top_rebars = 0
+    obj.number_of_bot_rebars = 0
+    if FreeCAD.GuiUp:
+        ViewProviderOsafeRebar(obj.ViewObject)
+    return obj
 
 
 class OsafeRebar(ArchComponent.Component):
@@ -430,23 +494,31 @@ class Ui:
         self.form.cancel_pushbutton.clicked.connect(self.reject)
 
     def fill_form(self):
-        top_diameter = self.obj.top_diameter
-        top_index = self.form.top_rebar_diameter_combobox.findText(str(int(top_diameter)))
-        self.form.top_rebar_diameter_combobox.setCurrentIndex(top_index)
-        bot_diameter = self.obj.bot_diameter 
-        bot_index = self.form.bot_rebar_diameter_combobox.findText(str(int(bot_diameter)))
-        self.form.bot_rebar_diameter_combobox.setCurrentIndex(bot_index)
-        stirrup_diameter = self.obj.stirrup_diameter
-        stirrup_index = self.form.stirrup_rebar_diameter_combobox.findText(str(int(stirrup_diameter)))
-        self.form.stirrup_rebar_diameter_combobox.setCurrentIndex(stirrup_index) 
-        extended = self.obj.extended.Value
-        self.form.extended_spinbox.setValue(extended / 10)
-        cover = self.obj.cover.Value
-        self.form.cover_spinbox.setValue(cover / 10)
-        height = self.obj.height.Value
-        self.form.height_spinbox.setValue(height / 10)
-        width = self.obj.width.Value
-        self.form.width_spinbox.setValue(width / 10)
+        # Top diameter
+        top_diameter = self.obj.top_diameter.getValueAs('mm').Value
+        index = self.form.top_rebar_diameter_combobox.findText(str(int(top_diameter)))
+        print(f'{index=}')
+        self.form.top_rebar_diameter_combobox.setCurrentIndex(index)
+        # Bot diameter
+        bot_diameter = self.obj.bot_diameter.getValueAs('mm').Value
+        index = self.form.bot_rebar_diameter_combobox.findText(str(int(bot_diameter)))
+        print(f'{index=}')
+        self.form.bot_rebar_diameter_combobox.setCurrentIndex(index)
+        # Stirrup diameter
+        stirrup_diameter = self.obj.stirrup_diameter.getValueAs('mm').Value
+        index = self.form.stirrup_rebar_diameter_combobox.findText(str(int(stirrup_diameter)))
+        print(f'{index=}')
+        self.form.stirrup_rebar_diameter_combobox.setCurrentIndex(index) 
+        extended = self.obj.extended.getValueAs('cm').Value
+        self.form.extended_spinbox.setValue(extended)
+        cover = self.obj.cover.getValueAs('cm').Value
+        self.form.cover_spinbox.setValue(cover)
+        height = self.obj.height.getValueAs('cm').Value
+        self.form.height_spinbox.setValue(height)
+        width = self.obj.width.getValueAs('cm').Value
+        self.form.width_spinbox.setValue(width)
+        print(type(cover), type(height), type(extended), type(width))
+        print(cover, height, extended, width)
         min_ratio = self.obj.min_ratio_of_rebars
         self.form.impose_minimum_spinbox.setValue(min_ratio)
         self.set_properties()
@@ -471,22 +543,22 @@ class Ui:
         self.obj.top_diameter = self.original_values["top_diameter"]
         self.obj.bot_diameter = self.original_values["bot_diameter"]
         self.obj.stirrup_diameter = self.original_values["stirrup_diameter"]
-        self.obj.extended = self.original_values["extended"]
-        self.obj.cover = self.original_values["cover"]
-        self.obj.height = self.original_values["height"]
-        self.obj.width = self.original_values["width"]
+        self.obj.extended = f'{self.original_values["extended"]} cm'
+        self.obj.cover = f'{self.original_values["cover"]} cm'
+        self.obj.height = f'{self.original_values["height"]} cm'
+        self.obj.width = f'{self.original_values["width"]} cm'
         self.obj.min_ratio_of_rebars = self.original_values["min_ratio"]
         self.obj.recompute(True)
         Gui.Control.closeDialog()
 
     def modify_obj(self):
-        self.obj.top_diameter = int(self.form.top_rebar_diameter_combobox.currentText())
-        self.obj.bot_diameter = int(self.form.bot_rebar_diameter_combobox.currentText())
-        self.obj.stirrup_diameter = int(self.form.stirrup_rebar_diameter_combobox.currentText())
-        self.obj.extended = self.form.extended_spinbox.value() * 10
-        self.obj.cover = self.form.cover_spinbox.value() * 10
-        self.obj.height = self.form.height_spinbox.value() * 10
-        self.obj.width = self.form.width_spinbox.value() * 10
+        self.obj.top_diameter = self.form.top_rebar_diameter_combobox.currentText() + 'mm'
+        self.obj.bot_diameter = self.form.bot_rebar_diameter_combobox.currentText() + 'mm'
+        self.obj.stirrup_diameter = self.form.stirrup_rebar_diameter_combobox.currentText() + 'mm'
+        self.obj.extended = f"{self.form.extended_spinbox.value()} cm"
+        self.obj.cover = f"{self.form.cover_spinbox.value()} cm"
+        self.obj.height = f"{self.form.height_spinbox.value()} cm"
+        self.obj.width = f"{self.form.width_spinbox.value()} cm"
         self.obj.min_ratio_of_rebars = self.form.impose_minimum_spinbox.value()
         self.obj.recompute(True)
         self.set_properties()
