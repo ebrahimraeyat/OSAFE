@@ -478,8 +478,8 @@ class Ui:
     def __init__(self, obj=None):
         self.form = Gui.PySideUic.loadUi(str(Path(__file__).parent.parent / "osafe_widgets" / "edit_objects" / "edit_osafe_rebars.ui"))
         self.obj = obj
-        self.create_connections()
         self.original_values = self.fill_form()
+        self.create_connections()
 
     def create_connections(self):
         self.form.top_rebar_diameter_combobox.currentIndexChanged.connect(self.modify_obj)
@@ -497,17 +497,14 @@ class Ui:
         # Top diameter
         top_diameter = self.obj.top_diameter.getValueAs('mm').Value
         index = self.form.top_rebar_diameter_combobox.findText(str(int(top_diameter)))
-        print(f'{index=}')
         self.form.top_rebar_diameter_combobox.setCurrentIndex(index)
         # Bot diameter
         bot_diameter = self.obj.bot_diameter.getValueAs('mm').Value
         index = self.form.bot_rebar_diameter_combobox.findText(str(int(bot_diameter)))
-        print(f'{index=}')
         self.form.bot_rebar_diameter_combobox.setCurrentIndex(index)
         # Stirrup diameter
         stirrup_diameter = self.obj.stirrup_diameter.getValueAs('mm').Value
         index = self.form.stirrup_rebar_diameter_combobox.findText(str(int(stirrup_diameter)))
-        print(f'{index=}')
         self.form.stirrup_rebar_diameter_combobox.setCurrentIndex(index) 
         extended = self.obj.extended.getValueAs('cm').Value
         self.form.extended_spinbox.setValue(extended)
@@ -517,8 +514,6 @@ class Ui:
         self.form.height_spinbox.setValue(height)
         width = self.obj.width.getValueAs('cm').Value
         self.form.width_spinbox.setValue(width)
-        print(type(cover), type(height), type(extended), type(width))
-        print(cover, height, extended, width)
         min_ratio = self.obj.min_ratio_of_rebars
         self.form.impose_minimum_spinbox.setValue(min_ratio)
         self.set_properties()
