@@ -67,7 +67,8 @@ class Geom(object):
             fusion = slab_struc[0]
         else:
             s1 = slab_struc[0]
-            fusion = s1.fuse(slab_struc[1:])
+            fuzzy_tolerance = 1
+            fusion = s1.multiFuse(slab_struc[1:], fuzzy_tolerance)
         if bool(slab_opening):
             print('openings')
             fusion = fusion.cut(slab_opening)
