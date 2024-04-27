@@ -53,9 +53,17 @@ def add_column_to_ax(punch, ax):
     for face in punch.column.Shape.Faces:
         if face.BoundBox.ZMin == z_min and face.BoundBox.ZMax == z_min:
             break
-    xy = [[v.X, v.Y] for v in face.OuterWire.Vertexes]
-    xy = osafe_funcs.sort_vertex(xy)
-    p = patches.Polygon(xy, edgecolor='black', linewidth=.4, facecolor=color, closed=True)
+    vertexes = face.OuterWire.Vertexes
+    if len(vertexes) == 1: # circle
+        x, y = face.BoundBox.Center.x, face.BoundBox.Center.y
+        radius = face.BoundBox.XLength / 2
+        p = patches.Circle((x, y), radius=radius, fill=True, color=color)
+        # Add equivalent column
+        add_equivalent_column(punch=punch, ax=ax)
+    else:
+        xy = [[v.X, v.Y] for v in vertexes]
+        xy = osafe_funcs.sort_vertex(xy)
+        p = patches.Polygon(xy, edgecolor='black', linewidth=.4, facecolor=color, closed=True)
     ax.add_patch(p)
 
 def add_base_plate_to_ax(punch, ax):
@@ -76,6 +84,9 @@ def add_base_plate_to_ax(punch, ax):
     p = patches.Polygon(xy, edgecolor='black', linewidth=.4, facecolor=color, closed=True)
     ax.add_patch(p)
     # Add equivalent column
+    add_equivalent_column(punch=punch, ax=ax)
+
+def add_equivalent_column(punch, ax):
     xy = [[v.X, v.Y] for v in punch.rect.Vertexes]
     xy = osafe_funcs.sort_vertex(xy)
     p = patches.Polygon(xy, edgecolor='black', linewidth=.6, closed=True, alpha=.2)
@@ -101,9 +112,22 @@ def get_column_points_for_dimensioning(col):
     for face in col.Shape.Faces:
         if face.BoundBox.ZMin == z_min and face.BoundBox.ZMax == z_min:
             break
-    e1, e2 = Part.__sortEdges__(face.OuterWire.Edges)[2:]
-    v1, v2 = e1.Vertexes
-    v3, v4 = e2.Vertexes
+    edges = face.OuterWire.Edges
+    if len(edges) == 1: # circle
+        e = edges[0]
+        bb = e.BoundBox
+        xmin = bb.XMin
+        xmax = bb.XMax
+        ymin = bb.YMin
+        ymax = bb.YMax
+        v1 = Part.Vertex(xmin, ymin)
+        v2 = Part.Vertex(xmin, ymax)
+        v3 = Part.Vertex(xmin, ymax)
+        v4 = Part.Vertex(xmax, ymax)
+    else:
+        e1, e2 = Part.__sortEdges__(edges)[2:]
+        v1, v2 = e1.Vertexes
+        v3, v4 = e2.Vertexes
     return v1, v2, v3, v4
 
 def add_punch_edges_dimension_to_ax(punch, ax):
@@ -246,7 +270,7 @@ def export_dict_to_doc(
     
 
 def add_punch_ratios_to_doc(punch, doc=None):
-    doc = export_dict_to_doc(punch.combos_ratio, ['Combo', 'Ratio'], doc)
+    doc = export_dict_to_doc(punch.combos_ratio, ['Combo', 'Ratio'], doc, style='DATAFRAME')
     return doc
 
 def add_punch_properties_to_doc(punch, doc=None):
@@ -267,13 +291,13 @@ def add_punch_properties_to_doc(punch, doc=None):
     d['fc'] = f'{float(punch.fc.getValueAs("N/mm^2")):.1f} Mpa'
     d['gamma vx'] = f'{punch.gamma_vx:.2f}'
     d['gamma vy'] = f'{punch.gamma_vy:.2f}'
-    doc = export_dict_to_doc(d, [], doc, 'connection')
+    doc = export_dict_to_doc(d, [], doc, 'DATAFRAME')
     return doc
 
 def create_doc():
     import docx
-    punch_path = Path(__file__).parent.parent
-    filepath = punch_path / 'osafe_import_export' / 'templates' / 'punch_default.docx'
+    punch_path_report = Path(__file__).parent
+    filepath = punch_path_report / 'templates' / 'punch_default.docx'
     doc = docx.Document(str(filepath))
     return doc
 
