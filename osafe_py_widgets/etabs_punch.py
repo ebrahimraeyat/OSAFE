@@ -209,8 +209,8 @@ class EtabsPunch(object):
                     steptype = row2['StepType']
                     combo_name = f'{combo} {steptype}'
                     F = row2['FZ']
-                    mx = row2['MX']
-                    my = row2['MY']
+                    mx = float(row2['MX']) * -1
+                    my = float(row2['MY']) * -1
                     d[combo_name] = f"{F}, {mx}, {my}"
                 if not hasattr(col, "combos_load"):
                     col.addProperty(
