@@ -6,11 +6,14 @@ import FreeCADGui as Gui
 from draftutils.translate import translate
 import civilwelcome
 
+from osafe_gui import (
+    gui_automatic_rebars,
+)
+
 from osafe_py_widgets import (
     gui_punch,
     gui_dxf,
     gui_automatic_strip,
-    gui_automatic_rebars,
     explode_foundation,
     osafe_views,
     )
@@ -651,7 +654,6 @@ command_list = [
             "Civil_opening_etabs",
             'civil_punch',
             "civil_safe",
-            # "osafe_automatic_rebars",
             # 'civil_sketch',
             # "civil_explod_load_patterns",
             # "Civil_update",
@@ -677,6 +679,7 @@ draw_list = [
             # 'civil_slab',
             'civil_base_plate',
             "Draft_Wire",
+            "osafe_automatic_rebars",
             ]
 assign_list = [
             "Civil_force",
