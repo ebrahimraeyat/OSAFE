@@ -435,7 +435,10 @@ class Punch:
         # if obj.Use_Reinforcement:
             Av_over_s = (obj.Vu / 0.75 - obj.Vc) / (obj.Fys * obj.foundation.d)
             obj.s = max(0, obj.Av / Av_over_s)
-            obj.Vs = obj.Av * obj.Fys * obj.foundation.d / obj.s
+            if obj.s == 0:
+                obj.Vs = 0
+            else:
+                obj.Vs = obj.Av * obj.Fys * obj.foundation.d / obj.s
             # calculate required length for arranging stirrups
             Vu = obj.Vu.getValueAs('N').Value
             fc = obj.fc.getValueAs('MPa').Value
