@@ -292,6 +292,8 @@ def get_user_location_faces(
     return new_faces
 
 def sort_vertex(coords):
+    if len(coords) < 2:
+        return coords
     from functools import reduce
     import operator
     center = tuple(map(operator.truediv, reduce(lambda x, y: map(operator.add, x, y), coords), [len(coords)] * 2))
