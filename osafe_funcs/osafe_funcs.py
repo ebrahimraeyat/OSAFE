@@ -543,7 +543,7 @@ def offset_frame_points(x1, y1, x2, y2, distance, neg:bool):
 
 def get_common_part_of_base_foundation(base_foundations):
     if len(base_foundations) < 2:
-        return None
+        return {}, {}
     points_base_connections = get_points_inside_base_foundations(base_foundations)
     points_common_shape = {}
     base_name_common_shape = {}
