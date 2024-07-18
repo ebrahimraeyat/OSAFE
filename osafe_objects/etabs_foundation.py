@@ -146,6 +146,12 @@ class Foundation(ArchComponent.Component):
                 "redraw",
                 "Foundation",
                 ).redraw = False
+        if not hasattr(obj, "tolerance"):
+            obj.addProperty(
+                "App::PropertyFloat",
+                "tolerance",
+                "Foundation",
+                )
         obj.setEditorMode('redraw', 2)
         obj.setEditorMode('level', 2)
         obj.setEditorMode('d', 1)
@@ -179,6 +185,7 @@ class Foundation(ArchComponent.Component):
                 openings=obj.openings,
                 split_mat=obj.split,
                 slabs=obj.Slabs,
+                tol=obj.tolerance,
                 )
         # obj.plan, obj.plan_without_openings, holes = osafe_funcs.get_foundation_plan_with_holes(obj)
         # obj.Shape = obj.plan.copy().extrude(FreeCAD.Vector(0, 0, -obj.height.Value))
@@ -247,6 +254,7 @@ def make_foundation(
     continuous_layer : str = 'AB',
     ks : float = 2,
     openings : list = [],
+    tol : float = 0,
     ):
     from draftutils.translate import translate
     FreeCAD.ActiveDocument.openTransaction(translate("OSAFE","Make Foundation"))
@@ -267,6 +275,7 @@ def make_foundation(
         FreeCADGui.activeDocument().activeView().viewIsometric()
         FreeCADGui.SendMsgToActiveView("ViewFit")
     obj.cover = cover
+    obj.tolerance = tol
     obj.fc = f"{fc} MPa"
     obj.ks = ks
     obj.height = height

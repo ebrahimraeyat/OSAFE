@@ -391,7 +391,7 @@ class FreecadReadwriteModel():
                 faces = base_foundation.extended_plan.Faces
                 slab_names = []
                 for face in faces:
-                    points = self.get_sort_points(face.Edges)
+                    points = self.get_sort_points(face.Edges, tol=0.01)
                     name = self.create_area_by_coord(points, slab_sec_name)
                     slab_names.append(name)
                 all_slab_names.extend(slab_names)
@@ -441,7 +441,7 @@ class FreecadReadwriteModel():
             else:
                 names_props = [(soil_name, soil_modulus)]
                 edges = foun.outer_wire.Edges
-                points = self.get_sort_points(edges)
+                points = self.get_sort_points(edges, tol=0.01)
                 name = self.create_area_by_coord(points, slab_sec_name)
                 all_slab_names.append(name)
                 soil_assignment_content = self.export_freecad_soil_support(
@@ -479,7 +479,7 @@ class FreecadReadwriteModel():
                 faces = slab.Base.Shape.Faces
             slab_names = []
             for face in faces:
-                points = self.get_sort_points(face.Edges)
+                points = self.get_sort_points(face.Edges, tol=0.01)
                 name = self.create_area_by_coord(points, slab_sec_name)
                 slab_names.append(name)
             all_slab_names.extend(slab_names)
@@ -501,22 +501,15 @@ class FreecadReadwriteModel():
                 vector=True,
                 last=False,
                 sort_edges=True,
+                tol=-1,
                 ):
-        points = []
         if sort_edges:
             edges = Part.__sortEdges__(edges)
-        for e in edges:
-            v = e.firstVertex()
-            if vector:
-                points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
-            else:
-                points.append(v)
-        if last:
-            v = e.lastVertex()
-            if vector:
-                points.append(FreeCAD.Vector(v.X, v.Y, v.Z))
-            else:
-                points.append(v)
+        points = osafe_funcs.get_points_from_indirection_edges(edges=edges, tol=tol)
+        if not vector:
+            points = [FreeCAD.Vector(v.x, v.y, v.z) for v in points]
+        if not last:
+            points = points[:-1]
         return points
 
     def create_area_by_coord(self,
@@ -637,7 +630,7 @@ class FreecadReadwriteModel():
                 z_min = o.Shape.BoundBox.ZMin
                 for f in o.Shape.Faces:
                     if f.BoundBox.ZLength == 0 and f.BoundBox.ZMin == z_min:
-                        points = self.get_sort_points(f.Edges)
+                        points = self.get_sort_points(f.Edges, tol=0.01)
                         self.create_area_by_coord(points, prop_name='COL_STIFF')
                         break
     

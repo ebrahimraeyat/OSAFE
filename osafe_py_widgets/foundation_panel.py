@@ -50,6 +50,7 @@ class Form:
     def create(self):
         doc = FreeCAD.ActiveDocument
         cover = self.form.cover.value() * 10
+        tolerance = self.form.tolerance.value()
         fc = self.form.fc.value()
         ks = self.form.ks.value()
         height = self.form.height_spinbox.value() * 10
@@ -112,6 +113,7 @@ class Form:
             base_foundations=base_foundations,
             ks=ks,
             openings=openings,
+            tol=tolerance,
             )
         FreeCAD.ActiveDocument.commitTransaction()
         # Gui.ActiveDocument.ActiveView.setCameraType("Perspective")

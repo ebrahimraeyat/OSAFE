@@ -565,11 +565,13 @@ def get_common_part_of_base_foundation(base_foundations):
 def get_top_faces(
         shape,
         fuse : bool = False,
+        tol : float = 0,
         ):
     z_max = shape.BoundBox.ZMax
     faces = []
     for f in shape.Faces:
         if math.isclose(f.BoundBox.ZLength, 0, abs_tol=0.1) and math.isclose(f.BoundBox.ZMax, z_max, abs_tol=0.1):
+            f = remove_colinear_edges(f, tol)
             faces.append(f)
     if fuse:
         if len(faces) > 1:
@@ -577,6 +579,7 @@ def get_top_faces(
             face = face.removeSplitter()
         else:
             face = faces[0]
+        # face = remove_colinear_edges(face, tol)
         return face
     return faces
 
@@ -588,12 +591,14 @@ def get_foundation_shape_from_base_foundations(
         openings : list = [],
         split_mat : bool = True,
         slabs : list = [],
+        tol : float = 0,
         ):
     '''
     Creates Foundation shapes from base foundations objects. if height is 0, the height of each base foundations
     used to create foundation shape
     continuoues_dir : in Strip foundation, the strips with layer name equals to continuoues_dir get
         continuoes and other side cut with this shapes
+    tol: for remove colineare lines from face of foundation
     '''
     shapes = []
     outer_wire = Part.Shape()
@@ -631,7 +636,7 @@ def get_foundation_shape_from_base_foundations(
                 shape = shape.cut(openings_shapes)
             shapes.append(shape)
             if foundation_type == 'Strip':
-                base_foundation.extended_plan = Part.makeCompound(get_top_faces(shape))
+                base_foundation.extended_plan = Part.makeCompound(get_top_faces(shape, tol=tol))
     if foundation_type == 'Strip' and slabs:
         slabs_a = [slab.Shape for slab in slabs if slab.layer == 'A']
         slabs_b = [slab.Shape for slab in slabs if slab.layer == 'B']
@@ -655,13 +660,13 @@ def get_foundation_shape_from_base_foundations(
         strip_shape = shapes[0]
     if foundation_type == 'Strip':
         shape = Part.makeCompound(shapes)
-        plan = get_top_faces(strip_shape, fuse=True)
+        plan = get_top_faces(strip_shape, fuse=True, tol=tol)
     elif foundation_type == 'Mat':
         if height == 0:
             from collections import Counter
             counts = Counter(heights)
             height = counts.most_common[0][0]
-        outer_wire = get_top_faces(strip_shape, fuse=True).OuterWire
+        outer_wire = get_top_faces(strip_shape, fuse=True, tol=tol).OuterWire
         plan_without_openings = Part.Face(outer_wire)
         if split_mat:
             faces = split_face_with_scales(plan_without_openings)
@@ -676,7 +681,7 @@ def get_foundation_shape_from_base_foundations(
             shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
                 shape = shape.cut(openings_shapes)
-        plan = get_top_faces(shape, fuse=True)
+        plan = get_top_faces(shape, fuse=True, tol=tol)
     if slabs:
         mat_slabs_shapes = [slab.Shape for slab in slabs if not hasattr(slab, 'layer')]
         if mat_slabs_shapes:
@@ -1725,6 +1730,37 @@ def get_points_from_indirection_edges(edges, tol=1e-7):
                 points.append(e1.lastVertex().Point)
     points.append(edges[-1].lastVertex().Point)
     return points
+
+def remove_colinear_edges(
+        edges: Union[list, Part.Face],
+        tol : float = 0,
+        ):
+    face = False
+    if isinstance(edges, (Part.Face, Part.Wire)):
+        edges = Part.__sortEdges__(edges.Edges)
+        face = True
+    p1 = edges[0].firstVertex().Point
+    points = [p1]
+    es = []
+    if len(edges) > 1:
+        for e1, e2 in zip(edges[0:-1], edges[1:]):
+            dir_e1 = e1.tangentAt(e1.FirstParameter)
+            dir_e2 = e2.tangentAt(e2.FirstParameter)
+            curr_len = dir_e1.cross(dir_e2).Length
+            # print(f"{curr_len=}\n")
+            if curr_len > tol:
+                p2 = e1.lastVertex().Point
+                es.append(Part.makeLine(p1, p2))
+                points.append(p2)
+                p1 = p2
+    p2 = edges[-1].lastVertex().Point
+    points.append(p2)
+    es.append(Part.makeLine(p1, p2))
+    if face:
+        points.append(points[0])
+        wire = Part.makePolygon(points)
+        es = Part.Face(wire)
+    return es
 
 def get_objects_of_type(
         type_: str,

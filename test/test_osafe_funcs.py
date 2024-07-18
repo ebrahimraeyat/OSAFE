@@ -66,6 +66,38 @@ def test_get_points_from_indirection_edges():
     assert len(points) == 2
     assert points == [v1, v5]
 
+def test_remove_colinear_edges():
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(2, 1, 0)
+    v3 = FreeCAD.Vector(3, 3, 0)
+    v4 = FreeCAD.Vector(4, 5, 0)
+    v5 = FreeCAD.Vector(6, 6, 0)
+    vs = (v1, v2, v3, v4, v5)
+    edges = []
+    for p1, p2 in zip(vs[:-1], vs[1:]):
+        l = Part.makeLine(p1, p2)
+        edges.append(Part.Edge(l))
+    es = osafe_funcs.remove_colinear_edges(edges)
+    assert len(es) == 3
+    # one edge
+    es = osafe_funcs.remove_colinear_edges([edges[0]])
+    assert len(es) == 1
+    #  straight line
+    vs = (v1, v3, v5)
+    edges = []
+    for p1, p2 in zip(vs[:-1], vs[1:]):
+        l = Part.makeLine(p1, p2)
+        edges.append(Part.Edge(l))
+    es = osafe_funcs.remove_colinear_edges(edges)
+    assert len(es) == 1
+    # Face
+    vs = (v1, v2, v3, v4, v1)
+    wire = Part.makePolygon(vs)
+    face = Part.Face(wire)
+    es = osafe_funcs.remove_colinear_edges(face)
+    assert isinstance(es, Part.Face)
+    assert len(es.Edges) == 3
+
 def test_get_sort_points():
     v1 = FreeCAD.Vector(0, 0, 0)
     v2 = FreeCAD.Vector(5, 0, 0)
