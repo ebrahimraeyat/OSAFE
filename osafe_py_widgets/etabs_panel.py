@@ -120,14 +120,14 @@ class EtabsTaskPanel:
             exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
             #  types: {1: steel, 2: concrete, 3: composite Beam, 7: No Design, 13: composite column }
             beams, _ = self.etabs.frame_obj.get_beams_columns(stories=level_names, types=[1,2,3,7,13])
-            beams = self.etabs.frame_obj.get_unique_frames(beams)
+            beams = self.etabs.frame_obj.get_unique_frames(beams)[0]
             if self.form.all_beams.isChecked():
                 beams_names = beams
             elif selected_beams:
                 beams_names = selected_beam_names
             elif exclude_selected_beams:
                 beams_names = set(beams).difference(selected_beam_names)
-            beams_names = self.etabs.frame_obj.get_unique_frames(beams_names)
+            beams_names = self.etabs.frame_obj.get_unique_frames(beams_names)[0]
         punch = etabs_punch.EtabsPunch(
                 etabs_model = self.etabs,
                 beam_names = beams_names,
