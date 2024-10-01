@@ -1721,6 +1721,14 @@ def is_straight_line(edges, tol=1e-7):
     return True
 
 def get_points_from_indirection_edges(edges, tol=1e-7):
+    new_edges = []
+    for e in edges:
+        try:
+            if hasattr(e, "FirstParameter"):
+                new_edges.append(e)
+        except:
+            continue
+    edges = new_edges
     points = [edges[0].firstVertex().Point]
     if len(edges) > 1:
         for e1, e2 in zip(edges[0:-1], edges[1:]):
