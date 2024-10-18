@@ -1360,6 +1360,15 @@ def get_continuous_edges(
                     if is_close(current_edge, other_edge):
                         angle = angle_between_two_edges(current_edge, other_edge)
                         if angle >= max_angle:
+                            # search in edges that unused and maybe sutiable for get to joint with other_edge
+                            for k, maybe_suitable_edge in enumerate(edges):
+                                if k in used or k == j:
+                                    continue
+                                if is_close(other_edge, maybe_suitable_edge):
+                                    maybe_suitable_angle = angle_between_two_edges(other_edge, maybe_suitable_edge)
+                                    if maybe_suitable_angle < angle:
+                                        continue
+
                             desired_edge = other_edge
                             max_angle = angle
                             index = j
