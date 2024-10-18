@@ -1,6 +1,8 @@
 from typing import List, Union
 import math
 
+import numpy as np
+
 import FreeCAD
 import Part
 import DraftGeomUtils
@@ -1261,15 +1263,17 @@ def make_automatic_base_foundation(
     strips = []
     for slabs in continuous_slabs:
         edges = [slab.Shape.Edges[0] for slab in slabs]
-        strip_direction = get_almost_direction_of_edges_list(edges)
-        if strip_direction == 'x':
-            layer = x_stirp_name
-        else:
-            layer = y_stirp_name
-        points = get_sort_points(edges, get_last=True, sort_edges=False)
-        wire = Draft.make_wire(points, face=False)
-        strip = make_base_foundation(wire, layer, width, height, soil_modulus)
-        strips.append(strip)
+        edges_group = Part.sortEdges(edges)
+        for edges in edges_group:
+            strip_direction = get_almost_direction_of_edges_list(edges)
+            if strip_direction == 'x':
+                layer = x_stirp_name
+            else:
+                layer = y_stirp_name
+            points = get_sort_points(edges, get_last=True, sort_edges=True)
+            wire = Draft.make_wire(points, face=False)
+            strip = make_base_foundation(wire, layer, width, height, soil_modulus)
+            strips.append(strip)
     for beam in beams:
         # FreeCAD.ActiveDocument.removeObject(beam.Name)
         beam.ViewObject.hide()
@@ -1321,7 +1325,53 @@ def get_similar_edge_direction_in_common_points_from_edges(
         df1[col] = df1[col].astype(int)
     return df1
 
+def is_similar_direction(edge1, edge2, angle_threshold=45):
+    angle_diff = angle_between_two_edges(edge1, edge2)
+    return (angle_diff >= 180 - angle_threshold)
+
 def get_continuous_edges(
+        edges : list,
+        threshol_angle : int = 45,
+        ):
+    '''
+    This function gets a list of edges and search for groups of edges that create
+    continuous edges in x or y direction
+    '''
+    grouped = []
+    used = set()
+
+    for i, edge in enumerate(edges, start=1):
+        if i in used:
+            continue
+        current_group = [i]
+        used.add(i)
+
+        # Explore connected lines
+        stack = [edge]
+        while stack:
+            current_edge = stack.pop()
+            desired_edge = current_edge
+            while desired_edge:
+                desired_edge = None
+                max_angle = 180 - threshol_angle
+                for j, other_edge in enumerate(edges, start=1):
+                    if j in used:
+                        continue
+                    if is_close(current_edge, other_edge):
+                        angle = angle_between_two_edges(current_edge, other_edge)
+                        if angle >= max_angle:
+                            desired_edge = other_edge
+                            max_angle = angle
+                            index = j
+                if desired_edge:
+                    current_group.append(index)
+                    used.add(index)
+                    stack.append(desired_edge)
+
+        grouped.append(current_group)
+    return grouped
+
+def get_continuous_edges_p(
         edges : list,
         angle : int = 45,
         ):
@@ -1452,6 +1502,14 @@ def angle_between_two_edges(
         return 360 - ang_deg
     else: 
         return ang_deg
+    
+def is_close(edge1, edge2, threshold=0.01):
+    return any((
+        np.linalg.norm(edge1.firstVertex().Point - edge2.firstVertex().Point) < threshold,
+        np.linalg.norm(edge1.firstVertex().Point - edge2.lastVertex().Point) < threshold,
+        np.linalg.norm(edge1.lastVertex().Point - edge2.firstVertex().Point) < threshold,
+        np.linalg.norm(edge1.lastVertex().Point - edge2.lastVertex().Point) < threshold,
+    ))
 
 def find_common_point(p1, p2, p3, p4):
     if p1.isEqual(p3, .001):

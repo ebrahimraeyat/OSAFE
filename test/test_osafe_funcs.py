@@ -543,6 +543,21 @@ def test_get_continuous_edges():
     edges_numbers = osafe_funcs.get_continuous_edges(edges)
     assert edges_numbers == [[13, 14, 15], [16, 1, 2, 3], [4, 5, 6], [8, 7], [10, 9], [12, 11]]
 
+def test_get_continuous_edges_p():
+    edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
+    edges_numbers = osafe_funcs.get_continuous_edges_p(edges)
+    assert edges_numbers == [[13, 14, 15], [16, 1, 2, 3], [4, 5, 6], [8, 7], [10, 9], [12, 11]]
+
+def test_is_close():
+    edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
+    assert osafe_funcs.is_close(edges[12], edges[13])
+    assert not osafe_funcs.is_close(edges[12], edges[14])
+
+def test_angle_between_two_edges():
+    edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
+    angle = osafe_funcs.angle_between_two_edges(edges[12], edges[13])
+    np.testing.assert_allclose(angle, 159.38619076306847, atol= .1)
+
 def test_get_almost_direction_of_edges_list():
     bf = document_rashidzadeh.BaseFoundation005
     edges = bf.Base.Shape.Edges
@@ -645,4 +660,4 @@ def test_get_total_length_of_shapes():
 
 if __name__ == '__main__':
     # test_get_similar_edge_direction_in_common_points_from_edges()
-    test_get_continuous_slabs()
+    test_get_continuous_edges()
