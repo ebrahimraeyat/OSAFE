@@ -310,6 +310,7 @@ def make_foundation(
         for bf in base_foundations:
             show_object(bf, False)
             show_object(bf.Base, False)
+        obj.ViewObject.Transparency = 70
     FreeCAD.ActiveDocument.commitTransaction()
     FreeCAD.ActiveDocument.recompute()
     return obj

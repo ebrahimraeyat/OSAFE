@@ -350,7 +350,7 @@ def get_common_vector_in_two_edges(e1, e2) -> FreeCAD.Vector:
     p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
     p3 = FreeCAD.Vector(v3.X, v3.Y, v3.Z)
     p4 = FreeCAD.Vector(v4.X, v4.Y, v4.Z)
-    if p2.isEqual(p3, True) or p2.isEqual(p4, True):
+    if p2.isEqual(p3, False) or p2.isEqual(p4, False):
         return p2
     else:
         return p1
@@ -1329,7 +1329,28 @@ def is_similar_direction(edge1, edge2, angle_threshold=45):
     angle_diff = angle_between_two_edges(edge1, edge2)
     return (angle_diff >= 180 - angle_threshold)
 
-def get_continuous_edges(
+def get_number_of_edges_connect_to_point(p, edges, used=[]):
+    """
+    Count the number of edges connected to a given point p.
+
+    Parameters:
+    p (FreeCAD.Vector): The point to check connections for.
+    edges (list): A list of edges, where each edge is a tuple of two FreeCAD.Vector points.
+
+    Returns:
+    int: The number of edges connected to the point p.
+    """
+    count = 0
+    for i, edge in enumerate(edges):
+        start, end = edge.Vertexes
+        start = FreeCAD.Vector(start.X, start.Y, start.Z)
+        end = FreeCAD.Vector(end.X, end.Y, end.Z)
+        if (start.isEqual(p, False) or end.isEqual(p, False)) and i not in used:
+            count += 1
+    return count
+
+
+def get_continuous_edges_1(
         edges : list,
         threshol_angle : int = 45,
         ):
@@ -1340,7 +1361,7 @@ def get_continuous_edges(
     grouped = []
     used = set()
 
-    for i, edge in enumerate(edges, start=1):
+    for i, edge in enumerate(edges):
         if i in used:
             continue
         current_group = [i]
@@ -1348,27 +1369,39 @@ def get_continuous_edges(
 
         # Explore connected lines
         stack = [edge]
-        while stack:
+        while stack and len(used) < len(edges):
             current_edge = stack.pop()
             desired_edge = current_edge
             while desired_edge:
                 desired_edge = None
+                suitable = False
                 max_angle = 180 - threshol_angle
-                for j, other_edge in enumerate(edges, start=1):
+                for j, other_edge in enumerate(edges):
                     if j in used:
                         continue
                     if is_close(current_edge, other_edge):
                         angle = angle_between_two_edges(current_edge, other_edge)
                         if angle >= max_angle:
                             # search in edges that unused and maybe sutiable for get to joint with other_edge
-                            for k, maybe_suitable_edge in enumerate(edges):
-                                if k in used or k == j:
-                                    continue
-                                if is_close(other_edge, maybe_suitable_edge):
-                                    maybe_suitable_angle = angle_between_two_edges(other_edge, maybe_suitable_edge)
-                                    if maybe_suitable_angle < angle:
-                                        continue
-
+                            # p = get_common_vector_in_two_edges(other_edge, current_edge)
+                            # n = get_number_of_edges_connect_to_point(p, edges, used)
+                            # if n == 1:
+                            #     desired_edge = other_edge
+                            #     # max_angle = angle
+                            #     index = j
+                            #     suitable = True
+                            #     break
+                            # else:
+                            #     suitable = True
+                            #     for k, maybe_suitable_edge in enumerate(edges):
+                            #         if k in used or k == j:
+                            #             continue
+                            #         if is_close(other_edge, maybe_suitable_edge):
+                            #             maybe_suitable_angle = angle_between_two_edges(other_edge, maybe_suitable_edge)
+                            #             if maybe_suitable_angle > angle:
+                            #                 suitable = False
+                            #                 break
+                            # if suitable:
                             desired_edge = other_edge
                             max_angle = angle
                             index = j
@@ -1380,7 +1413,7 @@ def get_continuous_edges(
         grouped.append(current_group)
     return grouped
 
-def get_continuous_edges_p(
+def get_continuous_edges(
         edges : list,
         angle : int = 45,
         ):

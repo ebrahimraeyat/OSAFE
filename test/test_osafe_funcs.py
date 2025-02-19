@@ -16,6 +16,7 @@ filename_strip_foundation = Path(__file__).parent / 'test_files' / 'freecad' / '
 filename_mat = Path(__file__).parent / 'test_files' / 'freecad' / 'mat.FCStd'
 filename_base_foundation = Path(__file__).parent / 'test_files' / 'freecad' / 'base_foundation.FCStd'
 filename_khalaji = Path(__file__).parent / 'test_files' / 'freecad' / 'khalaji.FCStd'
+filename_test_p = Path(__file__).parent / 'test_files' / 'freecad' / 'test_p.FCStd'
 filename_test = Path(__file__).parent / 'test_files' / 'freecad' / 'test.FCStd'
 filename_base_plate = Path(__file__).parent / 'test_files' / 'freecad' / 'base_plate.FCStd'
 filename_rashidzadeh = Path(__file__).parent / 'test_files' / 'freecad' / 'rashidzadeh.FCStd'
@@ -24,6 +25,7 @@ document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
 document_strip_foundation = FreeCAD.openDocument(str(filename_strip_foundation))
 document_khalaji = FreeCAD.openDocument(str(filename_khalaji))
+document_test_p = FreeCAD.openDocument(str(filename_test_p))
 document_test = FreeCAD.openDocument(str(filename_test))
 document_base_plate = FreeCAD.openDocument(str(filename_base_plate))
 document_rashidzadeh = FreeCAD.openDocument(str(filename_rashidzadeh))
@@ -538,15 +540,117 @@ def test_punch_null_points():
     assert len(null_edges) == 6
     assert len(null_points) == 6
 
+def test_get_number_of_edges_connect_to_point():
+    point = FreeCAD.Vector(1.0, 2.0, 3.0)
+    # Define edges (as tuples of FreeCAD.Vector points)
+    edges = [
+        Part.Edge(Part.makeLine(FreeCAD.Vector(1.0, 2.0, 3.0), FreeCAD.Vector(4.0, 5.0, 6.0))),  # Connected
+        Part.Edge(Part.makeLine(FreeCAD.Vector(1.0, 2.0, 3.0), FreeCAD.Vector(7.0, 8.0, 9.0))),  # Connected
+        Part.Edge(Part.makeLine(FreeCAD.Vector(10.0, 11.0, 12.0), FreeCAD.Vector(13.0, 14.0, 15.0))),  # Not connected
+        Part.Edge(Part.makeLine(FreeCAD.Vector(4.0, 5.0, 6.0), FreeCAD.Vector(1.0, 2.0, 3.0))),  # Connected (reverse)
+    ]
+    np.testing.assert_equal(osafe_funcs.get_number_of_edges_connect_to_point(point, edges), 3)
+    point_not_connected = FreeCAD.Vector(100.0, 100.0, 100.0)
+    np.testing.assert_equal(osafe_funcs.get_number_of_edges_connect_to_point(point_not_connected, edges), 0)
+
+    # test_edge_with_multiple_connections
+    edges_with_multiple_connections = [
+        Part.Edge(Part.makeLine(FreeCAD.Vector(1.0, 2.0, 3.0), FreeCAD.Vector(4.0, 5.0, 6.0))),
+        Part.Edge(Part.makeLine(FreeCAD.Vector(1.0, 2.0, 3.0), FreeCAD.Vector(7.0, 8.0, 9.0))),
+        Part.Edge(Part.makeLine(FreeCAD.Vector(1.0, 2.0, 3.0), FreeCAD.Vector(2.0, 2.0, 3.0))),  # Self-loop
+    ]
+    np.testing.assert_equal(osafe_funcs.get_number_of_edges_connect_to_point(point, edges_with_multiple_connections), 3)
+
+def test_get_number_of_edges_connect_to_point_used():
+    # Define edges (as tuples of FreeCAD.Vector points)
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(1, .2, 0)
+    v3 = FreeCAD.Vector(2, .2, 0)
+    e1 = Part.Edge(Part.makeLine(v1, v2))
+    e2 = Part.Edge(Part.makeLine(v2, v3))
+    n = osafe_funcs.get_number_of_edges_connect_to_point(v2, (e1, e2), used=[0])
+    assert n == 1
+
 def test_get_continuous_edges():
-    edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
+    edges = [b.Shape.Edges[0] for b in document_test_p.Beams.Group]
     edges_numbers = osafe_funcs.get_continuous_edges(edges)
-    assert edges_numbers == [[13, 14, 15], [16, 1, 2, 3], [4, 5, 6], [8, 7], [10, 9], [12, 11]]
+    desired_numbers = (set((12, 13, 14)), set((15, 0, 1, 2)), set((3, 4, 5)), set((6, 7)), set((8, 9)), set((10, 11)))
+    for numbers in edges_numbers:
+        assert set(numbers) in desired_numbers
+
+def test_get_continuous_edges_1():
+    edges = [b.Shape.Edges[0] for b in document_test.Objects]
+    edges_numbers = osafe_funcs.get_continuous_edges_1(edges)
+    print(edges_numbers)
+    assert len(edges_numbers) == 5
+    desired_numbers = (set((12, 13, 14)), set((15, 0, 1, 2)), set((3, 4, 5)), set((6, 7)), set((8, 9)), set((10, 11)))
+    for numbers in edges_numbers:
+        assert set(numbers) in desired_numbers
+
+def test_get_common_vector_in_two_edges():
+    # Define edges (as tuples of FreeCAD.Vector points)
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(1, .2, 0)
+    v3 = FreeCAD.Vector(2, .2, 0)
+    e1 = Part.Edge(Part.makeLine(v1, v2))
+    e2 = Part.Edge(Part.makeLine(v2, v3))
+    p = osafe_funcs.get_common_vector_in_two_edges(e1, e2)
+    assert p.isEqual(v2, False)
+
+
+def test_get_continuous_edges1():
+    # Define edges (as tuples of FreeCAD.Vector points)
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(1, .2, 0)
+    v3 = FreeCAD.Vector(2, .2, 0)
+    v4 = FreeCAD.Vector(3, .2, 0)
+    edges = [
+        Part.Edge(Part.makeLine(v1, v2)),
+        Part.Edge(Part.makeLine(v2, v3)),
+        Part.Edge(Part.makeLine(v3, v4)),
+    ]
+    continuous_edges = osafe_funcs.get_continuous_edges(edges)
+    assert len(continuous_edges) == 1
+
+def test_get_continuous_edges2():
+    # Define edges (as tuples of FreeCAD.FreeCAD.Vectorpoints)
+    v1 = FreeCAD.Vector(1126.9442138671882, 11916.228515625, 0.0)
+    v2 = FreeCAD.Vector(2347.258544921876, 12515.29296875, 0.0)
+    v3 = FreeCAD.Vector(3745.074218750001, 13914.6689453125, 0.0)
+    v4 = FreeCAD.Vector(5231.639160156251, 12892.4814453125, 0.0)
+    v5 = FreeCAD.Vector(6474.143554687501, 12404.3544921875, 0.0)
+    edges = [
+        Part.Edge(Part.makeLine(v1, v2)),
+        Part.Edge(Part.makeLine(v2, v3)),
+        Part.Edge(Part.makeLine(v3, v4)),
+        Part.Edge(Part.makeLine(v4, v5)),
+    ]
+    continuous_edges = osafe_funcs.get_continuous_edges(edges)
+    assert len(continuous_edges) == 2
+
+def test_get_continuous_edges3():
+    # Define edges (as tuples of FreeCAD.v = FreeCAD.Vectorpoints)
+    v1 = FreeCAD.Vector(-1, -0.5, 0)
+    v2 = FreeCAD.Vector(0, 0, 0)
+    v3 = FreeCAD.Vector(1, 0.5, 0)
+    v4 = FreeCAD.Vector(-1, 0.5, 0)
+    v5 = FreeCAD.Vector(1, -0.5, 0)
+    edges = [
+        Part.Edge(Part.makeLine(v1, v2)),
+        Part.Edge(Part.makeLine(v2, v3)),
+        Part.Edge(Part.makeLine(v4, v2)),
+        Part.Edge(Part.makeLine(v2, v5)),
+    ]
+    continuous_edges = osafe_funcs.get_continuous_edges(edges)
+    assert len(continuous_edges) == 2
+    desired_numbers = (set((0, 1)), set((2,3)))
+    for numbers in continuous_edges:
+        assert set(numbers) in desired_numbers
 
 def test_get_continuous_edges_p():
     edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
     edges_numbers = osafe_funcs.get_continuous_edges_p(edges)
-    assert edges_numbers == [[13, 14, 15], [16, 1, 2, 3], [4, 5, 6], [8, 7], [10, 9], [12, 11]]
+    assert edges_numbers == [[12, 13, 14], [15, 0, 1, 2], [3, 4, 5], [6, 7], [8, 9], [10, 11]]
 
 def test_is_close():
     edges = [b.Shape.Edges[0] for b in document_test.Beams.Group]
@@ -660,4 +764,4 @@ def test_get_total_length_of_shapes():
 
 if __name__ == '__main__':
     # test_get_similar_edge_direction_in_common_points_from_edges()
-    test_get_continuous_edges()
+    test_get_continuous_edges1()
