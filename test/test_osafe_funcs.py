@@ -99,6 +99,15 @@ def test_remove_colinear_edges():
     es = osafe_funcs.remove_colinear_edges(face)
     assert isinstance(es, Part.Face)
     assert len(es.Edges) == 3
+    # Face with tolerance
+    vs = (v1 , v2, v3, v4, v1)
+    vs = [v * 1000 for v in vs]
+    wire = Part.makePolygon(vs)
+    face = Part.Face(wire)
+    for t in range(100):
+        es = osafe_funcs.remove_colinear_edges(face, tol=t / 1000)
+        assert isinstance(es, Part.Face)
+        assert len(es.Edges) == 3
 
 def test_get_sort_points():
     v1 = FreeCAD.Vector(0, 0, 0)
@@ -764,4 +773,4 @@ def test_get_total_length_of_shapes():
 
 if __name__ == '__main__':
     # test_get_similar_edge_direction_in_common_points_from_edges()
-    test_get_continuous_edges1()
+    test_get_foundation_shape_from_base_foundations()

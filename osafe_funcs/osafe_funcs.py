@@ -10,6 +10,15 @@ import Draft
 
 from osafe_objects import strip
 
+PART_TOLERANCE = 0.01
+if 'mm' in FreeCAD.Units.Length.__str__():
+    PART_TOLERANCE = 1
+elif 'cm' in FreeCAD.Units.Length.__str__():
+    PART_TOLERANCE = .1
+elif 'm' in FreeCAD.Units.Length.__str__():
+    PART_TOLERANCE = .01
+
+
 
 def remove_obj(name: str) -> None:
     o = FreeCAD.ActiveDocument.getObject(name)
@@ -49,7 +58,7 @@ def punch_area_edges(
     sh1: Part.Shape,
     sh2: Part.Shape,
     ):
-    cut = sh1.cut(sh2)
+    cut = sh1.cut(sh2, PART_TOLERANCE)
     edges = []
     for e in cut.Edges:
         p1 = e.firstVertex().Point
@@ -367,8 +376,8 @@ def split_face_with_scales(
     s1.Placement.Base = tr1
     tr2 = center_of_mass.sub(s2.CenterOfMass)
     s2.Placement.Base = tr2
-    area1 = face.cut(s1)
-    area2 = s1.cut(s2)
+    area1 = face.cut(s1, PART_TOLERANCE)
+    area2 = s1.cut(s2, PART_TOLERANCE)
     e1, e2 = sorted(face.Edges, key=lambda x: x.Length, reverse=True)[0:2]
     v1 = e1.CenterOfMass
     v2 = e2.CenterOfMass
@@ -568,16 +577,18 @@ def get_top_faces(
         shape,
         fuse : bool = False,
         tol : float = 0,
+        remove_colinear_edge: bool=False,
         ):
     z_max = shape.BoundBox.ZMax
     faces = []
     for f in shape.Faces:
         if math.isclose(f.BoundBox.ZLength, 0, abs_tol=0.1) and math.isclose(f.BoundBox.ZMax, z_max, abs_tol=0.1):
-            f = remove_colinear_edges(f, tol)
+            if remove_colinear_edge:
+                f = remove_colinear_edges(f, tol)
             faces.append(f)
     if fuse:
         if len(faces) > 1:
-            face = faces[0].fuse(faces[1:])
+            face = faces[0].fuse(faces[1:], PART_TOLERANCE)
             face = face.removeSplitter()
         else:
             face = faces[0]
@@ -633,9 +644,9 @@ def get_foundation_shape_from_base_foundations(
                             used_commons_center_point.append(comm.BoundBox.Center)
                             unused_common.append(comm)
                     commons = [comm.extrude(FreeCAD.Vector(0, 0, -height)) for comm in unused_common]
-                    shape = shape.cut(commons)
+                    shape = shape.cut(commons, PART_TOLERANCE)
             if foundation_type == 'Strip' and openings:
-                shape = shape.cut(openings_shapes)
+                shape = shape.cut(openings_shapes, PART_TOLERANCE)
             shapes.append(shape)
             if foundation_type == 'Strip':
                 base_foundation.extended_plan = Part.makeCompound(get_top_faces(shape, tol=tol))
@@ -646,23 +657,23 @@ def get_foundation_shape_from_base_foundations(
         comp_b = Part.makeCompound(slabs_b)
         if continuous_layer != 'AB' and slabs_a and slabs_b:
             if continuous_layer == 'A':
-                diff = comp_b.cut(comp_a)
+                diff = comp_b.cut(comp_a, PART_TOLERANCE)
                 shape = Part.makeCompound([comp_a, diff])
             elif continuous_layer == 'B':
-                diff = comp_a.cut(comp_b)
+                diff = comp_a.cut(comp_b, PART_TOLERANCE)
                 shape = Part.makeCompound([comp_b, diff])
             shapes.append(shape)
         else:
             shapes.append(comp_a)
             shapes.append(comp_b)
     if len(shapes) > 1:
-        strip_shape = shapes[0].fuse(shapes[1:])
+        strip_shape = shapes[0].fuse(shapes[1:], PART_TOLERANCE)
         strip_shape = strip_shape.removeSplitter()
     else:
         strip_shape = shapes[0]
     if foundation_type == 'Strip':
         shape = Part.makeCompound(shapes)
-        plan = get_top_faces(strip_shape, fuse=True, tol=tol)
+        plan = get_top_faces(strip_shape, fuse=True, tol=tol, remove_colinear_edge=False)
     elif foundation_type == 'Mat':
         if height == 0:
             from collections import Counter
@@ -676,18 +687,18 @@ def get_foundation_shape_from_base_foundations(
             for face in faces:
                 shape = face.extrude(FreeCAD.Vector(0, 0, -height))
                 if openings:
-                    shape = shape.cut(openings_shapes)
+                    shape = shape.cut(openings_shapes, PART_TOLERANCE)
                 shapes.append(shape)
             shape = Part.makeCompound(shapes)
         else:
             shape = plan_without_openings.extrude(FreeCAD.Vector(0, 0, -height))
             if openings:
-                shape = shape.cut(openings_shapes)
+                shape = shape.cut(openings_shapes, PART_TOLERANCE)
         plan = get_top_faces(shape, fuse=True, tol=tol)
     if slabs:
         mat_slabs_shapes = [slab.Shape for slab in slabs if not hasattr(slab, 'layer')]
         if mat_slabs_shapes:
-            shape = shape.fuse(mat_slabs_shapes)
+            shape = shape.fuse(mat_slabs_shapes, PART_TOLERANCE)
             shape = shape.removeSplitter()
     return shape, outer_wire, plan, plan_without_openings
 
@@ -702,7 +713,7 @@ def get_continuous_base_foundation_shape(
     '''
 
     def get_cut_faces(sh1, sh2):
-        cut = sh1.cut(sh2)
+        cut = sh1.cut(sh2, PART_TOLERANCE)
         if len(cut.Faces) > 1:
             faces = cut.Faces
             areas = [f.Area for f in faces]
@@ -759,13 +770,13 @@ def get_continuous_base_foundation_shape(
     shapes.append(base_foundation.plan)
     shapes = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in shapes]
     if len(shapes) > 1:
-        shape = shapes[0].fuse(shapes[1:])
+        shape = shapes[0].fuse(shapes[1:], PART_TOLERANCE)
         shape = shape.removeSplitter()
     else:
         shape = shapes[0]
     if cut_shape:
         cut_shape = [shape.extrude(FreeCAD.Vector(0, 0, -height)) for shape in cut_shape]
-        shape = shape.cut(cut_shape)
+        shape = shape.cut(cut_shape, PART_TOLERANCE)
     return shape
 
 def get_common_part_of_strips(points, offset, width):
