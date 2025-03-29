@@ -59,7 +59,10 @@ class EtabsPunch(object):
         columns = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Columns")
         beams = FreeCAD.ActiveDocument.addObject("App::DocumentObjectGroup","Beams")
         profiles = {}
-        frame_props = self.etabs.SapModel.PropFrame.GetAllFrameProperties()
+        try:
+            frame_props = self.etabs.SapModel.PropFrame.GetAllFrameProperties()
+        except AttributeError:
+            return columns
         section_types_map = {
             1 : ['H', 'IPE'],
             2 : ['U', 'UNP'],
@@ -177,8 +180,6 @@ class EtabsPunch(object):
     def import_load_combos(self,
         columns : Union[FreeCAD.DocumentObjectGroup, bool, list] = None,
         ):
-        
-        joint_design_reactions = self.etabs.database.get_all_joint_design_reactions()
         doc = FreeCAD.ActiveDocument
         if columns is None:
             if hasattr(doc, 'Columns') and hasattr(doc.Columns, 'Group'):
@@ -190,6 +191,9 @@ class EtabsPunch(object):
                         columns.append(obj)
         elif isinstance(columns, FreeCAD.DocumentObjectGroup):
             columns = columns.Group
+        if len(columns) == 0:
+            return
+        joint_design_reactions = self.etabs.database.get_all_joint_design_reactions()
         for col in columns:
             label, story = col.Label.split('_')
             name = self.etabs.SapModel.FrameObj.GetNameFromLabel(label, story)[0]

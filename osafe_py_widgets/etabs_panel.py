@@ -38,7 +38,8 @@ class EtabsTaskPanel:
 
     def fill_levels(self):
         self.form.levels_list.clear()
-        levels_names = self.etabs.story.get_level_names()
+        self.storyname_and_levels = self.etabs.story.get_sorted_story_and_levels()
+        levels_names = [i[0] for i in self.storyname_and_levels]
         self.form.levels_list.addItems(levels_names[1:])
         lw = self.form.levels_list
         for i in range(lw.count()):
@@ -115,7 +116,10 @@ class EtabsTaskPanel:
                 if item.checkState() == Qt.Checked:
                     level_name = item.text()
                     level_names.append(level_name)
-                    elevations.append(self.etabs.SapModel.Story.GetElevation(level_name)[0])
+                    # elevations.append(self.etabs.SapModel.Story.GetElevation(level_name)[0])
+            d = dict(self.storyname_and_levels)
+            for name in level_names:
+                elevations.append(d.get(name))
             selected_beams = self.form.selected_beams.isChecked()
             exclude_selected_beams = self.form.exclude_selected_beams.isChecked()
             #  types: {1: steel, 2: concrete, 3: composite Beam, 7: No Design, 13: composite column }
