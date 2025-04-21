@@ -1,6 +1,8 @@
 from typing import Union
 import os
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import FreeCAD
@@ -127,7 +129,7 @@ def to_excel(
     os.startfile(filename)
 
 def to_dxf(
-           filename: str,
+           filename: Union[str, None]=None,
            doc: Union[FreeCAD.Document, bool] = None,
            columns: bool = True,
            punches: bool = True,
@@ -136,10 +138,13 @@ def to_dxf(
     dwg = ezdxf.new()
     msp = dwg.modelspace()
     
-    if not filename:
-        return
     if doc is None:
         doc = FreeCAD.ActiveDocument
+    if filename is None:
+        if doc.FileName:
+            filename = Path(doc.FileName).with_suffix('.dxf')
+        else:
+            return
     height = 500
     center = (0, 0)
     found = None

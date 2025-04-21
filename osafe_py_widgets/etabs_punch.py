@@ -62,6 +62,7 @@ class EtabsPunch(object):
         try:
             frame_props = self.etabs.SapModel.PropFrame.GetAllFrameProperties()
         except AttributeError:
+            self.import_basepoints()
             return columns
         section_types_map = {
             1 : ['H', 'IPE'],
@@ -223,7 +224,22 @@ class EtabsPunch(object):
                         "Structure",
                         ).combos_load = d
                 col.setEditorMode('combos_load', 2)
-                col.recompute() 
+                col.recompute()
+
+    def import_basepoints(self):
+        points = self.etabs.points.get_point_names()
+        for point in points:
+            try:
+                restraint = self.is_restraint(point)
+                if restraint:
+                    x, y, _ = self.etabs.points.get_point_coordinate(point)
+                    v1 = FreeCAD.Vector(x, y, 0)
+                    v2 = FreeCAD.Vector(x, y, 3000)
+                    line = Draft.make_line(v1, v2)
+                    line.recompute()
+            except IndexError:
+                pass
+        Gui.activeDocument().activeView().setCameraType("Perspective")
 
     def is_restraint(self, points : list):
         for p in points:
