@@ -38,14 +38,18 @@ class EtabsTaskPanel:
 
     def fill_levels(self):
         self.form.levels_list.clear()
-        self.storyname_and_levels = self.etabs.story.get_sorted_story_and_levels()
+        self.storyname_and_levels = self.etabs.story.get_sorted_story_and_levels(
+            reverse=True,
+            include_base=False,
+            unit='mm',
+            )
         levels_names = [i[0] for i in self.storyname_and_levels]
-        self.form.levels_list.addItems(levels_names[1:])
+        self.form.levels_list.addItems(levels_names)
         lw = self.form.levels_list
         for i in range(lw.count()):
             item = lw.item(i)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-            if i == 0:
+            if i == len(levels_names) - 1:
                 item.setCheckState(Qt.Checked)
             else:
                 item.setCheckState(Qt.Unchecked)
