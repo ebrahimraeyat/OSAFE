@@ -19,6 +19,7 @@ class EtabsTaskPanel:
         ):
         self.form = Gui.PySideUic.loadUi(str(punch_path / 'osafe_widgets' / 'etabs_panel.ui'))
         self.etabs = etabs
+        self.etabs.set_current_unit('N', 'mm')
         # self.set_foundation_level()
         self.update_gui()
         self.create_connections()
