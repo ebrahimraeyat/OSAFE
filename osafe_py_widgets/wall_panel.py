@@ -21,8 +21,11 @@ class WallTaskPanel:
         Gui.runCommand('Std_DrawStyle',2)
         Gui.runCommand('OSAFE_view_beams',1)
         Gui.runCommand('OSAFE_view_basefoundation',0)
-        Gui.runCommand('OSAFE_view_design_layer_a',0)
-        Gui.runCommand('OSAFE_view_design_layer_b',0)
+        Gui.runCommand('OSAFE_view_foundations',0)
+        Gui.runCommand('OSAFE_view_design_layer',0)
+        Gui.runCommand('OSAFE_view_punch',0)
+        Gui.runCommand('OSAFE_view_slabs',0)
+        Gui.runCommand('OSAFE_view_arch_wall',1)
 
     def fill_load_cases(self):
         deads = []
