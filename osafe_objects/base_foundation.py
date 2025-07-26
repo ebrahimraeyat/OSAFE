@@ -38,7 +38,7 @@ def make_base_foundation(
         obj.left_width = obj.right_width = obj.width / 2
     obj.align = align
     obj.height = height
-    obj.ks = soil_modulus
+    obj.setExpression('ks', f'{soil_modulus} * width.Value / width.Value')
     obj.fc = fc
     if FreeCAD.GuiUp:
         vobj = obj.ViewObject
