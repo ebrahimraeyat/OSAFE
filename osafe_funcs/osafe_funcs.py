@@ -1259,15 +1259,11 @@ def get_almost_direction_of_edges_list(edges : list) -> str:
 def make_automatic_base_foundation(
         beams,
         width,
-        north_dist : Union[float, bool] = None,
-        south_dist : Union[float, bool] = None,
-        east_dist : Union[float, bool] = None,
-        west_dist : Union[float, bool] = None,
         x_stirp_name : str = 'A',
         y_stirp_name : str = 'B',
         angle : int = 45,
         height : int = 1000,
-        soil_modulus : int = 2,
+        soil_modulus : str='2',
         ):
     from osafe_objects.base_foundation import make_base_foundation
     continuous_slabs = get_continuous_slabs(beams, angle)

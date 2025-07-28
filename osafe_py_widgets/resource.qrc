@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../osafe_images/add.svg</file>
+    <file>../osafe_images/remove.svg</file>
     <file>../osafe_images/tick.svg</file>
     <file>../osafe_images/osafe_rebar.svg</file>
     <file>../osafe_images/auto_strip.svg</file>

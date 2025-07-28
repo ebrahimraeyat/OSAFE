@@ -1,6 +1,12 @@
 from pathlib import Path
+
+
+import numpy as np
+
 from PySide2 import QtCore
-from PySide2.QtCore import QT_TRANSLATE_NOOP
+from PySide2.QtCore import QT_TRANSLATE_NOOP, Qt
+from PySide2.QtWidgets import QTableWidgetItem, QMessageBox
+
 import FreeCAD
 import Part
 from FreeCAD import Vector
@@ -152,9 +158,9 @@ class BaseFoundation(gui_lines.Line):
         """
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         fc = self.fc_spin.value()
-        soil_modulus = self.soil_modulus_spin.value()
+        soil_modulus = self.get_ks()
         p.SetFloat("foundation_fc",fc)
-        p.SetFloat("base_foundation_soil_modulus",soil_modulus)
+        p.SetFloat("base_foundation_soil_modulus", self.soil_modulus_spin.value())
         # if self.ui:
             # self.linetrack.finalize()
         if not utils.getParam("UiMode", 1):
@@ -212,6 +218,11 @@ class BaseFoundation(gui_lines.Line):
         self.align_box = w.align
         self.soil_modulus_spin = w.soil_modulus
         self.fc_spin = w.fc
+        self.ks_input_group = w.ks_input_group
+        self.add_ks_row_button = w.add_ks_row_button
+        self.remove_ks_row_button = w.remove_ks_row_button
+        self.ks_table = w.ks_table
+        self.ks_label = w.ks_label
         # self.layer_box.setValue(self.bx / 10))
         self.width_spinbox.setValue(int(self.bf_width / 10))
         self.left_width_spinbox.setValue(int(self.bf_left_width / 10))
@@ -225,6 +236,10 @@ class BaseFoundation(gui_lines.Line):
         self.layer_box.setCurrentIndex(i)
 
         # connect slotsx
+        self.create_connections()
+        return w
+    
+    def create_connections(self):
         self.width_spinbox.valueChanged.connect(self.set_width)
         self.left_width_spinbox.valueChanged.connect(self.set_width)
         self.right_width_spinbox.valueChanged.connect(self.set_width)
@@ -232,10 +247,47 @@ class BaseFoundation(gui_lines.Line):
         self.align_box.currentIndexChanged.connect(self.set_width)
         self.align_box.currentIndexChanged.connect(self.update_gui)
         self.layer_box.currentIndexChanged.connect(self.set_layer)
+        self.ks_input_group.clicked.connect(self.ks_input_group_clicked)
+        self.add_ks_row_button.clicked.connect(self.add_ks_row)
+        self.remove_ks_row_button.clicked.connect(self.remove_ks_row)
 
-        # self.height_spin.valueChanged.connect(self.set_height)
-        # self.soil_modulus_spin.valueChanged.connect(self.set_soil_modulus)
-        return w
+    def add_ks_row(self):
+        row_count = self.ks_table.rowCount()
+        self.ks_table.insertRow(row_count)
+        for i in (0, 1):
+            item = QTableWidgetItem(f"{i + 1}")
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.ks_table.setItem(row_count, i, item)
+
+    def remove_ks_row(self):
+        selected_row = self.ks_table.currentRow()
+        if selected_row >= 0:
+            self.ks_table.removeRow(selected_row)
+
+    def ks_input_group_clicked(self, checked: bool):
+        self.soil_modulus_spin.setEnabled(not checked)
+        self.ks_label.setEnabled(not checked)
+
+    def get_ks(self):
+        if self.ks_input_group.isChecked():
+            """Retrieves all data from a QTableWidget."""
+            data = []
+            for row in range(self.ks_table.rowCount()):
+                row_data = []
+                for col in range(self.ks_table.columnCount()):
+                    item = self.ks_table.item(row, col)
+                    row_data.append(float(item.text()))
+                data.append(row_data)
+            data = sorted(data, key=lambda x: x[0])
+            if len(data) < 2:
+                QMessageBox.warning(None, "Ks", "Please Enter at least two values for Ks.")
+                return None
+            widths, kss = zip(*data)
+            m, c = np.polyfit(widths, kss, 1)
+            ks = f"{m:.3f} * .width.Value / 1000 + {c:.3f}"
+        else:
+            ks = str(self.soil_modulus_spin.value())
+        return ks
 
     def update_gui(self):
         align = self.align_box.currentText()

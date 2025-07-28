@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>199</width>
-    <height>237</height>
+    <width>362</width>
+    <height>501</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,16 +17,9 @@
    <item>
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="7" column="0">
-      <widget class="QLabel" name="label_7">
+      <widget class="QLabel" name="ks_label">
        <property name="text">
         <string>Soil Modulus</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Width</string>
        </property>
       </widget>
      </item>
@@ -49,6 +42,13 @@
        </property>
       </widget>
      </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Width</string>
+       </property>
+      </widget>
+     </item>
      <item row="5" column="1">
       <widget class="QSpinBox" name="right_width_spinbox">
        <property name="suffix">
@@ -65,6 +65,13 @@
        </property>
        <property name="value">
         <number>50</number>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Left Width</string>
        </property>
       </widget>
      </item>
@@ -87,17 +94,17 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Left Width</string>
-       </property>
-      </widget>
-     </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
         <string>Right Width</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Height</string>
        </property>
       </widget>
      </item>
@@ -120,18 +127,30 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Height</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Strip Layer</string>
        </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="strip_layer">
+       <item>
+        <property name="text">
+         <string>A</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>B</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>other</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="1" column="1">
@@ -153,30 +172,11 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
+     <item row="9" column="0">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>Align</string>
+        <string>fc</string>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="strip_layer">
-       <item>
-        <property name="text">
-         <string>A</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>B</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>other</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="7" column="1">
@@ -204,14 +204,14 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="label_8">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>fc</string>
+        <string>Align</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QSpinBox" name="fc">
        <property name="suffix">
         <string>  MPa</string>
@@ -222,6 +222,111 @@
        <property name="value">
         <number>25</number>
        </property>
+      </widget>
+     </item>
+     <item row="8" column="0" colspan="2">
+      <widget class="QGroupBox" name="ks_input_group">
+       <property name="title">
+        <string>Ks Table</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <layout class="QVBoxLayout" name="ks_input_layout">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QPushButton" name="add_ks_row_button">
+              <property name="text">
+               <string>Add Row</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../osafe_py_widgets/resource.qrc">
+                <normaloff>:/safe/osafe_images/add.svg</normaloff>:/safe/osafe_images/add.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="remove_ks_row_button">
+              <property name="text">
+               <string>Remove Row</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../osafe_py_widgets/resource.qrc">
+                <normaloff>:/safe/osafe_images/remove.svg</normaloff>:/safe/osafe_images/remove.svg</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="ks_table">
+            <property name="rowCount">
+             <number>2</number>
+            </property>
+            <property name="columnCount">
+             <number>2</number>
+            </property>
+            <row/>
+            <row/>
+            <column>
+             <property name="text">
+              <string>Width (m)</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignCenter</set>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Ks</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignCenter</set>
+             </property>
+            </column>
+            <item row="0" column="0">
+             <property name="text">
+              <string>1</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignCenter</set>
+             </property>
+            </item>
+            <item row="0" column="1">
+             <property name="text">
+              <string>3</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignCenter</set>
+             </property>
+            </item>
+            <item row="1" column="0">
+             <property name="text">
+              <string>1.5</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignCenter</set>
+             </property>
+            </item>
+            <item row="1" column="1">
+             <property name="text">
+              <string>2</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignCenter</set>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -238,6 +343,8 @@
   <tabstop>soil_modulus</tabstop>
   <tabstop>fc</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../osafe_py_widgets/resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

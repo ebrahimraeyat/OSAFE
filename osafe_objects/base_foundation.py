@@ -15,7 +15,7 @@ def make_base_foundation(
         layer : str = 'A',
         width : float = 1000,
         height : float = 1000,
-        soil_modulus : float =2,
+        soil_modulus : str='2',
         fc : Union[float, str] = '25 MPa',
         align : str = 'Center',
         left_width : Union[float, bool] = None,
@@ -38,7 +38,7 @@ def make_base_foundation(
         obj.left_width = obj.right_width = obj.width / 2
     obj.align = align
     obj.height = height
-    obj.setExpression('ks', f'{soil_modulus} * width.Value / width.Value')
+    obj.setExpression('ks', soil_modulus)
     obj.fc = fc
     if FreeCAD.GuiUp:
         vobj = obj.ViewObject
