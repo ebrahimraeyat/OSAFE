@@ -20,6 +20,7 @@ filename_test_p = Path(__file__).parent / 'test_files' / 'freecad' / 'test_p.FCS
 filename_test = Path(__file__).parent / 'test_files' / 'freecad' / 'test.FCStd'
 filename_base_plate = Path(__file__).parent / 'test_files' / 'freecad' / 'base_plate.FCStd'
 filename_rashidzadeh = Path(__file__).parent / 'test_files' / 'freecad' / 'rashidzadeh.FCStd'
+filename_karimi = Path(__file__).parent / 'test_files' / 'freecad' / 'karimi.FCStd'
 document= FreeCAD.openDocument(str(filename))
 document_mat= FreeCAD.openDocument(str(filename_mat))
 document_base_foundation = FreeCAD.openDocument(str(filename_base_foundation))
@@ -29,6 +30,7 @@ document_test_p = FreeCAD.openDocument(str(filename_test_p))
 document_test = FreeCAD.openDocument(str(filename_test))
 document_base_plate = FreeCAD.openDocument(str(filename_base_plate))
 document_rashidzadeh = FreeCAD.openDocument(str(filename_rashidzadeh))
+document_karimi = FreeCAD.openDocument(str(filename_karimi))
 
 
 punch_path = Path(__file__).parent.parent
@@ -549,6 +551,16 @@ def test_punch_null_points():
     assert len(null_edges) == 6
     assert len(null_points) == 6
 
+def test_punch_null_points2():
+    punch = document_karimi.Punch001
+    null_edges, null_points = osafe_funcs.punch_null_points(punch)
+    assert null_edges == ['Yes', 'No', 'No', 'Yes']
+    desired_x = (330, 388.9, -737.5, -737.5)
+    desired_y = (380, -712.5, -712.5, 380)
+    for i, p in enumerate(null_points):
+        assert math.isclose(p.x, desired_x[i], abs_tol=1)
+        assert math.isclose(p.y, desired_y[i], abs_tol=1)
+
 def test_get_number_of_edges_connect_to_point():
     point = FreeCAD.Vector(1.0, 2.0, 3.0)
     # Define edges (as tuples of FreeCAD.Vector points)
@@ -605,6 +617,17 @@ def test_get_common_vector_in_two_edges():
     e2 = Part.Edge(Part.makeLine(v2, v3))
     p = osafe_funcs.get_common_vector_in_two_edges(e1, e2)
     assert p.isEqual(v2, False)
+
+def test_get_common_vector_in_two_edges2():
+    # Define edges (as tuples of FreeCAD.Vector points)
+    v1 = FreeCAD.Vector(0, 0, 0)
+    v2 = FreeCAD.Vector(1749.5, .2, 0)
+    v22 = FreeCAD.Vector(1749.4999999, .2, 0)
+    v3 = FreeCAD.Vector(2, .2, 0)
+    e1 = Part.Edge(Part.makeLine(v1, v2))
+    e2 = Part.Edge(Part.makeLine(v22, v3))
+    v = osafe_funcs.get_common_vector_in_two_edges(e1, e2)
+    assert v.isEqual(v2, False)
 
 
 def test_get_continuous_edges1():
@@ -773,4 +796,4 @@ def test_get_total_length_of_shapes():
 
 if __name__ == '__main__':
     # test_get_similar_edge_direction_in_common_points_from_edges()
-    test_get_foundation_shape_from_base_foundations()
+    test_punch_null_points2()

@@ -103,7 +103,7 @@ def punch_null_points(
     punch,
     ) -> tuple:
     null_edges, common_edges = punch_null_edges(punch)
-    null_points_in_general = get_sort_points(common_edges)
+    null_points_in_general = get_sort_points(common_edges, sort_edges=False)
     null_points_in_local = []
     for point in null_points_in_general:
         null_points_in_local.append(point.sub(punch.center_of_column))
@@ -350,19 +350,15 @@ def get_sort_points(
     else:
         return [Part.Vertex(v) for v in vectors]
 
-def get_common_vector_in_two_edges(e1, e2) -> FreeCAD.Vector:
-    v1 = e1.firstVertex()
-    v2 = e1.lastVertex()
-    v3 = e2.firstVertex()
-    v4 = e2.lastVertex()
-    p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
-    p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
-    p3 = FreeCAD.Vector(v3.X, v3.Y, v3.Z)
-    p4 = FreeCAD.Vector(v4.X, v4.Y, v4.Z)
-    if p2.isEqual(p3, False) or p2.isEqual(p4, False):
-        return p2
+def get_common_vector_in_two_edges(e1, e2, tol=1) -> FreeCAD.Vector:
+    p1 = e1.firstVertex().Point
+    p2 = e1.lastVertex().Point
+    p3 = e2.firstVertex().Point
+    p4 = e2.lastVertex().Point
+    if p2.isEqual(p3, tol) or p2.isEqual(p4, tol):
+        return FreeCAD.Vector(p2.x, p2.y, p2.z)
     else:
-        return p1
+        return FreeCAD.Vector(p1.x, p1.y, p1.z)
 
 def split_face_with_scales(
     face : Part.Face,
