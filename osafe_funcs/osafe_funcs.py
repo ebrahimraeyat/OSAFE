@@ -91,8 +91,8 @@ def punch_null_edges(
         for e2 in edges:
             p3 = e2.firstVertex().Point
             p4 = e2.lastVertex().Point
-            if (p1.isEqual(p3, .1) and p2.isEqual(p4, .1)) or \
-                (p1.isEqual(p4, .1) and p2.isEqual(p3, .1)):
+            if (is_equal_two_points(p1, p3) and is_equal_two_points(p2, p4)) or \
+                (is_equal_two_points(p1, p4) and is_equal_two_points(p2, p3)):
                 null_edges.append('No')
                 break
         else:
@@ -310,6 +310,16 @@ def sort_vertex(coords):
     center = tuple(map(operator.truediv, reduce(lambda x, y: map(operator.add, x, y), coords), [len(coords)] * 2))
     return sorted(coords, key=lambda coord: (-135 - math.degrees(math.atan2(*tuple(map(operator.sub, coord, center))[::-1]))) % 360)
 
+def is_equal_two_points(p1, p2, tol=.1):
+    '''
+    check if two points are equal with tolerance
+    '''
+    if isinstance(p1, Part.Vertex):
+        p1 = p1.Point
+    if isinstance(p2, Part.Vertex):
+        p2 = p2.Point
+    return p1.isEqual(p2, tol)
+
 def get_sort_points(
     edges,
     vector=True,
@@ -328,21 +338,17 @@ def get_sort_points(
         vectors.append(p)
     # add first point
     e = edges[0]
-    v1 = e.firstVertex()
-    p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
+    p1 = e.firstVertex().Point
     p = vectors[0]
-    if p1.isEqual(p, True):
-        v1 = e.lastVertex()
-        p1 = FreeCAD.Vector(v1.X, v1.Y, v1.Z)
+    if is_equal_two_points(p, p1):
+        p1 = e.lastVertex().Point
     vectors.insert(0, p1)
     if get_last:
         e = edges[-1]
-        v2 = e.lastVertex()
-        p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
+        p2 = e.lastVertex().Point
         p = vectors[-1]
-        if p.isEqual(p2, True):
-            v2 = e.firstVertex()
-            p2 = FreeCAD.Vector(v2.X, v2.Y, v2.Z)
+        if is_equal_two_points(p, p2):
+            p2 = e.firstVertex().Point
         vectors.append(p2)
 
     if vector:
@@ -355,7 +361,7 @@ def get_common_vector_in_two_edges(e1, e2, tol=1) -> FreeCAD.Vector:
     p2 = e1.lastVertex().Point
     p3 = e2.firstVertex().Point
     p4 = e2.lastVertex().Point
-    if p2.isEqual(p3, tol) or p2.isEqual(p4, tol):
+    if is_equal_two_points(p2, p3, tol) or is_equal_two_points(p2, p4, tol):
         return FreeCAD.Vector(p2.x, p2.y, p2.z)
     else:
         return FreeCAD.Vector(p1.x, p1.y, p1.z)
@@ -634,7 +640,7 @@ def get_foundation_shape_from_base_foundations(
                 if commons:
                     for comm in commons:
                         for p in used_commons_center_point:
-                            if comm.BoundBox.Center.isEqual(p, 1):
+                            if is_equal_two_points(comm.BoundBox.Center, p, 1):
                                 break
                         else:
                             used_commons_center_point.append(comm.BoundBox.Center)
@@ -1346,9 +1352,7 @@ def get_number_of_edges_connect_to_point(p, edges, used=[]):
     count = 0
     for i, edge in enumerate(edges):
         start, end = edge.Vertexes
-        start = FreeCAD.Vector(start.X, start.Y, start.Z)
-        end = FreeCAD.Vector(end.X, end.Y, end.Z)
-        if (start.isEqual(p, False) or end.isEqual(p, False)) and i not in used:
+        if (is_equal_two_points(start, p) or is_equal_two_points(end, p)) and i not in used:
             count += 1
     return count
 
@@ -1557,13 +1561,13 @@ def is_close(edge1, edge2, threshold=0.01):
     ))
 
 def find_common_point(p1, p2, p3, p4):
-    if p1.isEqual(p3, .001):
+    if is_equal_two_points(p1, p3, .001):
         return p1, p2, p1, p4
-    elif p1.isEqual(p4, .001):
+    elif is_equal_two_points(p1, p4, .001):
         return p1, p2, p1, p3
-    elif p2.isEqual(p3, .001):
+    elif is_equal_two_points(p2, p3, .001):
         return p2, p1, p2, p4
-    elif p2.isEqual(p4, .001):
+    elif is_equal_two_points(p2, p4, .001):
         return p2, p1, p2, p3
 
 def get_coordinate_and_width_between(min_coord, max_coord, width, equal=True) -> dict:
