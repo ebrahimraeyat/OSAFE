@@ -27,7 +27,19 @@ class CheckLegalUse:
     def allowed_to_continue(self):
         if sys.platform == "win32":
             if not self.is_registered:
-                self.serial = str(subprocess.check_output("wmic csproduct get uuid")).split("\\r\\r\\n")[1].split()[0]
+                try:
+                    self.serial = str(subprocess.check_output("wmic csproduct get uuid")).split("\\r\\r\\n")[1].split()[0]
+                except Exception as e:
+                    print(f"Error retrieving serial number: {e}")
+                    try:
+                        import wmi
+                    except ImportError:
+                        from freecad_funcs import install_package
+                        install_package('wmi')
+                        import wmi
+                    # Fallback to wmi package if wmic fails
+                    c = wmi.WMI()
+                    self.serial = c.Win32_ComputerSystemProduct()[0].UUID
                 if not internet():
                     return False, 'INTERNET'
                 
