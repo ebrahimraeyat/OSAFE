@@ -528,8 +528,10 @@ def allowed_to_continue(
             ui = SerialForm()
             ui.form.serial.setText(check.serial)
             Gui.Control.showDialog(ui)
-            # if ui.setupUi():
-            #     Gui.Control.closeDialog(ui)
+            return False, check
+        elif text == 'REBOOT':
+            msg = "Please reboot your computer and try again!"
+            QMessageBox.information(None, 'Reboot', str(msg))
             return False, check
         elif text == 'REGISTERED':
             msg = "Congrajulation! You are now registered, enjoy using this features!"

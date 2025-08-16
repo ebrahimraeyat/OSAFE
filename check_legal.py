@@ -34,16 +34,18 @@ class CheckLegalUse:
                     try:
                         import wmi
                     except ImportError:
-                        from freecad_funcs import install_package
-                        install_package('wmi')
-                        import wmi
+                        from freecad_funcs import install_packages
+                        install_packages(['wmi', 'pywin32', 'pypiwin32'])
+                        try:
+                            import wmi
+                        except ImportError:
+                            return False, 'REBOOT'
                     # Fallback to wmi package if wmic fails
                     c = wmi.WMI()
                     self.serial = c.Win32_ComputerSystemProduct()[0].UUID
                 if not internet():
                     return False, 'INTERNET'
-                
-                if not self.serial_number(self.serial):
+                elif not self.serial_number(self.serial):
                     return False, 'SERIAL'
                 else:
                     self.register()
