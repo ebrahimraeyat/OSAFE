@@ -2,7 +2,7 @@ import os
 import FreeCAD
 import FreeCADGui
 
-from PySide2 import QtCore, QtGui
+from PySide import QtCore, QtGui
 
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt

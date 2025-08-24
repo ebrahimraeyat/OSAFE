@@ -9,7 +9,7 @@ A Workbench in [FreeCAD](https://freecadweb.org) for creating foundation model i
   - [x] Most up to date development release
   - [x] Python 3 compatible
   - [x] Qt5 compatible
-  - [ ] Qt5 and Qt6 compatible (uses "import PySide" rather than "import PySide2")
+  - [ ] Qt5 and Qt6 compatible (uses "import PySide" rather than "import PySide")
 - [x] Backward compatible with 0.19 version of FC.
 - [x] 3rd party dependencies:  
   - [x] numpy

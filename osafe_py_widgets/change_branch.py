@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from PySide2.QtWidgets import  QMessageBox
+from PySide.QtGui import  QMessageBox
 import FreeCADGui as Gui
 import git
 

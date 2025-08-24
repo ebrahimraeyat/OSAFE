@@ -5,7 +5,7 @@ import FreeCAD
 import Part
 if FreeCAD.GuiUp:
     import FreeCADGui as Gui
-    import PySide2
+    import PySide
 
 try:
     from osafe_funcs import osafe_funcs
@@ -716,9 +716,9 @@ class Ui:
         # user_modified = punch_obj.user_location
 
         # if user_modified:
-        #     self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Checked)
+        #     self.form.user_modified.setCheckState(PySide.QtCore.Qt.Checked)
         # else:
-        #     self.form.user_modified.setCheckState(PySide2.QtCore.Qt.Unchecked)
+        #     self.form.user_modified.setCheckState(PySide.QtCore.Qt.Unchecked)
 
     def accept(self):
         self.modify_punch()

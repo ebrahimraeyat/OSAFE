@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from PySide2 import QtWidgets
+from PySide import QtGui
 
 import FreeCAD
 import FreeCADGui as Gui
@@ -44,11 +44,11 @@ class WallTaskPanel:
     def create_wall(self):
         loadpat = self.form.loadpat.currentText()
         if not loadpat:
-            QtWidgets.QMessageBox.warning(None, "Load Case Name", "Please Enter the name of the Loadcase.")
+            QtGui.QMessageBox.warning(None, "Load Case Name", "Please Enter the name of the Loadcase.")
             return
         sel = Gui.Selection.getSelection()
         if len(sel) == 0:
-            QtWidgets.QMessageBox.warning(None, "Selection", "Please Select Lines or Wires.")
+            QtGui.QMessageBox.warning(None, "Selection", "Please Select Lines or Wires.")
             return
 
         wires = []
@@ -57,7 +57,7 @@ class WallTaskPanel:
             if utils.get_type(s) == 'Wire':
                 wires.append(s)
         if len(wires) == 0:
-            QtWidgets.QMessageBox.warning(None, "Selection", "Please Select Lines or Wires.")
+            QtGui.QMessageBox.warning(None, "Selection", "Please Select Lines or Wires.")
             return
         weight = self.form.weight.value()
         height = self.form.height_box.value()

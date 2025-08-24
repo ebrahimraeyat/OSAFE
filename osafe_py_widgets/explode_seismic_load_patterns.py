@@ -4,7 +4,7 @@ import FreeCADGui as Gui
 
 import etabs_obj
 from osafe_py_widgets import resource_rc
-from PySide2.QtGui import QPixmap
+from PySide.QtGui import QPixmap
 
 punch_path = Path(__file__).parent.parent
 

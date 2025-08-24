@@ -3,9 +3,9 @@ from pathlib import Path
 
 import numpy as np
 
-from PySide2 import QtCore
-from PySide2.QtCore import QT_TRANSLATE_NOOP, Qt
-from PySide2.QtWidgets import QTableWidgetItem, QMessageBox
+from PySide import QtCore
+from PySide.QtCore import QT_TRANSLATE_NOOP, Qt
+from PySide.QtGui import QTableWidgetItem, QMessageBox
 
 import FreeCAD
 import Part

@@ -1,8 +1,8 @@
 
 from pathlib import Path
 
-from PySide2 import QtCore
-from PySide2.QtCore import QT_TRANSLATE_NOOP
+from PySide import QtCore
+from PySide.QtCore import QT_TRANSLATE_NOOP
 
 import FreeCAD
 import FreeCADGui as Gui

@@ -9,7 +9,7 @@ import Part
 if FreeCAD.GuiUp:
     import FreeCADGui
     from DraftTools import translate
-    from PySide2.QtCore import QT_TRANSLATE_NOOP
+    from PySide.QtCore import QT_TRANSLATE_NOOP
     import draftguitools.gui_trackers as DraftTrackers
 else:
     # \cond

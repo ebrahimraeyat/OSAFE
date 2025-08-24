@@ -5,8 +5,8 @@ import FreeCAD
 import FreeCADGui as Gui
 
 from osafe_py_widgets import resource_rc
-from PySide2.QtGui import QPixmap
-from PySide2.QtCore import Qt
+from PySide.QtGui import QPixmap
+from PySide.QtCore import Qt
 
 punch_path = Path(__file__).parent.parent
 
@@ -78,7 +78,7 @@ class EtabsTaskPanel:
 
     def browse(self):
         ext = '.f2k'
-        from PySide2.QtWidgets import QFileDialog
+        from PySide.QtGui import QFileDialog
         filters = f"{ext[1:]} (*{ext})"
         filename, _ = QFileDialog.getSaveFileName(None, 'select file',
                                                 None, filters)

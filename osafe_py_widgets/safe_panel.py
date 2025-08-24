@@ -3,7 +3,7 @@ from pathlib import Path
 import FreeCAD
 import FreeCADGui as Gui
 
-from PySide2.QtWidgets import QMessageBox, QFileDialog, QMessageBox
+from PySide.QtGui import QMessageBox, QFileDialog, QMessageBox
 
 from osafe_py_widgets import resource_rc
 from osafe_funcs import osafe_funcs as osf

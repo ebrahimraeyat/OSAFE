@@ -1,7 +1,7 @@
 from typing import Union
 from pathlib import Path
 
-from PySide2 import QtCore
+from PySide import QtCore
 import FreeCAD
 import FreeCADGui
 # import Part
@@ -232,12 +232,13 @@ class ViewProviderFoundation:
         return children
 
     def setupContextMenu(self, vobj, menu):
-        from PySide2 import QtGui, QtWidgets
+        from PySide import QtGui
+        # from PySide import QtGui
         icon_path = str(
                 Path(__file__).parent.absolute() / "osafe_images" / "explode_foundation.svg"
                 )
         icon = QtGui.QIcon(icon_path)
-        action1 = QtWidgets.QAction(icon,"Explode Foundation", menu)
+        action1 = QtGui.QAction(icon,"Explode Foundation", menu)
         action1.triggered.connect(explode_foundation)
         menu.addAction(action1)
 

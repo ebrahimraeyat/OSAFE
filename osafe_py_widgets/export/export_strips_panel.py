@@ -4,7 +4,7 @@ from pathlib import Path
 import FreeCAD
 import FreeCADGui as Gui
 
-from PySide2.QtWidgets import QMessageBox
+from PySide.QtGui import QMessageBox
 
 from osafe_py_widgets import resource_rc
 
@@ -64,7 +64,7 @@ class Form:
 
     def browse(self):
         ext = '.f2k'
-        from PySide2.QtWidgets import QFileDialog
+        from PySide.QtGui import QFileDialog
         filters = f"{ext[1:]} (*{ext})"
         filename, _ = QFileDialog.getOpenFileName(None, 'select file',
                                                 None, filters)

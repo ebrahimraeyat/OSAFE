@@ -7,8 +7,8 @@ import FreeCAD
 import FreeCADGui as Gui
 from draftutils.translate import translate
 
-from PySide2.QtWidgets import QMessageBox, QTableWidgetItem
-from PySide2.QtCore import Qt
+from PySide.QtGui import QMessageBox, QTableWidgetItem
+from PySide.QtCore import Qt
 
 from osafe_funcs import osafe_funcs
 from osafe_py_widgets import resource_rc
