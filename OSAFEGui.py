@@ -10,6 +10,8 @@ from osafe_gui import (
     gui_automatic_rebars,
 )
 
+from osafe_gui.modify_f2k import gui_modify_f2k
+
 from osafe_py_widgets import (
     gui_punch,
     gui_dxf,
@@ -683,6 +685,10 @@ draw_list = [
             "Draft_Wire",
             "osafe_automatic_rebars",
             ]
+
+modify_list = [
+    "osafe_update_reaction_forces"
+]
 assign_list = [
             "Civil_force",
             "Civil_wall",

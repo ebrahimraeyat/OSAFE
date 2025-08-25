@@ -23,6 +23,7 @@ class OSAFEWorkbench(Workbench):
         draw_list = OSAFEGui.draw_list
         assign_list = OSAFEGui.assign_list
         edit_list = OSAFEGui.edit_list
+        modify_list = OSAFEGui.modify_list
         view_list = OSAFEGui.view_list
         help_list = OSAFEGui.help_list
         snap_list = OSAFEGui.snap_list
@@ -39,6 +40,7 @@ class OSAFEWorkbench(Workbench):
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Draw")), draw_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("Civil", "Assign")), assign_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Edit")), edit_list)
+        self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "OSAFE Edit")), modify_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&View")), view_list)
         self.appendMenu(str(QtCore.QT_TRANSLATE_NOOP("OSAFE", "&Help")), help_list)
         osafe_path = Path(OSAFEGui.__file__).parent
