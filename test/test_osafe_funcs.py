@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import numpy as np
 
-FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = str(Path(sys.executable).parent)
 sys.path.append(FREECADPATH)
 
 import FreeCAD

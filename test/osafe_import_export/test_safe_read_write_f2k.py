@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 # path to FreeCAD.so
-FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = str(Path(sys.executable).parent)
 sys.path.append(FREECADPATH)
 import FreeCAD
 import pytest
@@ -269,7 +269,7 @@ def test_get_f2k_version():
     ver = get_f2k_version(doc='alaki', content=content % 200)
     assert ver is None
     # version 8, 12
-    content = '''$ File G:\design\97\hajrezaee\mosavab\etabs\hajrezaee_97-03-01.e2k saved 5/26/2016 5:10:58 AM
+    content = r'''$ File G:\design\97\hajrezaee\mosavab\etabs\hajrezaee_97-03-01.e2k saved 5/26/2016 5:10:58 AM
  
                 SAFE %s.2.0.S
                 UNITS  kgf  m

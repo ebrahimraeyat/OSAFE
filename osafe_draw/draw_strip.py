@@ -19,11 +19,11 @@ from osafe_funcs import osafe_funcs
 from osafe_objects.strip import make_strip
 
 
-class DrawStrip(gui_lines.Line):
+class DrawStrip(gui_lines.Wire):
     """Gui command for Draw Strips."""
 
     def __init__(self):
-        super(DrawStrip, self).__init__(wiremode=True)
+        super(DrawStrip, self).__init__()
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
@@ -43,7 +43,8 @@ class DrawStrip(gui_lines.Line):
         """
         Execute when the command is called.
         """
-        super(DrawStrip, self).Activated(name=translate("OSAFE", "DrawStrip"))
+        super(DrawStrip, self).Activated()
+        self.featureName = translate("OSAFE", "DrawStrip")
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         self.strip_width = p.GetFloat("draw_strip_width",1000)
         self.strip_left_width = p.GetFloat("draw_strip_left_width",500)

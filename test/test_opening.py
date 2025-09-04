@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 # path to FreeCAD.so
-FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = str(Path(sys.executable).parent)
 sys.path.append(FREECADPATH)
 import FreeCAD
 

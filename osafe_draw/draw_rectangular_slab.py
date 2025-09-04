@@ -18,11 +18,11 @@ from osafe_objects.rectangular_slab import make_rectangular_slab
 
 from osafe_funcs import osafe_funcs
 
-class RectangularSlab(gui_lines.Line):
+class RectangularSlab(gui_lines.Wire):
     """Gui command for the Base Foundation tool."""
 
     def __init__(self):
-        super(RectangularSlab, self).__init__(wiremode=True)
+        super(RectangularSlab, self).__init__()
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
@@ -42,7 +42,8 @@ class RectangularSlab(gui_lines.Line):
         """
         Execute when the command is called.
         """
-        super(RectangularSlab, self).Activated(name=translate("OSAFE", "RectangularSlab"))
+        super(RectangularSlab, self).Activated()
+        self.featureName = translate("OSAFE", "RectangularSlab")
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         self.rec_width = p.GetFloat("base_foundation_width",1000)
         self.rec_left_width = p.GetFloat("base_foundation_left_width",500)

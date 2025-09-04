@@ -2,13 +2,13 @@ import sys
 from pathlib import Path
 
 # path to FreeCAD.so
-FREECADPATH = 'G:\\program files\\FreeCAD 0.19\\bin'
+FREECADPATH = str(Path(sys.executable).parent)
 sys.path.append(FREECADPATH)
 import FreeCAD
 
 punch_path = Path(__file__).absolute().parent.parent
 sys.path.insert(0, str(punch_path))
-from trapezoidal_slab import make_trapezoidal_slab
+from osafe_objects.trapezoidal_slab import make_trapezoidal_slab
 document= FreeCAD.newDocument()
 
 # def test_create_vectors():

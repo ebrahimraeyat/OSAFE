@@ -26,11 +26,11 @@ from osafe_funcs import osafe_funcs
 from osafe_objects.base_foundation import make_base_foundation
 
 
-class BaseFoundation(gui_lines.Line):
+class BaseFoundation(gui_lines.Wire):
     """Gui command for the Base Foundation tool."""
 
     def __init__(self):
-        super(BaseFoundation, self).__init__(wiremode=True)
+        super(BaseFoundation, self).__init__()
 
     def GetResources(self):
         menu_text = QtCore.QT_TRANSLATE_NOOP(
@@ -50,7 +50,8 @@ class BaseFoundation(gui_lines.Line):
         """
         Execute when the command is called.
         """
-        super(BaseFoundation, self).Activated(name=translate("OSAFE", "BaseFoundation"))
+        super(BaseFoundation, self).Activated()
+        self.featureName = translate("OSAFE", "BaseFoundation")
         p = FreeCAD.ParamGet("User parameter:BaseApp/Preferences/Mod/OSAFE")
         self.bf_width = p.GetFloat("base_foundation_width",1000)
         self.bf_left_width = p.GetFloat("base_foundation_left_width",500)
