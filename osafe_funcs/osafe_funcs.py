@@ -1864,7 +1864,8 @@ def remove_colinear_edges(
             curr_len = dir_e1.cross(dir_e2).Length
             # print(f"{curr_len=}\n")
             if curr_len > tol:
-                p2 = e1.lastVertex().Point
+                p2 = get_common_vector_in_two_edges(e1, e2, tol=.01)
+                # p2 = e1.lastVertex().Point
                 es.append(Part.makeLine(p1, p2))
                 points.append(p2)
                 p1 = p2

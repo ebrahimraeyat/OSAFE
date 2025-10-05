@@ -1,5 +1,7 @@
 import sys
 from pathlib import Path
+import tempfile
+import re
 
 # path to FreeCAD.so
 FREECADPATH = str(Path(sys.executable).parent)
@@ -7,7 +9,11 @@ sys.path.append(FREECADPATH)
 import FreeCAD
 import pytest
 
+temp_dir = tempfile.gettempdir()
+output_f2k_path = Path(temp_dir) / 'output.f2k'
+
 filename_rashidzadeh = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'rashidzadeh.FCStd'
+filename_single_foundation = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'single_foundation.FCStd'
 input_f2k = Path(__file__).absolute().parent.parent / 'test_files' / 'freecad' / 'khalaji.F2k'
 
 punch_path = Path(__file__).absolute().parent.parent
@@ -23,6 +29,114 @@ def test_export_freecad_slabs():
     slabs = rw.export_freecad_slabs()
     rw.safe.write()
     assert len(slabs) == 33
+
+
+def test_export_freecad_single_slabs():
+    doc_single_foundation = FreeCAD.openDocument(str(filename_single_foundation))
+    rw = FRW(output_f2k_path=output_f2k_path, doc=doc_single_foundation)
+    slabs = rw.export_freecad_single_slabs()
+    rw.safe.write()
+    assert Path(output_f2k_path).exists()
+
+    # Expected points and coordinates
+    expected_points = {
+        172: (35967.63671875, 16168.472656250004, 0.0),
+        173: (35967.63671875, 24168.472656250004, 0.0),
+        174: (27967.63671875, 24168.472656250004, 0.0),
+        175: (27967.63671875, 16168.472656250004, 0.0),
+        176: (41320.33203125, 5629.059570312502, 0.0),
+        177: (41320.33203125, 13629.059570312502, 0.0),
+        178: (33320.33203125, 13629.059570312502, 0.0),
+        179: (33320.33203125, 5629.059570312502, 0.0),
+    }
+    expected_areas = {
+        1000: [172, 173, 174, 175],
+        1001: [176, 177, 178, 179],
+    }
+
+    with open(output_f2k_path, 'r') as f:
+        content = f.read()
+
+    # Check points
+    for pt_num, coords in expected_points.items():
+        found = False
+        for line in content.splitlines():
+            if f"Point={pt_num}" in line:
+                # Extract coordinates from line
+                try:
+                    gx = float(line.split("GlobalX=")[1].split()[0])
+                    gy = float(line.split("GlobalY=")[1].split()[0])
+                    gz = float(line.split("GlobalZ=")[1].split()[0])
+                    # Compare with expected (allow small tolerance)
+                    if (abs(gx - coords[0]) < 1e-6 and
+                        abs(gy - coords[1]) < 1e-6 and
+                        abs(gz - coords[2]) < 1e-6):
+                        found = True
+                        break
+                except Exception:
+                    continue
+        assert found, f"Point {pt_num} with correct coordinates not found in output file"
+
+def test_export_freecad_single_slabs_all():
+    doc_single_foundation = FreeCAD.openDocument(str(filename_single_foundation))
+    rw = FRW(output_f2k_path=output_f2k_path, doc=doc_single_foundation)
+    rw.export_freecad_slabs()
+    rw.export_freecad_single_slabs()
+    rw.safe.write()
+    assert Path(output_f2k_path).exists()
+    # Expected points and coordinates
+    expected_coords = [
+        (35967.63671875, 16168.472656250004, 0.0),
+        (35967.63671875, 24168.472656250004, 0.0),
+        (27967.63671875, 24168.472656250004, 0.0),
+        (27967.63671875, 16168.472656250004, 0.0),
+        (41320.33203125, 5629.059570312502, 0.0),
+        (41320.33203125, 13629.059570312502, 0.0),
+        (33320.33203125, 13629.059570312502, 0.0),
+        (33320.33203125, 5629.059570312502, 0.0),
+    ]
+    expected_areas = [
+        [0, 1, 2, 3],  # indices in expected_coords for area 1
+        [4, 5, 6, 7],  # indices in expected_coords for area 2
+    ]
+
+    with open(output_f2k_path, 'r') as f:
+        content = f.read()
+
+    # 1. Find all points and their coordinates
+    point_pattern = re.compile(r'Point=(\d+)\s+GlobalX=([0-9eE\.\-]+)\s+GlobalY=([0-9eE\.\-]+)\s+GlobalZ=([0-9eE\.\-]+)')
+    points = {}
+    for match in point_pattern.finditer(content):
+        num = int(match.group(1))
+        x = float(match.group(2))
+        y = float(match.group(3))
+        z = float(match.group(4))
+        points[num] = (x, y, z)
+
+    # 2. For each expected coordinate, find the matching point number
+    def find_point_number(coord):
+        for num, pt in points.items():
+            if all(abs(a-b) < 1e-4 for a, b in zip(coord, pt)):
+                return num
+        return None
+
+    found_point_numbers = [find_point_number(coord) for coord in expected_coords]
+    assert all(pn is not None for pn in found_point_numbers), "Not all expected points found in file"
+
+    # 3. Find all areas and their point references
+    area_pattern = re.compile(r'Area=(\d+).*?Point1=(\d+).*?Point2=(\d+).*?Point3=(\d+).*?Point4=(\d+)', re.DOTALL)
+    areas = []
+    for match in area_pattern.finditer(content):
+        area_num = int(match.group(1))
+        pts = [int(match.group(i)) for i in range(2, 6)]
+        areas.append((area_num, pts))
+
+    # 4. For each expected area, check if any area uses the found point numbers
+    for area_indices in expected_areas:
+        expected_pts = [found_point_numbers[i] for i in area_indices]
+        found = any(all(pt in area_pts for pt in expected_pts) for _, area_pts in areas)
+        assert found, f"Area with points {expected_pts} not found in file"
+
 
 def test_export_freecad_wall_loads():
     input_f2k_path = Path(r'~\input.f2k').expanduser()
@@ -283,4 +397,4 @@ def test_get_f2k_version():
     assert ver is None
 
 if __name__ == '__main__':
-    test_export_freecad_mat_strips()
+    test_export_freecad_single_slabs()

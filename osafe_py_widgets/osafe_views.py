@@ -33,6 +33,8 @@ def QT_TRANSLATE_NOOP(ctx, txt):
     return txt
 
 def show_object(obj, index: int):
+    if obj is None:
+        return
     if index == 0:
         obj.ViewObject.hide()
     else:
@@ -207,7 +209,7 @@ class OSAFEViewFoundations:
 
     def Activated(self, index):
         for obj in FreeCAD.ActiveDocument.Objects:
-            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type") and obj.Proxy.Type == "Foundation":
+            if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type") and obj.Proxy.Type in ("Foundation", "SingleFoundation"):
                 show_object(obj, index)
 
 
@@ -229,7 +231,8 @@ class OSAFEViewDesignLayer:
             if hasattr(obj, "Proxy") and hasattr(obj.Proxy, "Type"):
                 if obj.Proxy.Type == 'Strip':
                     show_object(obj, index)
-                    show_object(obj.Base, index)
+                    if hasattr(obj, 'Base'):
+                        show_object(obj.Base, index)
                 elif obj.Proxy.Type in ("Rebar", "BaseFoundation") and index != 0:
                     obj.ViewObject.hide()
                     if hasattr(obj, "Base") and hasattr(obj.Base, "ViewObject"):

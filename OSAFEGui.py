@@ -32,6 +32,7 @@ from osafe_py_widgets import (
 
 from osafe_objects import (
     base_plate,
+    single_foundation
 )
 
 def QT_TRANSLATE_NOOP(ctx, txt): return txt
@@ -682,6 +683,7 @@ draw_list = [
             # "osafe_rectangular_slab",
             # 'civil_slab',
             'civil_base_plate',
+            'civil_single_foundation',
             "Draft_Wire",
             "osafe_automatic_rebars",
             ]

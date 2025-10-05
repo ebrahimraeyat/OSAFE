@@ -79,6 +79,7 @@ class Safe12TaskPanel:
             return
         software = self.form.software.currentText()
         is_slabs = self.form.slabs_checkbox.isChecked()
+        single_slabs = self.form.single_slabs_checkbox.isChecked()
         is_area_loads = self.form.loads_checkbox.isChecked()
         is_openings = self.form.openings_checkbox.isChecked()
         is_strips = self.form.strips_checkbox.isChecked()
@@ -184,6 +185,8 @@ class Safe12TaskPanel:
                                 )
                     except TypeError:
                         print('Can not find any loads in model')
+            if single_slabs:
+                slab_names = rw.export_freecad_single_slabs()
             rw.safe.set_analysis_type(is_2d=is_2d)
             rw.safe.set_mesh_options(mesh_size=max_mesh_size)
             if self.form.wall_loads.isChecked():

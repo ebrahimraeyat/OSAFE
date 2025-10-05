@@ -350,7 +350,61 @@ class FreecadReadwriteModel():
         self.last_point_number = self.safe.get_last_point_number()
         self.last_area_number = 1000
         self.last_line_number = 1000
+        self.soil_names = set()
+        self.mat_names = set()
 
+    def export_freecad_single_slabs(self,
+                                    single_slabs: Union[list, None] = None,
+            ):
+        if single_slabs is None:
+            single_slabs = osafe_funcs.get_objects_of_type('SingleFoundation', self.doc)
+        soil_assignment_content = ''
+        slab_sec_names = []
+        names_props = []
+        all_slab_names = []
+        for slab in single_slabs:
+            # create concrete
+            fc_mpa = int(slab.fc.getValueAs("MPa"))
+            mat_name = f'C{fc_mpa}'
+            if mat_name not in self.mat_names:
+                self.create_concrete_material(mat_name=mat_name, fc_mpa=fc_mpa)
+                self.mat_names.add(mat_name)
+            # create slab section
+            thickness_name = int(slab.thickness.getValueAs('cm'))
+            thickness = round(slab.thickness.getValueAs(f'{self.length_unit}'), 2)
+            slab_sec_name = f'SLAB{thickness_name}'
+            if slab_sec_name not in slab_sec_names:
+                # define slab
+                self.create_solid_slab(slab_sec_name, 'Mat', mat_name, thickness)
+                slab_sec_names.append(slab_sec_name)
+            # create soil
+            ks_name = f"{slab.ks:.2f}"
+            ks = slab.ks
+            soil_name = f'Soil_{ks_name}'
+            if soil_name not in self.soil_names:
+                # soil content
+                names_props.append((soil_name, ks))
+                self.soil_names.add(soil_name)
+            faces = osafe_funcs.get_top_faces(slab.Shape)
+            slab_names = []
+            for face in faces:
+                points = osafe_funcs.get_sort_points(face.Edges)
+                name = self.create_area_by_coord(points, slab_sec_name)
+                slab_names.append(name)
+            all_slab_names.extend(slab_names)
+            soil_assignment_content +=  self.export_freecad_soil_support(
+                slab_names=slab_names,
+                soil_name=soil_name,
+                soil_modulus=None,
+            )
+
+        soil_content = self.create_soil_table(names_props)
+        table_key = "SOIL PROPERTIES"
+        self.safe.add_content_to_table(table_key, soil_content)
+        table_key = "SOIL PROPERTY ASSIGNMENTS"
+        self.safe.add_content_to_table(table_key, soil_assignment_content)
+        return all_slab_names
+    
     def export_freecad_slabs(self,
         soil_name : str = 'SOIL',
         soil_modulus : float = 2,
@@ -359,11 +413,12 @@ class FreecadReadwriteModel():
         
         foun = self.doc.Foundation
         # creating concrete material
+
         mat_name = self.create_concrete_material(foun=foun)
-        mat_names = [mat_name]
+        if mat_name is not None:
+            self.mat_names.add(mat_name)
         soil_assignment_content = ''
         all_slab_names = []
-        soil_names = []
         names_props = []
         slab_sec_names = []
         
@@ -384,10 +439,10 @@ class FreecadReadwriteModel():
                 ks_name = f"{base_foundation.ks:.2f}"
                 ks = base_foundation.ks
                 soil_name = f'Soil_{ks_name}'
-                if soil_name not in soil_names:
+                if soil_name not in self.soil_names:
                     # soil content
                     names_props.append((soil_name, ks))
-                    soil_names.append(soil_name)
+                    self.soil_names.add(soil_name)
                 faces = base_foundation.extended_plan.Faces
                 slab_names = []
                 for face in faces:
@@ -453,9 +508,9 @@ class FreecadReadwriteModel():
             # create concrete
             fc_mpa = int(slab.fc.getValueAs("MPa"))
             mat_name = f'C{fc_mpa}'
-            if mat_name not in mat_names:
+            if mat_name not in self.mat_names:
                 self.create_concrete_material(mat_name=mat_name, fc_mpa=fc_mpa)
-                mat_names.append(mat_name)
+                self.mat_names.add(mat_name)
             # create slab section
             if foun.height == 0:
                 height_name = int(slab.height.getValueAs('cm'))
@@ -469,10 +524,10 @@ class FreecadReadwriteModel():
             ks_name = f"{slab.ks:.2f}"
             ks = slab.ks
             soil_name = f'Soil_{ks_name}'
-            if soil_name not in soil_names:
+            if soil_name not in self.soil_names:
                 # soil content
                 names_props.append((soil_name, ks))
-                soil_names.append(soil_name)
+                self.soil_names.add(soil_name)
             if hasattr(slab, 'plan'):
                 faces = slab.plan.Shape.Faces
             elif hasattr(slab, 'Base'):
@@ -774,6 +829,8 @@ class FreecadReadwriteModel():
         if foun is not None:
             fc_mpa = int(foun.fc.getValueAs("MPa"))
             mat_name = f'C{fc_mpa}'
+        if mat_name in self.mat_names:
+            return
         fc = fc_mpa * self.safe.force_units['N'] / self.safe.length_units['mm'] ** 2
         self.add_material(mat_name, 'Concrete')
         table_key = "MATERIAL PROPERTIES 03 - CONCRETE"

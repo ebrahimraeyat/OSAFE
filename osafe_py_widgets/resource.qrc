@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="safe">
+    <file>../osafe_images/column.svg</file>
+    <file>../osafe_images/opening.svg</file>
+    <file>../osafe_images/wall.svg</file>
+    <file>../osafe_images/strip.svg</file>
+    <file>../osafe_images/punch.svg</file>
+    <file>../osafe_images/single_foundation.svg</file>
     <file>../osafe_images/add.svg</file>
     <file>../osafe_images/remove.svg</file>
     <file>../osafe_images/tick.svg</file>
