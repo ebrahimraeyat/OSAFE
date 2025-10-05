@@ -352,6 +352,7 @@ class FreecadReadwriteModel():
         self.last_line_number = 1000
         self.soil_names = set()
         self.mat_names = set()
+        self.slab_sec_names = set()
 
     def export_freecad_single_slabs(self,
                                     single_slabs: Union[list, None] = None,
@@ -359,7 +360,6 @@ class FreecadReadwriteModel():
         if single_slabs is None:
             single_slabs = osafe_funcs.get_objects_of_type('SingleFoundation', self.doc)
         soil_assignment_content = ''
-        slab_sec_names = []
         names_props = []
         all_slab_names = []
         for slab in single_slabs:
@@ -373,10 +373,10 @@ class FreecadReadwriteModel():
             thickness_name = int(slab.thickness.getValueAs('cm'))
             thickness = round(slab.thickness.getValueAs(f'{self.length_unit}'), 2)
             slab_sec_name = f'SLAB{thickness_name}'
-            if slab_sec_name not in slab_sec_names:
+            if slab_sec_name not in self.slab_sec_names:
                 # define slab
                 self.create_solid_slab(slab_sec_name, 'Mat', mat_name, thickness)
-                slab_sec_names.append(slab_sec_name)
+                self.slab_sec_names.add(slab_sec_name)
             # create soil
             ks_name = f"{slab.ks:.2f}"
             ks = slab.ks
@@ -420,7 +420,6 @@ class FreecadReadwriteModel():
         soil_assignment_content = ''
         all_slab_names = []
         names_props = []
-        slab_sec_names = []
         
         height_name = int(foun.height.getValueAs('cm'))
         height = round(foun.height.getValueAs(f'{self.length_unit}'), 2)
@@ -431,10 +430,10 @@ class FreecadReadwriteModel():
                     height_name = int(base_foundation.height.getValueAs('cm'))
                     height = round(base_foundation.height.getValueAs(f'{self.length_unit}'), 2)
                 slab_sec_name = f'SLAB{height_name}'
-                if slab_sec_name not in slab_sec_names:
+                if slab_sec_name not in self.slab_sec_names:
                     # define slab
                     self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
-                    slab_sec_names.append(slab_sec_name)
+                    self.slab_sec_names.add(slab_sec_name)
                 # create soil
                 ks_name = f"{base_foundation.ks:.2f}"
                 ks = base_foundation.ks
@@ -461,10 +460,10 @@ class FreecadReadwriteModel():
                 height_name = int(foun.height.getValueAs('cm'))
                 height = round(foun.height.getValueAs(f'{self.length_unit}'), 2)
             slab_sec_name = f'SLAB{height_name}'
-            if slab_sec_name not in slab_sec_names:
+            if slab_sec_name not in self.slab_sec_names:
                 # define slab
                 self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
-                slab_sec_names.append(slab_sec_name)
+                self.slab_sec_names.add(slab_sec_name)
             if foun.split:
                 names_props = [
                     (soil_name, soil_modulus),
@@ -516,10 +515,10 @@ class FreecadReadwriteModel():
                 height_name = int(slab.height.getValueAs('cm'))
                 height = round(slab.height.getValueAs(f'{self.length_unit}'), 2)
             slab_sec_name = f'SLAB{height_name}'
-            if slab_sec_name not in slab_sec_names:
+            if slab_sec_name not in self.slab_sec_names:
                 # define slab
                 self.create_solid_slab(slab_sec_name, 'Mat', mat_name, height)
-                slab_sec_names.append(slab_sec_name)
+                self.slab_sec_names.add(slab_sec_name)
             # create soil
             ks_name = f"{slab.ks:.2f}"
             ks = slab.ks
@@ -867,6 +866,8 @@ class FreecadReadwriteModel():
             thickness,
             is_thick='Yes',
             ):
+        if name in self.slab_sec_names:
+            return
         table_key = "SLAB PROPERTIES 01 - GENERAL"
         slab_general_content = f'Slab={name}   Type={type_}   ThickPlate={is_thick}\n'
         self.safe.add_content_to_table(table_key, slab_general_content)
