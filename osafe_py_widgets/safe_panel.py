@@ -89,7 +89,7 @@ class Safe12TaskPanel:
         soil_name = self.form.soil_name.text()
         soil_modulus = self.form.soil_modulus.value()
         is_2d = 'Yes' if self.form.analysis_2d.isChecked() else 'No'
-        max_mesh_size = self.form.max_mesh_size.value()
+        max_mesh_size = self.form.max_mesh_size.value() * 10
         slab_names = []
         software_name = software.split()[0]
         if software in ('SAFE 20', 'ETABS 19'):

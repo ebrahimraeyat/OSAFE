@@ -290,22 +290,22 @@
         <string/>
        </property>
        <property name="suffix">
-        <string> mm</string>
+        <string> cm</string>
        </property>
        <property name="decimals">
-        <number>2</number>
+        <number>0</number>
        </property>
        <property name="minimum">
-        <double>10.000000000000000</double>
+        <double>1.000000000000000</double>
        </property>
        <property name="maximum">
         <double>2000.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>50.000000000000000</double>
+        <double>5.000000000000000</double>
        </property>
        <property name="value">
-        <double>300.000000000000000</double>
+        <double>30.000000000000000</double>
        </property>
       </widget>
      </item>
