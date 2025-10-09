@@ -723,6 +723,7 @@ view_list = [
             "OSAFE_view_punch",
             "OSAFE_view_slabs",
             "OSAFE_view_arch_wall",
+            "OSAFE_view_architectural_plan",
             # "OSAFE_view_rebars",
             # "OSAFE_view_group",
             ]

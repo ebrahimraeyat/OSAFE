@@ -259,6 +259,24 @@ class OSAFEViewPunch:
                 for c in obj.ViewObject.claimChildren():
                     show_object(c, index)
 
+class OSAFEViewArchitecturalPlan:
+    def GetResources(self):
+        return {
+            "Pixmap": str(
+                Path(__file__).parent.parent / "osafe_images" / "floor-plan.png"
+                ),
+            "MenuText": "Base Foundations",
+            "Checkable": True,
+        }
+
+    def IsActive(self):
+        return FreeCAD.ActiveDocument is not None
+
+    def Activated(self, index):
+        if hasattr(FreeCAD.ActiveDocument, 'LayerContainer'):
+            obj = FreeCAD.ActiveDocument.LayerContainer
+            show_object(obj, index)
+
 
 FreeCADGui.addCommand("OSAFE_wireframe_views", WireFrameView())
 FreeCADGui.addCommand("OSAFE_view_basefoundation", OSAFEViewBaseFoundation())
@@ -270,3 +288,4 @@ FreeCADGui.addCommand("OSAFE_view_design_layer", OSAFEViewDesignLayer())
 FreeCADGui.addCommand("OSAFE_view_punch", OSAFEViewPunch())
 FreeCADGui.addCommand("OSAFE_view_arch_wall", OSAFEViewArchWall())
 FreeCADGui.addCommand("OSAFE_view_rebars", OSAFEViewRebars())
+FreeCADGui.addCommand("OSAFE_view_architectural_plan", OSAFEViewArchitecturalPlan())
