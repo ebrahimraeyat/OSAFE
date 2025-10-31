@@ -1892,6 +1892,20 @@ def get_objects_of_type(
             objs.append(o)
     return objs
 
+def get_objects_of_ifc_type(
+        type_: str,
+        doc=None,
+        ):
+    if doc is None:
+        doc = FreeCAD.ActiveDocument
+        if doc is None:
+            return []
+    objs = []
+    for o in doc.Objects:
+        if hasattr(o, "IfcType") and o.IfcType == type_:
+            objs.append(o)
+    return objs
+
 def get_beams(doc=None):
     beams = []
     if doc is None:

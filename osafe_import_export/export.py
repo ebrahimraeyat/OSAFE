@@ -1,5 +1,7 @@
 from typing import Union
 import os
+import random
+import string
 
 from pathlib import Path
 
@@ -133,6 +135,7 @@ def to_dxf(
            doc: Union[FreeCAD.Document, bool] = None,
            columns: bool = True,
            punches: bool = True,
+           open: bool = True,
            )-> bool:
     import ezdxf
     dwg = ezdxf.new()
@@ -147,62 +150,70 @@ def to_dxf(
             return
     height = 500
     center = (0, 0)
-    found = None
-    for o in doc.Objects:
-        if hasattr(o, "Proxy") and hasattr(o.Proxy, "Type"):
-            if o.Proxy.Type == "Punch":
+    cols = []
+    block_name = 'Foundation_' + ''.join(random.choices(string.ascii_letters + string.digits, k=50))
+    block_foun = dwg.blocks.new(name=block_name)
+    if punches:
+        punches = osafe_funcs.get_objects_of_type("Punch", doc)
+        if len(punches) > 0:
+            for punch in punches:
+                if hasattr(punch, 'column'):
+                    col = punch.column
+                    if col.Name not in cols:
+                        cols.append(col.Name)
+                add_edges_to_dxf(punch.edges.Edges, {'color': 2}, block_foun)
+                # add text
+                t = punch.text
+                text = t.Text
+                mtext = block_foun.add_mtext(f"\\S{text[0]}^ {text[1]}")
+                dx, dy = t.Placement.Base.x, t.Placement.Base.y
+                align = get_alignment(punch)
+                mtext.set_location(insert=(dx, dy, 0), attachment_point=align)
+                mtext.dxf.char_height = t.ViewObject.FontSize.Value
+                mtext.dxf.rotation = punch.angle.Value
+                mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
                 # draw rectangle column via hatch
-                if columns:
-                    xy = [[v.X, v.Y] for v in o.rect.Vertexes]
-                    points = osafe_funcs.sort_vertex(xy)
-                    hatch = msp.add_hatch()
-                    hatch.rgb = [int(i * 255) for i in o.ViewObject.ShapeColor[0:-1]]
-                    hatch.paths.add_polyline_path(points, is_closed=1)
-                    add_edges_to_dxf(o.rect.Edges, {'color': 2}, msp)
-                # draw punch face line
-                if punches:
-                    add_edges_to_dxf(o.edges.Edges, {'color': 2}, msp)
-                    # add text
-                    t = o.text
-                    text = t.Text
-                    mtext = msp.add_mtext(f"\\S{text[0]}^ {text[1]}")
-                    dx, dy = t.Placement.Base.x, t.Placement.Base.y
-                    align = get_alignment(o)
-                    mtext.set_location(insert=(dx, dy, 0), attachment_point=align)
-                    mtext.dxf.char_height = t.ViewObject.FontSize.Value
-                    mtext.dxf.rotation = o.angle.Value
-                    mtext.rgb = [int(i * 255) for i in t.ViewObject.TextColor[0:-1]]
-        if hasattr(o, "IfcType") and o.IfcType == "Footing":
-            found = o
-        # if 'Text' in o.Name:
-        #     if len(o.Text) > 1:
-        #         continue
-        #     v = o.Placement.Base
-        #     x, y = v.x, v.y
-            # ax1.annotate(o.Text[0], (x, y), color='black', fontsize=6, ha='center', va='center', rotation=0, annotation_clip=False)
+                xy = [[v.X, v.Y] for v in punch.rect.Vertexes]
+                points = osafe_funcs.sort_vertex(xy)
+                hatch = block_foun.add_hatch()
+                hatch.rgb = [int(i * 255) for i in punch.ViewObject.ShapeColor[0:-1]]
+                hatch.paths.add_polyline_path(points, is_closed=1)
+                add_edges_to_dxf(punch.rect.Edges, {'color': 2}, block_foun)
+    if columns:
+        columns = osafe_funcs.get_objects_of_ifc_type("Column", doc)
+        for col in columns:
+            if col.Name in cols:
+                continue
+            xy = [[v.X, v.Y] for v in col.Shape.Vertexes if v.Z == 0]
+            points = osafe_funcs.sort_vertex(xy)
+            hatch = block_foun.add_hatch()
+            hatch.rgb = [int(i * 255) for i in col.ViewObject.ShapeColor[0:-1]]
+            hatch.paths.add_polyline_path(points, is_closed=1)
+            add_edges_to_dxf(col.Shape.Edges, {'color': 4}, block_foun)
+    # Get Foundation
+    found = osafe_funcs.get_objects_of_type("Foundation", doc)
+    if len(found) == 0:
+        found = osafe_funcs.get_objects_of_ifc_type("Footing", doc)
+        if len(found) == 0:
+            for o in doc.Objects:
+                if hasattr(o, 'fc') and o.Label == 'Foundation':
+                    found.append(o)
+    if len(found) > 0:
+        for foun in found:
+            b = foun.Shape.BoundBox
+            height = max(b.XLength, b.YLength)
+            center = (b.Center.x, b.Center.y)
+            # draw foundation
+            add_edges_to_dxf(foun.plan.Edges, {'color': 4}, block_foun)
+        dwg.set_modelspace_vport(height=height, center=center)
+        msp.add_blockref(block_name, (0 , 0))
 
-    if found is None:
-        for o in doc.Objects:
-            if hasattr(o, 'fc') and o.Label == 'Foundation':
-                found = o
-                break
-    if found is None:
-        return False
-
-    b = found.Shape.BoundBox
-    height = max(b.XLength, b.YLength)
-    center = (b.Center.x, b.Center.y)
-    # draw foundation
-    block_foun = dwg.blocks.new(name=found.Name)
-    add_edges_to_dxf(found.plan.Edges, {'color': 4}, block_foun)
-    msp.add_blockref(found.Name, (0 , 0))
-
-    dwg.set_modelspace_vport(height=height, center=center)
     dwg.saveas(filename)
 
     FreeCAD.Console.PrintMessage("Saving dxf file...")
     FreeCAD.Console.PrintMessage("dxf file saved as: " + filename)
-    os.startfile(filename)
+    if open:
+        os.startfile(filename)
     return True
 
 
