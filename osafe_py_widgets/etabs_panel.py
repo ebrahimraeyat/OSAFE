@@ -56,7 +56,14 @@ class EtabsTaskPanel:
                 item.setCheckState(Qt.Unchecked)
 
     def set_filename(self):
-        filename = Path(self.etabs.SapModel.GetModelFilename()).with_suffix('.F2k')
+        file_path = self.etabs.get_filepath()
+        folder_path = file_path.parent / 'safe'
+        if not folder_path.exists():
+            import os
+            os.mkdir(str(folder_path))
+        filename_without_suffix = self.etabs.get_file_name_without_suffix()
+        filename = filename_without_suffix + ".F2K"
+        filename = folder_path / filename
         self.form.filename.setText(str(filename))
         
     def create_connections(self):
