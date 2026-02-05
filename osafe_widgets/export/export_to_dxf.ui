@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>285</width>
+    <width>217</width>
     <height>256</height>
    </rect>
   </property>
@@ -38,7 +38,7 @@
        <normaloff>:/osafe_images/punch.svg</normaloff>:/osafe_images/punch.svg</iconset>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
